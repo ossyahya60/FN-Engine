@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Profile>Reach</Profile>
+  <Platform>Windows</Platform>
+  <Config />
+  <SourceFiles>
+    <File>C:/MyEngine/MyEngine/MyEngine/Content/Arrow.png</File>
+    <File>C:/MyEngine/MyEngine/MyEngine/Content/CharacterIdleAnimation.PNG</File>
+    <File>C:/MyEngine/MyEngine/MyEngine/Content/CharacterRunningAnimation.PNG</File>
+    <File>C:/MyEngine/MyEngine/MyEngine/Content/Font.spritefont</File>
+    <File>C:/MyEngine/MyEngine/MyEngine/Content/Hornet.png</File>
+    <File>C:/MyEngine/MyEngine/MyEngine/Content/SkyAndClouds.png</File>
+  </SourceFiles>
+  <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+  </DestFiles>
+</SourceFileCollection>

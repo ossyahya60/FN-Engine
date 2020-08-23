@@ -1,0 +1,7 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/MyEngine/MyEngine/MyEngine/Content/Arrow.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Arrow.xnb","TextureProcessor","Texture2DContent",454,16469,0.6007297
+"C:/MyEngine/MyEngine/MyEngine/Content/CharacterIdleAnimation.PNG","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/CharacterIdleAnimation.xnb","TextureProcessor","Texture2DContent",1856,299093,0.6442781
+"C:/MyEngine/MyEngine/MyEngine/Content/CharacterRunningAnimation.PNG","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/CharacterRunningAnimation.xnb","TextureProcessor","Texture2DContent",2132,364501,0.602184
+"C:/MyEngine/MyEngine/MyEngine/Content/Font.spritefont","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Font.xnb","FontDescriptionProcessor","SpriteFontContent",2008,21521,0.8896037
+"C:/MyEngine/MyEngine/MyEngine/Content/Hornet.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Hornet.xnb","TextureProcessor","Texture2DContent",4015,977685,0.7718555
+"C:/MyEngine/MyEngine/MyEngine/Content/SkyAndClouds.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/SkyAndClouds.xnb","TextureProcessor","Texture2DContent",41967,33554517,1.288196
