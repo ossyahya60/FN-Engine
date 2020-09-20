@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/FireWorks_M.ogg</SourceFile>
+  <SourceTime>2020-04-23T16:15:51.664066+02:00</SourceTime>
+  <DestFile>C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Content/FireWorks_M.xnb</DestFile>
+  <DestTime>2020-09-15T16:32:03.4902357+02:00</DestTime>
+  <Importer>OggImporter</Importer>
+  <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
+  <Processor>SongProcessor</Processor>
+  <ProcessorTime>2018-12-08T18:35:54+02:00</ProcessorTime>
+  <Parameters>
+    <Key>Quality</Key>
+    <Value>Best</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput>
+    <string>C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Content/FireWorks_M.wma</string>
+  </BuildOutput>
+</PipelineBuildEvent>

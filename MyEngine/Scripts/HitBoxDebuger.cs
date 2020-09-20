@@ -5,14 +5,44 @@ namespace MyEngine
 {
     public static class HitBoxDebuger
     {
-        public static void DrawRectangle(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Rectangle Rect)  //Draw filledRectangle
+        private static Texture2D _textureFilled = null;
+        private static Texture2D _textureNonFilled = null;
+
+        static HitBoxDebuger()
         {
-            Texture2D _texture;
+            _textureFilled = new Texture2D(Setup.GraphicsDevice, 1, 1);
+            _textureFilled.SetData(new Color[] { Color.White });
 
-            _texture = new Texture2D(graphicsDevice, 1, 1);
-            _texture.SetData(new Color[] { Color.DarkSlateGray });
+            _textureNonFilled = new Texture2D(Setup.GraphicsDevice, 1, 1);
+            _textureNonFilled.SetData(new Color[] { Color.White });
+        }
 
-            spriteBatch.Draw(_texture, Rect, Color.White);
+        public static void DrawRectangle(Rectangle Rect)  //Draw filledRectangle
+        {
+            Setup.spriteBatch.Draw(_textureFilled, Rect, Color.White);
+        }
+
+        public static void DrawRectangle(Rectangle Rect, Color color, float Angle, float Layer)  //Draw filledRectangle
+        {
+            Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(Angle), Vector2.Zero, SpriteEffects.None, Layer);
+        }
+
+        public static void DrawRectangle(Rectangle Rect, Color color, float Angle, Texture2D texture, float Layer)  //Draw filledRectangle
+        {
+            Setup.spriteBatch.Draw(texture, Rect, null, color, MathHelper.ToRadians(Angle), Vector2.Zero, SpriteEffects.None, Layer);
+        }
+
+        public static void DrawNonFilledRectangle(Rectangle Rect) //Draw Non filledRectangle
+        {
+            Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Left, Rect.Top, Rect.Width, 1), Color.LightGreen);
+            Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Right, Rect.Top, 1, Rect.Height), Color.LightGreen);
+            Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Left, Rect.Bottom, Rect.Width, 1), Color.LightGreen);
+            Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Left, Rect.Top, 1, Rect.Height), Color.LightGreen);
+        }
+
+        public static void DrawLine(Rectangle Rect, Color color, float Angle, float Layer)  //Draw filledRectangle
+        {
+            Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(Angle), Vector2.Zero, SpriteEffects.None, Layer);
         }
     }
 }

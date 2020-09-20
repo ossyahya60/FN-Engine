@@ -27,3 +27,8 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\CharacterRunningAnim
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\Font.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\SkyAndClouds.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\Arrow.xnb
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\FireWorks_M.wma
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\FireWorks_M.xnb
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\Jump.xnb
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\AMB_WR_BirdWind.wma
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\AMB_WR_BirdWind.xnb

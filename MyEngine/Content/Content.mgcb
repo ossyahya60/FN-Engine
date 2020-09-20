@@ -13,6 +13,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin AMB_WR_BirdWind.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:AMB_WR_BirdWind.ogg
+
 #begin Arrow.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -49,6 +55,12 @@
 /processorParam:TextureFormat=Color
 /build:CharacterRunningAnimation.PNG
 
+#begin FireWorks_M.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:FireWorks_M.ogg
+
 #begin Font.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -67,6 +79,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Hornet.png
+
+#begin Jump.WAV
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Jump.WAV
 
 #begin SkyAndClouds.png
 /importer:TextureImporter

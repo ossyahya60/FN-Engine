@@ -1,4 +1,7 @@
-﻿namespace MyEngine
+﻿using Microsoft.Xna.Framework;
+using System;
+
+namespace MyEngine
 {
     public static class MathCompanion
     {
@@ -34,6 +37,25 @@
                 return 1;
             else
                 return -1;
+        }
+
+        public static double Atan(float y, float x)
+        {
+            return Math.Atan2(y, x);
+        }
+
+        public static float GetAngle(Vector2 V1, Vector2 V2)
+        {
+            return MathHelper.ToDegrees((float)Atan(V2.Y - V1.Y, V2.X - V1.X));
+        }
+
+        public static int GetNumerOfValuesBetween(int A1, int A2, float ScaleDownFactor)
+        {
+            float sign = 0;
+            if (A2 != A1)
+                sign = Sign(A2 - A1);
+
+            return (int)((A2 - A1) * ScaleDownFactor - sign);
         }
     }
 }

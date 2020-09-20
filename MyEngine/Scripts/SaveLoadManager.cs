@@ -1,15 +1,33 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace MyEngine
 {
-    public class SaveLoadManager
+    public static class SaveLoadManager
     {
-        public static void SaveData<T>(T HighScore)
+        private static string GamePath;
+
+        public static void InitializeDirectory() //call this the first time you use this class
+        {
+            GamePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+            string GameName = "";
+            foreach (char C in System.AppDomain.CurrentDomain.FriendlyName)
+            {
+                if (C != '.')
+                    GameName += C;
+                else
+                    break;
+            }
+            var SubFolders = new DirectoryInfo(GamePath).CreateSubdirectory("From Newbies").CreateSubdirectory(GameName);
+            GamePath = System.IO.Path.Combine(GamePath, "From Newbies", GameName);
+        }
+
+        public static void SaveData<T>(T HighScore, string SaveFileName)
         {
             BinaryFormatter Formatter = new BinaryFormatter();
-            string Path = "C:/MonoGame Projects/FlappyShit/SaveData/HighScore.Data";
-            FileStream stream = new FileStream(Path, FileMode.Create);
+            string SavePath = System.IO.Path.Combine(GamePath, SaveFileName);
+            FileStream stream = new FileStream(SavePath, FileMode.Create);
 
             T dataTobeSaved = HighScore;
 
@@ -17,14 +35,14 @@ namespace MyEngine
             stream.Close();
         }
 
-        public static T LoadData<T>()
+        public static T LoadData<T>(string SaveFileName)
         {
-            string Path = "C:/MonoGame Projects/FlappyShit/SaveData/HighScore.Data";
+            string SavePath = System.IO.Path.Combine(GamePath, SaveFileName);
 
-            if (File.Exists(Path))
+            if (File.Exists(SavePath))
             {
                 BinaryFormatter Formatter = new BinaryFormatter();
-                FileStream stream = new FileStream(Path, FileMode.Open);
+                FileStream stream = new FileStream(SavePath, FileMode.Open);
                 var dataTobeSaved = Formatter.Deserialize(stream);
                 stream.Close();
 
@@ -34,10 +52,11 @@ namespace MyEngine
                 return default(T);
         }
 
-        public static void ResetData()
+        public static void ResetData(string SaveFileName)
         {
-            string Path = "C:/MonoGame Projects/FlappyShit/SaveData/HighScore.Data";
-            File.Delete(Path);
+            string SavePath = System.IO.Path.Combine(GamePath, SaveFileName);
+
+            File.Delete(SavePath);
         }
     }
 }

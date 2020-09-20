@@ -12,7 +12,7 @@ namespace MyEngine
         public int GameComponentsCount = 0;
         public bool Active = true;
 
-        private static string[] CanBeAddedMultipleTimes = { "BoxCollider2D" };
+        private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect" };
 
         public GameObject()
         {

@@ -11,7 +11,7 @@ namespace MyEngine
 
         public Input()
         {
-            gameObject.AddComponent<Input>(this);
+            //gameObject.AddComponent<Input>(this);
 
             Left = Keys.A;
             Right = Keys.D;

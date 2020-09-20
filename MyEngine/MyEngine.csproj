@@ -46,6 +46,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripts\Animation.cs" />
     <Compile Include="Scripts\Animator.cs" />
+    <Compile Include="Scripts\AudioSource.cs" />
     <Compile Include="Scripts\BoxCollider2D.cs" />
     <Compile Include="Scripts\Camera2D.cs" />
     <Compile Include="Scripts\Collider2D.cs" />
@@ -54,6 +55,9 @@
     <Compile Include="Scripts\HitBoxDebuger.cs" />
     <Compile Include="Scripts\Input.cs" />
     <Compile Include="Scripts\MathCompanion.cs" />
+    <Compile Include="Scripts\MediaSource.cs" />
+    <Compile Include="Scripts\Particle.cs" />
+    <Compile Include="Scripts\ParticleEffect.cs" />
     <Compile Include="Scripts\ResolutionIndependentRendering.cs" />
     <Compile Include="Scripts\Rigidbody2D.cs" />
     <Compile Include="Scripts\SaveLoadManager.cs" />
@@ -62,6 +66,7 @@
     <Compile Include="Scripts\Setup.cs" />
     <Compile Include="Scripts\Sprite.cs" />
     <Compile Include="Scripts\SpriteRenderer.cs" />
+    <Compile Include="Scripts\TrailRenderer.cs" />
     <Compile Include="Scripts\Transform.cs" />
   </ItemGroup>
   <ItemGroup>

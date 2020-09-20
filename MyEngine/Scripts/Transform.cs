@@ -7,6 +7,7 @@ namespace MyEngine
         public Transform()
         {
             Rotation = 0;
+            LastPosition = Vector2.Zero;
         }
 
         public static int PixelsPerUnit = 100; //100 pixel = 1 unit = 1 meter
@@ -14,6 +15,7 @@ namespace MyEngine
         {
             set
             {
+                LastPosition = Position;
                 position = value * PixelsPerUnit;
             }
             get
@@ -73,6 +75,7 @@ namespace MyEngine
                 return new Vector2(0, 1);
             }
         }
+        public Vector2 LastPosition;
 
         private Vector2 scale = Vector2.One;
         private float rotation = 0f;
@@ -86,6 +89,7 @@ namespace MyEngine
 
         public void Move(Vector2 Movement) //Move a gameobject a certain distance in x and y axis
         {
+            LastPosition = Position;
             position += Movement * PixelsPerUnit;
         }
 

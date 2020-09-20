@@ -60,7 +60,8 @@ namespace MyEngine
 
             NormalForcesApplied = Vector2.Zero;
             ImpulseForcesApplied = Vector2.Zero;
-            velocity = Vector2.Zero;
+            if(velocity == null)
+                velocity = Vector2.Zero;
             LastPosition = Vector2.Zero;
         }
 
