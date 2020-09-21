@@ -9,7 +9,7 @@ namespace MyEngine
     public class TrailRenderer: GameObjectComponent
     {
         public Vector2 OffsetPosition;
-        public int SegmentWidth = 10;
+        public int SegmentWidth = 40;
         public Color Color = Color.White;
         public float VanishAfter = 1f; //Time for Segments to start vanishing
         //public int ParticleSize = 20;

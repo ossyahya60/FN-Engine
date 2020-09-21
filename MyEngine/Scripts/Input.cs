@@ -1,22 +1,49 @@
 ﻿using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework;
+using System;
 
 namespace MyEngine
 {
-    public class Input: GameObjectComponent
+    public static class Input
     {
-        public Keys Left;
-        public Keys Right;
-        public Keys Up;
-        public Keys Down;
-
-        public Input()
+        static Input()
         {
-            //gameObject.AddComponent<Input>(this);
+            LastKeyState = new KeyboardState();
+        }
 
-            Left = Keys.A;
-            Right = Keys.D;
-            Up = Keys.W;
-            Down = Keys.S;
+        private static KeyboardState LastKeyState;
+
+        public static bool GetKey(Keys Key)
+        {
+            return Keyboard.GetState().IsKeyDown(Key);
+        }
+
+        public static bool GetKeyDown(Keys Key)
+        {
+            if (Keyboard.GetState().IsKeyDown(Key) && LastKeyState.IsKeyUp(Key))
+            {
+                LastKeyState = Keyboard.GetState();
+                return true;
+            }
+            else
+            {
+                LastKeyState = Keyboard.GetState();
+                return false;
+            }
+        }
+
+        public static bool GetKeyUp(Keys Key)
+        {
+            if (Keyboard.GetState().IsKeyUp(Key) && LastKeyState.IsKeyDown(Key))
+            {
+                LastKeyState = Keyboard.GetState();
+                return true;
+            }
+            else
+            {
+                LastKeyState = Keyboard.GetState();
+                return false;
+            }
         }
     }
 }

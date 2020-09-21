@@ -5,8 +5,8 @@ namespace MyEngine
 {
     public static class HitBoxDebuger
     {
-        private static Texture2D _textureFilled = null;
-        private static Texture2D _textureNonFilled = null;
+        public static Texture2D _textureFilled = null;
+        public static Texture2D _textureNonFilled = null;
 
         static HitBoxDebuger()
         {
@@ -27,9 +27,9 @@ namespace MyEngine
             Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(Angle), Vector2.Zero, SpriteEffects.None, Layer);
         }
 
-        public static void DrawRectangle(Rectangle Rect, Color color, float Angle, Texture2D texture, float Layer)  //Draw filledRectangle
+        public static void DrawRectangle(Rectangle Rect, Color color, float Angle, Texture2D texture, float Layer, Vector2 Origin)  //Draw filledRectangle
         {
-            Setup.spriteBatch.Draw(texture, Rect, null, color, MathHelper.ToRadians(Angle), Vector2.Zero, SpriteEffects.None, Layer);
+            Setup.spriteBatch.Draw(texture, Rect, null, color, MathHelper.ToRadians(Angle), Origin, SpriteEffects.None, Layer);
         }
 
         public static void DrawNonFilledRectangle(Rectangle Rect) //Draw Non filledRectangle
@@ -40,9 +40,9 @@ namespace MyEngine
             Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Left, Rect.Top, 1, Rect.Height), Color.LightGreen);
         }
 
-        public static void DrawLine(Rectangle Rect, Color color, float Angle, float Layer)  //Draw filledRectangle
+        public static void DrawLine(Rectangle Rect, Color color, float Angle, float Layer, Vector2 Origin)  //Draw filledRectangle
         {
-            Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(Angle), Vector2.Zero, SpriteEffects.None, Layer);
+            Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(Angle), Origin, SpriteEffects.None, Layer);
         }
     }
 }

@@ -41,6 +41,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Scripts\Canvas.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Scripts\Input.cs" />
     <Compile Include="Scripts\MathCompanion.cs" />
     <Compile Include="Scripts\MediaSource.cs" />
+    <Compile Include="Scripts\Panel.cs" />
     <Compile Include="Scripts\Particle.cs" />
     <Compile Include="Scripts\ParticleEffect.cs" />
     <Compile Include="Scripts\ResolutionIndependentRendering.cs" />
@@ -66,8 +68,10 @@
     <Compile Include="Scripts\Setup.cs" />
     <Compile Include="Scripts\Sprite.cs" />
     <Compile Include="Scripts\SpriteRenderer.cs" />
+    <Compile Include="Scripts\Text.cs" />
     <Compile Include="Scripts\TrailRenderer.cs" />
     <Compile Include="Scripts\Transform.cs" />
+    <Compile Include="Scripts\UIComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

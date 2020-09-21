@@ -100,7 +100,7 @@ namespace MyEngine
         {
             if (!Expired)
             {
-                HitBoxDebuger.DrawRectangle(new Rectangle((int)Position.X, (int)Position.Y, Size, Size), Color, Rotation, texture, Layer);
+                HitBoxDebuger.DrawRectangle(new Rectangle((int)Position.X, (int)Position.Y, Size, Size), Color, Rotation, texture, Layer, Vector2.Zero);
             }
         }
 
@@ -109,7 +109,7 @@ namespace MyEngine
         {
             if (!Expired)
             {
-                HitBoxDebuger.DrawLine(new Rectangle((int)Position.X, (int)Position.Y, Length, height), Color, Rotation, Layer);
+                HitBoxDebuger.DrawLine(new Rectangle((int)Position.X, (int)Position.Y, Length, height), Color, Rotation, Layer, Vector2.One * 0.5f);
             }
         }
     }

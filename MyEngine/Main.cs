@@ -21,7 +21,10 @@ namespace MyEngine
         Animation idle, run;
         Animator AM;
         Vector2 MousePos;
-        
+        GameObject canvas;
+        SpriteFont spriteFont;
+
+
         Sprite IDLE, RUN;
         ////////////////////////
 
@@ -66,6 +69,8 @@ namespace MyEngine
             RIR.InitializeResolutionIndependence(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, Camera);
             //////////////////////////////////////////////////////////
             // TODO: use this.Content to load your game content here
+            spriteFont = Content.Load<SpriteFont>("Font");
+
             Image = new GameObject();
             Image.AddComponent<Transform>(new Transform());
             Image.GetComponent<Transform>().Scale = Vector2.One * 0.25f;
@@ -126,7 +131,7 @@ namespace MyEngine
             backgroundSprite.LoadTexture("SkyAndClouds");
             backgroundSprite.SourceRectangle = new Rectangle(0, 0, backgroundSprite.Texture.Width / 2, backgroundSprite.Texture.Height);
             Background.GetComponent<SpriteRenderer>().Sprite = backgroundSprite;
-            backgroundSprite.Layer = 0.1f;
+            backgroundSprite.Layer = 1f;
 
             Arrow = new GameObject();
             Arrow.AddComponent<Transform>(new Transform());
@@ -134,7 +139,7 @@ namespace MyEngine
             Arrow.AddComponent<SpriteRenderer>(new SpriteRenderer());
             Arrow.GetComponent<SpriteRenderer>().Sprite = new Sprite(Arrow.GetComponent<Transform>());
             Arrow.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Arrow");
-            Arrow.GetComponent<SpriteRenderer>().Sprite.Origin = new Vector2(Arrow.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Width / 2, Arrow.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Height);
+            Arrow.GetComponent<SpriteRenderer>().Sprite.Origin = new Vector2(Arrow.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Width / 2, Arrow.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Height/2);
             Arrow.GetComponent<Transform>().Position = new Vector2(RIR.VirtualWidth / 2, RIR.VirtualHeight/2) / Transform.PixelsPerUnit;
             Arrow.AddComponent<ParticleEffect>(new ParticleEffect());
             Arrow.GetComponent<ParticleEffect>().CustomTexture = null;
@@ -142,6 +147,11 @@ namespace MyEngine
             Arrow.GetComponent<ParticleEffect>().Rotation = 390;
             /////////////////////////////
             //Clone = GameObject.Instantiate(Image);
+            canvas = new GameObject();
+            canvas.AddComponent<Transform>(new Transform());
+            canvas.AddComponent<Canvas>(new Canvas(RIR));
+            canvas.GetComponent<Canvas>().AddPanel(new Panel("Test"));
+            canvas.GetComponent<Canvas>().GetPanel("Test").AddUIComponent(new Text("Test Text") { text = "LOOOOOL", Font = spriteFont});
 
             TempScene = new Scene("Temp", 0);
             TempScene.AddGameObject(Image);
@@ -150,6 +160,7 @@ namespace MyEngine
             TempScene.AddGameObject(Background);
             TempScene.AddGameObject(Arrow);
             TempScene.AddGameObject(mouse);
+            TempScene.AddGameObject(canvas);
             SceneManager.Start();
             SceneManager.AddScene(TempScene);
             SceneManager.LoadScene(0);
@@ -220,13 +231,12 @@ namespace MyEngine
         protected override void Draw(GameTime gameTime)
         {
             //GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            
             // TODO: Add your drawing code here
             RIR.BeginDraw(); //Resolution related -> Mandatory
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
 
             TempScene.Draw(spriteBatch);
-            SpriteFont spriteFont = Content.Load<SpriteFont>("Font");
             //spriteBatch.DrawString(spriteFont, ((int)(1/(float)gameTime.ElapsedGameTime.TotalSeconds)).ToString(), Vector2.Zero, Color.Red);
             spriteBatch.DrawString(spriteFont, MathCompanion.GetNumerOfValuesBetween(50, 30, 0.5f).ToString(), Vector2.Zero, Color.Red);
             //HitBoxDebuger.DrawRectangle(Image.GetComponent<BoxCollider2D>().GetDynamicCollider());
