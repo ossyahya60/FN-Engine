@@ -7,10 +7,62 @@ namespace MyEngine
         public Transform()
         {
             Rotation = 0;
+            Scale = Vector2.One;
             LastPosition = Vector2.Zero;
         }
 
+        public override void Start()
+        {
+            if (LastParent == null)
+            {
+                LocalPosition = Position;
+                LocalRotation = Rotation;
+                LocalScale = Scale;
+            }
+            else
+                LocalScale = (LocalScale != Vector2.Zero)? LocalScale : Vector2.One;
+        }
+
         public static int PixelsPerUnit = 100; //100 pixel = 1 unit = 1 meter
+        public float LocalRotation
+        {
+            set
+            {
+                localRotation = value;
+                if (gameObject.Parent == null)
+                    Rotation = localRotation;
+            }
+            get
+            {
+                return localRotation;
+            }
+        }
+        public Vector2 LocalScale
+        {
+            set
+            {
+                localScale = (value.X >= 0 && value.X <= 1 && value.Y >= 0 && value.Y <= 1) ? value : localScale;
+                if (gameObject.Parent == null)
+                    Scale = localScale;
+            }
+            get
+            {
+                return localScale;
+            }
+        }
+        public Vector2 LocalPosition
+        {
+            set
+            {
+                localPosition = value;
+                if (gameObject.Parent == null)
+                    Position = localPosition;
+            }
+            get
+            {
+                return localPosition;
+            }
+        }
         public Vector2 Position
         {
             set
@@ -23,18 +75,8 @@ namespace MyEngine
                 return position / PixelsPerUnit;
             }
         }
-        public float Rotation //You set the rotation in degrees, retrieve it in radians (Just for easiness)
-        {
-            set
-            {
-                //rotation = MathHelper.ToRadians(value);
-                rotation = value;
-            }
-            get
-            {
-                return rotation;
-            }
-        }
+        public float Rotation //Gets rotation in radians
+        { set; get; } = 0f;
         public Vector2 Scale //Scale of a gameobject in x-y coordinate system
         {
             set
@@ -78,11 +120,22 @@ namespace MyEngine
         public Vector2 LastPosition;
 
         private Vector2 scale = Vector2.One;
-        private float rotation = 0f;
         private Vector2 position = Vector2.Zero;
+        private Vector2 Value;
+        private GameObject LastParent;
+        private Vector2 localPosition;
+        private float localRotation;
+        private Vector2 localScale;
 
         public void Move(float x, float y) //Move a gameobject a certain distance in x and y axis
         {
+            LastPosition = Position;
+            if (gameObject.Parent != null)
+            {
+                Value.X = x;
+                Value.Y = y;
+                LocalPosition += Value;
+            }
             position.X += x * PixelsPerUnit;
             position.Y += y * PixelsPerUnit;
         }
@@ -90,6 +143,8 @@ namespace MyEngine
         public void Move(Vector2 Movement) //Move a gameobject a certain distance in x and y axis
         {
             LastPosition = Position;
+            if (gameObject.Parent != null)
+                LocalPosition += Movement;
             position += Movement * PixelsPerUnit;
         }
 
@@ -101,6 +156,25 @@ namespace MyEngine
             Clone.Scale = new Vector2(scale.X, scale.Y);
 
             return Clone;
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            if (gameObject.Parent != null)
+            {
+                if (LastParent != gameObject.Parent)
+                {
+                    LocalPosition = Position - gameObject.Parent.GetComponent<Transform>().Position;
+                    LocalRotation = Rotation - gameObject.Parent.GetComponent<Transform>().Rotation;
+                    LocalScale = Scale - gameObject.Parent.GetComponent<Transform>().Scale;
+                }
+
+                Position = LocalPosition + gameObject.Parent.GetComponent<Transform>().Position;
+                Rotation = LocalRotation + gameObject.Parent.GetComponent<Transform>().Rotation;
+                Scale = LocalScale + gameObject.Parent.GetComponent<Transform>().Scale;
+            }
+
+            LastParent = gameObject.Parent;
         }
     }
 }

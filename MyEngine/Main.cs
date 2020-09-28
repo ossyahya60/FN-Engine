@@ -49,15 +49,11 @@ namespace MyEngine
             base.Initialize();
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
-        protected override void LoadContent()
+        private void ImportantIntialization()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            Setup.Initialize(graphics, Content, GraphicsDevice, spriteBatch);
+            Setup.Initialize(graphics, Content, spriteBatch, RIR, Window);
             graphics.PreferredBackBufferWidth = 1366;
             graphics.PreferredBackBufferHeight = 768;
             graphics.ApplyChanges();
@@ -67,6 +63,15 @@ namespace MyEngine
             Camera.Position = new Vector2(RIR.VirtualWidth / 2, RIR.VirtualHeight / 2);
 
             RIR.InitializeResolutionIndependence(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, Camera);
+        }
+
+        /// <summary>
+        /// LoadContent will be called once per game and is the place to load
+        /// all of your content.
+        /// </summary>
+        protected override void LoadContent()
+        {
+            ImportantIntialization();
             //////////////////////////////////////////////////////////
             // TODO: use this.Content to load your game content here
             spriteFont = Content.Load<SpriteFont>("Font");
@@ -88,6 +93,7 @@ namespace MyEngine
             IDLE.SourceRectangle.Width = IDLE.SourceRectangle.Width / 2;
             RUN.SourceRectangle.Width = RUN.SourceRectangle.Width / 2;
             Image.GetComponent<SpriteRenderer>().Sprite = IDLE;
+            
 
             idle = new Animation(IDLE, 2);
             idle.Tag = "Idle";
@@ -109,7 +115,7 @@ namespace MyEngine
             Image.AddComponent<AudioSource>(new AudioSource("Jump"));
             Image.AddComponent<TrailRenderer>(new TrailRenderer());
             Image.GetComponent<Rigidbody2D>().IsKinematic = false;
-            Image.GetComponent<Rigidbody2D>().Velocity = new Vector2(0, 1);
+            //Image.GetComponent<Rigidbody2D>().Velocity = new Vector2(0, 1);
             MediaSource.LoadTrack("AMB_WR_BirdWind");
             //MediaSource.Play();
             MediaSource.IsLooping = true;
@@ -135,7 +141,9 @@ namespace MyEngine
 
             Arrow = new GameObject();
             Arrow.AddComponent<Transform>(new Transform());
-            //Arrow.GetComponent<Transform>().Scale = Vector2.One * 0.5f;
+            Arrow.Parent = Image;
+            Arrow.Tag = "Arrow";
+            Arrow.GetComponent<Transform>().Scale = Vector2.One * 1f;
             Arrow.AddComponent<SpriteRenderer>(new SpriteRenderer());
             Arrow.GetComponent<SpriteRenderer>().Sprite = new Sprite(Arrow.GetComponent<Transform>());
             Arrow.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Arrow");
@@ -145,13 +153,13 @@ namespace MyEngine
             Arrow.GetComponent<ParticleEffect>().CustomTexture = null;
             Arrow.GetComponent<ParticleEffect>().ParticleSize = 50;
             Arrow.GetComponent<ParticleEffect>().Rotation = 390;
+            Arrow.AddComponent<PropertiesAnimator>(new PropertiesAnimator());
+            Arrow.GetComponent<PropertiesAnimator>().AddKeyFrame(new KeyFrame(0, MathHelper.ToRadians(360), 2, "Rotate360"), true);
             /////////////////////////////
             //Clone = GameObject.Instantiate(Image);
             canvas = new GameObject();
             canvas.AddComponent<Transform>(new Transform());
-            canvas.AddComponent<Canvas>(new Canvas(RIR));
-            canvas.GetComponent<Canvas>().AddPanel(new Panel("Test"));
-            canvas.GetComponent<Canvas>().GetPanel("Test").AddUIComponent(new Text("Test Text") { text = "LOOOOOL", Font = spriteFont});
+            //canvas.AddComponent<Canvas>(new Canvas());
 
             TempScene = new Scene("Temp", 0);
             TempScene.AddGameObject(Image);
@@ -160,13 +168,14 @@ namespace MyEngine
             TempScene.AddGameObject(Background);
             TempScene.AddGameObject(Arrow);
             TempScene.AddGameObject(mouse);
-            TempScene.AddGameObject(canvas);
+            //TempScene.AddGameObject(canvas);
             SceneManager.Start();
             SceneManager.AddScene(TempScene);
             SceneManager.LoadScene(0);
 
-            TempScene.Start();
-            Image.GetComponent<TrailRenderer>().OffsetPosition = new Vector2(Image.GetComponent<BoxCollider2D>().Bounds.Width / 2, Image.GetComponent<BoxCollider2D>().Bounds.Height / 2) / Transform.PixelsPerUnit;
+            SceneManager.GetActiveScene().Start();
+            //Arrow.GetComponent<SpriteRenderer>().Sprite.Origin = Arrow.GetComponent<SpriteRenderer>().Sprite.Texture.Bounds.Center.ToVector2();
+            //Image.GetComponent<TrailRenderer>().OffsetPosition = new Vector2(Image.GetComponent<BoxCollider2D>().Bounds.Width / 2, Image.GetComponent<BoxCollider2D>().Bounds.Height / 2) / Transform.PixelsPerUnit;
         }
 
         /// <summary>
@@ -185,6 +194,8 @@ namespace MyEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            Input.GetState(); //This has to be called at the start of update method!!
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             
@@ -211,15 +222,29 @@ namespace MyEngine
                 Camera.Zoom -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (Keyboard.GetState().IsKeyDown(Keys.Right))
-                Image2.GetComponent<Transform>().Rotation += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Arrow.GetComponent<Transform>().Move(Vector2.One * (float)gameTime.ElapsedGameTime.TotalSeconds);
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
-                Image2.GetComponent<Transform>().Rotation -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Arrow.GetComponent<Transform>().Move(-Vector2.One * (float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+                Image.GetComponent<Transform>().Scale += (float)gameTime.ElapsedGameTime.TotalSeconds * Vector2.One;
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+                Image.GetComponent<Transform>().Scale -= (float)gameTime.ElapsedGameTime.TotalSeconds * Vector2.One;
+
+            if (Input.GetMouseClickUp(MouseButtons.LeftClick))
+                Arrow.Parent = null;
+
+            if (Input.GetKeyDown(Keys.C))
+                Arrow.Transform.LocalScale = Vector2.One;
+
+            if (Input.GetKeyDown(Keys.Space))
+                Arrow.Parent = Image;
+
+            //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(ref Arrow.Transform.Rotation);
 
             TempScene.Update(gameTime);
-            MousePos.X = Mouse.GetState().X;
-            MousePos.Y = Mouse.GetState().Y;
-            RIR.ScaleMouseToScreenCoordinates(MousePos);
-            mouse.GetComponent<Transform>().Position = MousePos / Transform.PixelsPerUnit;
+
+            mouse.GetComponent<Transform>().Position = Input.GetMousePosition() / Transform.PixelsPerUnit;
 
             base.Update(gameTime);
         }
@@ -238,7 +263,7 @@ namespace MyEngine
 
             TempScene.Draw(spriteBatch);
             //spriteBatch.DrawString(spriteFont, ((int)(1/(float)gameTime.ElapsedGameTime.TotalSeconds)).ToString(), Vector2.Zero, Color.Red);
-            spriteBatch.DrawString(spriteFont, MathCompanion.GetNumerOfValuesBetween(50, 30, 0.5f).ToString(), Vector2.Zero, Color.Red);
+            spriteBatch.DrawString(spriteFont, Image.GetComponent<Transform>().Position.ToString(), Vector2.Zero, Color.Red);
             //HitBoxDebuger.DrawRectangle(Image.GetComponent<BoxCollider2D>().GetDynamicCollider());
             HitBoxDebuger.DrawNonFilledRectangle(Image2.GetComponent<BoxCollider2D>().GetDynamicCollider());
             //HitBoxDebuger.DrawLine(new Rectangle((int)(Image.GetComponent<Transform>().Position.X * Transform.PixelsPerUnit), (int)(Image.GetComponent<Transform>().Position.Y * Transform.PixelsPerUnit), (int)(Arrow.GetComponent<Transform>().Position.Length() * Transform.PixelsPerUnit), 10), Color.White, MathHelper.ToDegrees((float)MathCompanion.Atan(Arrow.GetComponent<Transform>().Position.Y - Image.GetComponent<Transform>().Position.Y, Arrow.GetComponent<Transform>().Position.X - Image.GetComponent<Transform>().Position.X)));

@@ -47,6 +47,15 @@ namespace MyEngine
             GameObjects.Add(GO);
         }
 
+        public void RemoveGameObject(GameObject GO)
+        {
+            foreach (GameObject gameObject in GameObjects.ToArray())
+                if (gameObject.Parent == GO)
+                    GameObjects.Remove(gameObject);
+
+            GameObjects.Remove(GO);
+        }
+
         public void Start()
         {
             foreach (GameObject GO in GameObjects)
@@ -63,6 +72,25 @@ namespace MyEngine
         {
             foreach (GameObject GO in GameObjects)
                 GO.Draw(spriteBatch);
+        }
+
+        public GameObject FindGameObjectWithTag(string Tag)
+        {
+            foreach (GameObject GO in GameObjects)
+                if (GO.Tag == Tag)
+                    return GO;
+
+            return null;
+        }
+
+        public GameObject[] FindGameObjectsWithTag(string Tag)
+        {
+            GameObject[] GOs = new GameObject[GameObjects.Count];
+            for (int i=0; i<GameObjects.Count; i++)
+                if (GameObjects[i].Tag == Tag)
+                    GOs[i] = GameObjects[i];
+
+            return GOs;
         }
     }
 }

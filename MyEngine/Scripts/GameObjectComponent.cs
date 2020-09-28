@@ -10,12 +10,12 @@ namespace MyEngine
 
         public GameObjectComponent()
         {
-
+    
         }
 
         public virtual void Start() //Called once per component
         {
-
+            
         }
 
         public virtual void Update(GameTime gameTime)  //Called every frame

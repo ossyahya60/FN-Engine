@@ -10,13 +10,17 @@ namespace MyEngine
         public static ContentManager Content { get; private set; }
         public static GraphicsDevice GraphicsDevice { get; private set; }
         public static SpriteBatch spriteBatch { get; private set; }
+        public static ResolutionIndependentRenderer resolutionIndependentRenderer { get; private set; }
+        public static GameWindow GameWindow { get; private set; }
 
-        public static void Initialize(GraphicsDeviceManager GDM, ContentManager CM, GraphicsDevice GD, SpriteBatch SB)
+        public static void Initialize(GraphicsDeviceManager GDM, ContentManager CM, SpriteBatch SB, ResolutionIndependentRenderer RIR, GameWindow GW)
         {
             graphics = GDM;
             Content = CM;
-            GraphicsDevice = GD;
+            GraphicsDevice = GDM.GraphicsDevice;
             spriteBatch = SB;
+            resolutionIndependentRenderer = RIR;
+            GameWindow = GW;
         }
     }
 }

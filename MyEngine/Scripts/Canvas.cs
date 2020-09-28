@@ -6,50 +6,34 @@ namespace MyEngine
 {
     public class Canvas: GameObjectComponent
     {
-        public ResolutionIndependentRenderer RIR;
+        public bool ScreenSpace = true; // false is world
+        public Rectangle DestinationRectangle;
 
-        private List<Panel> Panels;
-        private Vector2 Size;
-        private Vector2 OriginalSize;
+        private Camera2D Camera;
+        private Transform Transform;
 
-        public Canvas(ResolutionIndependentRenderer RIR)
+        public Canvas(Camera2D camera)
         {
-            this.RIR = RIR;
-            Panels = new List<Panel>();
-            Size = Vector2.Zero;
-            OriginalSize = new Vector2(RIR.ScreenWidth, RIR.ScreenHeight);
+            Transform = gameObject.Transform;
+            if (Transform == null)
+                gameObject.AddComponent<Transform>(new Transform());
+            Camera = camera;
+            DestinationRectangle = new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
         }
 
-        public void AddPanel(Panel panel)
+        public override void Start()
         {
-            Panels.Add(panel);
-        }
-
-        public Panel GetPanel(string Name)
-        {
-            foreach (Panel P in Panels)
-                if (P.Name == Name)
-                    return P;
-
-            return null;
+            
         }
 
         public override void Update(GameTime gameTime)
         {
-            Size.X = RIR.ScreenWidth;
-            Size.Y = RIR.ScreenHeight;
-
-            foreach (Panel P in Panels)
-            {
-                P.Size += Size - OriginalSize; //to scale UI components properly on canvas scaling
-                P.Update(gameTime);
-            }
+            DestinationRectangle.Size = DestinationRectangle.Size * Transform.Scale.ToPoint();
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            foreach (Panel P in Panels)
-                P.Draw(spriteBatch);
+            
         }
     }
 }

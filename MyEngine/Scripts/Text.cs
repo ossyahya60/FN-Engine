@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace MyEngine
 {
@@ -41,6 +42,11 @@ namespace MyEngine
         public string GetName()
         {
             return Name;
+        }
+
+        public void Fade(float Speed)
+        {
+            //Color.A = Math.Round()
         }
 
         public void Update(GameTime gameTime)

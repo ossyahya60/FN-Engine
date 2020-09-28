@@ -16,8 +16,6 @@ namespace MyEngine
             set
             {
                 size = value;
-                Origin.X = value.X/2;
-                Origin.Y = value.Y/2;
             }
             get
             {
@@ -53,7 +51,7 @@ namespace MyEngine
             Name = name;
             UIcomponents = new List<UIComponent>();
             size = new Vector2(600, 200);
-            Origin = new Vector2(size.X / 2, size.Y / 2);
+            Origin = new Vector2(0.5f, 0.5f);
             Position = new Vector2(Setup.graphics.PreferredBackBufferWidth/2, Setup.graphics.PreferredBackBufferHeight / 2);
             Bounds = new Rectangle();
             Texture = HitBoxDebuger._textureFilled;
@@ -68,15 +66,15 @@ namespace MyEngine
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            Position.X = Setup.graphics.PreferredBackBufferWidth / 2;
-            Position.Y = Setup.graphics.PreferredBackBufferHeight / 2;
+            //Position.X = Setup.graphics.PreferredBackBufferWidth / 2;
+            //Position.Y = Setup.graphics.PreferredBackBufferHeight / 2;
 
             Bounds.X = (int)Position.X;
             Bounds.Y = (int)Position.Y;
             Bounds.Width = (int)Size.X;
             Bounds.Height = (int)Size.Y;
 
-            HitBoxDebuger.DrawRectangle(Bounds, Color, 0, Texture, Layer, new Vector2(0.5f, 0.5f));
+            HitBoxDebuger.DrawRectangle(Bounds, Color, 0, Texture, Layer, Origin);
 
             foreach (UIComponent UIC in UIcomponents)
                 UIC.Draw(spriteBatch);

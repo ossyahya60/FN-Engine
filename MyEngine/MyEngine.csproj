@@ -41,6 +41,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Scripts\Button.cs" />
     <Compile Include="Scripts\Canvas.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Program.cs" />
@@ -51,15 +52,20 @@
     <Compile Include="Scripts\BoxCollider2D.cs" />
     <Compile Include="Scripts\Camera2D.cs" />
     <Compile Include="Scripts\Collider2D.cs" />
+    <Compile Include="Scripts\Debugger.cs" />
     <Compile Include="Scripts\GameObject.cs" />
     <Compile Include="Scripts\GameObjectComponent.cs" />
     <Compile Include="Scripts\HitBoxDebuger.cs" />
     <Compile Include="Scripts\Input.cs" />
+    <Compile Include="Scripts\KeyFrame.cs" />
+    <Compile Include="Scripts\Layer.cs" />
+    <Compile Include="Scripts\LayerUI.cs" />
     <Compile Include="Scripts\MathCompanion.cs" />
     <Compile Include="Scripts\MediaSource.cs" />
     <Compile Include="Scripts\Panel.cs" />
     <Compile Include="Scripts\Particle.cs" />
     <Compile Include="Scripts\ParticleEffect.cs" />
+    <Compile Include="Scripts\PropertiesAnimator.cs" />
     <Compile Include="Scripts\ResolutionIndependentRendering.cs" />
     <Compile Include="Scripts\Rigidbody2D.cs" />
     <Compile Include="Scripts\SaveLoadManager.cs" />

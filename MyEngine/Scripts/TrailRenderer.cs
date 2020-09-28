@@ -8,8 +8,9 @@ namespace MyEngine
 {
     public class TrailRenderer: GameObjectComponent
     {
+        public float SpawnRate = 0f;  //Control this to make the trail Continous or discrete, 0 means Fully Continionus
         public Vector2 OffsetPosition;
-        public int SegmentWidth = 40;
+        public int SegmentWidth = 10;
         public Color Color = Color.White;
         public float VanishAfter = 1f; //Time for Segments to start vanishing
         //public int ParticleSize = 20;
@@ -32,7 +33,6 @@ namespace MyEngine
         private int maxparticles = 100;
         private Queue Particles;
         private Transform transform;
-        private float SpawnRate = 0f;  //Control this to make the trail Continous or discrete, 0 means Fully Continionus
         private float SpawnRateCounter = 0;
         private Random random;
         private Color Color1, Color2, Color3, ColorDefault = Color.White;
@@ -47,7 +47,7 @@ namespace MyEngine
             Particles = new Queue();
             transform = gameObject.GetComponent<Transform>();
             SpawnRateCounter = SpawnRate;
-            if(OffsetPosition == Vector2.Zero)
+            if(OffsetPosition == null)
                 OffsetPosition = Vector2.Zero;
         }
 
@@ -81,7 +81,7 @@ namespace MyEngine
                     particle.Color = Color;
 
                 particle.Rotation = MathCompanion.GetAngle(transform.LastPosition + OffsetPosition, transform.Position + OffsetPosition);
-                particle.Length = (int)Math.Ceiling(((transform.Position + OffsetPosition) * Transform.PixelsPerUnit - (transform.LastPosition + OffsetPosition) * Transform.PixelsPerUnit).Length());
+                particle.Length = 1 + (int)Math.Ceiling(((transform.Position + OffsetPosition) * Transform.PixelsPerUnit - (transform.LastPosition + OffsetPosition) * Transform.PixelsPerUnit).Length());
                 particle.Height = SegmentWidth;
                 particle.Layer = Layer;
 

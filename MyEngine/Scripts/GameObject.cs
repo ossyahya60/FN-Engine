@@ -6,6 +6,13 @@ namespace MyEngine
 {
     public class GameObject
     {
+        public Transform Transform
+        {
+            get
+            {
+                return GetComponent<Transform>();
+            }
+        }
         public GameObject Parent = null; //Not yet implemented
         public List<GameObjectComponent> GameObjectComponents; //List of all  GO componets in a certain scene(scene is not yet implemented)
         public string Tag = null;
