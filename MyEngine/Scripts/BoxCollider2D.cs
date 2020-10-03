@@ -20,21 +20,21 @@ namespace MyEngine
                 return new Rectangle(bounds.X, bounds.Y, (int)(bounds.Width * Transform.Scale.X), (int)(bounds.Height * Transform.Scale.Y));
             }
         }
-        public Transform Transform { set; get; }
         public bool isTrigger = false;
 
+        private Transform Transform;
         private float GameTime = 0.01f;
         private Rectangle bounds;
         //private float DisplaceMagnitude = 0.01f; //1 pixel
 
         public Rectangle GetDynamicCollider()
         {
-            return new Rectangle((int)((Transform.Position.X + Bounds.X / (float)Transform.PixelsPerUnit) * Transform.PixelsPerUnit), (int)((Transform.Position.Y + Bounds.Y / (float)Transform.PixelsPerUnit) * Transform.PixelsPerUnit), Bounds.Width, Bounds.Height);
+            return new Rectangle((int)(Transform.Position.X + Bounds.X), (int)(Transform.Position.Y + Bounds.Y), Bounds.Width, Bounds.Height);
         }
 
         public override void Start()
         {
-            Transform = gameObject.GetComponent<Transform>();
+            Transform = gameObject.Transform;
 
             if (gameObject.GetComponent<SpriteRenderer>() != null && bounds.Width == 0)  //Initializing Collider bounds with the sprite bounds if exists
             {

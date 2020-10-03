@@ -10,6 +10,7 @@ namespace MyEngine
         static Layer()
         {
             LayerWithValue = new Dictionary<string, float>();
+            AddLayer("Default", 100);
         }
 
         public static bool AddLayer(string Name, int Value)
@@ -23,10 +24,7 @@ namespace MyEngine
             if (LayerWithValue.ContainsKey(Name))
                 return false;
 
-            if (Value < 20 || Value > 100)
-                return false;
-
-            LayerWithValue.Add(Name, Value * 0.01f);
+            LayerWithValue.Add(Name, MathCompanion.Clamp(Value * 0.01f, 0.2f, 1));
             return true;
         }
 

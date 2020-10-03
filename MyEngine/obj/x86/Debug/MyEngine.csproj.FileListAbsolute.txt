@@ -1,4 +1,3 @@
-C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.exe
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.pdb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MonoGame.Framework.dll
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpDX.MediaFoundation.dll
@@ -19,7 +18,6 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpDX.XInput.xml
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.csprojAssemblyReference.cache
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.csproj.CoreCompileInputs.cache
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.csproj.CopyComplete
-C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.exe
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.pdb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\Hornet.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\CharacterIdleAnimation.xnb
@@ -32,3 +30,5 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\FireWorks_M.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\Jump.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\AMB_WR_BirdWind.wma
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\AMB_WR_BirdWind.xnb
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.dll
+C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.dll

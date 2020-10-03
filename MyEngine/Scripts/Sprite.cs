@@ -6,11 +6,12 @@ namespace MyEngine
     //Not entirely sure if it should be a gameobject component or not
     public class Sprite
     {
-        public Transform Transform { set; get; }
         public Texture2D Texture = null;
         public Rectangle SourceRectangle;  //P.S: scale??
         public float Layer = 0;
         public Vector2 Origin;
+
+        private Transform Transform;
 
         public Sprite(Transform transform)
         {
@@ -27,7 +28,7 @@ namespace MyEngine
 
         public Rectangle DynamicScaledRect()
         {
-            return new Rectangle((int)(Transform.Position.X * Transform.PixelsPerUnit), (int)(Transform.Position.Y * Transform.PixelsPerUnit), (int)(SourceRectangle.Width * Transform.Scale.X), (int)(SourceRectangle.Height * Transform.Scale.Y));
+            return new Rectangle((int)Transform.Position.X, (int)Transform.Position.Y, (int)(SourceRectangle.Width * Transform.Scale.X), (int)(SourceRectangle.Height * Transform.Scale.Y));
         }
 
         public Sprite DeepCopy()

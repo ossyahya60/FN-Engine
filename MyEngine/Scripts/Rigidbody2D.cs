@@ -11,7 +11,6 @@ namespace MyEngine
 
     public class Rigidbody2D: GameObjectComponent
     {
-        public Transform Transform { set; get; }
         public bool AffectedByGravity = true;
         public bool IsKinematic = false;
         public float GravityConstant = 10f;
@@ -33,6 +32,7 @@ namespace MyEngine
             }
         }
 
+        private Transform Transform;
         private Vector2 NormalForcesApplied;
         private Vector2 ImpulseForcesApplied;
         private Vector2 LastPosition;
@@ -56,7 +56,7 @@ namespace MyEngine
 
         public override void Start()
         {
-            Transform = gameObject.GetComponent<Transform>();
+            Transform = gameObject.Transform;
 
             NormalForcesApplied = Vector2.Zero;
             ImpulseForcesApplied = Vector2.Zero;
@@ -75,7 +75,7 @@ namespace MyEngine
                 if (AffectedByGravity) //here
                     AddForce(new Vector2(0, GravityConstant * GravityScale), ForceMode2D.Force);
 
-                if (AffectedByLinearDrag && velocity.X != 0)
+                if (AffectedByLinearDrag && velocity.X != 0) //This drag equation should be modified as it's not working properly and should affect all kinds of movements!
                     AddForce(new Vector2(-LinearDrag, 0) * velocity.X + new Vector2(-QuadraticDrag, 0) * (velocity.X * velocity.X) * (velocity.X / MathCompanion.Abs(velocity.X)), ForceMode2D.Force);
 
                 ///////////////////////////HorizontalForces////////////////////

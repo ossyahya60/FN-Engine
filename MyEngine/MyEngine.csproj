@@ -7,7 +7,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C7EC3F78-1916-4A0F-861A-E1D117199722}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MyEngine</RootNamespace>
     <AssemblyName>MyEngine</AssemblyName>
@@ -37,8 +37,9 @@
   <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Scripts\Button.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Scripts\Sprite.cs" />
     <Compile Include="Scripts\SpriteRenderer.cs" />
     <Compile Include="Scripts\Text.cs" />
+    <Compile Include="Scripts\Threader.cs" />
     <Compile Include="Scripts\TrailRenderer.cs" />
     <Compile Include="Scripts\Transform.cs" />
     <Compile Include="Scripts\UIComponent.cs" />

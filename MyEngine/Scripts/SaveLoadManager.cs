@@ -11,6 +11,7 @@ namespace MyEngine
         public static void InitializeDirectory() //call this the first time you use this class
         {
             GamePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+
             string GameName = "";
             foreach (char C in System.AppDomain.CurrentDomain.FriendlyName)
             {
@@ -27,7 +28,7 @@ namespace MyEngine
         {
             BinaryFormatter Formatter = new BinaryFormatter();
             string SavePath = System.IO.Path.Combine(GamePath, SaveFileName);
-            FileStream stream = new FileStream(SavePath, FileMode.Create);
+            FileStream stream = new FileStream(SavePath, FileMode.OpenOrCreate);
 
             T dataTobeSaved = HighScore;
 

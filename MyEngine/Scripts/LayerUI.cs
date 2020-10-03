@@ -23,10 +23,7 @@ namespace MyEngine
             if (LayerWithValue.ContainsKey(Name))
                 return false;
 
-            if (Value < 0 || Value >= 20)
-                return false;
-
-            LayerWithValue.Add(Name, Value * 0.01f);
+            LayerWithValue.Add(Name, MathCompanion.Clamp(Value * 0.01f, 0, 0.19f));
             return true;
         }
 

@@ -1,9 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 
 namespace MyEngine
 {
     public class KeyFrame
     {
+        public bool PlayAfterFinishing = false;
+        public bool FinishedButIsLooping = false;
+        public bool DeleteAfterFinishing = false;
         public bool ReverseAfterFinishing = false;
         public bool Finished = true;
         public bool IsLooping = false;
@@ -14,6 +18,8 @@ namespace MyEngine
         private float TimeDuration = 1;
         private float TimeCounter = 0;
         private bool Paused = false;
+        private Color OriginalColor;
+        private bool JustStarted = true;
 
         public KeyFrame(float sourceValue, float destinationValue, float timeDuration, string tag)
         {
@@ -27,20 +33,31 @@ namespace MyEngine
         {
             if (!Finished)
             {
-                TimeCounter = MathCompanion.Clamp(TimeCounter + (float)gameTime.ElapsedGameTime.TotalSeconds, 0, TimeDuration);
+                if(!Paused)
+                    TimeCounter = MathCompanion.Clamp(TimeCounter + (float)gameTime.ElapsedGameTime.TotalSeconds, 0, TimeDuration);
 
                 if (TimeCounter >= TimeDuration)
                 {
+                    FinishedButIsLooping = false;
                     Finished = true;
 
-                    if(ReverseAfterFinishing)
+                    if (ReverseAfterFinishing)
                     {
                         ReverseAfterFinishing = false;
                         ReverseKeyFrame();
                     }
 
-                    if (IsLooping)
+                    if (PlayAfterFinishing)
+                    {
                         Play();
+                        PlayAfterFinishing = false;
+                    }
+
+                    if (IsLooping)
+                    {
+                        FinishedButIsLooping = true;
+                        Play();
+                    }
                 }
             }
         }
@@ -50,6 +67,7 @@ namespace MyEngine
             TimeCounter = 0;
             Finished = false;
             Paused = false;
+            JustStarted = true;
         }
 
         public void GetFeedback(ref int Value)
@@ -70,6 +88,30 @@ namespace MyEngine
                 Value = Vector2.One * ((TimeDuration != 0) ? SourceValue + ((DestinationValue - SourceValue) * (TimeCounter / TimeDuration)) : DestinationValue);
         }
 
+        public void GetFeedback(ref Color Value)
+        {
+            if (JustStarted)
+            {
+                OriginalColor = Value;
+                JustStarted = false;
+            }
+
+            if (!Finished)
+                Value = OriginalColor * ((TimeDuration != 0) ? SourceValue + ((DestinationValue - SourceValue) * (TimeCounter / TimeDuration)) : DestinationValue);
+        }
+
+        public void GetFeedback(Action<float> Value)
+        {
+            if (!Finished)
+                Value((TimeDuration != 0) ? SourceValue + ((DestinationValue - SourceValue) * (TimeCounter / TimeDuration)) : DestinationValue);
+        }
+
+        public void GetFeedback(Action<Vector2> Value)
+        {
+            if (!Finished)
+                Value(Vector2.One * ((TimeDuration != 0) ? SourceValue + ((DestinationValue - SourceValue) * (TimeCounter / TimeDuration)) : DestinationValue));
+        }
+
         public void Pause()
         {
             Paused = true;
@@ -80,7 +122,7 @@ namespace MyEngine
             Paused = false;
         }
 
-        public void ReverseKeyFrame()
+        private void ReverseKeyFrame()
         {
             float TempConatiner = SourceValue;
             SourceValue = DestinationValue;

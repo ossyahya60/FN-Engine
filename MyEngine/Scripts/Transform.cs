@@ -13,6 +13,8 @@ namespace MyEngine
 
         public override void Start()
         {
+            //LastParent = gameObject.Parent;
+            LastPosition = position;
             if (LastParent == null)
             {
                 LocalPosition = Position;
@@ -23,11 +25,12 @@ namespace MyEngine
                 LocalScale = (LocalScale != Vector2.Zero)? LocalScale : Vector2.One;
         }
 
-        public static int PixelsPerUnit = 100; //100 pixel = 1 unit = 1 meter
+        //public static int PixelsPerUnit = 100; //100 pixel = 1 unit = 1 meter
         public float LocalRotation
         {
             set
             {
+                LocalRotationJustChanged = true;
                 localRotation = value;
                 if (gameObject.Parent == null)
                     Rotation = localRotation;
@@ -41,6 +44,7 @@ namespace MyEngine
         {
             set
             {
+                LocalScaleJustChanged = true;
                 localScale = (value.X >= 0 && value.X <= 1 && value.Y >= 0 && value.Y <= 1) ? value : localScale;
                 if (gameObject.Parent == null)
                     Scale = localScale;
@@ -54,6 +58,7 @@ namespace MyEngine
         {
             set
             {
+                LocalPositionJustChanged = true;
                 localPosition = value;
                 if (gameObject.Parent == null)
                     Position = localPosition;
@@ -67,20 +72,34 @@ namespace MyEngine
         {
             set
             {
+                PositionJustChanged = true;
                 LastPosition = Position;
-                position = value * PixelsPerUnit;
+                position = value;
             }
             get
             {
-                return position / PixelsPerUnit;
+                return position;
             }
         }
         public float Rotation //Gets rotation in radians
-        { set; get; } = 0f;
+        {
+            set
+            {
+                LastRotation = rotation;
+                rotation = value;
+                RotationJustChanged = true;
+            }
+            get
+            {
+                return rotation;
+            }
+        }
         public Vector2 Scale //Scale of a gameobject in x-y coordinate system
         {
             set
             {
+                LastScale = Scale;
+                ScaleJustChanged = true;
                 scale = (value.X >= 0 && value.X <= 1 && value.Y >= 0 && value.Y <= 1) ? value : scale;
             }
             get
@@ -118,6 +137,8 @@ namespace MyEngine
             }
         }
         public Vector2 LastPosition;
+        public float LastRotation = 0;
+        public Vector2 LastScale;
 
         private Vector2 scale = Vector2.One;
         private Vector2 position = Vector2.Zero;
@@ -126,6 +147,13 @@ namespace MyEngine
         private Vector2 localPosition;
         private float localRotation;
         private Vector2 localScale;
+        private float rotation = 0;
+        private bool RotationJustChanged = false;
+        private bool PositionJustChanged = false;
+        private bool ScaleJustChanged = false;
+        private bool LocalRotationJustChanged = false;
+        private bool LocalPositionJustChanged = false;
+        private bool LocalScaleJustChanged = false;
 
         public void Move(float x, float y) //Move a gameobject a certain distance in x and y axis
         {
@@ -136,8 +164,8 @@ namespace MyEngine
                 Value.Y = y;
                 LocalPosition += Value;
             }
-            position.X += x * PixelsPerUnit;
-            position.Y += y * PixelsPerUnit;
+            position.X += x;
+            position.Y += y;
         }
 
         public void Move(Vector2 Movement) //Move a gameobject a certain distance in x and y axis
@@ -145,7 +173,7 @@ namespace MyEngine
             LastPosition = Position;
             if (gameObject.Parent != null)
                 LocalPosition += Movement;
-            position += Movement * PixelsPerUnit;
+            position += Movement;
         }
 
         public override GameObjectComponent DeepCopy()
@@ -164,17 +192,32 @@ namespace MyEngine
             {
                 if (LastParent != gameObject.Parent)
                 {
-                    LocalPosition = Position - gameObject.Parent.GetComponent<Transform>().Position;
-                    LocalRotation = Rotation - gameObject.Parent.GetComponent<Transform>().Rotation;
-                    LocalScale = Scale - gameObject.Parent.GetComponent<Transform>().Scale;
+                    if(!LocalPositionJustChanged)
+                        LocalPosition = Position - gameObject.Parent.GetComponent<Transform>().LastPosition;
+                    if(!LocalRotationJustChanged)
+                        LocalRotation = Rotation - gameObject.Parent.GetComponent<Transform>().LastRotation;
+                    if(!LocalScaleJustChanged)
+                        LocalScale = Scale - gameObject.Parent.GetComponent<Transform>().LastScale;
                 }
 
-                Position = LocalPosition + gameObject.Parent.GetComponent<Transform>().Position;
-                Rotation = LocalRotation + gameObject.Parent.GetComponent<Transform>().Rotation;
-                Scale = LocalScale + gameObject.Parent.GetComponent<Transform>().Scale;
+                //Here I basically force the changes made in World coordinates
+                if (!PositionJustChanged)
+                    Position = LocalPosition + gameObject.Parent.GetComponent<Transform>().Position;
+                if (!RotationJustChanged)
+                    Rotation = LocalRotation + gameObject.Parent.GetComponent<Transform>().Rotation;
+                if (!ScaleJustChanged)
+                    Scale = LocalScale + gameObject.Parent.GetComponent<Transform>().Scale;
             }
 
             LastParent = gameObject.Parent;
+
+            RotationJustChanged = false;
+            ScaleJustChanged = false;
+            PositionJustChanged = false;
+
+            LocalRotationJustChanged = false;
+            LocalPositionJustChanged = false;
+            LocalScaleJustChanged = false;
         }
     }
 }

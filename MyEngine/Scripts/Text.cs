@@ -4,34 +4,58 @@ using System;
 
 namespace MyEngine
 {
-    public class Text : UIComponent
+    public class Text : GameObjectComponent
     {
         public string Name;
-        public Vector2 Position;
         public Color Color;
-        public float Scale;
         public string text;
         public SpriteFont Font;
-        public float Rotation;
         public SpriteEffects spriteEffects;
         public float Layer = 0f;
-        public Vector2 Origin;
+
+        private Vector2 Origin;
+        private Transform transform;
 
         public Text(string name)
         {
+            if(gameObject != null)
+                transform = gameObject.Transform;
             Origin = Vector2.Zero;
             Name = name;
-            Scale = 1;
             spriteEffects = SpriteEffects.None;
             Color = Color.White;
-            Rotation = 0;
-            Position = new Vector2(Setup.graphics.PreferredBackBufferWidth / 2, Setup.graphics.PreferredBackBufferHeight / 2);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public Text(string name, SpriteFont font)
+        {
+            if (gameObject != null)
+                transform = gameObject.Transform;
+            Origin = Vector2.Zero;
+            Name = name;
+            spriteEffects = SpriteEffects.None;
+            Color = Color.White;
+            Font = font;
+        }
+
+        static Text()
+        {
+            LayerUI.AddLayer("Text", 10);
+        }
+
+        public override void Start()
+        {
+            Layer = LayerUI.GetLayer("Text");
+            if (transform == null)
+                transform = gameObject.Transform;
+
+            transform.Position = new Vector2(Setup.graphics.PreferredBackBufferWidth / 2, Setup.graphics.PreferredBackBufferHeight / 2);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
         {
             Origin = Font.MeasureString(text) * 0.5f;
-            spriteBatch.DrawString(Font, text, Position, Color, MathHelper.ToRadians(Rotation), Origin, Scale, spriteEffects, Layer);
+
+            spriteBatch.DrawString(Font, text, transform.Position, Color, MathHelper.ToRadians(transform.Rotation), Origin, transform.Scale, spriteEffects, Layer);
         }
 
         public void LoadFont(string Name)
@@ -49,7 +73,7 @@ namespace MyEngine
             //Color.A = Math.Round()
         }
 
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             
         }

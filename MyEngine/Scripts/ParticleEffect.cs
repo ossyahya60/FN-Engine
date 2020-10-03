@@ -9,7 +9,6 @@ namespace MyEngine
     {
         public float Layer = 0;
         public Texture2D CustomTexture = null;
-        public Transform Transform;
         public Vector2 FireDirection;
         public float Speed = 5f;
         public Color Color = Color.White;
@@ -46,6 +45,7 @@ namespace MyEngine
             }
         }
 
+        private Transform Transform;
         private float minimumShrinkScale;
         private Queue Particles;
         private bool FinishedEffect = false;
@@ -63,7 +63,7 @@ namespace MyEngine
 
         public override void Start()
         {
-            Transform = gameObject.GetComponent<Transform>();
+            Transform = gameObject.Transform;
             FireCounter = TimeBetweenFiring;
             FireDirection = new Vector2(0, 1);
         }
@@ -107,7 +107,7 @@ namespace MyEngine
                         else
                             particle.Color = Color;
                         particle.Size = ParticleSize;
-                        particle.Position = Transform.Position * Transform.PixelsPerUnit;
+                        particle.Position = Transform.Position;
                         particle.LifeTime = VanishAfter;
                         particle.ShrinkMode = ShrinkWithTime;
                         particle.MinimumSize = minimumShrinkScale;

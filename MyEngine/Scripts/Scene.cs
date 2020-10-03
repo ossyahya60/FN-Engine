@@ -14,7 +14,7 @@ namespace MyEngine
             {
                 foreach (int id in IDs)
                     if (id == value)
-                        return;
+                        throw new System.Exception("Scene ID must be unique");
                 IDs.Add(value);
                 Id = value;
             }

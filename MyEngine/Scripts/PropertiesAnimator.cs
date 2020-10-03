@@ -61,7 +61,13 @@ namespace MyEngine
         public override void Update(GameTime gameTime)
         {
             foreach (KeyFrame key in keyFrames)
+            {
                 key.Update(gameTime);
+
+                if (key.Finished || key.FinishedButIsLooping)
+                    if (key.DeleteAfterFinishing)
+                        DeleteKeyFrame(key.Tag);
+            }
         }
 
         public int KeyFramesCount()

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MyEngine
@@ -14,20 +13,18 @@ namespace MyEngine
 
         public Canvas(Camera2D camera)
         {
-            Transform = gameObject.Transform;
-            if (Transform == null)
-                gameObject.AddComponent<Transform>(new Transform());
             Camera = camera;
-            DestinationRectangle = new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
         }
 
         public override void Start()
         {
-            
+            Transform = gameObject.Transform;
+            DestinationRectangle = new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
         }
 
         public override void Update(GameTime gameTime)
         {
+            DestinationRectangle.Location = Transform.Position.ToPoint();
             DestinationRectangle.Size = DestinationRectangle.Size * Transform.Scale.ToPoint();
         }
 

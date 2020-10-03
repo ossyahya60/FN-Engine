@@ -45,7 +45,7 @@ namespace MyEngine
         public override void Start()
         {
             Particles = new Queue();
-            transform = gameObject.GetComponent<Transform>();
+            transform = gameObject.Transform;
             SpawnRateCounter = SpawnRate;
             if(OffsetPosition == null)
                 OffsetPosition = Vector2.Zero;
@@ -61,7 +61,7 @@ namespace MyEngine
                     Particles.Dequeue();
 
                 Particle particle = new Particle(false);
-                particle.Position = (transform.LastPosition + OffsetPosition) * Transform.PixelsPerUnit;
+                particle.Position = transform.LastPosition + OffsetPosition;
                 particle.LifeTime = VanishAfter;
                 //if (RandomSize)
                 //    particle.Size = (int)(ParticleSize * random.NextDouble());
@@ -80,8 +80,8 @@ namespace MyEngine
                 else
                     particle.Color = Color;
 
-                particle.Rotation = MathCompanion.GetAngle(transform.LastPosition + OffsetPosition, transform.Position + OffsetPosition);
-                particle.Length = 1 + (int)Math.Ceiling(((transform.Position + OffsetPosition) * Transform.PixelsPerUnit - (transform.LastPosition + OffsetPosition) * Transform.PixelsPerUnit).Length());
+                particle.Rotation = MathCompanion.GetAngle(transform.LastPosition, transform.Position);
+                particle.Length = 1 + (int)Math.Ceiling((transform.Position - transform.LastPosition).Length());
                 particle.Height = SegmentWidth;
                 particle.Layer = Layer;
 

@@ -21,7 +21,7 @@ namespace MyEngine
         Animation idle, run;
         Animator AM;
         Vector2 MousePos;
-        GameObject canvas;
+        GameObject canvas, panel;
         SpriteFont spriteFont;
 
 
@@ -85,6 +85,7 @@ namespace MyEngine
             MousePos = Vector2.Zero;
             mouse.AddComponent<Transform>(new Transform());
             mouse.AddComponent<TrailRenderer>(new TrailRenderer());
+            mouse.GetComponent<TrailRenderer>().ShrinkWithTime = false;
 
             IDLE = new Sprite(Image.GetComponent<Transform>());
             IDLE.LoadTexture("CharacterIdleAnimation");
@@ -110,7 +111,7 @@ namespace MyEngine
 
             Image.AddComponent<Rigidbody2D>(new Rigidbody2D());
             Image.GetComponent<Rigidbody2D>().AffectedByGravity = false;
-            Image.GetComponent<Rigidbody2D>().AffectedByLinearDrag = true;
+            Image.GetComponent<Rigidbody2D>().AffectedByLinearDrag = false;
             Image.AddComponent<BoxCollider2D>(new BoxCollider2D());
             Image.AddComponent<AudioSource>(new AudioSource("Jump"));
             Image.AddComponent<TrailRenderer>(new TrailRenderer());
@@ -128,7 +129,6 @@ namespace MyEngine
             Image2.GetComponent<SpriteRenderer>().Sprite = IDLE;
             Image2.GetComponent<Transform>().Position = new Vector2(9, 0);
             Image2.AddComponent<BoxCollider2D>(new BoxCollider2D());
-
 
             GameObject Background = new GameObject();
             Background.AddComponent<Transform>(new Transform());
@@ -148,7 +148,6 @@ namespace MyEngine
             Arrow.GetComponent<SpriteRenderer>().Sprite = new Sprite(Arrow.GetComponent<Transform>());
             Arrow.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Arrow");
             Arrow.GetComponent<SpriteRenderer>().Sprite.Origin = new Vector2(Arrow.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Width / 2, Arrow.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Height/2);
-            Arrow.GetComponent<Transform>().Position = new Vector2(RIR.VirtualWidth / 2, RIR.VirtualHeight/2) / Transform.PixelsPerUnit;
             Arrow.AddComponent<ParticleEffect>(new ParticleEffect());
             Arrow.GetComponent<ParticleEffect>().CustomTexture = null;
             Arrow.GetComponent<ParticleEffect>().ParticleSize = 50;
@@ -159,21 +158,33 @@ namespace MyEngine
             //Clone = GameObject.Instantiate(Image);
             canvas = new GameObject();
             canvas.AddComponent<Transform>(new Transform());
-            //canvas.AddComponent<Canvas>(new Canvas());
+            canvas.AddComponent<Canvas>(new Canvas(Camera));
+
+            panel = new GameObject();
+            panel.AddComponent<Transform>(new Transform());
+            panel.AddComponent<Panel>(new Panel("Test"));
 
             TempScene = new Scene("Temp", 0);
             TempScene.AddGameObject(Image);
             //TempScene.AddGameObject(Clone);
-            TempScene.AddGameObject(Image2);
+            //TempScene.AddGameObject(Image2);
             TempScene.AddGameObject(Background);
             TempScene.AddGameObject(Arrow);
             TempScene.AddGameObject(mouse);
-            //TempScene.AddGameObject(canvas);
+            TempScene.AddGameObject(canvas);
+            TempScene.AddGameObject(panel);
             SceneManager.Start();
             SceneManager.AddScene(TempScene);
             SceneManager.LoadScene(0);
-
+            //panel.Parent = canvas;
             SceneManager.GetActiveScene().Start();
+
+            //panel.GetComponent<Panel>().Size = new Vector2(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+            canvas.GetComponent<Transform>().Position = 1000 * Vector2.One;
+            Arrow.GetComponent<Transform>().Position = new Vector2(RIR.VirtualWidth / 2, RIR.VirtualHeight / 2);
+            Image.Transform.Position = Vector2.One * 100;
+            Image.Transform.Rotation = MathHelper.ToRadians(90);
+            
             //Arrow.GetComponent<SpriteRenderer>().Sprite.Origin = Arrow.GetComponent<SpriteRenderer>().Sprite.Texture.Bounds.Center.ToVector2();
             //Image.GetComponent<TrailRenderer>().OffsetPosition = new Vector2(Image.GetComponent<BoxCollider2D>().Bounds.Width / 2, Image.GetComponent<BoxCollider2D>().Bounds.Height / 2) / Transform.PixelsPerUnit;
         }
@@ -198,7 +209,7 @@ namespace MyEngine
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            
+
             /////////Resolution related//////////// -> Mandatory
             if (Resolution != new Vector2(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight))
                 RIR.InitializeResolutionIndependence(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, Camera);
@@ -206,15 +217,15 @@ namespace MyEngine
             Resolution = new Vector2(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
             ///////////////////////////////////////
             // TODO: Add your update logic here
-            if (Keyboard.GetState().IsKeyDown(Keys.D))
-                Image.GetComponent<Rigidbody2D>().AddForce(new Vector2(0.2f, 0), ForceMode2D.Impulse);
+            if (Input.GetKey(Keys.D))
+                Image.GetComponent<Rigidbody2D>().AddForce(new Vector2(20, 0), ForceMode2D.Impulse);
             else if (Keyboard.GetState().IsKeyDown(Keys.A))
-                Image.GetComponent<Rigidbody2D>().AddForce(new Vector2(-0.2f, 0), ForceMode2D.Impulse);
+                Image.GetComponent<Rigidbody2D>().AddForce(new Vector2(-20, 0), ForceMode2D.Impulse);
 
             if (Keyboard.GetState().IsKeyDown(Keys.W))
-                Image.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, -0.2f), ForceMode2D.Impulse);
+                Image.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, -20f), ForceMode2D.Impulse);
             else if (Keyboard.GetState().IsKeyDown(Keys.S))
-                Image.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 0.2f), ForceMode2D.Impulse);
+                Image.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 20f), ForceMode2D.Impulse);
 
             if (Keyboard.GetState().IsKeyDown(Keys.Z))
                 Camera.Zoom += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -240,11 +251,12 @@ namespace MyEngine
             if (Input.GetKeyDown(Keys.Space))
                 Arrow.Parent = Image;
 
-            //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(ref Arrow.Transform.Rotation);
+            //passing a property as a refrence using delegates
+            //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(value => Arrow.Transform.Rotation = value);
+
+            mouse.GetComponent<Transform>().Position = Input.GetMousePosition();
 
             TempScene.Update(gameTime);
-
-            mouse.GetComponent<Transform>().Position = Input.GetMousePosition() / Transform.PixelsPerUnit;
 
             base.Update(gameTime);
         }
@@ -265,7 +277,7 @@ namespace MyEngine
             //spriteBatch.DrawString(spriteFont, ((int)(1/(float)gameTime.ElapsedGameTime.TotalSeconds)).ToString(), Vector2.Zero, Color.Red);
             spriteBatch.DrawString(spriteFont, Image.GetComponent<Transform>().Position.ToString(), Vector2.Zero, Color.Red);
             //HitBoxDebuger.DrawRectangle(Image.GetComponent<BoxCollider2D>().GetDynamicCollider());
-            HitBoxDebuger.DrawNonFilledRectangle(Image2.GetComponent<BoxCollider2D>().GetDynamicCollider());
+            //HitBoxDebuger.DrawNonFilledRectangle(Image2.GetComponent<BoxCollider2D>().GetDynamicCollider());
             //HitBoxDebuger.DrawLine(new Rectangle((int)(Image.GetComponent<Transform>().Position.X * Transform.PixelsPerUnit), (int)(Image.GetComponent<Transform>().Position.Y * Transform.PixelsPerUnit), (int)(Arrow.GetComponent<Transform>().Position.Length() * Transform.PixelsPerUnit), 10), Color.White, MathHelper.ToDegrees((float)MathCompanion.Atan(Arrow.GetComponent<Transform>().Position.Y - Image.GetComponent<Transform>().Position.Y, Arrow.GetComponent<Transform>().Position.X - Image.GetComponent<Transform>().Position.X)));
 
             spriteBatch.End();

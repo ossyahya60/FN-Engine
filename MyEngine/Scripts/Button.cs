@@ -3,63 +3,49 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MyEngine
 {
-    public class Button : UIComponent
+    public class Button : GameObjectComponent
     {
-        public string Name;
-        public Rectangle Bounds
-        {
-            set
-            {
-                bounds = value;
-                GetRectangle = value;
-                bounds.Offset(bounds.Size.ToVector2() / -2);
-            }
-            get
-            {
-                return GetRectangle;
-            }
-        }
-        public Text Text;
+        public Point Size;
         public Color IdleColor;
         public Color HighlightColor;
         public float Layer;
-        public SpriteFont TextFont = null;
 
+        private Transform Transform;
+        private Rectangle Bounds;
         private Color ActiveColor;
         private Vector2 Origin;
-        private Rectangle bounds;
-        private Rectangle GetRectangle;
+        private Rectangle ActualHitBox;
 
-        public Button(string name)
+        public Button()
         {
-            bounds = Rectangle.Empty;
-            GetRectangle = Rectangle.Empty;
-            Bounds = new Rectangle(Setup.graphics.PreferredBackBufferWidth / 2, Setup.graphics.PreferredBackBufferHeight / 2, 60, 30);
+            
+        }
+
+        static Button()
+        {
+            LayerUI.AddLayer("Buttons", 5);
+        }
+
+        public override void Start()
+        {
+            Size = new Point(60, 30);
+            Transform = gameObject.Transform;
+            Layer = LayerUI.GetLayer("Buttons");
+            Bounds = new Rectangle(Transform.Position.ToPoint(), Size);
             Origin = Vector2.One * 0.5f;
-            Name = name;
-            if(TextFont != null)
-                Text = new Text("ButtonText") { text = "Text", Color = Color.Black, Font = TextFont };
             IdleColor = Color.White;
             HighlightColor = IdleColor * 0.4f;
             ActiveColor = IdleColor;
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
-            HitBoxDebuger.DrawRectangle(GetRectangle, ActiveColor, 0, HitBoxDebuger._textureFilled, Layer, Origin);
-            if (Text != null)
-            {
-                Text.Position = Bounds.Location.ToVector2();
-                Text.Draw(spriteBatch);
-            }
+            Bounds.Location = Transform.Position.ToPoint();
+            Bounds.Size = Size * Transform.Scale.ToPoint();
+            HitBoxDebuger.DrawRectangle(Bounds, ActiveColor, 0, HitBoxDebuger._textureFilled, Layer, Origin);
         }
 
-        public string GetName()
-        {
-            return Name;
-        }
-
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             if (IsCursorInRange())
                 ActiveColor = HighlightColor;
@@ -69,7 +55,11 @@ namespace MyEngine
 
         public bool IsCursorInRange()
         {
-            return bounds.Contains(Input.GetMousePosition());
+            Bounds.Location = Transform.Position.ToPoint();
+            Bounds.Size = Size * Transform.Scale.ToPoint();
+            ActualHitBox = Bounds;
+            ActualHitBox.Offset(-Bounds.Size.ToVector2() * 0.5f);
+            return ActualHitBox.Contains(Input.GetMousePosition());
         }
 
         public bool ClickedOnButton()
