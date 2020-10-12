@@ -18,6 +18,7 @@ namespace MyEngine
         public string Tag = null;
         public int GameComponentsCount = 0;
         public bool Active = true;
+        public string Name = "Default";
 
         private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect" };
 
@@ -44,7 +45,7 @@ namespace MyEngine
 
             if (!GameObjectComponents.Contains(component) || CanBeAdded)
             {
-                GameObjectComponents.Add(component);
+                GameObjectComponents.Insert(GameComponentsCount, component);
                 GameObjectComponents[GameComponentsCount].gameObject = this;
                 GameComponentsCount++;
             }
@@ -81,6 +82,8 @@ namespace MyEngine
 
         public virtual void Update(GameTime gameTime)
         {
+            Active = (Parent != null)? Parent.Active : Active;
+
             if (Active)
             {
                 foreach (GameObjectComponent GOC in GameObjectComponents)

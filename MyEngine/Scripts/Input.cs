@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace MyEngine
 {
@@ -11,10 +12,12 @@ namespace MyEngine
         {
             LastKeyState = Keyboard.GetState();
             LastMouseState = new MouseState();
+            LastFrameTouch = new TouchCollection();
         }
 
         private static KeyboardState LastKeyState, CurrentKeyState;
         private static MouseState LastMouseState, CurrentMouseState;
+        private static TouchCollection LastFrameTouch, CurrentFrameTouch;
 
         public static bool GetKey(Keys Key)
         {
@@ -28,6 +31,9 @@ namespace MyEngine
 
             LastMouseState = CurrentMouseState;
             CurrentMouseState = Mouse.GetState();
+
+            LastFrameTouch = CurrentFrameTouch;
+            CurrentFrameTouch = TouchPanel.GetState();
         }
 
         public static bool GetKeyDown(Keys Key)
@@ -112,6 +118,14 @@ namespace MyEngine
         public static Vector2 GetMousePosition()
         {
             return Setup.resolutionIndependentRenderer.ScaleMouseToScreenCoordinates(Mouse.GetState().Position.ToVector2());
+        }
+
+        public static bool TouchDown()
+        {
+            if (CurrentFrameTouch.Count == 1 && LastFrameTouch.Count == 0)
+                return true;
+
+            return false;
         }
     }
 }

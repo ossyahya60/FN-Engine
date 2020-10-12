@@ -21,6 +21,9 @@ namespace MyEngine
         public override void Start()
         {
             Transform = gameObject.Transform;
+
+            if (Sprite == null)
+                Sprite = new Sprite(Transform);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

@@ -66,6 +66,7 @@
     <Compile Include="Scripts\Panel.cs" />
     <Compile Include="Scripts\Particle.cs" />
     <Compile Include="Scripts\ParticleEffect.cs" />
+    <Compile Include="Scripts\ParticleSimulator.cs" />
     <Compile Include="Scripts\PropertiesAnimator.cs" />
     <Compile Include="Scripts\ResolutionIndependentRendering.cs" />
     <Compile Include="Scripts\Rigidbody2D.cs" />
@@ -80,6 +81,8 @@
     <Compile Include="Scripts\TrailRenderer.cs" />
     <Compile Include="Scripts\Transform.cs" />
     <Compile Include="Scripts\UIComponent.cs" />
+    <Compile Include="Scripts\UnitParticle.cs" />
+    <Compile Include="Scripts\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

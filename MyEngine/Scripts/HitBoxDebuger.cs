@@ -22,6 +22,11 @@ namespace MyEngine
             Setup.spriteBatch.Draw(_textureFilled, Rect, Color.White);
         }
 
+        public static void DrawRectangle(Vector2 Position, Color color)  //Draw filledRectangle
+        {
+            Setup.spriteBatch.Draw(_textureFilled, Position, color);
+        }
+
         public static void DrawRectangle(Rectangle Rect, Color color, float Angle, float Layer)  //Draw filledRectangle
         {
             Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(Angle), Vector2.Zero, SpriteEffects.None, Layer);

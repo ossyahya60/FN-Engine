@@ -6,6 +6,7 @@ namespace MyEngine
 {
     public class Scene
     {
+        public bool Active = false;
         public List<GameObject> GameObjects;
         public string Name;
         public int ID
@@ -26,6 +27,7 @@ namespace MyEngine
 
         private static List<int> IDs;
         private int Id;
+        private int GameObjectCount = 0;
 
         public Scene(string name)
         {
@@ -42,36 +44,69 @@ namespace MyEngine
             ID = _ID;
         }
 
+        public void CleanScene()
+        {
+            Active = true;
+            GameObjects.Clear();
+            GameObjectCount = 0;
+            SceneManager.ActiveScene = this;
+        }
+
+        public void CleanScene(string Name)
+        {
+            Active = true;
+            GameObjects.Clear();
+            GameObjectCount = 0;
+            this.Name = Name;
+            SceneManager.ActiveScene = this;
+        }
+
+        public void CleanScene(string Name, int ID)
+        {
+            Active = true;
+            GameObjects.Clear();
+            GameObjectCount = 0;
+            this.Name = Name;
+            this.ID = ID;
+            SceneManager.ActiveScene = this;
+        }
+
         public void AddGameObject(GameObject GO)
         {
-            GameObjects.Add(GO);
+            GameObjects.Insert(GameObjectCount, GO);
+            GameObjectCount++;
         }
 
         public void RemoveGameObject(GameObject GO)
         {
             foreach (GameObject gameObject in GameObjects.ToArray())
                 if (gameObject.Parent == GO)
-                    GameObjects.Remove(gameObject);
+                    if(GameObjects.Remove(gameObject))
+                        GameObjectCount--;
 
-            GameObjects.Remove(GO);
+            if (GameObjects.Remove(GO))
+                GameObjectCount--;
         }
 
         public void Start()
         {
-            foreach (GameObject GO in GameObjects)
-                GO.Start();
+            if(Active)
+                foreach (GameObject GO in GameObjects)
+                    GO.Start();
         }
 
         public void Update(GameTime gameTime)
         {
-            foreach (GameObject GO in GameObjects)
-                GO.Update(gameTime);
+            if(Active)
+                foreach (GameObject GO in GameObjects)
+                    GO.Update(gameTime);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            foreach (GameObject GO in GameObjects)
-                GO.Draw(spriteBatch);
+            if(Active)
+                foreach (GameObject GO in GameObjects)
+                    GO.Draw(spriteBatch);
         }
 
         public GameObject FindGameObjectWithTag(string Tag)
@@ -83,10 +118,20 @@ namespace MyEngine
             return null;
         }
 
+        public GameObject FindGameObjectWithName(string Name)
+        {
+            foreach (GameObject GO in GameObjects)
+                if (GO.Name == Name)
+                    return GO;
+
+            return null;
+        }
+
         public GameObject[] FindGameObjectsWithTag(string Tag)
         {
             GameObject[] GOs = new GameObject[GameObjects.Count];
-            for (int i=0; i<GameObjects.Count; i++)
+
+            for (int i = 0; i < GameObjects.Count; i++)
                 if (GameObjects[i].Tag == Tag)
                     GOs[i] = GameObjects[i];
 

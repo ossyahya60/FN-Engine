@@ -109,7 +109,7 @@ namespace MyEngine
         {
             if (!Expired)
             {
-                HitBoxDebuger.DrawLine(new Rectangle((int)Position.X, (int)Position.Y, Length, height), Color, Rotation, Layer, Vector2.One * 0.5f);
+                HitBoxDebuger.DrawLine(new Rectangle((int)Position.X, (int)Position.Y, Length, height), Color, Rotation, Layer, Vector2.Zero);
             }
         }
     }

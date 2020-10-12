@@ -12,8 +12,10 @@ namespace MyEngine
         public static SpriteBatch spriteBatch { get; private set; }
         public static ResolutionIndependentRenderer resolutionIndependentRenderer { get; private set; }
         public static GameWindow GameWindow { get; private set; }
+        public static Camera2D Camera { get; private set; }
+        public static Game Game { get; private set; }
 
-        public static void Initialize(GraphicsDeviceManager GDM, ContentManager CM, SpriteBatch SB, ResolutionIndependentRenderer RIR, GameWindow GW)
+    public static void Initialize(GraphicsDeviceManager GDM, ContentManager CM, SpriteBatch SB, ResolutionIndependentRenderer RIR, GameWindow GW, Camera2D camera, Game game)
         {
             graphics = GDM;
             Content = CM;
@@ -21,6 +23,8 @@ namespace MyEngine
             spriteBatch = SB;
             resolutionIndependentRenderer = RIR;
             GameWindow = GW;
+            Camera = camera;
+            Game = game;
         }
     }
 }

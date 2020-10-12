@@ -50,7 +50,10 @@ namespace MyEngine
         public AudioSource(string AudioName)
         {
             SoundEffect = Setup.Content.Load<SoundEffect>(AudioName);
+        }
 
+        public override void Start()
+        {
             if (PlayOnAwake)
                 Play();
         }

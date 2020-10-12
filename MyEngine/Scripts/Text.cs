@@ -12,12 +12,14 @@ namespace MyEngine
         public SpriteFont Font;
         public SpriteEffects spriteEffects;
         public float Layer = 0f;
+        public Vector2 Origin;
+        public bool CustomOrigin = false;
 
-        private Vector2 Origin;
         private Transform transform;
 
         public Text(string name)
         {
+            text = "Text";
             if(gameObject != null)
                 transform = gameObject.Transform;
             Origin = Vector2.Zero;
@@ -28,6 +30,7 @@ namespace MyEngine
 
         public Text(string name, SpriteFont font)
         {
+            text = "Text";
             if (gameObject != null)
                 transform = gameObject.Transform;
             Origin = Vector2.Zero;
@@ -48,12 +51,13 @@ namespace MyEngine
             if (transform == null)
                 transform = gameObject.Transform;
 
-            transform.Position = new Vector2(Setup.graphics.PreferredBackBufferWidth / 2, Setup.graphics.PreferredBackBufferHeight / 2);
+            //transform.Position = new Vector2(Setup.graphics.PreferredBackBufferWidth / 2, Setup.graphics.PreferredBackBufferHeight / 2);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Origin = Font.MeasureString(text) * 0.5f;
+            if(!CustomOrigin)
+                Origin = Font.MeasureString(text) * 0.5f;
 
             spriteBatch.DrawString(Font, text, transform.Position, Color, MathHelper.ToRadians(transform.Rotation), Origin, transform.Scale, spriteEffects, Layer);
         }
@@ -66,11 +70,6 @@ namespace MyEngine
         public string GetName()
         {
             return Name;
-        }
-
-        public void Fade(float Speed)
-        {
-            //Color.A = Math.Round()
         }
 
         public override void Update(GameTime gameTime)

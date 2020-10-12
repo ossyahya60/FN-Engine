@@ -90,7 +90,7 @@ namespace MyEngine
             {
                 if(RB.Enabled && !RB.IsKinematic && RB.Velocity != Vector2.Zero)
                 {
-                    foreach (GameObject GO in SceneManager.GetActiveScene().GameObjects)
+                    foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
                     {
                         BoxCollider2D Box = GO.GetComponent<BoxCollider2D>();
                         if (Box != null)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace MyEngine
 {
@@ -47,23 +48,46 @@ namespace MyEngine
 
         public override void Update(GameTime gameTime)
         {
-            if (IsCursorInRange())
-                ActiveColor = HighlightColor;
+            if (!TouchPanel.GetState().IsConnected)
+            {
+                if (IsCursorInRange())
+                    ActiveColor = HighlightColor;
+                else
+                    ActiveColor = IdleColor;
+            }
             else
                 ActiveColor = IdleColor;
         }
 
         public bool IsCursorInRange()
         {
+            if (!gameObject.Active)
+                return false;
+
             Bounds.Location = Transform.Position.ToPoint();
             Bounds.Size = Size * Transform.Scale.ToPoint();
             ActualHitBox = Bounds;
             ActualHitBox.Offset(-Bounds.Size.ToVector2() * 0.5f);
-            return ActualHitBox.Contains(Input.GetMousePosition());
+
+            if (!TouchPanel.GetState().IsConnected)
+                return ActualHitBox.Contains(Input.GetMousePosition());
+            else
+                return ActualHitBox.Contains(Setup.resolutionIndependentRenderer.ScaleMouseToScreenCoordinates(TouchPanel.GetState()[0].Position));
         }
 
         public bool ClickedOnButton()
         {
+            if (!gameObject.Active)
+                return false;
+
+            try
+            {
+                if (TouchPanel.GetState().IsConnected)
+                    if (Input.TouchDown())
+                        return IsCursorInRange();
+            }
+            catch { }
+
             if (Input.GetMouseClickUp(MouseButtons.LeftClick))
                 return IsCursorInRange();
 

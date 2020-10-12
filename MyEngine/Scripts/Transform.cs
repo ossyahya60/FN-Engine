@@ -33,7 +33,7 @@ namespace MyEngine
                 LocalRotationJustChanged = true;
                 localRotation = value;
                 if (gameObject.Parent == null)
-                    Rotation = localRotation;
+                    rotation = localRotation;
             }
             get
             {
@@ -47,7 +47,7 @@ namespace MyEngine
                 LocalScaleJustChanged = true;
                 localScale = (value.X >= 0 && value.X <= 1 && value.Y >= 0 && value.Y <= 1) ? value : localScale;
                 if (gameObject.Parent == null)
-                    Scale = localScale;
+                    scale = localScale;
             }
             get
             {
@@ -61,7 +61,7 @@ namespace MyEngine
                 LocalPositionJustChanged = true;
                 localPosition = value;
                 if (gameObject.Parent == null)
-                    Position = localPosition;
+                    position = localPosition;
             }
             get
             {

@@ -1,58 +1,59 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MyEngine
 {
     public static class SceneManager
     {
-        private static Scene ActiveScene;
-        private static List<Scene> Scenes;
+        public static Scene ActiveScene;
+        public static List<Action> InitializerList = new List<Action>();
+
+        private static List<int> Scenes;
 
         public static void Start()
         {
-            Scenes = new List<Scene>();
+            InitializerList = new List<Action>();
+            Scenes = new List<int>();
             ActiveScene = null;
         }
 
-        public static Scene GetActiveScene()
+        public static void AddScene(int id)
         {
-            return ActiveScene;
+            foreach (int _id in Scenes)
+                if (id == _id)
+                    throw new Exception("Scene ID can't be duplicated!");
+
+            Scenes.Add(id);
         }
 
-        public static void AddScene(Scene scene)
+        public static void RemoveScene(int id)
         {
-            foreach (Scene S in Scenes)
-                if (S == scene)
-                    return;
-
-            Scenes.Add(scene);
+            Scenes.Remove(id);
         }
 
-        public static void UnloadScene()
+        private static void UnloadScene()
         {
-            Scenes.Remove(ActiveScene);
             //Freeing the currently loaded assets, must be called before loading any new assets!!
             if (ActiveScene != null)
-                Setup.Content.Unload();
-        }
-
-        public static void UnloadScene(Scene scene)
-        {
-            Scenes.Remove(scene);
-            //Freeing the currently loaded assets, must be called before loading any new assets!!
-            if (scene != null)
-                Setup.Content.Unload();
-        }
-
-        public static void LoadScene(int index)
-        {
-            foreach (Scene S in Scenes)
             {
-                if (S.ID == index)
-                {
-                    ActiveScene = S;
-                    break;
-                }
+                Setup.Content.Unload();
+                ActiveScene = null;
+                GC.Collect();
             }
+        }
+
+        public static void AddInitializer(Action initializer, int Index)
+        {
+            InitializerList.Insert(Index, initializer);
+        }
+
+        public static void LoadScene(Scene scene)
+        {
+            UnloadScene();
+
+            foreach (int _id in Scenes)
+                if (scene.ID == _id)
+                    ActiveScene = scene;
         }
     }
 }
