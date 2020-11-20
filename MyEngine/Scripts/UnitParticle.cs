@@ -16,7 +16,8 @@ namespace MyEngine
         {
             Velocity = 1;
             this.particleType = particleType;
-            Position = Utility.Vector2Int(position);
+            Position = position;
+            Utility.Vector2Int(ref Position);
 
             switch (particleType)
             {

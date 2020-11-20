@@ -25,16 +25,23 @@ namespace MyEngine
         private Transform Transform;
         private float GameTime = 0.01f;
         private Rectangle bounds;
+        private Rectangle HandyRectangle; //To avoid stack allocating a lot if memory in a short time
         //private float DisplaceMagnitude = 0.01f; //1 pixel
 
         public Rectangle GetDynamicCollider()
         {
-            return new Rectangle((int)(Transform.Position.X + Bounds.X), (int)(Transform.Position.Y + Bounds.Y), Bounds.Width, Bounds.Height);
-        }
+            HandyRectangle.X = (int)(Transform.Position.X + Bounds.X);
+            HandyRectangle.Y = (int)(Transform.Position.Y + Bounds.Y);
+            HandyRectangle.Width = Bounds.Width;
+            HandyRectangle.Height = Bounds.Height;
 
+            return HandyRectangle;
+        }
+        
         public override void Start()
         {
             Transform = gameObject.Transform;
+            HandyRectangle = new Rectangle();
 
             if (gameObject.GetComponent<SpriteRenderer>() != null && bounds.Width == 0)  //Initializing Collider bounds with the sprite bounds if exists
             {
@@ -104,6 +111,15 @@ namespace MyEngine
                     }
                 }
             }
+        }
+
+        public override GameObjectComponent DeepCopy(GameObject clone)
+        {
+            BoxCollider2D Clone = this.MemberwiseClone() as BoxCollider2D;
+            Clone.Transform = clone.Transform;
+            Clone.bounds = new Rectangle(bounds.Location, bounds.Size);
+
+            return Clone;
         }
 
         public bool IsTrigger()  //Is this collider marked as trigger? (trigger means no collision or physics is applied on this collider

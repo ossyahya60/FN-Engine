@@ -10,8 +10,8 @@ namespace MyEngine
         public Rectangle SourceRectangle;  //P.S: scale??
         public float Layer = 0;
         public Vector2 Origin;
-
-        private Transform Transform;
+        public Transform Transform;
+        private Rectangle HandyRectangle; //To avoid stack allocating a lot if memory in a short time
 
         public Sprite(Transform transform)
         {
@@ -28,14 +28,20 @@ namespace MyEngine
 
         public Rectangle DynamicScaledRect()
         {
-            return new Rectangle((int)Transform.Position.X, (int)Transform.Position.Y, (int)(SourceRectangle.Width * Transform.Scale.X), (int)(SourceRectangle.Height * Transform.Scale.Y));
+            HandyRectangle.X = (int)Transform.Position.X;
+            HandyRectangle.Y = (int)Transform.Position.Y;
+            HandyRectangle.Width = (int)(SourceRectangle.Width * Transform.Scale.X);
+            HandyRectangle.Height = (int)(SourceRectangle.Height * Transform.Scale.Y);
+
+            return HandyRectangle;
         }
 
-        public Sprite DeepCopy()
+        public Sprite DeepCopy(GameObject clone)
         {
             Sprite Clone = this.MemberwiseClone() as Sprite;
-
-            Clone.Transform = new Transform();
+            Clone.SourceRectangle = new Rectangle(SourceRectangle.Location, SourceRectangle.Size);
+            Clone.Origin = new Vector2(Origin.X, Origin.Y);
+            Clone.Transform = clone.Transform;
 
             return Clone;
         }

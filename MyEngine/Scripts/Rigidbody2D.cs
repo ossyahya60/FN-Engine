@@ -38,6 +38,7 @@ namespace MyEngine
         private Vector2 LastPosition;
         private Vector2 velocity;
         private bool VelocityJustAssigned = false;
+        private Vector2 HandyVector, HandyVector2; //avoid alot of memory allocation in short time
 
         public Rigidbody2D()
         {
@@ -73,37 +74,62 @@ namespace MyEngine
             if (!IsKinematic)
             {
                 if (AffectedByGravity) //here
-                    AddForce(new Vector2(0, GravityConstant * GravityScale), ForceMode2D.Force);
+                {
+                    HandyVector.X = 0;
+                    HandyVector.Y = GravityConstant * GravityScale;
+
+                    AddForce(HandyVector, ForceMode2D.Force);
+                }
 
                 if (AffectedByLinearDrag && velocity.X != 0) //This drag equation should be modified as it's not working properly and should affect all kinds of movements!
-                    AddForce(new Vector2(-LinearDrag, 0) * velocity.X + new Vector2(-QuadraticDrag, 0) * (velocity.X * velocity.X) * (velocity.X / MathCompanion.Abs(velocity.X)), ForceMode2D.Force);
+                {
+                    HandyVector.X = -LinearDrag;
+                    HandyVector.Y = 0;
+
+                    HandyVector2.X = -QuadraticDrag;
+                    HandyVector2.Y = 0;
+
+                    AddForce(HandyVector * velocity.X + HandyVector2 * (velocity.X * velocity.X) * (velocity.X / MathCompanion.Abs(velocity.X)), ForceMode2D.Force);
+                }
 
                 ///////////////////////////HorizontalForces////////////////////
                 if (!VelocityJustAssigned)  //Assigning velocity from outside overrides any type of force(even drag)
                 {
                     if (NormalForcesApplied.X != 0)
                     {
+                        HandyVector.X = NormalForcesApplied.X * GameTime;
+                        HandyVector.Y = 0;
+
                         //Transform.Move(NormalForcesApplied.X * GameTime * GameTime, 0);
-                        velocity += new Vector2(NormalForcesApplied.X * GameTime, 0);
+                        velocity += HandyVector;
                     }
 
                     if (ImpulseForcesApplied.X != 0)
                     {
+                        HandyVector.X = ImpulseForcesApplied.X;
+                        HandyVector.Y = 0;
+
                         //Transform.Move(ImpulseForcesApplied.X * GameTime, 0);
-                        velocity += new Vector2(ImpulseForcesApplied.X, 0);
+                        velocity += HandyVector;
                     }
 
                     /////////////VerticalForces//////////////////
                     if (NormalForcesApplied.Y != 0)
                     {
+                        HandyVector.X = 0;
+                        HandyVector.Y = NormalForcesApplied.Y * GameTime;
+
                         //Transform.Move(0, NormalForcesApplied.Y * GameTime * GameTime);
-                        velocity += new Vector2(0, NormalForcesApplied.Y * GameTime);
+                        velocity += HandyVector;
                     }
 
                     if (ImpulseForcesApplied.Y != 0)
                     {
+                        HandyVector.X = 0;
+                        HandyVector.Y = ImpulseForcesApplied.Y;
+
                         //Transform.Move(0, ImpulseForcesApplied.Y * GameTime);
-                        velocity += new Vector2(0, ImpulseForcesApplied.Y);
+                        velocity += HandyVector;
                     }
                 }
 

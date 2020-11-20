@@ -60,38 +60,42 @@ namespace MyEngine
                 if (Particles.Count >= MaxParticles)
                     Particles.Dequeue();
 
-                Particle particle = new Particle(false);
-                particle.Position = transform.LastPosition + OffsetPosition;
-                particle.LifeTime = VanishAfter;
-                //if (RandomSize)
-                //    particle.Size = (int)(ParticleSize * random.NextDouble());
-                //else
-                //    particle.Size = ParticleSize;
-                particle.ShrinkMode = ShrinkWithTime;
-                if (RandomColor)
+                if (transform.Position - transform.LastPosition != Vector2.Zero)
                 {
-                    Color1 = Color.Multiply(ColorDefault, (float)random.NextDouble());
-                    Color2 = Color.Multiply(ColorDefault, (float)random.NextDouble());
-                    Color3 = Color.Multiply(ColorDefault, (float)random.NextDouble());
-                    particle.Color.R = Color1.R;
-                    particle.Color.G = Color2.G;
-                    particle.Color.B = Color3.B;
+                    Particle particle = new Particle(false);
+                    particle.Position = transform.LastPosition + OffsetPosition;
+                    particle.LifeTime = VanishAfter;
+                    //if (RandomSize)
+                    //    particle.Size = (int)(ParticleSize * random.NextDouble());
+                    //else
+                    //    particle.Size = ParticleSize;
+                    particle.ShrinkMode = ShrinkWithTime;
+                    if (RandomColor)
+                    {
+                        Color1 = Color.Multiply(ColorDefault, (float)random.NextDouble());
+                        Color2 = Color.Multiply(ColorDefault, (float)random.NextDouble());
+                        Color3 = Color.Multiply(ColorDefault, (float)random.NextDouble());
+                        particle.Color.R = Color1.R;
+                        particle.Color.G = Color2.G;
+                        particle.Color.B = Color3.B;
+                    }
+                    else
+                        particle.Color = Color;
+
+                    particle.Rotation = MathCompanion.GetAngle(transform.LastPosition, transform.Position);
+                    particle.Length = 1 + (int)Math.Ceiling((transform.Position - transform.LastPosition).Length());
+                    particle.Height = SegmentWidth;
+                    particle.Layer = Layer;
+
+                    Particles.Enqueue(particle);
                 }
-                else
-                    particle.Color = Color;
-
-                particle.Rotation = MathCompanion.GetAngle(transform.LastPosition, transform.Position);
-                particle.Length = 1 + (int)Math.Ceiling((transform.Position - transform.LastPosition).Length());
-                particle.Height = SegmentWidth;
-                particle.Layer = Layer;
-
-                Particles.Enqueue(particle);
 
                 SpawnRateCounter = 0;
             }
 
-            if ((Particles.Peek() as Particle).Expired)
-                Particles.Dequeue();
+            if (Particles.Count != 0)
+                if ((Particles.Peek() as Particle).Expired)
+                    Particles.Dequeue();
 
             foreach (Particle P in Particles)
                 P.Update(gameTime);
@@ -109,6 +113,16 @@ namespace MyEngine
         {
             //Vector2 Displacement = transform.Position - LastPosition;
             //Setup.spriteBatch.Draw(HitBoxDebuger._textureFilled, new Rectangle((int)(LastPosition.X * Transform.PixelsPerUnit), (int)(LastPosition.Y * Transform.PixelsPerUnit), (int)(Displacement.Length() * Transform.PixelsPerUnit), 20), Color.White);
+        }
+
+        public override GameObjectComponent DeepCopy(GameObject clone)
+        {
+            TrailRenderer Clone = this.MemberwiseClone() as TrailRenderer;
+            Clone.Particles = new Queue();
+            Clone.transform = clone.Transform;
+            Clone.SpawnRateCounter = 0;
+
+            return Clone;
         }
     }
 }

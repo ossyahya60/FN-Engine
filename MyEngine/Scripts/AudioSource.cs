@@ -40,15 +40,18 @@ namespace MyEngine
         }
         public bool PlayOnAwake = false;
         public bool IsLooping = false;
+        public bool DestroyAfterFinishing = false;
 
         private SoundEffect SoundEffect;
         private SoundEffectInstance SoundEffectInstance;
         private float volume = 1;
         private float pitch = 0;
         private float pan = 0;
+        private string AudioName;
 
         public AudioSource(string AudioName)
         {
+            this.AudioName = AudioName;
             SoundEffect = Setup.Content.Load<SoundEffect>(AudioName);
         }
 
@@ -104,8 +107,27 @@ namespace MyEngine
                 {
                     SoundEffectInstance.Dispose();
                     SoundEffectInstance = null;
+
+                    if (DestroyAfterFinishing)
+                        Threader.Invoke(Destroy, 5);
                 }
             }
+        }
+
+        public override GameObjectComponent DeepCopy(GameObject Clone)
+        {
+            AudioSource clone = this.MemberwiseClone() as AudioSource;
+            clone.volume = volume;
+            clone.pitch = pitch;
+            clone.pan = pan;
+            clone.AudioName = AudioName;
+            if (SoundEffect != null)
+            {
+                clone.SoundEffect = Setup.Content.Load<SoundEffect>(AudioName);
+                clone.SoundEffectInstance = clone.SoundEffect.CreateInstance();
+            }
+
+            return clone;
         }
     }
 }

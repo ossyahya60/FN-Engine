@@ -176,12 +176,22 @@ namespace MyEngine
             position += Movement;
         }
 
-        public override GameObjectComponent DeepCopy()
+        public override GameObjectComponent DeepCopy(GameObject clone)
         {
             Transform Clone = this.MemberwiseClone() as Transform;
 
             Clone.position = new Vector2(position.X, position.Y);
-            Clone.Scale = new Vector2(scale.X, scale.Y);
+            Clone.scale = new Vector2(scale.X, scale.Y);
+            Clone.rotation = rotation;
+            Clone.LastPosition = new Vector2(LastPosition.X, LastPosition.Y);
+            Clone.LastScale = new Vector2(LastScale.X, LastScale.Y);
+            Clone.Value = new Vector2(Value.X, Value.Y);
+            Clone.localPosition = new Vector2(localPosition.X, localPosition.Y);
+            Clone.localScale = new Vector2(localScale.X, localScale.Y);
+            Clone.localRotation = localRotation;
+            Clone.RotationJustChanged = false;
+            Clone.ScaleJustChanged = false;
+            Clone.PositionJustChanged = false;
 
             return Clone;
         }

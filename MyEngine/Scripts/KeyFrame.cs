@@ -20,6 +20,8 @@ namespace MyEngine
         private bool Paused = false;
         private Color OriginalColor;
         private bool JustStarted = true;
+        private float OriginalSourceValue;
+        private float OriginalDestinationValue;
 
         public KeyFrame(float sourceValue, float destinationValue, float timeDuration, string tag)
         {
@@ -27,6 +29,9 @@ namespace MyEngine
             SourceValue = sourceValue;
             DestinationValue = destinationValue;
             TimeDuration = (timeDuration < 0) ? 0 : timeDuration;
+
+            OriginalSourceValue = SourceValue;
+            OriginalDestinationValue = DestinationValue;
         }
 
         public void Update(GameTime gameTime)
@@ -42,10 +47,7 @@ namespace MyEngine
                     Finished = true;
 
                     if (ReverseAfterFinishing)
-                    {
-                        ReverseAfterFinishing = false;
                         ReverseKeyFrame();
-                    }
 
                     if (PlayAfterFinishing)
                     {
@@ -60,7 +62,10 @@ namespace MyEngine
                     }
                 }
             }
-        }
+            else
+                if(ReverseAfterFinishing)
+                    ReverseKeyFrame();
+        }           
 
         public void Play()
         {
@@ -127,7 +132,39 @@ namespace MyEngine
             float TempConatiner = SourceValue;
             SourceValue = DestinationValue;
             DestinationValue = TempConatiner;
+            ReverseAfterFinishing = false;
             //TimeCounter = TimeDuration - TimeCounter;
+        }
+
+        public void ReverseNow()
+        {
+            float TempConatiner = SourceValue;
+            SourceValue = DestinationValue;
+            DestinationValue = TempConatiner;
+            TimeCounter = TimeDuration - TimeCounter;
+        }
+
+        public void ReverseNow(bool PlayIfFinished)
+        {
+            float TempConatiner = SourceValue;
+            SourceValue = DestinationValue;
+            DestinationValue = TempConatiner;
+            TimeCounter = TimeDuration - TimeCounter;
+
+            if (Finished)
+                Play();
+        }
+
+        public void Reset()
+        {
+            SourceValue = OriginalSourceValue;
+            DestinationValue = OriginalDestinationValue;
+            Finished = true;
+        }
+
+        public bool IsReversed()
+        {
+            return OriginalSourceValue == DestinationValue && OriginalDestinationValue == SourceValue;
         }
     }
 }

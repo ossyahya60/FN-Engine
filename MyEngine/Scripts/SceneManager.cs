@@ -6,29 +6,12 @@ namespace MyEngine
     public static class SceneManager
     {
         public static Scene ActiveScene;
-        public static List<Action> InitializerList = new List<Action>();
-
-        private static List<int> Scenes;
+        public static Dictionary<int, Action> InitializerList;
 
         public static void Start()
         {
-            InitializerList = new List<Action>();
-            Scenes = new List<int>();
+            InitializerList = new Dictionary<int, Action>();
             ActiveScene = null;
-        }
-
-        public static void AddScene(int id)
-        {
-            foreach (int _id in Scenes)
-                if (id == _id)
-                    throw new Exception("Scene ID can't be duplicated!");
-
-            Scenes.Add(id);
-        }
-
-        public static void RemoveScene(int id)
-        {
-            Scenes.Remove(id);
         }
 
         private static void UnloadScene()
@@ -44,16 +27,24 @@ namespace MyEngine
 
         public static void AddInitializer(Action initializer, int Index)
         {
-            InitializerList.Insert(Index, initializer);
+            InitializerList.Add(Index, initializer);
         }
 
         public static void LoadScene(Scene scene)
         {
-            UnloadScene();
+            UnloadScene(); 
+            ActiveScene = scene;
 
-            foreach (int _id in Scenes)
-                if (scene.ID == _id)
-                    ActiveScene = scene;
+            try
+            {
+                foreach (KeyValuePair<int, Action> KVP in InitializerList)
+                    if (KVP.Key == scene.ID)
+                        KVP.Value.Invoke();
+            }
+            catch(NullReferenceException)
+            {
+                throw new Exception("Scene Initializer Not Found!");
+            }
         }
     }
 }

@@ -13,18 +13,33 @@ namespace MyEngine
                 return GetComponent<Transform>();
             }
         }
-        public GameObject Parent = null; //Not yet implemented
+        public GameObject Parent = null; 
         public List<GameObjectComponent> GameObjectComponents; //List of all  GO componets in a certain scene(scene is not yet implemented)
         public string Tag = null;
         public int GameComponentsCount = 0;
-        public bool Active = true;
+        public bool Active
+        {
+            set
+            {
+                active = value;
+                foreach (GameObject GO in GetChildrenIfExist())
+                    GO.Active = value;
+            }
+            get
+            {
+                return active;
+            }
+        }
         public string Name = "Default";
 
         private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect" };
+        private List<GameObject> HandyList;
+        private bool active = true;
 
         public GameObject()
         {
             GameObjectComponents = new List<GameObjectComponent>();
+            HandyList = new List<GameObject>();
         }
 
         public T GetComponent<T>() where T : GameObjectComponent
@@ -73,6 +88,18 @@ namespace MyEngine
                 return GameObjectComponents.ToArray();
         }
 
+        public GameObject[] GetChildrenIfExist()
+        {
+            HandyList.Clear();
+
+            foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
+                if (GO.Parent == this)
+                    HandyList.Add(GO);
+
+            HandyList.Reverse();
+            return HandyList.ToArray();
+        }
+
         public virtual void Start()
         {
             foreach (GameObjectComponent GOC in GameObjectComponents)
@@ -82,8 +109,6 @@ namespace MyEngine
 
         public virtual void Update(GameTime gameTime)
         {
-            Active = (Parent != null)? Parent.Active : Active;
-
             if (Active)
             {
                 foreach (GameObjectComponent GOC in GameObjectComponents)
@@ -106,21 +131,63 @@ namespace MyEngine
         //{
         //    Scene.DestroyGameObject(GO); 
         //}
+        
+        //Update: Implemented using recursion, this means, you don't have to add every child to the simulation, just add the parent and you are good to go
+        public static GameObject Instantiate(GameObject GO)  //=> Implement it using "Recursion"
+        {
+            GameObject Clone = new GameObject();
+            Clone.Parent = GO.Parent;
+            Clone.Tag = GO.Tag;
+            Clone.Active = GO.Active;
 
-        //public static GameObject Instantiate(GameObject GO)  //Scene not yet implemented
-        //{
-        //    GameObject Clone = new GameObject();
-        //    Clone.Parent = GO.Parent;
-        //    Clone.Tag = GO.Tag;
-        //    Clone.GameObjectComponents = new List<GameObjectComponent>();
+            for (int i = 0; i < GO.GameObjectComponents.Count; i++)
+                Clone.AddComponent<GameObjectComponent>(GO.GameObjectComponents[i].DeepCopy(Clone));
 
-        //    for (int i = 0; i < GO.GameObjectComponents.Count; i++)
-        //    {
-        //        Clone.AddComponent<GameObjectComponent>(GO.GameObjectComponents[i].DeepCopy());
-        //        Clone.GameObjectComponents[i].gameObject = Clone;
-        //    }
-        //    GO.GetComponent<Transform>().Rotation = 90;
-        //    return Clone;
-        //}
+            SceneManager.ActiveScene.AddGameObject(Clone);
+
+            InstantiateRecursive(GO, Clone);
+
+            return Clone;
+        }
+
+        public static GameObject Instantiate(GameObject GO, GameObject parent)  //=> Implement it using "Recursion"
+        {
+            GameObject Clone = new GameObject();
+            Clone.Parent = parent;
+            Clone.Tag = GO.Tag;
+            Clone.Active = GO.Active;
+
+            for (int i = 0; i < GO.GameObjectComponents.Count; i++)
+                Clone.AddComponent<GameObjectComponent>(GO.GameObjectComponents[i].DeepCopy(Clone));
+
+            SceneManager.ActiveScene.AddGameObject(Clone);
+
+            InstantiateRecursive(GO, Clone);
+
+            return Clone;
+        }
+
+        private static void InstantiateRecursive(GameObject GO, GameObject Parent)
+        {
+            GameObject[] Children = GO.GetChildrenIfExist();
+
+            if (Children.Length == 0)
+                return;
+
+            foreach (GameObject Child in Children)
+            {
+                GameObject ChildClone = new GameObject();
+                ChildClone.Parent = Parent;
+                ChildClone.Tag = Child.Tag;
+                ChildClone.Active = Child.Active;
+
+                for (int i = 0; i < Child.GameObjectComponents.Count; i++)
+                    ChildClone.AddComponent<GameObjectComponent>(Child.GameObjectComponents[i].DeepCopy(ChildClone));
+
+                SceneManager.ActiveScene.AddGameObject(ChildClone);
+
+                InstantiateRecursive(Child, ChildClone);
+            }
+        }
     }
 }

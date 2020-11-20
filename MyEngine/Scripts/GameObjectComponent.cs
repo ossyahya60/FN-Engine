@@ -28,7 +28,12 @@ namespace MyEngine
 
         }
 
-        public virtual GameObjectComponent DeepCopy()
+        public virtual void Destroy()
+        {
+            gameObject.RemoveComponent<GameObjectComponent>(this);
+        }
+
+        public virtual GameObjectComponent DeepCopy(GameObject Clone)
         {
             return this.MemberwiseClone() as GameObjectComponent;
         }

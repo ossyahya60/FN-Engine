@@ -42,11 +42,15 @@ namespace MyEngine
         private bool ForParticleEffect = false;
         private float AccelerationCounter = 0;
         private int height;
+        private Rectangle HandyRectangle; //To avoid stack allocating a lot if memory in a short time
 
         public Particle(bool ForParticleEffect)
         {
             OriginalSize = Size;
             this.ForParticleEffect = ForParticleEffect;
+            HandyRectangle = new Rectangle();
+            Length = 2;
+            Height = 10;
         }
 
         public void Update(GameTime gameTime)
@@ -92,7 +96,12 @@ namespace MyEngine
         {
             if(!Expired)
             {
-                HitBoxDebuger.DrawRectangle(new Rectangle((int)Position.X, (int)Position.Y, Size, Size), Color, Rotation, Layer);
+                HandyRectangle.X = (int)Position.X;
+                HandyRectangle.Y = (int)Position.Y;
+                HandyRectangle.Width = Size;
+                HandyRectangle.Height = Size;
+
+                HitBoxDebuger.DrawRectangle(HandyRectangle, Color, Rotation, Layer);
             }
         }
 
@@ -100,7 +109,12 @@ namespace MyEngine
         {
             if (!Expired)
             {
-                HitBoxDebuger.DrawRectangle(new Rectangle((int)Position.X, (int)Position.Y, Size, Size), Color, Rotation, texture, Layer, Vector2.Zero);
+                HandyRectangle.X = (int)Position.X;
+                HandyRectangle.Y = (int)Position.Y;
+                HandyRectangle.Width = Size;
+                HandyRectangle.Height = Size;
+
+                HitBoxDebuger.DrawRectangle(HandyRectangle, Color, Rotation, texture, Layer, Vector2.Zero);
             }
         }
 
@@ -109,8 +123,18 @@ namespace MyEngine
         {
             if (!Expired)
             {
-                HitBoxDebuger.DrawLine(new Rectangle((int)Position.X, (int)Position.Y, Length, height), Color, Rotation, Layer, Vector2.Zero);
+                HandyRectangle.X = (int)Position.X;
+                HandyRectangle.Y = (int)Position.Y;
+                HandyRectangle.Width = Length;
+                HandyRectangle.Height = Height;
+
+                HitBoxDebuger.DrawLine(HandyRectangle, Color, Rotation, Layer, Vector2.Zero);
             }
+        }
+
+        public Particle DeepCopy()
+        {
+            return this.MemberwiseClone() as Particle;
         }
     }
 }

@@ -6,7 +6,7 @@ namespace MyEngine
 {
     public class Scene
     {
-        public bool Active = false;
+        public bool Active = true;
         public List<GameObject> GameObjects;
         public string Name;
         public int ID
@@ -28,12 +28,14 @@ namespace MyEngine
         private static List<int> IDs;
         private int Id;
         private int GameObjectCount = 0;
+        private List<GameObject> HandyList;
 
         public Scene(string name)
         {
             GameObjects = new List<GameObject>();
             IDs = new List<int>();
             Name = name;
+            HandyList = new List<GameObject>();
         }
 
         public Scene(string name, int _ID)
@@ -42,50 +44,93 @@ namespace MyEngine
             IDs = new List<int>();
             Name = name;
             ID = _ID;
+            HandyList = new List<GameObject>();
         }
 
-        public void CleanScene()
+        //public void CleanScene()
+        //{
+        //    Active = true;
+        //    GameObjects.Clear();
+        //    GameObjectCount = 0;
+        //    SceneManager.ActiveScene = this;
+        //}
+
+        //public void CleanScene(string Name)
+        //{
+        //    Active = true;
+        //    GameObjects.Clear();
+        //    GameObjectCount = 0;
+        //    this.Name = Name;
+        //    SceneManager.ActiveScene = this;
+        //}
+
+        //public void CleanScene(string Name, int ID)
+        //{
+        //    Active = true;
+        //    GameObjects.Clear();
+        //    GameObjectCount = 0;
+        //    this.Name = Name;
+        //    this.ID = ID;
+        //    SceneManager.ActiveScene = this;
+        //}
+
+        public void AddGameObject(GameObject GO) //=> Implement it using "Recursion"
         {
-            Active = true;
-            GameObjects.Clear();
-            GameObjectCount = 0;
-            SceneManager.ActiveScene = this;
+            if (!GameObjects.Contains(GO))
+            {
+                GameObjects.Insert(GameObjectCount, GO);
+                GameObjectCount++;
+            }
         }
 
-        public void CleanScene(string Name)
-        {
-            Active = true;
-            GameObjects.Clear();
-            GameObjectCount = 0;
-            this.Name = Name;
-            SceneManager.ActiveScene = this;
-        }
-
-        public void CleanScene(string Name, int ID)
-        {
-            Active = true;
-            GameObjects.Clear();
-            GameObjectCount = 0;
-            this.Name = Name;
-            this.ID = ID;
-            SceneManager.ActiveScene = this;
-        }
-
-        public void AddGameObject(GameObject GO)
+        /* //Didn't work as Gameobjects have to be in the simulation in order to be find by "GetChildrenMethod" :(
+        public void AddGameObject(GameObject GO) //=> Implement it using "Recursion"
         {
             GameObjects.Insert(GameObjectCount, GO);
             GameObjectCount++;
+
+            AddGameObjectRecursive(GO);
         }
 
-        public void RemoveGameObject(GameObject GO)
+        private void AddGameObjectRecursive(GameObject GO)
         {
-            foreach (GameObject gameObject in GameObjects.ToArray())
-                if (gameObject.Parent == GO)
-                    if(GameObjects.Remove(gameObject))
-                        GameObjectCount--;
+            GameObject[] Children = GO.GetChildrenIfExist();
+
+            if (Children.Length == 0)
+                return;
+
+            foreach (GameObject Child in Children)
+            {
+                GameObjects.Insert(GameObjectCount, Child);
+                GameObjectCount++;
+
+                AddGameObjectRecursive(Child);
+            }
+        }
+        */
+
+        public void RemoveGameObject(GameObject GO) //=> Implement it using "Recursion"
+        {
+            RemoveGameObjectRecursive(GO);
 
             if (GameObjects.Remove(GO))
                 GameObjectCount--;
+        }
+
+        private void RemoveGameObjectRecursive(GameObject GO)
+        {
+            GameObject[] Children = GO.GetChildrenIfExist();
+
+            if (Children.Length == 0)
+                return;
+
+            foreach (GameObject Child in Children)
+            {
+                RemoveGameObjectRecursive(Child);
+
+                if (GameObjects.Remove(Child))
+                    GameObjectCount--;
+            }
         }
 
         public void Start()
@@ -98,7 +143,7 @@ namespace MyEngine
         public void Update(GameTime gameTime)
         {
             if(Active)
-                foreach (GameObject GO in GameObjects)
+                foreach (GameObject GO in GameObjects.ToArray())
                     GO.Update(gameTime);
         }
 
@@ -129,13 +174,14 @@ namespace MyEngine
 
         public GameObject[] FindGameObjectsWithTag(string Tag)
         {
-            GameObject[] GOs = new GameObject[GameObjects.Count];
+            HandyList.Clear();
 
+            int Counter = 0;
             for (int i = 0; i < GameObjects.Count; i++)
                 if (GameObjects[i].Tag == Tag)
-                    GOs[i] = GameObjects[i];
+                    HandyList.Insert(Counter++, GameObjects[i]);
 
-            return GOs;
+            return HandyList.ToArray();
         }
     }
 }

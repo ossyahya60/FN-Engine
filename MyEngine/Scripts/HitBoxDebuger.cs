@@ -37,7 +37,7 @@ namespace MyEngine
             Setup.spriteBatch.Draw(texture, Rect, null, color, MathHelper.ToRadians(Angle), Origin, SpriteEffects.None, Layer);
         }
 
-        public static void DrawNonFilledRectangle(Rectangle Rect) //Draw Non filledRectangle (Does it consume much memory?)
+        public static void DrawNonFilledRectangle(Rectangle Rect) //Draw Non filledRectangle (Does it consume much memory?) use for debugging purposes only!!
         {
             Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Left, Rect.Top, Rect.Width, 1), Color.LightGreen);
             Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Right, Rect.Top, 1, Rect.Height), Color.LightGreen);

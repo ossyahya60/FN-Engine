@@ -8,8 +8,7 @@ namespace MyEngine
         public Sprite Sprite { set; get; }
         public SpriteEffects SpriteEffects;
         public Color Color;
-
-        private Transform Transform;
+        public Transform Transform;
 
         public SpriteRenderer()
         {
@@ -32,11 +31,11 @@ namespace MyEngine
                 spriteBatch.Draw(Sprite.Texture, Transform.Position, Sprite.SourceRectangle, Color, Transform.Rotation, Sprite.Origin, Transform.Scale, SpriteEffects, Sprite.Layer);
         }
 
-        public override GameObjectComponent DeepCopy()
+        public override GameObjectComponent DeepCopy(GameObject clone)
         {
             SpriteRenderer Clone = this.MemberwiseClone() as SpriteRenderer;
-
-            Clone.Sprite = Sprite.DeepCopy();
+            Clone.Transform = clone.Transform;
+            Clone.Sprite = Sprite.DeepCopy(clone);
 
             return Clone;
         }

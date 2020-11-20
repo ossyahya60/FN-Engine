@@ -32,7 +32,7 @@ namespace MyEngine
         {
             foreach (KeyValuePair<string, float> KVP in LayerWithValue)
                 if (KVP.Key == Name)
-                    return 1 - KVP.Value;
+                    return 1.2f - KVP.Value;
 
             return 1;
         }
