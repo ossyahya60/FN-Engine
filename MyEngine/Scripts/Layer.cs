@@ -5,7 +5,7 @@ namespace MyEngine
     public static class Layer
     {
         private static Dictionary<string, float> LayerWithValue;
-        private static readonly float Maximum = 80;
+        private static readonly float Maximum = 100;
 
         static Layer()
         {
@@ -28,8 +28,11 @@ namespace MyEngine
             return true;
         }
 
-        public static float GetLayer(string Name) //Invalid Input if Layer is not found
+        public static float GetLayer(string Name, bool Sort = false) //Invalid Input if Layer is not found
         {
+            if (Sort)
+                SceneManager.ActiveScene.SortGameObjectsWithLayer();
+
             foreach (KeyValuePair<string, float> KVP in LayerWithValue)
                 if (KVP.Key == Name)
                     return 1.2f - KVP.Value;

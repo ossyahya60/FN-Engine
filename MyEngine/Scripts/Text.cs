@@ -11,7 +11,6 @@ namespace MyEngine
         public string text;
         public SpriteFont Font;
         public SpriteEffects spriteEffects;
-        public float Layer = 0f;
         public Vector2 Origin;
         public bool CustomOrigin = false;
 
@@ -47,7 +46,7 @@ namespace MyEngine
 
         public override void Start()
         {
-            Layer = LayerUI.GetLayer("Text");
+            gameObject.Layer = LayerUI.GetLayer("Text");
             if (transform == null)
                 transform = gameObject.Transform;
 
@@ -59,7 +58,7 @@ namespace MyEngine
             if(!CustomOrigin)
                 Origin = Font.MeasureString(text) * 0.5f;
 
-            spriteBatch.DrawString(Font, text, transform.Position, Color, MathHelper.ToRadians(transform.Rotation), Origin, transform.Scale, spriteEffects, Layer);
+            spriteBatch.DrawString(Font, text, transform.Position, Color, MathHelper.ToRadians(transform.Rotation), Origin, transform.Scale, spriteEffects, gameObject.Layer);
         }
 
         public void LoadFont(string Name)

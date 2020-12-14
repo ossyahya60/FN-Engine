@@ -166,7 +166,7 @@ namespace MyEngine
         {
             // TODO: Add your drawing code here
             RIR.BeginDraw(); //Resolution related -> Mandatory
-            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
+            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
 
             SceneManager.ActiveScene.Draw(spriteBatch);
             spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow2").GetComponent<SpriteRenderer>().Sprite.Transform.Position.ToString(), Vector2.Zero, Color.Red);

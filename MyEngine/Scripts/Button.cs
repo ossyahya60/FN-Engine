@@ -9,7 +9,6 @@ namespace MyEngine
         public Point Size;
         public Color IdleColor;
         public Color HighlightColor;
-        public float Layer;
 
         private Transform Transform;
         private Rectangle Bounds;
@@ -31,7 +30,7 @@ namespace MyEngine
         {
             Size = new Point(60, 30);
             Transform = gameObject.Transform;
-            Layer = LayerUI.GetLayer("Buttons");
+            gameObject.Layer = LayerUI.GetLayer("Buttons");
             Bounds = new Rectangle(Transform.Position.ToPoint(), Size);
             Origin = Vector2.One * 0.5f;
             IdleColor = Color.White;
@@ -43,7 +42,7 @@ namespace MyEngine
         {
             Bounds.Location = Transform.Position.ToPoint();
             Bounds.Size = Size * Transform.Scale.ToPoint();
-            HitBoxDebuger.DrawRectangle(Bounds, ActiveColor, 0, HitBoxDebuger._textureFilled, Layer, Origin);
+            HitBoxDebuger.DrawRectangle(Bounds, ActiveColor, 0, HitBoxDebuger._textureFilled, gameObject.Layer, Origin);
         }
 
         public override void Update(GameTime gameTime)

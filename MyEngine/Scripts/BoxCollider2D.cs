@@ -63,6 +63,13 @@ namespace MyEngine
             return false;
         }
 
+        public bool IsTouching(Vector2 Point)  //Are the two colliders currently touching?
+        {
+            if (GetDynamicCollider().Contains(Point))
+                return true;
+            return false;
+        }
+
         bool CollisionDetection(Collider2D collider, bool Continous)
         {
             BoxCollider2D boxCollider = collider as BoxCollider2D;

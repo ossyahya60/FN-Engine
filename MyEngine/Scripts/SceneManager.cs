@@ -35,16 +35,9 @@ namespace MyEngine
             UnloadScene(); 
             ActiveScene = scene;
 
-            try
-            {
-                foreach (KeyValuePair<int, Action> KVP in InitializerList)
-                    if (KVP.Key == scene.ID)
-                        KVP.Value.Invoke();
-            }
-            catch(NullReferenceException)
-            {
-                throw new Exception("Scene Initializer Not Found!");
-            }
+            foreach (KeyValuePair<int, Action> KVP in InitializerList)
+                if (KVP.Key == scene.ID)
+                    KVP.Value.Invoke();
         }
     }
 }

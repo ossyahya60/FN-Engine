@@ -78,6 +78,9 @@
     <Compile Include="Scripts\SpriteRenderer.cs" />
     <Compile Include="Scripts\Text.cs" />
     <Compile Include="Scripts\Threader.cs" />
+    <Compile Include="Scripts\Tile.cs" />
+    <Compile Include="Scripts\TileMap.cs" />
+    <Compile Include="Scripts\TileMapLoader.cs" />
     <Compile Include="Scripts\TrailRenderer.cs" />
     <Compile Include="Scripts\Transform.cs" />
     <Compile Include="Scripts\UIComponent.cs" />
@@ -87,6 +90,10 @@
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\MonoGame Projects\Windows\Alchemist\packages\Newtonsoft.Json.12.0.3\lib\net20\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />

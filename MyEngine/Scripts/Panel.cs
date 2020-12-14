@@ -10,7 +10,6 @@ namespace MyEngine
         public string Name;
         public Color Color;
         public Point Size;
-        public float Layer = 0.1f;
 
         private Transform Transform;
         private Texture2D Texture;
@@ -33,7 +32,7 @@ namespace MyEngine
 
         public override void Start()
         {
-            Layer = LayerUI.GetLayer("Panels");
+            gameObject.Layer = LayerUI.GetLayer("Panels");
             Transform = gameObject.Transform;
             if(Transform.Position == Vector2.Zero)
                 Transform.Position = new Vector2(Setup.graphics.PreferredBackBufferWidth / 2, Setup.graphics.PreferredBackBufferHeight / 2);
@@ -49,7 +48,7 @@ namespace MyEngine
             Bounds.Location = Transform.Position.ToPoint();
             Bounds.Size = Size * Transform.Scale.ToPoint();
 
-            HitBoxDebuger.DrawRectangle(Bounds, Color, 0, Texture, Layer, Origin);
+            HitBoxDebuger.DrawRectangle(Bounds, Color, 0, Texture, gameObject.Layer, Origin);
         }
 
         public void FillTheScreen()

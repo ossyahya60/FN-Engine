@@ -1,10 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace MyEngine
 {
-    public class GameObject
+    public class GameObject: IComparer<GameObject>
     {
         public Transform Transform
         {
@@ -13,6 +14,7 @@ namespace MyEngine
                 return GetComponent<Transform>();
             }
         }
+        public float Layer = 1;
         public GameObject Parent = null; 
         public List<GameObjectComponent> GameObjectComponents; //List of all  GO componets in a certain scene(scene is not yet implemented)
         public string Tag = null;
@@ -88,6 +90,8 @@ namespace MyEngine
                 return GameObjectComponents.ToArray();
         }
 
+        
+
         public GameObject[] GetChildrenIfExist()
         {
             HandyList.Clear();
@@ -156,6 +160,7 @@ namespace MyEngine
             Clone.Parent = parent;
             Clone.Tag = GO.Tag;
             Clone.Active = GO.Active;
+            Clone.Layer = GO.Layer;
 
             for (int i = 0; i < GO.GameObjectComponents.Count; i++)
                 Clone.AddComponent<GameObjectComponent>(GO.GameObjectComponents[i].DeepCopy(Clone));
@@ -180,6 +185,7 @@ namespace MyEngine
                 ChildClone.Parent = Parent;
                 ChildClone.Tag = Child.Tag;
                 ChildClone.Active = Child.Active;
+                ChildClone.Layer = Child.Layer;
 
                 for (int i = 0; i < Child.GameObjectComponents.Count; i++)
                     ChildClone.AddComponent<GameObjectComponent>(Child.GameObjectComponents[i].DeepCopy(ChildClone));
@@ -188,6 +194,20 @@ namespace MyEngine
 
                 InstantiateRecursive(Child, ChildClone);
             }
+        }
+
+        public int Compare(GameObject x, GameObject y)
+        {
+            if (x.Layer < y.Layer)
+                return 1;
+            if (x.Layer > y.Layer)
+                return -1;
+            return 0;
+        }
+
+        public static IComparer<GameObject> SortByLayer()
+        {
+            return (IComparer<GameObject>)new GameObject();
         }
     }
 }

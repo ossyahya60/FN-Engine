@@ -14,7 +14,6 @@ namespace MyEngine
         public bool DestroyWhenFinished = true;
         public bool BurstMode = false;
         public int ParticlesAtaTime = 10;
-        public float Layer = 0;
         public Texture2D CustomTexture = null;
         public Vector2 FireDirection;
         public float Speed = 5f;
@@ -141,7 +140,7 @@ namespace MyEngine
                             particle.AccelerationMagnitude = 0.1f;
                             particle.ShrinkMode = true;
                             particle.MinimumSize = 0.5f;
-                            particle.Layer = Layer;
+                            particle.Layer = gameObject.Layer;
                             if (RandomRotation)
                             {
                                 Rotation = (float)random.NextDouble() * 360;

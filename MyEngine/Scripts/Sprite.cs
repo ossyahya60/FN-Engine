@@ -8,7 +8,6 @@ namespace MyEngine
     {
         public Texture2D Texture = null;
         public Rectangle SourceRectangle;  //P.S: scale??
-        public float Layer = 0;
         public Vector2 Origin;
         public Transform Transform;
         private Rectangle HandyRectangle; //To avoid stack allocating a lot if memory in a short time

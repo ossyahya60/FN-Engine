@@ -149,7 +149,7 @@ namespace MyEngine
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            if(Active)
+            if (Active)
                 foreach (GameObject GO in GameObjects)
                     GO.Draw(spriteBatch);
         }
@@ -182,6 +182,11 @@ namespace MyEngine
                     HandyList.Insert(Counter++, GameObjects[i]);
 
             return HandyList.ToArray();
+        }
+
+        public void SortGameObjectsWithLayer()
+        {
+            GameObjects.Sort(GameObject.SortByLayer());
         }
     }
 }

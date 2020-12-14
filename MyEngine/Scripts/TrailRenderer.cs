@@ -14,7 +14,6 @@ namespace MyEngine
         public Color Color = Color.White;
         public float VanishAfter = 1f; //Time for Segments to start vanishing
         //public int ParticleSize = 20;
-        public float Layer = 0f;
         //public bool RandomSize = true;
         public bool RandomColor = false;
         public bool ShrinkWithTime = true;
@@ -85,7 +84,7 @@ namespace MyEngine
                     particle.Rotation = MathCompanion.GetAngle(transform.LastPosition, transform.Position);
                     particle.Length = 1 + (int)Math.Ceiling((transform.Position - transform.LastPosition).Length());
                     particle.Height = SegmentWidth;
-                    particle.Layer = Layer;
+                    particle.Layer = gameObject.Layer;
 
                     Particles.Enqueue(particle);
                 }
