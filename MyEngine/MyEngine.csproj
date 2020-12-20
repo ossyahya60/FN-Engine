@@ -78,8 +78,6 @@
     <Compile Include="Scripts\SpriteRenderer.cs" />
     <Compile Include="Scripts\Text.cs" />
     <Compile Include="Scripts\Threader.cs" />
-    <Compile Include="Scripts\Tile.cs" />
-    <Compile Include="Scripts\TileMap.cs" />
     <Compile Include="Scripts\TileMapLoader.cs" />
     <Compile Include="Scripts\TrailRenderer.cs" />
     <Compile Include="Scripts\Transform.cs" />

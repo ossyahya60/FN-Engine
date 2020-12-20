@@ -7,13 +7,7 @@ namespace MyEngine
 {
     public class GameObject: IComparer<GameObject>
     {
-        public Transform Transform
-        {
-            get
-            {
-                return GetComponent<Transform>();
-            }
-        }
+        public Transform Transform;
         public float Layer = 1;
         public GameObject Parent = null; 
         public List<GameObjectComponent> GameObjectComponents; //List of all  GO componets in a certain scene(scene is not yet implemented)

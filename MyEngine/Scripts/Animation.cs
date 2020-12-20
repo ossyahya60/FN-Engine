@@ -14,11 +14,14 @@ namespace MyEngine
         public string Tag;
 
         private int FramesCount;
-        private int CurrentFrame = 0;
+        private Point CurrentFrame;
         private float Timer = 0;
+        private Point OrigSpriteSourceValues;
 
         public Animation(Sprite sprite, int framesCount)
         {
+            CurrentFrame = Point.Zero;
+            OrigSpriteSourceValues = sprite.SourceRectangle.Location;
             Sprite = sprite;
             FramesCount = framesCount;
 
@@ -33,7 +36,7 @@ namespace MyEngine
                 Timer = 0;
                 IsPlaying = true;
                 Resume();
-                CurrentFrame = (Reversed) ? FramesCount - 1 : 0;
+                CurrentFrame = (Reversed) ? GetLastFrame(ref CurrentFrame) : Point.Zero;
             }
         }
 
@@ -68,31 +71,62 @@ namespace MyEngine
                 {
                     if (Reversed)
                     {
-                        if (CurrentFrame <= 0)
+                        if (CurrentFrame == Point.Zero)
                         {
                             IsPlaying = false;
                             if (IsLooping)
                                 Play();
                         }
                         else
-                            CurrentFrame--;
+                            DecrementFrame();
                     }
                     else
                     {
-                        if (CurrentFrame >= FramesCount - 1)
+                        if (IsLastFrame())
                         {
                             IsPlaying = false;
                             if (IsLooping)
                                 Play();
                         }
                         else
-                            CurrentFrame++;
+                            IncrementFrame();
                     }
                     Timer = 0;
                 }
 
-                Sprite.SourceRectangle.X = CurrentFrame * Sprite.SourceRectangle.Width;
+                Sprite.SourceRectangle.X = CurrentFrame.X * Sprite.SourceRectangle.Width + OrigSpriteSourceValues.X;
+                Sprite.SourceRectangle.Y = CurrentFrame.Y * Sprite.SourceRectangle.Height + OrigSpriteSourceValues.Y;
             }
+        }
+
+        //Note: We assume that every consecutive Frame has the same Dimensions!
+        private Point GetLastFrame(ref Point point)
+        {
+            Point Temp = Point.Zero;
+            point.X = FramesCount % (Sprite.Texture.Width / Sprite.SourceRectangle.Width) - 1;
+            point.Y = FramesCount / (Sprite.Texture.Width / Sprite.SourceRectangle.Width);
+
+            return point;
+        }
+
+        private bool IsLastFrame()
+        {
+            bool Valid = (CurrentFrame.X == FramesCount % (Sprite.Texture.Width / Sprite.SourceRectangle.Width) - 1) && (CurrentFrame.Y == FramesCount / (Sprite.Texture.Width / Sprite.SourceRectangle.Width));
+            return Valid;
+        }
+
+        private void IncrementFrame()
+        {
+            CurrentFrame.X += 1;
+            CurrentFrame.X = CurrentFrame.X % (Sprite.Texture.Width / Sprite.SourceRectangle.Width);
+            CurrentFrame.Y = CurrentFrame.Y / (Sprite.Texture.Width / Sprite.SourceRectangle.Width);
+        }
+
+        private void DecrementFrame()
+        {
+            CurrentFrame.X -= 1;
+            CurrentFrame.X = CurrentFrame.X % (Sprite.Texture.Width / Sprite.SourceRectangle.Width);
+            CurrentFrame.Y = CurrentFrame.Y / (Sprite.Texture.Width / Sprite.SourceRectangle.Width);
         }
     }
 }

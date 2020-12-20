@@ -14,6 +14,7 @@ namespace MyEngine
         public override void Start()
         {
             //LastParent = gameObject.Parent;
+            gameObject.Transform = this;
             LastPosition = position;
             if (LastParent == null)
             {
@@ -180,6 +181,7 @@ namespace MyEngine
         {
             Transform Clone = this.MemberwiseClone() as Transform;
 
+            clone.Transform = Clone;
             Clone.position = new Vector2(position.X, position.Y);
             Clone.scale = new Vector2(scale.X, scale.Y);
             Clone.rotation = rotation;

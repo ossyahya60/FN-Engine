@@ -46,7 +46,7 @@ namespace MyEngine
             if (gameObject.GetComponent<SpriteRenderer>() != null && bounds.Width == 0)  //Initializing Collider bounds with the sprite bounds if exists
             {
                 if (gameObject.GetComponent<SpriteRenderer>().Sprite != null)
-                    Bounds = gameObject.GetComponent<SpriteRenderer>().Sprite.SourceRectangle;
+                    Bounds = new Rectangle(0, 0, gameObject.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Size.X, gameObject.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Size.Y);
                 else
                     Bounds = new Rectangle(0, 0, 100, 100);
             }
