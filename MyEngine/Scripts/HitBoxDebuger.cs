@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MyEngine
 {
+    //Use this class for debugging only, it's not designed for real-time use!! (Inefficient)
     public static class HitBoxDebuger
     {
         public static Texture2D _textureFilled = null;
@@ -77,7 +78,8 @@ namespace MyEngine
             Setup.spriteBatch.Draw(CreateCircleTextureShell(OuterRadius, InnerRadius, color), transform.Position, null, color, 0, Origin, transform.Scale.X, SpriteEffects.None, transform.gameObject.Layer);
         }
 
-        private static Texture2D CreateCircleTexture(int Radius, Color color)
+        //You may use the following two functions to create a texture and use it, not creating a texture every frame!
+        public static Texture2D CreateCircleTexture(int Radius, Color color)
         {
             int Diameter = 2 * Radius;
             Color[] Pixels = new Color[Diameter * Diameter];
@@ -103,7 +105,7 @@ namespace MyEngine
             return texture;
         }
 
-        private static Texture2D CreateCircleTextureShell(int Radius1, int Radius2, Color color)
+        public static Texture2D CreateCircleTextureShell(int Radius1, int Radius2, Color color)
         {
             int Diameter = 2 * Radius1;
             Color[] Pixels = new Color[Diameter * Diameter];
