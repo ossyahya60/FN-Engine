@@ -93,10 +93,16 @@ namespace MyEngine
             Circle.GetComponent<SpriteRenderer>().Sprite = new Sprite(Circle.Transform);
             Circle.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.CreateCircleTextureShell(graphics.PreferredBackBufferHeight/2, (int)(0.9f*graphics.PreferredBackBufferHeight / 2), Color.Red);
 
-            SceneManager.ActiveScene.AddGameObject(Circle);
-            //SceneManager.ActiveScene.AddGameObject(Arrow1);
+            //SceneManager.ActiveScene.AddGameObject(Circle);
+            SceneManager.ActiveScene.AddGameObject(Arrow1);
+
+            GameObject Arrow2 = GameObject.Instantiate(Arrow1);
+
+            Arrow1.AddChild(Arrow2);
 
             SceneManager.ActiveScene.Start();
+
+            Arrow2.Transform.Position = Vector2.One * 100;
 
             //Initialization here
 
@@ -137,9 +143,9 @@ namespace MyEngine
             //passing a property as a refrence using delegates
             //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(value => Arrow.Transform.Rotation = value);
             if (Input.GetKey(Keys.W))
-                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Position -= Vector2.UnitY * (float)gameTime.ElapsedGameTime.TotalSeconds * 20;
+                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Scale += Vector2.One * (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (Input.GetKey(Keys.S))
-                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Position += Vector2.UnitY * (float)gameTime.ElapsedGameTime.TotalSeconds * 20;
+                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Scale -= Vector2.One * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             SceneManager.ActiveScene.Update(gameTime);
 
@@ -156,11 +162,8 @@ namespace MyEngine
             RIR.BeginDraw(); //Resolution related -> Mandatory
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
 
-            //HitBoxDebuger.DrawLine(new Rectangle(50, 50, 200, 20), Color.Red, 45, 0, Vector2.Zero);
-            //HitBoxDebuger.DrawCircleFilled(Vector2.Zero, Radius, Color.Red, 0, 1);
-            //HitBoxDebuger.DrawCircleNonFilled(new Vector2(200, 100), Radius, (int)(Radius*0.9f), Color.Green, 0, 1);
             SceneManager.ActiveScene.Draw(spriteBatch);
-            //spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow2").Transform.Position.ToString(), Vector2.Zero, Color.Red);
+            spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Scale.ToString(), Vector2.Zero, Color.Red);
 
             spriteBatch.End();
             base.Draw(gameTime);

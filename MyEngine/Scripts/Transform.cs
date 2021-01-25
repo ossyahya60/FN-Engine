@@ -316,8 +316,9 @@ namespace MyEngine
             set
             {
                 Vector2 LastScale = scale;
-                scale.X = (value.X >= 0) ? value.X : 0;
-                scale.X = (value.Y >= 0) ? value.Y : 0;
+                scale = value;
+                scale.X = (scale.X >= 0) ? scale.X : 0;
+                scale.Y = (scale.Y >= 0) ? scale.Y : 0;
 
                 GameObject[] GOs = gameObject.GetChildren();
 
