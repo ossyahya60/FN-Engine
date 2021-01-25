@@ -153,5 +153,10 @@ namespace MyEngine
         {
             throw new System.NotImplementedException();
         }
+
+        public bool Contains(Vector2 Point)
+        {
+            return GetDynamicCollider().Contains(Point);
+        }
     }
 }

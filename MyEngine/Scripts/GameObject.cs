@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace MyEngine
@@ -13,29 +12,127 @@ namespace MyEngine
         public List<GameObjectComponent> GameObjectComponents; //List of all  GO componets in a certain scene(scene is not yet implemented)
         public string Tag = null;
         public int GameComponentsCount = 0;
-        public bool Active
-        {
-            set
-            {
-                active = value;
-                foreach (GameObject GO in GetChildrenIfExist())
-                    GO.Active = value;
-            }
-            get
-            {
-                return active;
-            }
-        }
+        public bool Active { set; get; }
         public string Name = "Default";
 
-        private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect" };
-        private List<GameObject> HandyList;
-        private bool active = true;
+        private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect", "CircleCollider" };
+        private List<GameObject> Children;
 
         public GameObject()
         {
+            Active = true;
             GameObjectComponents = new List<GameObjectComponent>();
-            HandyList = new List<GameObject>();
+            Children = new List<GameObject>();
+        }
+
+        public bool AddChild(GameObject Child)
+        {
+            if (Child == null)
+                return false;
+
+            Child.Parent = this;
+            Children.Add(Child);
+
+            return true;
+        }
+
+        public bool RemoveChild(GameObject Child)
+        {
+            if (Child == null)
+                return false;
+
+            foreach (GameObject child in Children)
+            {
+                if(Children.Contains(Child))
+                {
+                    Child.Parent = null;
+                    Children.Remove(Child);
+                    return true;
+                }
+
+                if (RemoveChild(child))
+                    break;
+            }
+
+            return false;
+        }
+
+        public bool RemoveChild(string Tag)
+        {
+            foreach (GameObject child in Children)
+            {
+                if (child.Tag == Tag)
+                {
+                    child.Parent = null;
+                    Children.Remove(child);
+                    return true;
+                }
+
+                if (RemoveChild(Tag))
+                    break;
+            }
+
+            return false;
+        }
+
+        public void RemoveChildren(string Tag)
+        {
+            foreach (GameObject child in Children)
+            {
+                RemoveChild(Tag);
+
+                if (child.Tag == Tag)
+                {
+                    child.Parent = null;
+                    Children.Remove(child);
+                }
+            }
+        }
+
+        public bool RemoveChildWithName(string Name)
+        {
+            foreach (GameObject child in Children)
+            {
+                if (child.Tag == Name)
+                {
+                    child.Parent = null;
+                    Children.Remove(child);
+                    return true;
+                }
+
+                if (RemoveChild(Name))
+                    break;
+            }
+
+            return false;
+        }
+
+        public GameObject GetChild(string Tag)
+        {
+            foreach (GameObject child in Children)
+            {
+                if (child.Tag == Tag)
+                    return child;
+
+                if (GetChild(Tag) != null)
+                    break;
+            }
+
+            return null;
+        }
+
+        public GameObject GetChildWithName(string Name)
+        {
+            foreach (GameObject child in Children)
+            {
+                if (child.Name == Name)
+                    return child;
+
+                if (GetChild(Name) != null)
+                    break;
+            }
+
+            return null;
         }
 
         public T GetComponent<T>() where T : GameObjectComponent
@@ -71,11 +168,6 @@ namespace MyEngine
             }
         }
 
-        //public T ReturnType(GameObjectComponent GOC) where T: GameObjectComponent
-        //{
-        //    return T;
-        //}
-
         public GameObjectComponent[] GetAllComponents()
         {
             if (GameObjectComponents.Count == 0)
@@ -84,18 +176,32 @@ namespace MyEngine
                 return GameObjectComponents.ToArray();
         }
 
-        
-
-        public GameObject[] GetChildrenIfExist()
+        public GameObject[] GetChildren() //Returns First-Level children
         {
-            HandyList.Clear();
+            if (Children.Count == 0)
+                return null;
 
-            foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
-                if (GO.Parent == this)
-                    HandyList.Add(GO);
+            return Children.ToArray();
+        }
 
-            HandyList.Reverse();
-            return HandyList.ToArray();
+        public GameObject[] GetALLChildren()
+        {
+            if (Children.Count == 0)
+                return null;
+
+            List<GameObject> Arr = new List<GameObject>();
+            GetAllChildrenRecursive(Arr);
+
+            return Arr.ToArray();
+        }
+
+        private void GetAllChildrenRecursive(List<GameObject> Arr)
+        {
+            foreach(GameObject Child in Children)
+            {
+                GetAllChildrenRecursive(Arr);
+                Arr.Add(Child);
+            }
         }
 
         public virtual void Start()
@@ -109,9 +215,12 @@ namespace MyEngine
         {
             if (Active)
             {
-                foreach (GameObjectComponent GOC in GameObjectComponents)
-                    if (GOC.Enabled)
-                        GOC.Update(gameTime);
+                //if (Parent == null || Parent.Active)
+                {
+                    foreach (GameObjectComponent GOC in GameObjectComponents)
+                        if (GOC.Enabled)
+                            GOC.Update(gameTime);
+                }
             }
         }
 
@@ -119,9 +228,12 @@ namespace MyEngine
         {
             if (Active)
             {
-                foreach (GameObjectComponent GOC in GameObjectComponents)
-                    if (GOC.Enabled)
-                        GOC.Draw(spriteBatch);
+                //if (/*Parent == null || */Parent.Active)
+                {
+                    foreach (GameObjectComponent GOC in GameObjectComponents)
+                        if (GOC.Enabled)
+                            GOC.Draw(spriteBatch);
+                }
             }
         }
 
@@ -168,26 +280,25 @@ namespace MyEngine
 
         private static void InstantiateRecursive(GameObject GO, GameObject Parent)
         {
-            GameObject[] Children = GO.GetChildrenIfExist();
-
-            if (Children.Length == 0)
+            if (GO == null)
                 return;
 
-            foreach (GameObject Child in Children)
-            {
-                GameObject ChildClone = new GameObject();
-                ChildClone.Parent = Parent;
-                ChildClone.Tag = Child.Tag;
-                ChildClone.Active = Child.Active;
-                ChildClone.Layer = Child.Layer;
+            if(GO.Children.Count != 0)
+                foreach (GameObject Child in GO.Children)
+                {
+                    GameObject ChildClone = new GameObject();
+                    ChildClone.Parent = Parent;
+                    ChildClone.Tag = Child.Tag;
+                    ChildClone.Active = Child.Active;
+                    ChildClone.Layer = Child.Layer;
 
-                for (int i = 0; i < Child.GameObjectComponents.Count; i++)
-                    ChildClone.AddComponent<GameObjectComponent>(Child.GameObjectComponents[i].DeepCopy(ChildClone));
+                    for (int i = 0; i < Child.GameObjectComponents.Count; i++)
+                        ChildClone.AddComponent<GameObjectComponent>(Child.GameObjectComponents[i].DeepCopy(ChildClone));
 
-                SceneManager.ActiveScene.AddGameObject(ChildClone);
+                    SceneManager.ActiveScene.AddGameObject(ChildClone);
 
-                InstantiateRecursive(Child, ChildClone);
-            }
+                    InstantiateRecursive(Child, ChildClone);
+                }
         }
 
         public int Compare(GameObject x, GameObject y)

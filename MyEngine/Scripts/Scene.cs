@@ -47,33 +47,6 @@ namespace MyEngine
             HandyList = new List<GameObject>();
         }
 
-        //public void CleanScene()
-        //{
-        //    Active = true;
-        //    GameObjects.Clear();
-        //    GameObjectCount = 0;
-        //    SceneManager.ActiveScene = this;
-        //}
-
-        //public void CleanScene(string Name)
-        //{
-        //    Active = true;
-        //    GameObjects.Clear();
-        //    GameObjectCount = 0;
-        //    this.Name = Name;
-        //    SceneManager.ActiveScene = this;
-        //}
-
-        //public void CleanScene(string Name, int ID)
-        //{
-        //    Active = true;
-        //    GameObjects.Clear();
-        //    GameObjectCount = 0;
-        //    this.Name = Name;
-        //    this.ID = ID;
-        //    SceneManager.ActiveScene = this;
-        //}
-
         public void AddGameObject(GameObject GO) //=> Implement it using "Recursion"
         {
             if (!GameObjects.Contains(GO))
@@ -111,26 +84,18 @@ namespace MyEngine
 
         public void RemoveGameObject(GameObject GO) //=> Implement it using "Recursion"
         {
-            RemoveGameObjectRecursive(GO);
+            if (GO == null)
+                return;
+
+            GameObject[] Children = GO.GetALLChildren();
+
+            if(Children != null)
+                foreach (GameObject Child in Children)
+                    if (GameObjects.Remove(Child))
+                        GameObjectCount--;
 
             if (GameObjects.Remove(GO))
                 GameObjectCount--;
-        }
-
-        private void RemoveGameObjectRecursive(GameObject GO)
-        {
-            GameObject[] Children = GO.GetChildrenIfExist();
-
-            if (Children.Length == 0)
-                return;
-
-            foreach (GameObject Child in Children)
-            {
-                RemoveGameObjectRecursive(Child);
-
-                if (GameObjects.Remove(Child))
-                    GameObjectCount--;
-            }
         }
 
         public void Start()

@@ -31,6 +31,22 @@ namespace MyEngine
                 return Value;
         }
 
+        public static Vector2 Clamp(Vector2 Value, Vector2 Min, Vector2 Max)
+        {
+            Vector2 Output = Value;
+            if (Value.X <= Min.X)
+                Output.X = Min.X;
+            else if (Value.X > Max.X)
+                Output.X = Max.X;
+
+            if (Value.Y <= Min.Y)
+                Output.Y = Min.Y;
+            else if (Value.Y > Max.Y)
+                Output.Y = Max.Y;
+
+            return Output;
+        }
+
         public static int Sign(float number)
         {
             if (number >= 0)

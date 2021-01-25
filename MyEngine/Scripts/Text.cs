@@ -56,7 +56,7 @@ namespace MyEngine
         public override void Draw(SpriteBatch spriteBatch)
         {
             if(!CustomOrigin)
-                Origin = Font.MeasureString(text) * 0.5f;
+                Origin = Font.MeasureString(text) * 0.5f * transform.Scale;
 
             spriteBatch.DrawString(Font, text, transform.Position, Color, MathHelper.ToRadians(transform.Rotation), Origin, transform.Scale, spriteEffects, gameObject.Layer);
         }

@@ -30,7 +30,7 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\FireWorks_M.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\Jump.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\AMB_WR_BirdWind.wma
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\AMB_WR_BirdWind.xnb
-C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.dll
-C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.dll
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Newtonsoft.Json.dll
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Newtonsoft.Json.xml
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.dll
+C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.dll

@@ -1,8 +1,12 @@
-﻿namespace MyEngine
+﻿using Microsoft.Xna.Framework;
+
+namespace MyEngine
 {
     public interface Collider2D
     {
         bool IsTouching(Collider2D collider);
+
+        bool Contains(Vector2 Point);
 
         void OnCollisionEnter2D();
 

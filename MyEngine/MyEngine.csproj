@@ -52,6 +52,7 @@
     <Compile Include="Scripts\AudioSource.cs" />
     <Compile Include="Scripts\BoxCollider2D.cs" />
     <Compile Include="Scripts\Camera2D.cs" />
+    <Compile Include="Scripts\CircleCollider.cs" />
     <Compile Include="Scripts\Collider2D.cs" />
     <Compile Include="Scripts\Debugger.cs" />
     <Compile Include="Scripts\GameObject.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="Scripts\LayerUI.cs" />
     <Compile Include="Scripts\MathCompanion.cs" />
     <Compile Include="Scripts\MediaSource.cs" />
+    <Compile Include="Scripts\NameGenerator.cs" />
     <Compile Include="Scripts\Panel.cs" />
     <Compile Include="Scripts\Particle.cs" />
     <Compile Include="Scripts\ParticleEffect.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="Scripts\ResolutionIndependentRendering.cs" />
     <Compile Include="Scripts\Rigidbody2D.cs" />
     <Compile Include="Scripts\SaveLoadManager.cs" />
+    <Compile Include="Scripts\Scale.cs" />
     <Compile Include="Scripts\Scene.cs" />
     <Compile Include="Scripts\SceneManager.cs" />
     <Compile Include="Scripts\Setup.cs" />

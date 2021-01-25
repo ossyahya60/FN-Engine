@@ -117,7 +117,10 @@ namespace MyEngine
 
         public static Vector2 GetMousePosition()
         {
-            return Setup.resolutionIndependentRenderer.ScaleMouseToScreenCoordinates(Mouse.GetState().Position.ToVector2());
+            Vector2 Temp = Vector2.One;
+            Temp.X = Setup.graphics.PreferredBackBufferWidth;
+            Temp.Y = Setup.graphics.PreferredBackBufferHeight;
+            return MathCompanion.Clamp(Setup.resolutionIndependentRenderer.ScaleMouseToScreenCoordinates(Mouse.GetState().Position.ToVector2()), Vector2.Zero, Temp);
         }
 
         public static bool TouchDown()
