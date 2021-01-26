@@ -96,13 +96,15 @@ namespace MyEngine
             //SceneManager.ActiveScene.AddGameObject(Circle);
             SceneManager.ActiveScene.AddGameObject(Arrow1);
 
+            SceneManager.ActiveScene.Start();
+
             GameObject Arrow2 = GameObject.Instantiate(Arrow1);
+            Arrow2.Name = "Arrow2";
 
             Arrow1.AddChild(Arrow2);
 
-            SceneManager.ActiveScene.Start();
-
             Arrow2.Transform.Position = Vector2.One * 100;
+            Arrow2.Transform.LocalScale = Vector2.One;
 
             //Initialization here
 
@@ -143,9 +145,12 @@ namespace MyEngine
             //passing a property as a refrence using delegates
             //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(value => Arrow.Transform.Rotation = value);
             if (Input.GetKey(Keys.W))
-                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Scale += Vector2.One * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Scale += Vector2.One * (float)gameTime.ElapsedGameTime.TotalSeconds * 2;
             if (Input.GetKey(Keys.S))
-                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Scale -= Vector2.One * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Scale -= Vector2.One * (float)gameTime.ElapsedGameTime.TotalSeconds * 2;
+
+            if (Input.GetKeyDown(Keys.P))
+                SceneManager.ActiveScene.FindGameObjectWithName("Arrow2").Transform.LocalScale = 0.5f * Vector2.One;
 
             SceneManager.ActiveScene.Update(gameTime);
 
@@ -163,7 +168,7 @@ namespace MyEngine
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
 
             SceneManager.ActiveScene.Draw(spriteBatch);
-            spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Scale.ToString(), Vector2.Zero, Color.Red);
+            spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow2").Transform.LocalScale.ToString(), Vector2.Zero, Color.Red);
 
             spriteBatch.End();
             base.Draw(gameTime);

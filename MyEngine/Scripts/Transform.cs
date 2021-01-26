@@ -260,6 +260,7 @@ namespace MyEngine
         private Vector2 scale = Vector2.One;
         private Vector2 position = Vector2.Zero;
         private float rotation = 0;
+        private Vector2 localScale;
 
         public Transform()
         {
@@ -267,6 +268,7 @@ namespace MyEngine
             scale = Vector2.One;
             position = Vector2.Zero;
             LastPosition = position;
+            localScale = Vector2.One;
         }
 
         public override void Start()
@@ -311,7 +313,7 @@ namespace MyEngine
                 return rotation;
             }
         }
-        public Vector2 Scale //Scale of a gameobject in x-y coordinate system
+        public Vector2 Scale //Scale of a gameobject in x-y coordinate system //Scaling is a bit corrupted
         {
             set
             {
@@ -324,7 +326,7 @@ namespace MyEngine
 
                 if (GOs != null)
                     foreach (GameObject GO in GOs)
-                        GO.Transform.Scale += scale - LastScale;
+                        GO.Transform.Scale += (scale - LastScale) * GO.Transform.LocalScale;
             }
             get
             {
@@ -368,23 +370,31 @@ namespace MyEngine
             }
         }
 
-        /*public Vector2 LocalScale //Not true
+        public Vector2 LocalScale
         {
             set
             {
                 if (gameObject.Parent == null)
                     Scale = value;
                 else
-                    Scale = value + gameObject.Parent.Transform.Scale;
+                {
+                    localScale = value;
+                    localScale.X = (localScale.X >= 0) ? localScale.X : 0;
+                    localScale.Y = (localScale.Y >= 0) ? localScale.Y : 0;
+
+                    Scale *= localScale; //Something wrong here
+                }
             }
             get
             {
                 if (gameObject.Parent == null)
                     return Scale;
                 else
-                    return Scale - gameObject.Parent.Transform.Scale;
+                {
+                    return localScale;
+                }
             }
-        }*/
+        }
 
         public Vector2 Left
         {

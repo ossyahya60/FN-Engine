@@ -67,5 +67,12 @@ namespace MyEngine
         {
             throw new System.NotImplementedException();
         }
+
+        public override GameObjectComponent DeepCopy(GameObject Clone)
+        {
+            CircleCollider clone = this.MemberwiseClone() as CircleCollider;
+
+            return clone;
+        }
     }
 }
