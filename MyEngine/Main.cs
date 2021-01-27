@@ -46,7 +46,6 @@ namespace MyEngine
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            Setup.Initialize(graphics, Content, spriteBatch, RIR, Window, Camera, this);
             graphics.PreferredBackBufferWidth = 1366;
             graphics.PreferredBackBufferHeight = 768;
             RIR.VirtualWidth = 1366;
@@ -56,6 +55,8 @@ namespace MyEngine
             Camera = new Camera2D(RIR);
             Camera.Zoom = 1f;
             Camera.Position = new Vector2(RIR.VirtualWidth / 2, RIR.VirtualHeight / 2);
+
+            Setup.Initialize(graphics, Content, spriteBatch, RIR, Window, Camera, this);
 
             RIR.InitializeResolutionIndependence(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, Camera);
         }
@@ -150,7 +151,7 @@ namespace MyEngine
                 SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Scale -= Vector2.One * (float)gameTime.ElapsedGameTime.TotalSeconds * 2;
 
             if (Input.GetKeyDown(Keys.P))
-                SceneManager.ActiveScene.FindGameObjectWithName("Arrow2").Transform.LocalScale = 0.5f * Vector2.One;
+                SceneManager.ActiveScene.FindGameObjectWithName("Arrow2").Transform.Scale = 0.5f * Vector2.One;
 
             SceneManager.ActiveScene.Update(gameTime);
 

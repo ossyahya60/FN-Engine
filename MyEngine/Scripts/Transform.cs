@@ -313,7 +313,7 @@ namespace MyEngine
                 return rotation;
             }
         }
-        public Vector2 Scale //Scale of a gameobject in x-y coordinate system //Scaling is a bit corrupted
+        public Vector2 Scale //Scale of a gameobject in x-y coordinate system
         {
             set
             {
@@ -374,6 +374,7 @@ namespace MyEngine
         {
             set
             {
+                Vector2 PrevLocalScale = localScale;
                 if (gameObject.Parent == null)
                     Scale = value;
                 else
@@ -382,7 +383,7 @@ namespace MyEngine
                     localScale.X = (localScale.X >= 0) ? localScale.X : 0;
                     localScale.Y = (localScale.Y >= 0) ? localScale.Y : 0;
 
-                    Scale *= localScale; //Something wrong here
+                    Scale *= localScale/PrevLocalScale;
                 }
             }
             get
