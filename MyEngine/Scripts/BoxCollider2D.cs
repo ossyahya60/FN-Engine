@@ -23,7 +23,7 @@ namespace MyEngine
         public bool isTrigger = false;
 
         private Transform Transform;
-        private float GameTime = 0.01f;
+        private double GameTime = 1.0f / 60;
         private Rectangle bounds;
         private Rectangle HandyRectangle; //To avoid stack allocating a lot if memory in a short time
         //private float DisplaceMagnitude = 0.01f; //1 pixel
@@ -58,27 +58,17 @@ namespace MyEngine
         {
             BoxCollider2D boxCollider = collider as BoxCollider2D;
 
-            if (GetDynamicCollider().Intersects(boxCollider.GetDynamicCollider()))
-                return true;
-            return false;
+            return GetDynamicCollider().Intersects(boxCollider.GetDynamicCollider());
         }
 
-        public bool IsTouching(Vector2 Point)  //Are the two colliders currently touching?
-        {
-            if (GetDynamicCollider().Contains(Point))
-                return true;
-            return false;
-        }
-
-        bool CollisionDetection(Collider2D collider, bool Continous)
+        bool CollisionDetection(Collider2D collider) //AABB collision detection =>We should check if the two "Bounding Boxes are touching, then make SAT Collision detection
         {
             BoxCollider2D boxCollider = collider as BoxCollider2D;
 
-            if (GetDynamicCollider().Intersects(boxCollider.GetDynamicCollider()))
-                return true;
-            return false;
+            return GetDynamicCollider().Intersects(boxCollider.GetDynamicCollider());
         }
 
+        //SAT Collision response is good, you will possess the vector to push the two objects from each other
         void CollisionResponse(Collider2D collider, bool Continous)
         {
             if (!Continous && !isTrigger)
@@ -86,38 +76,13 @@ namespace MyEngine
                 BoxCollider2D boxCollider = collider as BoxCollider2D;
                 Rigidbody2D RB = gameObject.GetComponent<Rigidbody2D>();
 
-                //RB.Move(-RB.Velocity.X * GameTime, -RB.Velocity.Y * GameTime);
-                
-                //if ((GetDynamicCollider().Right <= boxCollider.GetDynamicCollider().Left || GetDynamicCollider().Left >= boxCollider.GetDynamicCollider().Right) && GetDynamicCollider().Bottom >= boxCollider.GetDynamicCollider().Top && GetDynamicCollider().Top <= boxCollider.GetDynamicCollider().Bottom)
-                //    RB.ResetHorizVelocity();
-                //else
-                //    RB.ResetVerticalVelocity();
+                Transform.Move(-RB.Velocity.X * (float)GameTime, -RB.Velocity.Y * (float)GameTime);
             }
         }
 
         public override void Update(GameTime gameTime)
         {
-            //GameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            //Rigidbody2D RB = gameObject.GetComponent<Rigidbody2D>();
-
-            //if (RB != null)
-            //{
-            //    if(RB.Enabled && !RB.IsKinematic && RB.Velocity != Vector2.Zero)
-            //    {
-            //        foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
-            //        {
-            //            BoxCollider2D Box = GO.GetComponent<BoxCollider2D>();
-            //            if (Box != null)
-            //            {
-            //                if (Box.Enabled && Box != this && !Box.isTrigger)
-            //                {
-            //                    if(CollisionDetection(Box, false))
-            //                        CollisionResponse(Box, false);
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
+            GameTime = gameTime.ElapsedGameTime.TotalSeconds;
         }
 
         public override GameObjectComponent DeepCopy(GameObject clone)
@@ -127,6 +92,11 @@ namespace MyEngine
             Clone.bounds = new Rectangle(bounds.Location, bounds.Size);
 
             return Clone;
+        }
+
+        public bool Contains(Vector2 Point)
+        {
+            return GetDynamicCollider().Contains(Point);
         }
 
         public bool IsTrigger()  //Is this collider marked as trigger? (trigger means no collision or physics is applied on this collider
@@ -152,11 +122,6 @@ namespace MyEngine
         public void OnTriggerExit2D()
         {
             throw new System.NotImplementedException();
-        }
-
-        public bool Contains(Vector2 Point)
-        {
-            return GetDynamicCollider().Contains(Point);
         }
     }
 }
