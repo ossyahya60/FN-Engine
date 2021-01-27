@@ -84,6 +84,7 @@ namespace MyEngine
             GameObject Arrow1 = new GameObject();
             Arrow1.AddComponent<Transform>(new Transform());
             Arrow1.AddComponent<SpriteRenderer>(new SpriteRenderer());
+            Arrow1.AddComponent<Rigidbody2D>(new Rigidbody2D());
             Arrow1.GetComponent<SpriteRenderer>().Sprite = new Sprite(Arrow1.Transform);
             Arrow1.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Arrow");
             Arrow1.Name = "Arrow1";
@@ -99,6 +100,8 @@ namespace MyEngine
 
             SceneManager.ActiveScene.Start();
 
+            //Initialization here
+            Arrow1.GetComponent<Rigidbody2D>().AffectedByGravity = false;
             GameObject Arrow2 = GameObject.Instantiate(Arrow1);
             Arrow2.Name = "Arrow2";
 
@@ -107,8 +110,7 @@ namespace MyEngine
             Arrow2.Transform.Position = Vector2.One * 100;
             Arrow2.Transform.LocalScale = Vector2.One;
 
-            //Initialization here
-
+            Arrow1.GetComponent<Rigidbody2D>().LinearDragScale = 2;
         }
 
         /// <summary>
@@ -153,6 +155,12 @@ namespace MyEngine
             if (Input.GetKeyDown(Keys.P))
                 SceneManager.ActiveScene.FindGameObjectWithName("Arrow2").Transform.Scale = 0.5f * Vector2.One;
 
+            if (Input.GetKeyUp(Keys.R))
+                SceneManager.LoadScene(SceneManager.ActiveScene);
+
+            if(Input.GetKey(Keys.F))
+                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").GetComponent<Rigidbody2D>().AddForce(Vector2.UnitY * 60 * 4, ForceMode2D.Force);
+
             SceneManager.ActiveScene.Update(gameTime);
 
             base.Update(gameTime);
@@ -169,7 +177,9 @@ namespace MyEngine
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
 
             SceneManager.ActiveScene.Draw(spriteBatch);
-            spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow2").Transform.LocalScale.ToString(), Vector2.Zero, Color.Red);
+            spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").GetComponent<Rigidbody2D>().Velocity.ToString(), Vector2.Zero, Color.Red);
+
+            //spriteBatch.DrawString(spriteFont, ((int)(1/this.TargetElapsedTime.TotalSeconds)).ToString(), Vector2.Zero, Color.Red); =>FPS
 
             spriteBatch.End();
             base.Draw(gameTime);

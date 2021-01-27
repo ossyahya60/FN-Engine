@@ -38,7 +38,6 @@ namespace MyEngine
                 return pan;
             }
         }
-        public bool PlayOnAwake = false;
         public bool IsLooping = false;
         public bool DestroyAfterFinishing = false;
 
@@ -57,8 +56,7 @@ namespace MyEngine
 
         public override void Start()
         {
-            if (PlayOnAwake)
-                Play();
+
         }
 
         public void LoadSoundEffect(string Path)

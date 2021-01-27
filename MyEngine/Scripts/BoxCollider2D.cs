@@ -86,38 +86,38 @@ namespace MyEngine
                 BoxCollider2D boxCollider = collider as BoxCollider2D;
                 Rigidbody2D RB = gameObject.GetComponent<Rigidbody2D>();
 
-                RB.Move(-RB.Velocity.X * GameTime, -RB.Velocity.Y * GameTime);
+                //RB.Move(-RB.Velocity.X * GameTime, -RB.Velocity.Y * GameTime);
                 
-                if ((GetDynamicCollider().Right <= boxCollider.GetDynamicCollider().Left || GetDynamicCollider().Left >= boxCollider.GetDynamicCollider().Right) && GetDynamicCollider().Bottom >= boxCollider.GetDynamicCollider().Top && GetDynamicCollider().Top <= boxCollider.GetDynamicCollider().Bottom)
-                    RB.ResetHorizVelocity();
-                else
-                    RB.ResetVerticalVelocity();
+                //if ((GetDynamicCollider().Right <= boxCollider.GetDynamicCollider().Left || GetDynamicCollider().Left >= boxCollider.GetDynamicCollider().Right) && GetDynamicCollider().Bottom >= boxCollider.GetDynamicCollider().Top && GetDynamicCollider().Top <= boxCollider.GetDynamicCollider().Bottom)
+                //    RB.ResetHorizVelocity();
+                //else
+                //    RB.ResetVerticalVelocity();
             }
         }
 
         public override void Update(GameTime gameTime)
         {
-            GameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Rigidbody2D RB = gameObject.GetComponent<Rigidbody2D>();
+            //GameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //Rigidbody2D RB = gameObject.GetComponent<Rigidbody2D>();
 
-            if (RB != null)
-            {
-                if(RB.Enabled && !RB.IsKinematic && RB.Velocity != Vector2.Zero)
-                {
-                    foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
-                    {
-                        BoxCollider2D Box = GO.GetComponent<BoxCollider2D>();
-                        if (Box != null)
-                        {
-                            if (Box.Enabled && Box != this && !Box.isTrigger)
-                            {
-                                if(CollisionDetection(Box, false))
-                                    CollisionResponse(Box, false);
-                            }
-                        }
-                    }
-                }
-            }
+            //if (RB != null)
+            //{
+            //    if(RB.Enabled && !RB.IsKinematic && RB.Velocity != Vector2.Zero)
+            //    {
+            //        foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
+            //        {
+            //            BoxCollider2D Box = GO.GetComponent<BoxCollider2D>();
+            //            if (Box != null)
+            //            {
+            //                if (Box.Enabled && Box != this && !Box.isTrigger)
+            //                {
+            //                    if(CollisionDetection(Box, false))
+            //                        CollisionResponse(Box, false);
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         public override GameObjectComponent DeepCopy(GameObject clone)
