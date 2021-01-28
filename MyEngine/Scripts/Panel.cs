@@ -10,9 +10,9 @@ namespace MyEngine
         public string Name;
         public Color Color;
         public Point Size;
+        public Texture2D Texture;
 
         private Transform Transform;
-        private Texture2D Texture;
         private Rectangle Bounds;
 
         public Panel(string name)

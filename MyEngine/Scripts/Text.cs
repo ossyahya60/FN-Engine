@@ -75,5 +75,14 @@ namespace MyEngine
         {
             
         }
+
+        public override GameObjectComponent DeepCopy(GameObject Clone)
+        {
+            Text clone = this.MemberwiseClone() as Text;
+            clone.transform = Clone.Transform;
+            Clone.Layer = LayerUI.GetLayer("Text");
+
+            return clone;
+        }
     }
 }

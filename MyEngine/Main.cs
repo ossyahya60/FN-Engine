@@ -73,7 +73,7 @@ namespace MyEngine
 
             SceneManager.AddInitializer(MainScene, 0);
             //////////////////////////////////////////////////////////
-            SceneManager.LoadScene(new Scene("MainScene", 0)); //Main Menu
+            SceneManager.LoadScene(new Scene("MainScene", 0)); //Main Scene
         }
 
         private void MainScene()
