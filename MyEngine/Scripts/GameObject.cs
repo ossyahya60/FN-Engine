@@ -249,6 +249,7 @@ namespace MyEngine
             Clone.Parent = GO.Parent;
             Clone.Tag = GO.Tag;
             Clone.Active = GO.Active;
+            Clone.Layer = GO.Layer;
 
             for (int i = 0; i < GO.GameObjectComponents.Count; i++)
                 Clone.AddComponent<GameObjectComponent>(GO.GameObjectComponents[i].DeepCopy(Clone));

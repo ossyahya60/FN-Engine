@@ -19,6 +19,14 @@ namespace MyEngine
             _textureNonFilled.SetData(new Color[] { Color.White });
         }
 
+        public static Texture2D RectTexture(Color color)
+        {
+            _textureFilled = new Texture2D(Setup.GraphicsDevice, 1, 1);
+            _textureFilled.SetData(new Color[] { color });
+
+            return _textureFilled;
+        }
+
         public static void DrawRectangle(Rectangle Rect)  //Draw filledRectangle
         {
             Setup.spriteBatch.Draw(_textureFilled, Rect, Color.White);
@@ -81,6 +89,7 @@ namespace MyEngine
         //You may use the following two functions to create a texture and use it, not creating a texture every frame!
         public static Texture2D CreateCircleTexture(int Radius, Color color)
         {
+            Radius = (int)MathCompanion.Clamp(Radius, 1, Radius);
             int Diameter = 2 * Radius;
             Color[] Pixels = new Color[Diameter * Diameter];
 
