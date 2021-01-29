@@ -111,6 +111,7 @@ namespace MyEngine
             Arrow2.Transform.LocalScale = Vector2.One;
 
             Arrow1.GetComponent<Rigidbody2D>().LinearDragScale = 2;
+
         }
 
         /// <summary>

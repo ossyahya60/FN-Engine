@@ -8,6 +8,7 @@ namespace MyEngine
         {
             Thread thread = new Thread(ExecuteThread);
             thread.Start();
+            thread.IsBackground = true;
 
             void ExecuteThread()
             {

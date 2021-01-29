@@ -62,6 +62,7 @@ namespace MyEngine
             SpriteRenderer Clone = this.MemberwiseClone() as SpriteRenderer;
             Clone.Transform = clone.Transform;
             Clone.Sprite = Sprite.DeepCopy(clone);
+            Clone.Sprite.Transform = clone.Transform;
             Clone.Effect = (Effect == null) ? null : Effect.Clone();
 
             return Clone;

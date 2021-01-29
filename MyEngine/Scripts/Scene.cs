@@ -119,7 +119,8 @@ namespace MyEngine
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].Update(gameTime);
 
-            GameObjects.RemoveAll(item => item.ShouldBeDeleted == true);
+            int Length = GameObjects.RemoveAll(item => item.ShouldBeDeleted == true);
+            GameObjectCount -= Length;
         }
 
         public void Draw(SpriteBatch spriteBatch)

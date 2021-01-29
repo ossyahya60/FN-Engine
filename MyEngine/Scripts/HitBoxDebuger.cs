@@ -21,10 +21,10 @@ namespace MyEngine
 
         public static Texture2D RectTexture(Color color)
         {
-            _textureFilled = new Texture2D(Setup.GraphicsDevice, 1, 1);
-            _textureFilled.SetData(new Color[] { color });
+            Texture2D textureFilled = new Texture2D(Setup.GraphicsDevice, 1, 1);
+            textureFilled.SetData(new Color[] { color });
 
-            return _textureFilled;
+            return textureFilled;
         }
 
         public static void DrawRectangle(Rectangle Rect)  //Draw filledRectangle
