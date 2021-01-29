@@ -30,7 +30,7 @@ namespace MyEngine
 
         public virtual void Destroy()
         {
-            gameObject.RemoveComponent<GameObjectComponent>(this);
+            //gameObject.RemoveComponent<GameObjectComponent>(this);
         }
 
         public virtual GameObjectComponent DeepCopy(GameObject Clone)

@@ -66,8 +66,8 @@ namespace MyEngine
 
         public void Play()
         {
-            if(SoundEffectInstance != null)
-                SoundEffectInstance.Dispose();
+            //if(SoundEffectInstance != null)
+              //  SoundEffectInstance.Dispose();
 
             SoundEffectInstance = SoundEffect.CreateInstance();
             SoundEffectInstance.IsLooped = IsLooping;

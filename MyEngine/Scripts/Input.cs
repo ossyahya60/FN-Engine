@@ -54,7 +54,7 @@ namespace MyEngine
 
         public static bool GetMouseClick(MouseButtons mouseButton)
         {
-            if (Setup.GameWindow.ClientBounds.Contains(GetMousePosition()))
+            if (Setup.GraphicsDevice.Viewport.Bounds.Contains(GetMousePosition()))
             {
                 if (mouseButton == MouseButtons.LeftClick)
                     return Mouse.GetState().LeftButton == ButtonState.Pressed;
@@ -69,7 +69,7 @@ namespace MyEngine
 
         public static bool GetMouseClickDown(MouseButtons mouseButton)
         {
-            if (Setup.GameWindow.ClientBounds.Contains(GetMousePosition()))
+            if (Setup.GraphicsDevice.Viewport.Bounds.Contains(GetMousePosition()))
             {
                 if (mouseButton == MouseButtons.LeftClick)
                 {
@@ -93,7 +93,7 @@ namespace MyEngine
 
         public static bool GetMouseClickUp(MouseButtons mouseButton)
         {
-            if (Setup.GameWindow.ClientBounds.Contains(GetMousePosition()))
+            if (Setup.GraphicsDevice.Viewport.Bounds.Contains(GetMousePosition()))
             {
                 if (mouseButton == MouseButtons.LeftClick)
                 {

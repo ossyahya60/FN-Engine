@@ -14,6 +14,7 @@ namespace MyEngine
         public int GameComponentsCount = 0;
         public bool Active { set; get; }
         public string Name = "Default";
+        public bool ShouldBeDeleted = false;
 
         private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect", "CircleCollider" };
         private List<GameObject> Children;

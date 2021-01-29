@@ -89,10 +89,14 @@ namespace MyEngine
 
             GameObject[] Children = GO.GetALLChildren();
 
-            if(Children != null)
-                foreach (GameObject Child in Children)
-                    if (GameObjects.Remove(Child))
+            if (Children != null)
+            {
+                int Count = GameObjects.Count - 1;
+
+                for (int i = Count; i >= 0; i--)
+                    if (GameObjects.Remove(GameObjects[Count - i]))
                         GameObjectCount--;
+            }
 
             if (GameObjects.Remove(GO))
                 GameObjectCount--;
@@ -100,39 +104,51 @@ namespace MyEngine
 
         public void Start()
         {
-            if(Active)
-                foreach (GameObject GO in GameObjects)
-                    GO.Start();
+            int Count = GameObjects.Count - 1;
+
+            if (Active)
+                for (int i = Count; i >= 0; i--)
+                    GameObjects[Count - i].Start();
         }
 
         public void Update(GameTime gameTime)
         {
-            if(Active)
-                foreach (GameObject GO in GameObjects.ToArray())
-                    GO.Update(gameTime);
+            int Count = GameObjects.Count - 1;
+
+            if (Active)
+                for (int i = Count; i >= 0; i--)
+                    GameObjects[Count - i].Update(gameTime);
+
+            GameObjects.RemoveAll(item => item.ShouldBeDeleted == true);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            int Count = GameObjects.Count - 1;
+
             if (Active)
-                foreach (GameObject GO in GameObjects)
-                    GO.Draw(spriteBatch);
+                for (int i = Count; i >= 0; i--)
+                    GameObjects[Count - i].Draw(spriteBatch);
         }
 
         public GameObject FindGameObjectWithTag(string Tag)
         {
-            foreach (GameObject GO in GameObjects)
-                if (GO.Tag == Tag)
-                    return GO;
+            int Count = GameObjects.Count - 1;
+
+            for (int i = Count; i >= 0; i--)
+                if (GameObjects[Count - i].Tag == Tag)
+                    return GameObjects[Count - i];
 
             return null;
         }
 
         public GameObject FindGameObjectWithName(string Name)
         {
-            foreach (GameObject GO in GameObjects)
-                if (GO.Name == Name)
-                    return GO;
+            int Count = GameObjects.Count - 1;
+
+            for (int i = Count; i >= 0; i--)
+                if (GameObjects[Count - i].Name == Name)
+                    return GameObjects[Count - i];
 
             return null;
         }
@@ -142,9 +158,11 @@ namespace MyEngine
             HandyList.Clear();
 
             int Counter = 0;
-            for (int i = 0; i < GameObjects.Count; i++)
-                if (GameObjects[i].Tag == Tag)
-                    HandyList.Insert(Counter++, GameObjects[i]);
+            int Count = GameObjects.Count - 1;
+
+            for (int i = Count; i >= 0; i--)
+                if (GameObjects[Count - i].Tag == Tag)
+                    HandyList.Insert(Counter++, GameObjects[Count - i]);
 
             return HandyList.ToArray();
         }
