@@ -216,7 +216,7 @@ namespace MyEngine
         {
             if (Active)
             {
-                //if (Parent == null || Parent.Active)
+                if (Parent == null || Parent.Active)
                 {
                     foreach (GameObjectComponent GOC in GameObjectComponents)
                         if (GOC.Enabled)
@@ -229,7 +229,7 @@ namespace MyEngine
         {
             if (Active)
             {
-                //if (/*Parent == null || */Parent.Active)
+                if (Parent == null || Parent.Active)
                 {
                     foreach (GameObjectComponent GOC in GameObjectComponents)
                         if (GOC.Enabled)

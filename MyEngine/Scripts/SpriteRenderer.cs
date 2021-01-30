@@ -30,7 +30,7 @@ namespace MyEngine
 
         public override void Start()
         {
-            gameObject.Layer = 1;
+            //gameObject.Layer = 1;
             Transform = gameObject.Transform;
 
             if (Sprite == null)
@@ -49,8 +49,8 @@ namespace MyEngine
 
                 //spriteBatch.Draw(Sprite.Texture, Transform.Position, Sprite.SourceRectangle, Color, Transform.Rotation, Sprite.Origin, Transform.Scale, SpriteEffects, gameObject.Layer);
                 DestRect.Location = Transform.Position.ToPoint();
-                DestRect.Width = (int)(Sprite.Texture.Width * Transform.Scale.X);
-                DestRect.Height = (int)(Sprite.Texture.Height * Transform.Scale.Y);
+                DestRect.Width = (int)(Sprite.SourceRectangle.Width * Transform.Scale.X);
+                DestRect.Height = (int)(Sprite.SourceRectangle.Height * Transform.Scale.Y);
                 spriteBatch.Draw(Sprite.Texture, null, DestRect, Sprite.SourceRectangle, Sprite.Origin, Transform.Rotation, Vector2.One, Color, SpriteEffects, gameObject.Layer);
 
                 LastEffect = Effect;

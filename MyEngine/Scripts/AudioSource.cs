@@ -127,5 +127,10 @@ namespace MyEngine
 
             return clone;
         }
+
+        public float ClipLength()
+        {
+            return (float)SoundEffect.Duration.TotalSeconds;
+        }
     }
 }

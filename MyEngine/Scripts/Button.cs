@@ -47,15 +47,15 @@ namespace MyEngine
 
         public override void Update(GameTime gameTime)
         {
-            if (!TouchPanel.GetState().IsConnected)
+            //if (!TouchPanel.GetState().IsConnected)
             {
                 if (IsCursorInRange())
                     ActiveColor = HighlightColor;
                 else
                     ActiveColor = IdleColor;
             }
-            else
-                ActiveColor = IdleColor;
+            //else
+              //  ActiveColor = IdleColor;
         }
 
         public bool IsCursorInRange()
@@ -68,10 +68,10 @@ namespace MyEngine
             ActualHitBox = Bounds;
             ActualHitBox.Offset(-Bounds.Size.ToVector2() * 0.5f);
 
-            if (!TouchPanel.GetState().IsConnected)
+            //if (!TouchPanel.GetState().IsConnected)
                 return ActualHitBox.Contains(Input.GetMousePosition());
-            else
-                return ActualHitBox.Contains(Setup.resolutionIndependentRenderer.ScaleMouseToScreenCoordinates(TouchPanel.GetState()[0].Position));
+            //else
+                //return ActualHitBox.Contains(Setup.resolutionIndependentRenderer.ScaleMouseToScreenCoordinates(TouchPanel.GetState()[0].Position));
         }
 
         public bool ClickedOnButton()
@@ -81,7 +81,7 @@ namespace MyEngine
 
             try
             {
-                if (TouchPanel.GetState().IsConnected)
+                //if (TouchPanel.GetState().IsConnected) // => Something wrong
                     if (Input.TouchDown())
                         return IsCursorInRange();
             }
