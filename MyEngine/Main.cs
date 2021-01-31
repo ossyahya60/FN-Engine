@@ -81,37 +81,23 @@ namespace MyEngine
             // TODO: use this.Content to load your game content here
             spriteFont = Content.Load<SpriteFont>("Font");
 
-            GameObject Arrow1 = new GameObject();
-            Arrow1.AddComponent<Transform>(new Transform());
-            Arrow1.AddComponent<SpriteRenderer>(new SpriteRenderer());
-            Arrow1.AddComponent<Rigidbody2D>(new Rigidbody2D());
-            Arrow1.GetComponent<SpriteRenderer>().Sprite = new Sprite(Arrow1.Transform);
-            Arrow1.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Arrow");
-            Arrow1.Name = "Arrow1";
+            GameObject Acid = new GameObject();
+            Acid.AddComponent<Transform>(new Transform());
+            Acid.AddComponent<SpriteRenderer>(new SpriteRenderer());
+            Acid.AddComponent<Animator>(new Animator());
 
-            GameObject Circle = new GameObject();
-            Circle.AddComponent<Transform>(new Transform());
-            Circle.AddComponent<SpriteRenderer>(new SpriteRenderer());
-            Circle.GetComponent<SpriteRenderer>().Sprite = new Sprite(Circle.Transform);
-            Circle.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.CreateCircleTextureShell(graphics.PreferredBackBufferHeight/2, (int)(0.9f*graphics.PreferredBackBufferHeight / 2), Color.Red);
-
-            //SceneManager.ActiveScene.AddGameObject(Circle);
-            SceneManager.ActiveScene.AddGameObject(Arrow1);
+            SceneManager.ActiveScene.AddGameObject(Acid);
 
             SceneManager.ActiveScene.Start();
 
             //Initialization here
-            Arrow1.GetComponent<Rigidbody2D>().AffectedByGravity = false;
-            GameObject Arrow2 = GameObject.Instantiate(Arrow1);
-            Arrow2.Name = "Arrow2";
-
-            Arrow1.AddChild(Arrow2);
-
-            Arrow2.Transform.Position = Vector2.One * 100;
-            Arrow2.Transform.LocalScale = Vector2.One;
-
-            Arrow1.GetComponent<Rigidbody2D>().LinearDragScale = 2;
-
+            Acid.GetComponent<SpriteRenderer>().Sprite.LoadTexture("TileSet1");
+            Acid.GetComponent<SpriteRenderer>().Sprite.SourceRectangle = new Rectangle(0, (int)(0.8f * Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Height), Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Width / 5, Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Height / 5);
+            Animation acid = new Animation(Acid.GetComponent<SpriteRenderer>(), 4);
+            acid.SourceRectangle = new Rectangle(0, (int)(0.8f * Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Height), Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Width / 5, Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Height / 5);
+            acid.Looping = true;
+            Acid.GetComponent<Animator>().AddClip(acid, true);
+            Acid.GetComponent<Animator>().ActiveClip.Play();
         }
 
         /// <summary>
@@ -148,19 +134,8 @@ namespace MyEngine
 
             //passing a property as a refrence using delegates
             //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(value => Arrow.Transform.Rotation = value);
-            if (Input.GetKey(Keys.W))
-                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Scale += Vector2.One * (float)gameTime.ElapsedGameTime.TotalSeconds * 2;
-            if (Input.GetKey(Keys.S))
-                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").Transform.Scale -= Vector2.One * (float)gameTime.ElapsedGameTime.TotalSeconds * 2;
-
-            if (Input.GetKeyDown(Keys.P))
-                SceneManager.ActiveScene.FindGameObjectWithName("Arrow2").Transform.Scale = 0.5f * Vector2.One;
-
             if (Input.GetKeyUp(Keys.R))
                 SceneManager.LoadScene(SceneManager.ActiveScene);
-
-            if(Input.GetKey(Keys.F))
-                SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").GetComponent<Rigidbody2D>().AddForce(Vector2.UnitY * 60 * 4, ForceMode2D.Force);
 
             SceneManager.ActiveScene.Update(gameTime);
 
@@ -178,7 +153,7 @@ namespace MyEngine
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
 
             SceneManager.ActiveScene.Draw(spriteBatch);
-            spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").GetComponent<Rigidbody2D>().Velocity.ToString(), Vector2.Zero, Color.Red);
+            //spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").GetComponent<Rigidbody2D>().Velocity.ToString(), Vector2.Zero, Color.Red);
 
             //spriteBatch.DrawString(spriteFont, ((int)(1/this.TargetElapsedTime.TotalSeconds)).ToString(), Vector2.Zero, Color.Red); =>FPS
 

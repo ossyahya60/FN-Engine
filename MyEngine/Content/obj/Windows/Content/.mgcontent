@@ -13,8 +13,10 @@
     <File>C:/MyEngine/MyEngine/MyEngine/Content/Hornet.png</File>
     <File>C:/MyEngine/MyEngine/MyEngine/Content/Jump.WAV</File>
     <File>C:/MyEngine/MyEngine/MyEngine/Content/SkyAndClouds.png</File>
+    <File>C:/MyEngine/MyEngine/MyEngine/Content/TileSet1.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

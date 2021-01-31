@@ -8,3 +8,4 @@ Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Siz
 "C:/MyEngine/MyEngine/MyEngine/Content/Hornet.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Hornet.xnb","TextureProcessor","Texture2DContent",4015,977685,0.7718555
 "C:/MyEngine/MyEngine/MyEngine/Content/Jump.WAV","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Jump.xnb","SoundEffectProcessor","SoundEffectContent",11346,11407,0.7114674
 "C:/MyEngine/MyEngine/MyEngine/Content/SkyAndClouds.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/SkyAndClouds.xnb","TextureProcessor","Texture2DContent",41967,33554517,1.288196
+"C:/MyEngine/MyEngine/MyEngine/Content/TileSet1.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/TileSet1.xnb","TextureProcessor","Texture2DContent",13634,409685,0.3455963

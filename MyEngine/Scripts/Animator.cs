@@ -41,5 +41,17 @@ namespace MyEngine
             if (ActiveClip != null)
                 ActiveClip.Update(gameTime);
         }
+
+        public override GameObjectComponent DeepCopy(GameObject Clone)
+        {
+            Animator clone = this.MemberwiseClone() as Animator;
+            clone.ActiveClip = ActiveClip.DeepCopy(Clone);
+            clone.AnimationClips = new List<Animation>();
+
+            foreach (Animation animation in AnimationClips)
+                clone.AddClip(animation.DeepCopy(Clone));
+
+            return clone;
+        }
     }
 }

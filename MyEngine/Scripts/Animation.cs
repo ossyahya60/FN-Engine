@@ -154,11 +154,12 @@ namespace MyEngine
         private int FramesPassed = 0;
         private Point NewSize;
 
-        public Animation(SpriteRenderer SR)
+        public Animation(SpriteRenderer SR, int FrameCount)
         {
             spriteRenderer = SR;
             SourceRectangle = Rectangle.Empty;
             NewSize = SourceRectangle.Size;
+            this.FramesCount = FrameCount;
         }
 
         public void Stop()
@@ -191,18 +192,20 @@ namespace MyEngine
                     Counter = 0;
                     FramesPassed++;
 
-                    NewSize.X = Math.Abs(SourceRectangle.Size.X);
-                    NewSize.Y = Math.Abs(SourceRectangle.Size.Y);
-                    spriteRenderer.Sprite.SourceRectangle.Location = CurrentFrame;
-                    spriteRenderer.Sprite.SourceRectangle.Size =  NewSize;
-
                     if (!GoNextFrame())
                     {
                         if (Looping)
                             CurrentFrame = SourceRectangle.Location;
                         else
                             stop = true;
+
+                        FramesPassed = 0;
                     }
+
+                    NewSize.X = Math.Abs(SourceRectangle.Size.X);
+                    NewSize.Y = Math.Abs(SourceRectangle.Size.Y);
+                    spriteRenderer.Sprite.SourceRectangle.Location = CurrentFrame;
+                    spriteRenderer.Sprite.SourceRectangle.Size = NewSize;
                 }
             }
         }
@@ -212,13 +215,23 @@ namespace MyEngine
             if (FramesPassed >= FramesCount)
                 return false;
 
-            if(CurrentFrame.X + SourceRectangle.X >= spriteRenderer.Sprite.Texture.Width)
+            if (CurrentFrame.X + SourceRectangle.X >= spriteRenderer.Sprite.Texture.Width)
             {
                 CurrentFrame.X = 0;
                 CurrentFrame.Y += SourceRectangle.Height;
             }
+            else
+                CurrentFrame.X += SourceRectangle.Width;
 
             return true;
+        }
+
+        public Animation DeepCopy(GameObject Clone)
+        {
+            Animation clone = this.MemberwiseClone() as Animation;
+            clone.spriteRenderer = Clone.GetComponent<SpriteRenderer>();
+
+            return clone;
         }
     }
 }
