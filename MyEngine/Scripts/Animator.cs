@@ -6,42 +6,40 @@ namespace MyEngine
     public class Animator: GameObjectComponent
     {
         public List<Animation> AnimationClips;
+        public Animation ActiveClip = null;
 
         public Animator()
         {
             AnimationClips = new List<Animation>();
         }
 
-        public void PlayWithTag(string Tag)
+        public void AddClip(Animation AM)
         {
-            Animation ActiveClip = GetActiveClip();
-
-            if (ActiveClip != null)
-                ActiveClip.ExitAnimation();
-
-            foreach (Animation Anim in AnimationClips)
-                if (Anim.Tag == Tag)
-                    Anim.Play();
+            AnimationClips.Add(AM);
         }
 
-        public Animation GetActiveClip()
+        public void AddClip(Animation AM, bool SetAsActive)
+        {
+            AnimationClips.Add(AM);
+
+            if (SetAsActive)
+                ActiveClip = AM;
+        }
+
+        public void PlayWithTag(string Tag)
         {
             foreach (Animation Anim in AnimationClips)
-                if (Anim.IsPlaying)
-                    return Anim;
-
-            return null;
+                if (Anim.Tag == Tag)
+                {
+                    Anim.Play();
+                    ActiveClip = Anim;
+                }
         }
 
         public override void Update(GameTime gameTime)
         {
-            Animation ActiveClip = GetActiveClip();
-
             if (ActiveClip != null)
-            {
-                gameObject.GetComponent<SpriteRenderer>().Sprite = ActiveClip.Sprite;
                 ActiveClip.Update(gameTime);
-            }
         }
     }
 }

@@ -247,7 +247,10 @@ namespace MyEngine
         public static GameObject Instantiate(GameObject GO)  //=> Implement it using "Recursion"
         {
             GameObject Clone = new GameObject(); //Add Children pls
-            Clone.Parent = GO.Parent;
+            if (GO.Parent != null)
+                GO.Parent.AddChild(Clone);
+            else
+                Clone.Parent = null;
             Clone.Tag = GO.Tag;
             Clone.Active = GO.Active;
             Clone.Layer = GO.Layer;
@@ -265,7 +268,10 @@ namespace MyEngine
         public static GameObject Instantiate(GameObject GO, GameObject parent)  //=> Implement it using "Recursion"
         {
             GameObject Clone = new GameObject();
-            Clone.Parent = parent;
+            if (parent != null)
+                parent.AddChild(Clone);
+            else
+                Clone.Parent = null;
             Clone.Tag = GO.Tag;
             Clone.Active = GO.Active;
             Clone.Layer = GO.Layer;
@@ -289,7 +295,10 @@ namespace MyEngine
                 foreach (GameObject Child in GO.Children)
                 {
                     GameObject ChildClone = new GameObject();
-                    ChildClone.Parent = Parent;
+                    if (Parent != null)
+                        Parent.AddChild(ChildClone);
+                    else
+                        ChildClone.Parent = null;
                     ChildClone.Tag = Child.Tag;
                     ChildClone.Active = Child.Active;
                     ChildClone.Layer = Child.Layer;
