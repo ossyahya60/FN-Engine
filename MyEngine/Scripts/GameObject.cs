@@ -246,7 +246,7 @@ namespace MyEngine
         //Update: Implemented using recursion, this means, you don't have to add every child to the simulation, just add the parent and you are good to go
         public static GameObject Instantiate(GameObject GO)  //=> Implement it using "Recursion"
         {
-            GameObject Clone = new GameObject();
+            GameObject Clone = new GameObject(); //Add Children pls
             Clone.Parent = GO.Parent;
             Clone.Tag = GO.Tag;
             Clone.Active = GO.Active;

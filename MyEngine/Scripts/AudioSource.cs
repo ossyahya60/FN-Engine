@@ -66,15 +66,20 @@ namespace MyEngine
 
         public void Play()
         {
-            //if(SoundEffectInstance != null)
-              //  SoundEffectInstance.Dispose();
+            try
+            {
+                //if(SoundEffectInstance != null)
+                //  SoundEffectInstance.Dispose();
 
-            SoundEffectInstance = SoundEffect.CreateInstance();
-            SoundEffectInstance.IsLooped = IsLooping;
-            SoundEffectInstance.Volume = volume;
-            SoundEffectInstance.Pitch = pitch;
-            SoundEffectInstance.Pan = pan;
-            SoundEffectInstance.Play();
+                SoundEffectInstance = SoundEffect.CreateInstance();
+                SoundEffectInstance.IsLooped = IsLooping;
+                SoundEffectInstance.Volume = volume;
+                SoundEffectInstance.Pitch = pitch;
+                SoundEffectInstance.Pan = pan;
+                SoundEffectInstance.Play();
+            }
+            catch
+            { }
         }
 
         public void Pause()
