@@ -8,6 +8,9 @@ namespace MyEngine
         public static Scene ActiveScene;
         public static Dictionary<int, Action> InitializerList;
 
+        private static Scene SceneToBeLoaded = null;
+        private static bool FirstTimeLoading = true;
+
         public static void Start()
         {
             InitializerList = new Dictionary<int, Action>();
@@ -30,14 +33,32 @@ namespace MyEngine
             InitializerList.Add(Index, initializer);
         }
 
-        public static void LoadScene(Scene scene)
+        public static void LoadSceneNow() //Not For High level user
         {
-            UnloadScene(); 
-            ActiveScene = scene;
+            if (SceneToBeLoaded == null)
+                return;
+
+            UnloadScene();
+            ActiveScene = SceneToBeLoaded;
 
             foreach (KeyValuePair<int, Action> KVP in InitializerList)
-                if (KVP.Key == scene.ID)
+                if (KVP.Key == ActiveScene.ID)
                     KVP.Value.Invoke();
+
+            SceneToBeLoaded = null;
+        }
+
+        public static void LoadScene(Scene scene) //Use this
+        {
+            if (FirstTimeLoading)
+            {
+                SceneToBeLoaded = scene;
+                LoadSceneNow();
+                FirstTimeLoading = false;
+                return;
+            }
+
+            SceneToBeLoaded = scene;
         }
     }
 }
