@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Profile>Reach</Profile>
+  <Platform>DesktopGL</Platform>
+  <Config />
+  <SourceFiles>
+    <File>C:/FN_Engine/FN_Engine/Content/Arrow.png</File>
+    <File>C:/FN_Engine/FN_Engine/Content/Font.spritefont</File>
+    <File>C:/FN_Engine/FN_Engine/Content/LightTest.fx</File>
+    <File>C:/FN_Engine/FN_Engine/Content/SubmittingGame.png</File>
+  </SourceFiles>
+  <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+  </DestFiles>
+</SourceFileCollection>

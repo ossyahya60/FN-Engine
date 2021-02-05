@@ -1,0 +1,5 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/FN_Engine/FN_Engine/Content/Arrow.png","C:/FN_Engine/FN_Engine/Content/bin/DesktopGL/Content/Arrow.xnb","TextureProcessor","Texture2DContent",454,16469,0.1190018
+"C:/FN_Engine/FN_Engine/Content/Font.spritefont","C:/FN_Engine/FN_Engine/Content/bin/DesktopGL/Content/Font.xnb","FontDescriptionProcessor","SpriteFontContent",2008,136209,0.1779702
+"C:/FN_Engine/FN_Engine/Content/LightTest.fx","C:/FN_Engine/FN_Engine/Content/bin/DesktopGL/Content/LightTest.xnb","EffectProcessor","CompiledEffectContent",1316,655,0.258
+"C:/FN_Engine/FN_Engine/Content/SubmittingGame.png","C:/FN_Engine/FN_Engine/Content/bin/DesktopGL/Content/SubmittingGame.xnb","TextureProcessor","Texture2DContent",9175,1048661,0.1529984

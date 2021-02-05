@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>C:/FN_Engine/FN_Engine/Content/LightTest.fx</SourceFile>
+  <SourceTime>2021-02-04T12:44:04.1687483+02:00</SourceTime>
+  <DestFile>C:/FN_Engine/FN_Engine/Content/bin/DesktopGL/Content/LightTest.xnb</DestFile>
+  <DestTime>2021-02-05T10:56:32.1636131+02:00</DestTime>
+  <Importer>EffectImporter</Importer>
+  <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
+  <Processor>EffectProcessor</Processor>
+  <ProcessorTime>2018-12-08T18:35:54+02:00</ProcessorTime>
+  <Parameters>
+    <Key>DebugMode</Key>
+    <Value>Auto</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>
