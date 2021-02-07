@@ -98,6 +98,9 @@ namespace MyEngine
                         GameObjectCount--;
             }
 
+            if (GO.Parent != null)
+                GO.Parent.RemoveChild(GO);
+
             if (GameObjects.Remove(GO))
                 GameObjectCount--;
         }

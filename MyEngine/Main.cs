@@ -17,6 +17,8 @@ namespace MyEngine
         ////////<Variables>/////
         Vector2 Resolution;
         SpriteFont spriteFont;
+        Effect LightTest;
+        RenderTarget2D RenderTarget2D;
         ////////////////////////
 
         public Main()
@@ -69,6 +71,8 @@ namespace MyEngine
         {
             ImportantIntialization();
 
+            RenderTarget2D = new RenderTarget2D(GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, false, GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+
             SceneManager.Start();
 
             SceneManager.AddInitializer(MainScene, 0);
@@ -81,23 +85,26 @@ namespace MyEngine
             // TODO: use this.Content to load your game content here
             spriteFont = Content.Load<SpriteFont>("Font");
 
-            GameObject Acid = new GameObject();
-            Acid.AddComponent<Transform>(new Transform());
-            Acid.AddComponent<SpriteRenderer>(new SpriteRenderer());
-            Acid.AddComponent<Animator>(new Animator());
-
-            SceneManager.ActiveScene.AddGameObject(Acid);
+            GameObject Test = new GameObject();
+            Test.AddComponent<Transform>(new Transform());
+            Test.AddComponent<SpriteRenderer>(new SpriteRenderer());
+            
+            SceneManager.ActiveScene.AddGameObject(Test);
 
             SceneManager.ActiveScene.Start();
 
             //Initialization here
-            Acid.GetComponent<SpriteRenderer>().Sprite.LoadTexture("TileSet1");
-            Acid.GetComponent<SpriteRenderer>().Sprite.SourceRectangle = new Rectangle(0, (int)(0.8f * Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Height), Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Width / 5, Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Height / 5);
-            Animation acid = new Animation(Acid.GetComponent<SpriteRenderer>(), 4);
-            acid.SourceRectangle = new Rectangle(0, (int)(0.8f * Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Height), Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Width / 5, Acid.GetComponent<SpriteRenderer>().Sprite.Texture.Height / 5);
-            acid.Looping = true;
-            Acid.GetComponent<Animator>().AddClip(acid, true);
-            Acid.GetComponent<Animator>().ActiveClip.Play();
+            //Use matrices to make transformations!!!!
+
+            Test.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.CreateCircleTexture(200, new Color(255, 255, 255, 255) * 0.2f);
+
+            GameObject.Instantiate(Test);
+
+            //Test.Active = false;
+
+            Camera.Position = new Vector2(0, 0);
+
+            SceneManager.ActiveScene.SortGameObjectsWithLayer();
         }
 
         /// <summary>
@@ -116,6 +123,9 @@ namespace MyEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if (!this.IsActive) //Pause Game when minimized
+                return;
+
             Input.GetState(); //This has to be called at the start of update method!!
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -148,16 +158,28 @@ namespace MyEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            if (!this.IsActive) //Pause Game when minimized
+                return;
+
+            //GraphicsDevice.SetRenderTarget(RenderTarget2D); //Render Target
             // TODO: Add your drawing code here
             RIR.BeginDraw(); //Resolution related -> Mandatory
-            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
+            SpriteRenderer.LastEffect = null; // This should be the same effect as in the begin method above
 
             SceneManager.ActiveScene.Draw(spriteBatch);
-            //spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow1").GetComponent<Rigidbody2D>().Velocity.ToString(), Vector2.Zero, Color.Red);
+            //spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow2").Transform.LocalPosition.ToString(), -Vector2.UnitX * graphics.PreferredBackBufferWidth/2 - Vector2.UnitY * graphics.PreferredBackBufferHeight/2, Color.Red);
 
             //spriteBatch.DrawString(spriteFont, ((int)(1/this.TargetElapsedTime.TotalSeconds)).ToString(), Vector2.Zero, Color.Red); =>FPS
 
             spriteBatch.End();
+
+            //Render Targets
+            //GraphicsDevice.SetRenderTarget(null);
+            //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightTest, Camera.GetViewTransformationMatrix());
+            //spriteBatch.Draw(RenderTarget2D, new Vector2(-graphics.PreferredBackBufferWidth/2, -graphics.PreferredBackBufferHeight/2), new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
+            //spriteBatch.End();
+
             base.Draw(gameTime);
         }
     }

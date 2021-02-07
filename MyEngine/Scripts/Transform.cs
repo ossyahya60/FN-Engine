@@ -370,6 +370,12 @@ namespace MyEngine
             }
         }
 
+        //Experimental
+        //public Matrix GetTransformationMatrix()
+        //{
+        //    return Matrix.CreateTranslation(Position.X, Position.Y, 1) * Matrix.CreateRotationZ(Rotation) * Matrix.CreateScale(Scale.X, Scale.Y, 1);
+        //}
+
         public Vector2 LocalScale
         {
             set

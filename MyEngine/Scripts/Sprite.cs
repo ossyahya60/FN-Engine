@@ -57,5 +57,10 @@ namespace MyEngine
 
             return Clone;
         }
+
+        public void SetCenterAsOrigin()
+        {
+            Origin = new Vector2(SourceRectangle.Width / 2, SourceRectangle.Height / 2);
+        }
     }
 }
