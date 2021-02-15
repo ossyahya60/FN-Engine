@@ -133,8 +133,6 @@ namespace MyEngine
             if (Active)
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].Draw(spriteBatch);
-
-            SceneManager.LoadSceneNow();
         }
 
         public GameObject FindGameObjectWithTag(string Tag)

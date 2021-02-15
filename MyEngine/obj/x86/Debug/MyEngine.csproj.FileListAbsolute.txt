@@ -35,5 +35,6 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Newtonsoft.Json.xml
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\TileSet1.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\SubmittingGame.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\LightTest.xnb
-C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.dll
-C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.dll
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.exe
+C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.exe
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\Temp.xnb

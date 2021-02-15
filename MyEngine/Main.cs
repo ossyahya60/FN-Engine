@@ -19,6 +19,12 @@ namespace MyEngine
         SpriteFont spriteFont;
         Effect LightTest;
         RenderTarget2D RenderTarget2D;
+        float Attenuation = 1;
+        float Radius = 0.25f;
+        Vector3 color = new Vector3(1, 1, 1);
+
+        Point Control1 = new Point(0, 300);
+        Point Control2 = new Point(250, 450);
         ////////////////////////
 
         public Main()
@@ -27,7 +33,6 @@ namespace MyEngine
             Content.RootDirectory = "Content";
             RIR = new ResolutionIndependentRenderer(this);
 
-            graphics.PreferMultiSampling = true;
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
         }
@@ -41,6 +46,11 @@ namespace MyEngine
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            graphics.GraphicsProfile = GraphicsProfile.HiDef;
+            graphics.PreferMultiSampling = true;
+            GraphicsDevice.PresentationParameters.MultiSampleCount = 8;
+            graphics.ApplyChanges();
+
             base.Initialize();
         }
 
@@ -70,8 +80,7 @@ namespace MyEngine
         protected override void LoadContent()
         {
             ImportantIntialization();
-
-            RenderTarget2D = new RenderTarget2D(GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, false, GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+            RIR.BackgroundColor = new Color(0, 0, 0, 0);
 
             SceneManager.Start();
 
@@ -84,11 +93,20 @@ namespace MyEngine
         {
             // TODO: use this.Content to load your game content here
             spriteFont = Content.Load<SpriteFont>("Font");
+            LightTest = Content.Load<Effect>("LightTest");
+            RenderTarget2D = new RenderTarget2D(GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, false, GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
 
             GameObject Test = new GameObject();
+            Test.Tag = "Test";
             Test.AddComponent<Transform>(new Transform());
             Test.AddComponent<SpriteRenderer>(new SpriteRenderer());
-            
+
+            GameObject Test2 = new GameObject();
+            Test2.Tag = "Test2";
+            Test2.AddComponent<Transform>(new Transform());
+            Test2.AddComponent<SpriteRenderer>(new SpriteRenderer());
+
+            SceneManager.ActiveScene.AddGameObject(Test2);
             SceneManager.ActiveScene.AddGameObject(Test);
 
             SceneManager.ActiveScene.Start();
@@ -96,13 +114,17 @@ namespace MyEngine
             //Initialization here
             //Use matrices to make transformations!!!!
 
-            Test.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.CreateCircleTexture(200, new Color(255, 255, 255, 255) * 0.2f);
+            Test.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Hornet");
+            Test.Transform.Scale = 0.5f * Vector2.One;
+            Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
 
-            GameObject.Instantiate(Test);
+            Test2.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
+            Test2.Transform.Scale = 2 * Vector2.One;
 
-            //Test.Active = false;
+            Test.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
+            Test.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
 
-            Camera.Position = new Vector2(0, 0);
+            //Camera.Position = new Vector2(0, 0);
 
             SceneManager.ActiveScene.SortGameObjectsWithLayer();
         }
@@ -147,6 +169,37 @@ namespace MyEngine
             if (Input.GetKeyUp(Keys.R))
                 SceneManager.LoadScene(SceneManager.ActiveScene);
 
+            if (Input.GetKey(Keys.A))
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+            if (Input.GetKey(Keys.D))
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+
+            if (Input.GetKey(Keys.Left))
+                Radius -= (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
+            else if (Input.GetKey(Keys.Right))
+                Radius += (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
+
+            if (Input.GetKey(Keys.Down))
+                Attenuation -= (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
+            else if (Input.GetKey(Keys.Up))
+                Attenuation += (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
+            //Attenuation = MathCompanion.Clamp(Attenuation, 0, 1);
+
+            if (Input.GetKeyUp(Keys.NumPad0))
+                color = new Vector3(1, 1, 1);
+            if (Input.GetKeyUp(Keys.NumPad1))
+                color = new Vector3(1, 0, 0);
+            if (Input.GetKeyUp(Keys.NumPad2))
+                color = new Vector3(0, 1, 0);
+            if (Input.GetKeyUp(Keys.NumPad3))
+                color = new Vector3(0, 0, 1);
+
+            LightTest.Parameters["X_Bias"].SetValue((SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.Position.X - graphics.PreferredBackBufferWidth * 0.5f)/ graphics.PreferredBackBufferWidth);
+            LightTest.Parameters["YOverX"].SetValue((float)graphics.PreferredBackBufferHeight/graphics.PreferredBackBufferWidth);
+            LightTest.Parameters["Color"].SetValue(color);
+            LightTest.Parameters["Radius"].SetValue(Radius);
+            LightTest.Parameters["Attenuation"].SetValue(Attenuation);
+
             SceneManager.ActiveScene.Update(gameTime);
 
             base.Update(gameTime);
@@ -161,26 +214,32 @@ namespace MyEngine
             if (!this.IsActive) //Pause Game when minimized
                 return;
 
-            //GraphicsDevice.SetRenderTarget(RenderTarget2D); //Render Target
+            GraphicsDevice.SetRenderTarget(RenderTarget2D); //Render Target
             // TODO: Add your drawing code here
             RIR.BeginDraw(); //Resolution related -> Mandatory
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
             SpriteRenderer.LastEffect = null; // This should be the same effect as in the begin method above
 
             SceneManager.ActiveScene.Draw(spriteBatch);
-            //spriteBatch.DrawString(spriteFont, SceneManager.ActiveScene.FindGameObjectWithName("Arrow2").Transform.LocalPosition.ToString(), -Vector2.UnitX * graphics.PreferredBackBufferWidth/2 - Vector2.UnitY * graphics.PreferredBackBufferHeight/2, Color.Red);
+            spriteBatch.DrawString(spriteFont, Input.GetMousePosition().ToString(), Vector2.Zero, Color.Red);
 
             //spriteBatch.DrawString(spriteFont, ((int)(1/this.TargetElapsedTime.TotalSeconds)).ToString(), Vector2.Zero, Color.Red); =>FPS
 
             spriteBatch.End();
 
             //Render Targets
-            //GraphicsDevice.SetRenderTarget(null);
-            //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightTest, Camera.GetViewTransformationMatrix());
-            //spriteBatch.Draw(RenderTarget2D, new Vector2(-graphics.PreferredBackBufferWidth/2, -graphics.PreferredBackBufferHeight/2), new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
-            //spriteBatch.End();
+            GraphicsDevice.SetRenderTarget(null);
+            if (!LightTest.IsDisposed)
+            {
+                GraphicsDevice.SetRenderTarget(null);
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightTest, Camera.GetViewTransformationMatrix());
+                spriteBatch.Draw(RenderTarget2D, new Vector2(0, 0), new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
+                spriteBatch.End();
+            }
 
             base.Draw(gameTime);
+
+            SceneManager.LoadSceneNow();
         }
     }
 }

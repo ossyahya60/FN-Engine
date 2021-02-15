@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 
 namespace MyEngine
 {
@@ -55,7 +57,7 @@ namespace MyEngine
             Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Left, Rect.Top, 1, Rect.Height), Color.LightGreen);
         }
 
-        public static void DrawLine(Rectangle Rect, Color color, float Angle, float Layer, Vector2 Origin)  //Draw filledRectangle
+        public static void DrawLine(Rectangle Rect, Color color, float Angle, float Layer, Vector2 Origin)  //Draw line
         {
             Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(Angle), Origin, SpriteEffects.None, Layer);
         }
@@ -103,8 +105,8 @@ namespace MyEngine
                     PointIterator.Y = i;
                     if ((Center - PointIterator).Length() <= Radius)
                         Pixels[i * Diameter + j] = color;
-                    else
-                        Pixels[i * Diameter + j] = Color.Transparent;
+                    //else
+                    //    Pixels[i * Diameter + j] = Color.Transparent;
                 }
             }
 
@@ -125,8 +127,8 @@ namespace MyEngine
                 {
                     if ((i - Radius1) * (i - Radius1) + (j - Radius1) * (j - Radius1) <= (Radius1 * Radius1) && (i - Radius1) * (i - Radius1) + (j - Radius1) * (j - Radius1) >= (Radius2 * Radius2))
                         Pixels[i * Diameter + j] = color;
-                    else
-                        Pixels[i * Diameter + j] = Color.Transparent;
+                    //else
+                    //    Pixels[i * Diameter + j] = Color.Transparent;
                 }
             }
 
@@ -134,6 +136,159 @@ namespace MyEngine
             texture.SetData(Pixels);
 
             return texture;
+        }
+
+        //Bezier Curves => Quadratic Curves
+
+        private static int getPt(int n1, int n2, float perc)
+        {
+            int diff = n2 - n1;
+
+            return (int)(n1 + (diff * perc));
+        }
+
+        private static int GetMinX(Point P1, Point P2, Point P3)
+        {
+            Point Res = Point.Zero;
+
+            Res = P2;
+            if (P1.X <= Res.X)
+                Res = P1;
+            if (P3.X <= Res.X)
+                Res = P3;
+
+            return Res.X;
+        }
+
+        private static int GetMaxX(Point P1, Point P2, Point P3)
+        {
+            Point Res = Point.Zero;
+
+            Res = P2;
+            if (P1.X >= Res.X)
+                Res = P1;
+            if (P3.X >= Res.X)
+                Res = P3;
+
+            return Res.X;
+        }
+
+        private static int GetMinY(Point P1, Point P2, Point P3)
+        {
+            Point Res = Point.Zero;
+
+            Res = P2;
+            if (P1.Y <= Res.Y)
+                Res = P1;
+            if (P3.Y <= Res.Y)
+                Res = P3;
+
+            return Res.Y;
+        }
+
+        private static int GetMaxY(Point P1, Point P2, Point P3)
+        {
+            Point Res = Point.Zero;
+
+            Res = P2;
+            if (P1.Y >= Res.Y)
+                Res = P1;
+            if (P3.Y >= Res.Y)
+                Res = P3;
+
+            return Res.Y;
+        }
+
+        public static void BezierLine(Point Start, Point Control, Point End, Color color, int Quality)
+        {
+            Point Auxilary = Point.Zero;
+            Point PrevPoint = Point.Zero;
+
+            // The Green Line
+            int xa = getPt(Start.X, Control.X, 0);
+            int ya = getPt(Start.Y, Control.Y, 0);
+            int xb = getPt(Control.X, End.X, 0);
+            int yb = getPt(Control.Y, End.Y, 0);
+
+            PrevPoint = Auxilary;
+
+            // The Black Dot
+            Auxilary.X = getPt(xa, xb, 0);
+            Auxilary.Y = getPt(ya, yb, 0);
+
+            for (float i = 1.0f / Quality; i <= 1.01f; i += 1.0f/Quality)
+            {
+                // The Green Line
+                xa = getPt(Start.X, Control.X, i);
+                ya = getPt(Start.Y, Control.Y, i);
+                xb = getPt(Control.X, End.X, i);
+                yb = getPt(Control.Y, End.Y, i);
+
+                PrevPoint = Auxilary;
+
+                // The Black Dot
+                Auxilary.X = getPt(xa, xb, i);
+                Auxilary.Y = getPt(ya, yb, i);
+
+                Rectangle Rect = Rectangle.Empty;
+                Rect.Location = PrevPoint;
+                Rect.Size = new Point((int)Math.Ceiling((Auxilary - PrevPoint).ToVector2().Length()), 3);
+                DrawLine(Rect, color, MathCompanion.GetAngle(PrevPoint.ToVector2(), Auxilary.ToVector2()), 0, Vector2.Zero);
+            }
+        }
+
+        public static void BezierLine(Point Start, Point Control1, Point Control2, Point End, Color color, int Quality)
+        {
+            Point Auxilary = Point.Zero;
+            Point PrevPoint = Point.Zero;
+
+            // The Green Line
+            int xa = getPt(Start.X, Control1.X, 0);
+            int ya = getPt(Start.Y, Control1.Y, 0);
+            int xb = getPt(Control1.X, Control2.X, 0);
+            int yb = getPt(Control1.Y, Control2.Y, 0);
+            int xc = getPt(Control2.X, End.X, 0);
+            int yc = getPt(Control2.Y, End.Y, 0);
+
+            // The Blue Line
+            int xm = getPt(xa, xb, 0);
+            int ym = getPt(ya, yb, 0);
+            int xn = getPt(xb, xc, 0);
+            int yn = getPt(yb, yc, 0);
+
+            PrevPoint = Auxilary;
+
+            // The Black Dot
+            Auxilary.X = getPt(xm, xn, 0);
+            Auxilary.Y = getPt(ym, yn, 0);
+
+            for (float i = 1.0f / Quality; i <= 1.01f; i += 1.0f / Quality)
+            {
+                // The Green Line
+                xa = getPt(Start.X, Control1.X, i);
+                ya = getPt(Start.Y, Control1.Y, i);
+                xb = getPt(Control1.X, Control2.X, i);
+                yb = getPt(Control1.Y, Control2.Y, i);
+                xc = getPt(Control2.X, End.X, i);
+                yc = getPt(Control2.Y, End.Y, i);
+
+                // The Blue Line
+                xm = getPt(xa, xb, i);
+                ym = getPt(ya, yb, i);
+                xn = getPt(xb, xc, i);
+                yn = getPt(yb, yc, i);
+
+                PrevPoint = Auxilary;
+
+                // The Black Dot
+                Auxilary.X = getPt(xm, xn, i);
+                Auxilary.Y = getPt(ym, yn, i);
+
+                Rectangle Rect = Rectangle.Empty;
+                Rect.Location = PrevPoint;
+                Rect.Size = new Point((int)Math.Ceiling((Auxilary - PrevPoint).ToVector2().Length()), 3);
+                DrawLine(Rect, color, MathCompanion.GetAngle(PrevPoint.ToVector2(), Auxilary.ToVector2()), 0, Vector2.Zero);
+            }
         }
     }
 }
