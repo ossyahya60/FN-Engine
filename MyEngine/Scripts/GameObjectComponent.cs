@@ -23,6 +23,11 @@ namespace MyEngine
             
         }
 
+        public virtual void LateUpdate(GameTime gameTime)  //Called every frame after Update()
+        {
+
+        }
+
         public virtual void Draw(SpriteBatch spriteBatch)  //Called every frame after "Update()" execution
         {
 

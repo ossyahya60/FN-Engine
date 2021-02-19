@@ -62,6 +62,7 @@
     <Compile Include="Scripts\KeyFrame.cs" />
     <Compile Include="Scripts\Layer.cs" />
     <Compile Include="Scripts\LayerUI.cs" />
+    <Compile Include="Scripts\Light.cs" />
     <Compile Include="Scripts\MathCompanion.cs" />
     <Compile Include="Scripts\MediaSource.cs" />
     <Compile Include="Scripts\NameGenerator.cs" />

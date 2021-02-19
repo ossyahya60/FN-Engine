@@ -17,14 +17,6 @@ namespace MyEngine
         ////////<Variables>/////
         Vector2 Resolution;
         SpriteFont spriteFont;
-        Effect LightTest;
-        RenderTarget2D RenderTarget2D;
-        float Attenuation = 1;
-        float Radius = 0.25f;
-        Vector3 color = new Vector3(1, 1, 1);
-
-        Point Control1 = new Point(0, 300);
-        Point Control2 = new Point(250, 450);
         ////////////////////////
 
         public Main()
@@ -93,13 +85,12 @@ namespace MyEngine
         {
             // TODO: use this.Content to load your game content here
             spriteFont = Content.Load<SpriteFont>("Font");
-            LightTest = Content.Load<Effect>("LightTest");
-            RenderTarget2D = new RenderTarget2D(GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, false, GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
 
             GameObject Test = new GameObject();
             Test.Tag = "Test";
             Test.AddComponent<Transform>(new Transform());
             Test.AddComponent<SpriteRenderer>(new SpriteRenderer());
+            Test.AddComponent<Light>(new Light());
 
             GameObject Test2 = new GameObject();
             Test2.Tag = "Test2";
@@ -178,49 +169,6 @@ namespace MyEngine
             if (Input.GetKey(Keys.D))
                 SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
-            if (Input.GetKey(Keys.Left))
-                Radius -= (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
-            else if (Input.GetKey(Keys.Right))
-                Radius += (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
-
-            if (Input.GetKey(Keys.Down))
-                Attenuation -= (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
-            else if (Input.GetKey(Keys.Up))
-                Attenuation += (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
-            //Attenuation = MathCompanion.Clamp(Attenuation, 0, 1);
-
-            if (Input.GetKeyUp(Keys.NumPad0))
-                color = new Vector3(1, 1, 1);
-            if (Input.GetKeyUp(Keys.NumPad1))
-                color = new Vector3(1, 0, 0);
-            if (Input.GetKeyUp(Keys.NumPad2))
-                color = new Vector3(0, 1, 0);
-            if (Input.GetKeyUp(Keys.NumPad3))
-                color = new Vector3(0, 0, 1);
-
-            //NOICELY DONE!, JUST WRAP IT IN A LIGHT CLASS
-            float[] Angles = { 360, 360 };
-            float[] X_BIASES = { (SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.Position.X - graphics.PreferredBackBufferWidth * 0.5f)/ graphics.PreferredBackBufferWidth, (SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.Position.X - graphics.PreferredBackBufferWidth * 0.5f) / graphics.PreferredBackBufferWidth };
-            float[] Y_BIASES = { (SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.Position.Y - graphics.PreferredBackBufferHeight * 0.5f) / graphics.PreferredBackBufferHeight, (SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.Position.Y - graphics.PreferredBackBufferHeight * 0.5f) / graphics.PreferredBackBufferHeight };
-            Vector3[] COLORS = new Vector3[2];
-            COLORS[0] = Vector3.One;
-            COLORS[1] = Vector3.One;
-            float[] RADII = { Radius, Radius * 2 };
-            float[] INNER_RADII = { Radius * 0.2f, Radius * 1.5f * 0.4f };
-            float[] INTENSITIES = { 1.5f, 2 };
-            float[] ATTENUATIONS = { 1, 2 };
-
-            LightTest.Parameters["LightCount"].SetValue(2);
-            LightTest.Parameters["AngularRadius"].SetValue(Angles);
-            LightTest.Parameters["X_Bias"].SetValue(X_BIASES);
-            LightTest.Parameters["Y_Bias"].SetValue(Y_BIASES);
-            LightTest.Parameters["YOverX"].SetValue((float)graphics.PreferredBackBufferHeight/graphics.PreferredBackBufferWidth);
-            LightTest.Parameters["Color"].SetValue(COLORS);
-            LightTest.Parameters["Radius"].SetValue(RADII);
-            LightTest.Parameters["InnerRadius"].SetValue(INNER_RADII);
-            LightTest.Parameters["InnerIntensity"].SetValue(INTENSITIES);
-            LightTest.Parameters["Attenuation"].SetValue(ATTENUATIONS);
-
             SceneManager.ActiveScene.Update(gameTime);
 
             base.Update(gameTime);
@@ -235,12 +183,13 @@ namespace MyEngine
             if (!this.IsActive) //Pause Game when minimized
                 return;
 
-            GraphicsDevice.SetRenderTarget(RenderTarget2D); //Render Target
-            // TODO: Add your drawing code here
+            ///
+            Light.Init_Light();
             RIR.BeginDraw(); //Resolution related -> Mandatory
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
             SpriteRenderer.LastEffect = null; // This should be the same effect as in the begin method above
-
+            ///
+            // TODO: Add your drawing code here
             SceneManager.ActiveScene.Draw(spriteBatch);
             spriteBatch.DrawString(spriteFont, Input.GetMousePosition().ToString(), Vector2.Zero, Color.Red);
 
@@ -249,14 +198,7 @@ namespace MyEngine
             spriteBatch.End();
 
             //Render Targets //Light (Experimental)
-            GraphicsDevice.SetRenderTarget(null);
-            if (!LightTest.IsDisposed)
-            {
-                GraphicsDevice.SetRenderTarget(null);
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightTest, Camera.GetViewTransformationMatrix());
-                spriteBatch.Draw(RenderTarget2D, new Vector2(0, 0), new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
-                spriteBatch.End();
-            }
+            Light.ApplyLighting();
 
             base.Draw(gameTime);
 

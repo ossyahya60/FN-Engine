@@ -122,6 +122,9 @@ namespace MyEngine
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].Update(gameTime);
 
+            foreach (GameObject GO in GameObjects.FindAll(item => item.ShouldBeDeleted == true))
+                GO.Destroy();
+
             int Length = GameObjects.RemoveAll(item => item.ShouldBeDeleted == true);
             GameObjectCount -= Length;
         }

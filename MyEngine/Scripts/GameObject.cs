@@ -312,6 +312,12 @@ namespace MyEngine
                 }
         }
 
+        public void Destroy()
+        {
+            foreach (GameObjectComponent GOC in GameObjectComponents)
+                GOC.Destroy();
+        }
+
         public int Compare(GameObject x, GameObject y)
         {
             if (x.Layer < y.Layer)
