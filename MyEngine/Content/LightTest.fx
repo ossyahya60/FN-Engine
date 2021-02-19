@@ -38,7 +38,10 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float4 color = tex2D(SpriteTextureSampler, input.TextureCoordinates);
     
     bool Dirty = false;
-    float3 ACC_COLOR = float3(0, 0, 0);
+    float3 SumColors[MAX_LIGHTS];
+    [unroll(9)]
+    for (int k = 0; k < LightCount; k++)
+        SumColors[k] = float3(0, 0, 0);
     
     [unroll(9)]
     for (int i = 0; i < LightCount; i++)
@@ -56,23 +59,26 @@ float4 MainPS(VertexShaderOutput input) : COLOR
                 {
                     float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
 
-                    ACC_COLOR.rgb += color.rgb * Color[i];
-                    ACC_COLOR.rgb *= Attenuation[i] * Dist * Dist;
+                    SumColors[i].rgb += color.rgb * Color[i];
+                    SumColors[i].rgb *= Attenuation[i] * Dist * Dist;
                     Dirty = true;
                 }
                 else if (Dist_SQ <= InnerRadius[i] * InnerRadius[i]) //Inner Radius
                 {
                     float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
 
-                    ACC_COLOR.rgb += color.rgb * Color[i];
-                    ACC_COLOR.rgb *= (InnerIntensity[i] * Attenuation[i] - (InnerIntensity[i] - 1) * Attenuation[i] * (sqrt(Dist_SQ) / InnerRadius[i])) * Dist * Dist;
+                    SumColors[i].rgb += color.rgb * Color[i];
+                    SumColors[i].rgb *= (InnerIntensity[i] * Attenuation[i] - (InnerIntensity[i] - 1) * Attenuation[i] * (sqrt(Dist_SQ) / InnerRadius[i])) * Dist * Dist;
                     Dirty = true;
                 }
             }
         }
     }
     
-    color = float4(ACC_COLOR, color.a);
+    color.rgb = 0;
+    [unroll(9)]
+    for (int j = 0; j < LightCount; j++)
+        color.rgb += SumColors[j];
         
     if(!Dirty)
         color.rgb = 0;
@@ -86,7 +92,7 @@ technique SpriteDrawing
     {
         PixelShader = compile PS_SHADERMODEL MainPS();
         AlphaBlendEnable = TRUE;
-        DestBlend = INVSRCALPHA;
-        SrcBlend = SRCALPHA;
+        //DestBlend = INVSRCALPHA;
+        //SrcBlend = SRCALPHA;
     }
 };

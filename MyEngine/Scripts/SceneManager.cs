@@ -58,6 +58,7 @@ namespace MyEngine
                 return;
             }
 
+            scene.GameObjects.Clear();
             SceneToBeLoaded = scene;
         }
     }

@@ -96,9 +96,10 @@ namespace MyEngine
             Test2.Tag = "Test2";
             Test2.AddComponent<Transform>(new Transform());
             Test2.AddComponent<SpriteRenderer>(new SpriteRenderer());
+            Test2.AddComponent<Light>(new Light());
 
-            SceneManager.ActiveScene.AddGameObject(Test2);
             SceneManager.ActiveScene.AddGameObject(Test);
+            SceneManager.ActiveScene.AddGameObject(Test2);
 
             SceneManager.ActiveScene.Start();
 
@@ -108,6 +109,8 @@ namespace MyEngine
             Test.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Hornet");
             Test.Transform.Scale = 0.5f * Vector2.One;
             Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
+            //Test.GetComponent<Light>().Attenuation = 2;
+            //Test.GetComponent<Light>().color = Color.Red;
 
             Test2.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
             Test2.Transform.Scale = 2 * Vector2.One;
@@ -117,7 +120,7 @@ namespace MyEngine
 
             //Camera.Position = new Vector2(0, 0);
 
-            SceneManager.ActiveScene.SortGameObjectsWithLayer();
+            //SceneManager.ActiveScene.SortGameObjectsWithLayer();
         }
 
         /// <summary>
@@ -158,7 +161,7 @@ namespace MyEngine
             //passing a property as a refrence using delegates
             //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(value => Arrow.Transform.Rotation = value);
             if (Input.GetKeyUp(Keys.R))
-                SceneManager.LoadScene(SceneManager.ActiveScene);
+                SceneManager.LoadScene(new Scene("MainScene", 0));
 
             if (Input.GetKey(Keys.W))
                 SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);

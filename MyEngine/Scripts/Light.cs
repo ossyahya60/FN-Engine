@@ -27,7 +27,7 @@ namespace MyEngine
 
         public override void Start()
         {
-            if (!ShaderLoaded)
+            if (!ShaderLoaded || LightEffect.IsDisposed)
             {
                 RenderTarget2D = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
                 LIGHTS = new List<Light>();
