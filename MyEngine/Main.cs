@@ -169,6 +169,10 @@ namespace MyEngine
             if (Input.GetKeyUp(Keys.R))
                 SceneManager.LoadScene(SceneManager.ActiveScene);
 
+            if (Input.GetKey(Keys.W))
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+            if (Input.GetKey(Keys.S))
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.A))
                 SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.D))
@@ -194,11 +198,28 @@ namespace MyEngine
             if (Input.GetKeyUp(Keys.NumPad3))
                 color = new Vector3(0, 0, 1);
 
-            LightTest.Parameters["X_Bias"].SetValue((SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.Position.X - graphics.PreferredBackBufferWidth * 0.5f)/ graphics.PreferredBackBufferWidth);
+            //NOICELY DONE!, JUST WRAP IT IN A LIGHT CLASS
+            float[] Angles = { 360, 360 };
+            float[] X_BIASES = { (SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.Position.X - graphics.PreferredBackBufferWidth * 0.5f)/ graphics.PreferredBackBufferWidth, (SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.Position.X - graphics.PreferredBackBufferWidth * 0.5f) / graphics.PreferredBackBufferWidth };
+            float[] Y_BIASES = { (SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.Position.Y - graphics.PreferredBackBufferHeight * 0.5f) / graphics.PreferredBackBufferHeight, (SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.Position.Y - graphics.PreferredBackBufferHeight * 0.5f) / graphics.PreferredBackBufferHeight };
+            Vector3[] COLORS = new Vector3[2];
+            COLORS[0] = Vector3.One;
+            COLORS[1] = Vector3.One;
+            float[] RADII = { Radius, Radius * 2 };
+            float[] INNER_RADII = { Radius * 0.2f, Radius * 1.5f * 0.4f };
+            float[] INTENSITIES = { 1.5f, 2 };
+            float[] ATTENUATIONS = { 1, 2 };
+
+            LightTest.Parameters["LightCount"].SetValue(2);
+            LightTest.Parameters["AngularRadius"].SetValue(Angles);
+            LightTest.Parameters["X_Bias"].SetValue(X_BIASES);
+            LightTest.Parameters["Y_Bias"].SetValue(Y_BIASES);
             LightTest.Parameters["YOverX"].SetValue((float)graphics.PreferredBackBufferHeight/graphics.PreferredBackBufferWidth);
-            LightTest.Parameters["Color"].SetValue(color);
-            LightTest.Parameters["Radius"].SetValue(Radius);
-            LightTest.Parameters["Attenuation"].SetValue(Attenuation);
+            LightTest.Parameters["Color"].SetValue(COLORS);
+            LightTest.Parameters["Radius"].SetValue(RADII);
+            LightTest.Parameters["InnerRadius"].SetValue(INNER_RADII);
+            LightTest.Parameters["InnerIntensity"].SetValue(INTENSITIES);
+            LightTest.Parameters["Attenuation"].SetValue(ATTENUATIONS);
 
             SceneManager.ActiveScene.Update(gameTime);
 
@@ -227,7 +248,7 @@ namespace MyEngine
 
             spriteBatch.End();
 
-            //Render Targets
+            //Render Targets //Light (Experimental)
             GraphicsDevice.SetRenderTarget(null);
             if (!LightTest.IsDisposed)
             {

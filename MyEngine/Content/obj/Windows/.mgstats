@@ -7,7 +7,6 @@ Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Siz
 "C:/MyEngine/MyEngine/MyEngine/Content/Font.spritefont","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Font.xnb","FontDescriptionProcessor","SpriteFontContent",2008,136209,0.911128
 "C:/MyEngine/MyEngine/MyEngine/Content/Hornet.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Hornet.xnb","TextureProcessor","Texture2DContent",4015,977685,0.7718555
 "C:/MyEngine/MyEngine/MyEngine/Content/Jump.WAV","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Jump.xnb","SoundEffectProcessor","SoundEffectContent",11346,11407,0.7114674
-"C:/MyEngine/MyEngine/MyEngine/Content/LightTest.fx","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/LightTest.xnb","EffectProcessor","CompiledEffectContent",1846,1641,0.4067763
 "C:/MyEngine/MyEngine/MyEngine/Content/SkyAndClouds.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/SkyAndClouds.xnb","TextureProcessor","Texture2DContent",41967,33554517,1.288196
 "C:/MyEngine/MyEngine/MyEngine/Content/SubmittingGame.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/SubmittingGame.xnb","TextureProcessor","Texture2DContent",9175,1048661,0.3560466
 "C:/MyEngine/MyEngine/MyEngine/Content/Temp.jpg","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Temp.xnb","TextureProcessor","Texture2DContent",76913,3686485,0.2355183
