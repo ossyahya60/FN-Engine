@@ -20,6 +20,7 @@ float X_Bias[MAX_LIGHTS];
 float Y_Bias[MAX_LIGHTS];
 float AngularRadius[MAX_LIGHTS];
 float InnerIntensity[MAX_LIGHTS];
+float DirectionalIntensity;
 
 sampler2D SpriteTextureSampler = sampler_state
 {
@@ -75,13 +76,15 @@ float4 MainPS(VertexShaderOutput input) : COLOR
         }
     }
     
-    color.rgb = 0;
+    float3 BaseColor = color.rgb;
+    
+    color.rgb = BaseColor * DirectionalIntensity;
     [unroll(9)]
     for (int j = 0; j < LightCount; j++)
         color.rgb += SumColors[j];
         
     if(!Dirty)
-        color.rgb = 0;
+        color.rgb = BaseColor.rgb * DirectionalIntensity;
 
     return color;
 }

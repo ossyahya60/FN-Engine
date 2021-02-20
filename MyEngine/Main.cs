@@ -110,10 +110,10 @@ namespace MyEngine
             Test.Transform.Scale = 0.5f * Vector2.One;
             Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
             //Test.GetComponent<Light>().Attenuation = 2;
-            //Test.GetComponent<Light>().color = Color.Red;
+            //Test.GetComponent<Light>().OuterRadius = 0.4f;
 
-            Test2.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
-            Test2.Transform.Scale = 2 * Vector2.One;
+            //Test2.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
+            Test2.Transform.Scale = Vector2.One;
 
             Test.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
             Test.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);

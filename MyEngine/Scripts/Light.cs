@@ -21,6 +21,7 @@ namespace MyEngine
         public float InnerRadius = 0.025f; //10% of OuterRadius
         public float InnerInensity = 1.5f; // 1 is the same as the outer radius Intensity
         public float Attenuation = 1;
+        public float DirectionalIntensity = 0.2f;
 
         private Transform Transform;
         private float YOVERX;
@@ -80,6 +81,13 @@ namespace MyEngine
                 Y_Bias[i] = (LIGHTS[i].Transform.Position.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f) / Setup.graphics.PreferredBackBufferHeight;
                 AngularRadius[i] = LIGHTS[i].AngularRadius;
                 InnerIntensity[i] = LIGHTS[i].InnerInensity;
+
+                if (LIGHTS[i].Type == LightTypes.Directional)
+                {
+                    LightEffect.Parameters["DirectionalIntensity"].SetValue(LIGHTS[i].DirectionalIntensity);
+                    InnerRadius[i] = 0;
+                    Radius[i] = 0;
+                }
             }
 
             LightEffect.Parameters["LightCount"].SetValue(LightCount);
