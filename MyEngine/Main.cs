@@ -138,6 +138,9 @@ namespace MyEngine
             Test4.Transform.MoveX(-100);
             Test4.Active = true;
 
+            GameObject Test5 = GameObject.Instantiate(Test3);
+            Test5.Tag = "Test5";
+
             SceneManager.ActiveScene.SortGameObjectsWithLayer();
         }
 
@@ -189,6 +192,15 @@ namespace MyEngine
                 SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.D))
                 SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+
+            if (Input.GetKey(Keys.Up))
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test5").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+            if (Input.GetKey(Keys.Down))
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test5").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+            if (Input.GetKey(Keys.Left))
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test5").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+            if (Input.GetKey(Keys.Right))
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test5").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             SceneManager.ActiveScene.Update(gameTime);
 

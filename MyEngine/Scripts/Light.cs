@@ -218,6 +218,8 @@ namespace MyEngine
 
             clone.Transform = Clone.Transform;
 
+            LIGHTS.Add(clone);
+
             return clone;
         }
     }
