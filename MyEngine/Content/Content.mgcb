@@ -92,6 +92,12 @@
 /processorParam:DebugMode=Auto
 /build:LightTest.fx
 
+#begin ShadowCasting.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:ShadowCasting.fx
+
 #begin SkyAndClouds.png
 /importer:TextureImporter
 /processor:TextureProcessor

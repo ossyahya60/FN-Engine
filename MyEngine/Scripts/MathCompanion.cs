@@ -73,5 +73,10 @@ namespace MyEngine
 
             return (int)((A2 - A1) * ScaleDownFactor - sign);
         }
+
+        public static float CrossProduct(Vector2 V1, Vector2 V2)
+        {
+            return (V1.X* V2.Y) - (V1.Y* V2.X);
+        }
     }
 }

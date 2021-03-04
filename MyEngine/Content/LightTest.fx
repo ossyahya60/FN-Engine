@@ -8,6 +8,7 @@
 #endif
 
 static const int MAX_LIGHTS = 8;
+static const int MAX_Shadows = 50;
 
 int LightCount;
 Texture2D SpriteTexture;
@@ -21,10 +22,19 @@ float Y_Bias[MAX_LIGHTS];
 float AngularRadius[MAX_LIGHTS];
 float InnerIntensity[MAX_LIGHTS];
 float DirectionalIntensity;
+bool CastShadows;
+
+//Shadows
+Texture2D ShadowMap;
 
 sampler2D SpriteTextureSampler = sampler_state
 {
     Texture = <SpriteTexture>;
+};
+
+sampler2D ShadowMapSampler = sampler_state
+{
+    Texture = <ShadowMap>;
 };
 
 struct VertexShaderOutput
@@ -51,26 +61,30 @@ float4 MainPS(VertexShaderOutput input) : COLOR
         float Angle = degrees(atan2(Direction.y, Direction.x)) + 180.0;
     
         float Dist_SQ = (input.TextureCoordinates.x - X_Bias[i] - 0.5) * (input.TextureCoordinates.x - X_Bias[i] - 0.5) + (input.TextureCoordinates.y - 0.5 - Y_Bias[i]) * YOverX * YOverX * (input.TextureCoordinates.y - 0.5 - Y_Bias[i]);
-    
+        
         if (Angle <= AngularRadius[i])
         {
             if (color.a != 0)
             {
-                if (Dist_SQ <= Radius[i] * Radius[i] && Dist_SQ > InnerRadius[i] * InnerRadius[i]) //Outer Radius
+                float4 Shadow = tex2D(ShadowMapSampler, input.TextureCoordinates);
+                if (!CastShadows || Shadow.r == 1) //There is no Shadow
                 {
-                    float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
+                    if (Dist_SQ <= Radius[i] * Radius[i] && Dist_SQ > InnerRadius[i] * InnerRadius[i]) //Outer Radius
+                    {
+                        float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
 
-                    SumColors[i].rgb += color.rgb * Color[i];
-                    SumColors[i].rgb *= Attenuation[i] * Dist * Dist;
-                    Dirty = true;
-                }
-                else if (Dist_SQ <= InnerRadius[i] * InnerRadius[i]) //Inner Radius
-                {
-                    float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
+                        SumColors[i].rgb += color.rgb * Color[i];
+                        SumColors[i].rgb *= Attenuation[i] * Dist * Dist;
+                        Dirty = true;
+                    }
+                    else if (Dist_SQ <= InnerRadius[i] * InnerRadius[i]) //Inner Radius
+                    {
+                        float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
 
-                    SumColors[i].rgb += color.rgb * Color[i];
-                    SumColors[i].rgb *= (InnerIntensity[i] * Attenuation[i] - (InnerIntensity[i] - 1) * Attenuation[i] * (sqrt(Dist_SQ) / InnerRadius[i])) * Dist * Dist;
-                    Dirty = true;
+                        SumColors[i].rgb += color.rgb * Color[i];
+                        SumColors[i].rgb *= (InnerIntensity[i] * Attenuation[i] - (InnerIntensity[i] - 1) * Attenuation[i] * (sqrt(Dist_SQ) / InnerRadius[i])) * Dist * Dist;
+                        Dirty = true;
+                    }
                 }
             }
         }

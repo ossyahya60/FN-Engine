@@ -174,6 +174,25 @@ namespace MyEngine
             return HandyList.ToArray();
         }
 
+        public T[] FindGameObjectComponents<T>() where T : GameObjectComponent
+        {
+            List<T> HandyList2 = new List<T>();
+
+            int Counter = 0;
+            int Count = GameObjects.Count - 1;
+
+            for (int i = Count; i >= 0; i--)
+            {
+                var GOC = GameObjects[Count - i].GetComponent<T>();
+                if (GOC != null && GOC.gameObject.Active == true)
+                {
+                    HandyList2.Insert(Counter++, GOC);
+                }
+            }
+
+            return HandyList2.ToArray() as T[];
+        }
+
         public void SortGameObjectsWithLayer()
         {
             GameObjects.Sort(GameObject.SortByLayer());

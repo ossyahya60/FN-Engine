@@ -329,7 +329,7 @@ namespace MyEngine
 
         public static IComparer<GameObject> SortByLayer()
         {
-            return (IComparer<GameObject>)new GameObject();
+            return new GameObject();
         }
     }
 }

@@ -38,3 +38,4 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\LightTest.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.exe
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.exe
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\Temp.xnb
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\ShadowCasting.xnb

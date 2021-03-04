@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
 
 namespace MyEngine
 {
@@ -16,7 +18,7 @@ namespace MyEngine
 
         ////////<Variables>/////
         Vector2 Resolution;
-        SpriteFont spriteFont;
+        public static SpriteFont spriteFont;
         ////////////////////////
 
         public Main()
@@ -86,41 +88,57 @@ namespace MyEngine
             // TODO: use this.Content to load your game content here
             spriteFont = Content.Load<SpriteFont>("Font");
 
+            Light.CastShadows = true;
             GameObject Test = new GameObject();
             Test.Tag = "Test";
             Test.AddComponent<Transform>(new Transform());
             Test.AddComponent<SpriteRenderer>(new SpriteRenderer());
             Test.AddComponent<Light>(new Light());
+            Test.AddComponent<ShadowCaster>(new ShadowCaster());
+
+            GameObject Test3 = new GameObject();
+            Test3.Tag = "Test3";
+            Test3.AddComponent<Transform>(new Transform());
+            Test3.AddComponent<Light>(new Light());
 
             GameObject Test2 = new GameObject();
             Test2.Tag = "Test2";
             Test2.AddComponent<Transform>(new Transform());
             Test2.AddComponent<SpriteRenderer>(new SpriteRenderer());
-            Test2.AddComponent<Light>(new Light());
 
             SceneManager.ActiveScene.AddGameObject(Test);
             SceneManager.ActiveScene.AddGameObject(Test2);
+            SceneManager.ActiveScene.AddGameObject(Test3);
 
             SceneManager.ActiveScene.Start();
 
             //Initialization here
             //Use matrices to make transformations!!!!
 
-            Test.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Hornet");
-            Test.Transform.Scale = 0.5f * Vector2.One;
+            Test.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Red);
+            Test.Transform.Scale = 50 * Vector2.One;
             Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
-            //Test.GetComponent<Light>().Attenuation = 2;
-            //Test.GetComponent<Light>().OuterRadius = 0.4f;
+            Test3.GetComponent<Light>().Attenuation = 2;
+            Test3.GetComponent<Light>().OuterRadius = 0.5f;
+            Test.GetComponent<Light>().Type = LightTypes.Directional;
+            Test.GetComponent<Light>().DirectionalIntensity = 0.4f;
+            //Test2.Layer = 0.5f;
 
             //Test2.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
-            Test2.Transform.Scale = Vector2.One;
+            //Test2.Transform.Scale = Vector2.One;
 
+            Test.Layer = 0.1f;
             Test.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
-            Test.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
-
+            Test.Transform.Position = new Vector2(1.5f*graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
             //Camera.Position = new Vector2(0, 0);
 
-            //SceneManager.ActiveScene.SortGameObjectsWithLayer();
+            GameObject Test4 = GameObject.Instantiate(Test);
+            Test4.RemoveComponent<Light>(Test4.GetComponent<Light>());
+            Test4.Tag = "Test4";
+            Test4.Transform.MoveX(-100);
+            Test4.Active = true;
+
+            SceneManager.ActiveScene.SortGameObjectsWithLayer();
         }
 
         /// <summary>
@@ -164,13 +182,13 @@ namespace MyEngine
                 SceneManager.LoadScene(new Scene("MainScene", 0));
 
             if (Input.GetKey(Keys.W))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.S))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.A))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.D))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             SceneManager.ActiveScene.Update(gameTime);
 
@@ -194,14 +212,19 @@ namespace MyEngine
             ///
             // TODO: Add your drawing code here
             SceneManager.ActiveScene.Draw(spriteBatch);
-            spriteBatch.DrawString(spriteFont, Input.GetMousePosition().ToString(), Vector2.Zero, Color.Red);
-
-            //spriteBatch.DrawString(spriteFont, ((int)(1/this.TargetElapsedTime.TotalSeconds)).ToString(), Vector2.Zero, Color.Red); =>FPS
 
             spriteBatch.End();
 
             //Render Targets //Light (Experimental)
             Light.ApplyLighting();
+
+            //UI Rendering
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
+
+            //spriteBatch.DrawString(spriteFont, Input.GetMousePosition().ToString(), Vector2.Zero, Color.Red);
+            spriteBatch.DrawString(spriteFont, ((int)(1 / this.TargetElapsedTime.TotalSeconds)).ToString(), Vector2.Zero, Color.Red); //=>FPS
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
 

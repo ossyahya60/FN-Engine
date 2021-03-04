@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/LightTest.fx</SourceFile>
-  <SourceTime>2021-03-04T17:26:42.2303937+02:00</SourceTime>
-  <DestFile>C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Content/LightTest.xnb</DestFile>
-  <DestTime>2021-03-04T17:27:16.6672447+02:00</DestTime>
+  <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/ShadowCasting.fx</SourceFile>
+  <SourceTime>2021-02-21T23:28:48.3930569+02:00</SourceTime>
+  <DestFile>C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Content/ShadowCasting.xnb</DestFile>
+  <DestTime>2021-02-21T23:28:51.1604609+02:00</DestTime>
   <Importer>EffectImporter</Importer>
   <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
   <Processor>EffectProcessor</Processor>

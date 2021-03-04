@@ -40,8 +40,8 @@ namespace MyEngine
 
         public Rectangle DynamicScaledRect()
         {
-            HandyRectangle.X = (int)Transform.Position.X;
-            HandyRectangle.Y = (int)Transform.Position.Y;
+            HandyRectangle.X = (int)(Transform.Position.X - Origin.X * Transform.Scale.X);
+            HandyRectangle.Y = (int)(Transform.Position.Y - Origin.Y * Transform.Scale.Y);
             HandyRectangle.Width = (int)(SourceRectangle.Width * Transform.Scale.X);
             HandyRectangle.Height = (int)(SourceRectangle.Height * Transform.Scale.Y);
 

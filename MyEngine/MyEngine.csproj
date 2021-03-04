@@ -63,6 +63,7 @@
     <Compile Include="Scripts\Layer.cs" />
     <Compile Include="Scripts\LayerUI.cs" />
     <Compile Include="Scripts\Light.cs" />
+    <Compile Include="Scripts\LineOccluder.cs" />
     <Compile Include="Scripts\MathCompanion.cs" />
     <Compile Include="Scripts\MediaSource.cs" />
     <Compile Include="Scripts\NameGenerator.cs" />
@@ -71,6 +72,8 @@
     <Compile Include="Scripts\ParticleEffect.cs" />
     <Compile Include="Scripts\ParticleSimulator.cs" />
     <Compile Include="Scripts\PropertiesAnimator.cs" />
+    <Compile Include="Scripts\Ray.cs" />
+    <Compile Include="Scripts\RectangleOccluder.cs" />
     <Compile Include="Scripts\ResolutionIndependentRendering.cs" />
     <Compile Include="Scripts\Rigidbody2D.cs" />
     <Compile Include="Scripts\SaveLoadManager.cs" />
@@ -78,6 +81,7 @@
     <Compile Include="Scripts\Scene.cs" />
     <Compile Include="Scripts\SceneManager.cs" />
     <Compile Include="Scripts\Setup.cs" />
+    <Compile Include="Scripts\ShadowCaster.cs" />
     <Compile Include="Scripts\Sprite.cs" />
     <Compile Include="Scripts\SpriteRenderer.cs" />
     <Compile Include="Scripts\Text.cs" />
