@@ -22,6 +22,7 @@ float Y_Bias[MAX_LIGHTS];
 float AngularRadius[MAX_LIGHTS];
 float InnerIntensity[MAX_LIGHTS];
 float DirectionalIntensity;
+float ShadowConstant = 1;
 bool CastShadows;
 
 //Shadows
@@ -66,25 +67,33 @@ float4 MainPS(VertexShaderOutput input) : COLOR
         {
             if (color.a != 0)
             {
-                float4 Shadow = tex2D(ShadowMapSampler, input.TextureCoordinates);
-                if (!CastShadows || Shadow.r == 1) //There is no Shadow
+                if (Dist_SQ <= Radius[i] * Radius[i] && Dist_SQ > InnerRadius[i] * InnerRadius[i]) //Outer Radius
                 {
-                    if (Dist_SQ <= Radius[i] * Radius[i] && Dist_SQ > InnerRadius[i] * InnerRadius[i]) //Outer Radius
-                    {
-                        float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
+                    float4 Shadow = tex2D(ShadowMapSampler, input.TextureCoordinates);
+                    float ShadowAttenuation = 1;
+                
+                    if (CastShadows && Shadow.r != 1) //There is no Shadow
+                        ShadowAttenuation = clamp(ShadowConstant, 0, 1);
+                                        
+                    float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
 
-                        SumColors[i].rgb += color.rgb * Color[i];
-                        SumColors[i].rgb *= Attenuation[i] * Dist * Dist;
-                        Dirty = true;
-                    }
-                    else if (Dist_SQ <= InnerRadius[i] * InnerRadius[i]) //Inner Radius
-                    {
-                        float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
+                    SumColors[i].rgb += color.rgb * Color[i];
+                    SumColors[i].rgb *= Attenuation[i] * Dist * Dist * ShadowAttenuation;
+                    Dirty = true;
+                }
+                else if (Dist_SQ <= InnerRadius[i] * InnerRadius[i]) //Inner Radius
+                {
+                    float4 Shadow = tex2D(ShadowMapSampler, input.TextureCoordinates);
+                    float ShadowAttenuation = 1;
+                
+                    if (CastShadows && Shadow.r != 1) //There is no Shadow
+                        ShadowAttenuation = clamp(ShadowConstant, 0, 1);
+                    
+                    float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
 
-                        SumColors[i].rgb += color.rgb * Color[i];
-                        SumColors[i].rgb *= (InnerIntensity[i] * Attenuation[i] - (InnerIntensity[i] - 1) * Attenuation[i] * (sqrt(Dist_SQ) / InnerRadius[i])) * Dist * Dist;
-                        Dirty = true;
-                    }
+                    SumColors[i].rgb += color.rgb * Color[i];
+                    SumColors[i].rgb *= (InnerIntensity[i] * Attenuation[i] - (InnerIntensity[i] - 1) * Attenuation[i] * (sqrt(Dist_SQ) / InnerRadius[i])) * Dist * Dist * ShadowAttenuation;
+                    Dirty = true;
                 }
             }
         }

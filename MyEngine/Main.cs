@@ -96,6 +96,13 @@ namespace MyEngine
             Test.AddComponent<Light>(new Light());
             Test.AddComponent<ShadowCaster>(new ShadowCaster());
 
+            GameObject Test6 = new GameObject();
+            Test6.Tag = "Test6";
+            Test6.AddComponent<Transform>(new Transform());
+            Test6.AddComponent<SpriteRenderer>(new SpriteRenderer());
+            //Test.AddComponent<Light>(new Light());
+            Test6.AddComponent<ShadowCaster>(new ShadowCaster());
+
             GameObject Test3 = new GameObject();
             Test3.Tag = "Test3";
             Test3.AddComponent<Transform>(new Transform());
@@ -109,17 +116,23 @@ namespace MyEngine
             SceneManager.ActiveScene.AddGameObject(Test);
             SceneManager.ActiveScene.AddGameObject(Test2);
             SceneManager.ActiveScene.AddGameObject(Test3);
+            SceneManager.ActiveScene.AddGameObject(Test6);
 
             SceneManager.ActiveScene.Start();
 
             //Initialization here
             //Use matrices to make transformations!!!!
 
+            Test6.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Yellow);
+            Test6.Transform.Scale = 100 * Vector2.One;
+            Test6.Layer = 0.1f;
+            Test6.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, 1.2f * graphics.PreferredBackBufferHeight / 2);
+
             Test.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Red);
             Test.Transform.Scale = 50 * Vector2.One;
             Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
-            Test3.GetComponent<Light>().Attenuation = 2;
-            Test3.GetComponent<Light>().OuterRadius = 0.5f;
+            Test3.GetComponent<Light>().Attenuation = 1;
+            Test3.GetComponent<Light>().OuterRadius = 0.1f;
             Test.GetComponent<Light>().Type = LightTypes.Directional;
             Test.GetComponent<Light>().DirectionalIntensity = 0.4f;
             //Test2.Layer = 0.5f;
@@ -132,14 +145,15 @@ namespace MyEngine
             Test.Transform.Position = new Vector2(1.5f*graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
             //Camera.Position = new Vector2(0, 0);
 
-            GameObject Test4 = GameObject.Instantiate(Test);
-            Test4.RemoveComponent<Light>(Test4.GetComponent<Light>());
-            Test4.Tag = "Test4";
-            Test4.Transform.MoveX(-100);
-            Test4.Active = true;
+            //GameObject Test4 = GameObject.Instantiate(Test);
+            //Test4.RemoveComponent<Light>(Test4.GetComponent<Light>());
+            //Test4.RemoveComponent<ShadowCaster>(Test4.GetComponent<ShadowCaster>());
+            //Test4.Tag = "Test4";
+            //Test4.Transform.MoveX(-100);
+            //Test4.Active = true;
 
-            GameObject Test5 = GameObject.Instantiate(Test3);
-            Test5.Tag = "Test5";
+            //GameObject Test5 = GameObject.Instantiate(Test3);
+            //Test5.Tag = "Test5";
 
             SceneManager.ActiveScene.SortGameObjectsWithLayer();
         }

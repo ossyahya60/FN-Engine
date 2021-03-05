@@ -10,6 +10,7 @@ namespace MyEngine
     public class Light: GameObjectComponent
     {
         public static bool CastShadows = true;
+        public static float ShadowIntensity = 0.5f;
 
         private static bool ShaderLoaded = false;
         private static int MAX_LIGHT_COUNT = 8;
@@ -129,44 +130,57 @@ namespace MyEngine
 
                 if (HandyList.Count != 0)
                 {
-                    foreach (Light L in LIGHTS)
+                    for(int k=0; k<LIGHTS.Count; k++)
                     {
                         PointsTriangle.Clear();
-                        if (L.gameObject.Active && L.Enabled)
+                        if (!LIGHTS[k].gameObject.Active || !LIGHTS[k].Enabled)
+                            continue;
+
+                        foreach (Vector2 P in Points)
                         {
-                            foreach (Vector2 P in Points)
-                            {
-                                float ClosestIntersection = 100000000; //Dummy Number
-                                Vector2 FoundClosestPoint = Vector2.Zero;
+                            float ClosestIntersection = 100000000; //Dummy Number
+                            Vector2 FoundClosestPoint = Vector2.Zero;
 
-                                foreach (LineOccluder LOC in HandyList) //Needs Optimization
+                            float Distance = -1;
+                            ray.Origin = LIGHTS[k].Transform.Position;
+                            ray.Direction = P - ray.Origin; //Don't Normalize!
+
+                            foreach (LineOccluder LOC in HandyList) //Needs Optimization
+                            {
+                                //Rectangle LineBoundingBox = Rectangle.Empty;
+                                //LineBoundingBox.X = (int)Math.Min(LOC.StartPoint.X, LOC.EndPoint.X);
+                                //LineBoundingBox.Y = (int)Math.Min(LOC.StartPoint.Y, LOC.EndPoint.Y);
+                                //LineBoundingBox.Width = (int)Math.Abs(LOC.StartPoint.X - LOC.EndPoint.X);
+                                //LineBoundingBox.Height = (int)Math.Abs(LOC.StartPoint.Y - LOC.EndPoint.Y);
+
+                                //bool X1 = MathCompanion.Abs(LIGHTS[k].Transform.Position.X - LineBoundingBox.Center.X) > LIGHTS[k].OuterRadius + LineBoundingBox.Width / 2;
+
+                                //bool X2 = MathCompanion.Abs(LIGHTS[k].Transform.Position.Y - LineBoundingBox.Center.Y) > LIGHTS[k].OuterRadius + LineBoundingBox.Height / 2;
+
+                                //if (X1 && X2)
+                                //    continue;
+
+                                Distance = ray.GetRayToLineSegmentIntersection(LOC);
+
+                                if (Distance != -1 && Distance < ClosestIntersection)
                                 {
-                                    float Distance = -1;
-                                    ray.Origin = L.Transform.Position;
-                                    ray.Direction = P - ray.Origin; //Don't Normalize!
-
-                                    Distance = ray.GetRayToLineSegmentIntersection(LOC);
-
-                                    if (Distance != -1 && Distance < ClosestIntersection)
-                                    {
-                                        ClosestIntersection = Distance;
-                                        FoundClosestPoint = ray.GetAPointAlongRay(Distance);
-                                    }
+                                    ClosestIntersection = Distance;
+                                    FoundClosestPoint = ray.GetAPointAlongRay(Distance);
                                 }
-
-                                if (ClosestIntersection != 100000000) //INTERSECTION
-                                    PointsTriangle.Add(FoundClosestPoint);
                             }
 
-                            PointsTriangle.Sort((x, y) => MathCompanion.GetAngle(x, L.Transform.Position).CompareTo(MathCompanion.GetAngle(y, L.Transform.Position)));
-
-                            //DrawTriangles
-                            for (int i = 0; i < PointsTriangle.Count-1; i++)
-                            {
-                                HitBoxDebuger.DrawTriangle(PointsTriangle[i], PointsTriangle[i + 1], L.Transform.Position); //White Color
-                            }
-                            HitBoxDebuger.DrawTriangle(PointsTriangle[PointsTriangle.Count-1], PointsTriangle[0], L.Transform.Position);
+                            if (ClosestIntersection != 100000000) //INTERSECTION
+                                PointsTriangle.Add(FoundClosestPoint);
                         }
+
+                        PointsTriangle.Sort((x, y) => MathCompanion.GetAngle(x, LIGHTS[k].Transform.Position).CompareTo(MathCompanion.GetAngle(y, LIGHTS[k].Transform.Position)));
+
+                        //DrawTriangles
+                        for (int i = 0; i < PointsTriangle.Count - 1; i++)
+                        {
+                            HitBoxDebuger.DrawTriangle(PointsTriangle[i], PointsTriangle[i + 1], LIGHTS[k].Transform.Position); //White Color
+                        }
+                        HitBoxDebuger.DrawTriangle(PointsTriangle[PointsTriangle.Count - 1], PointsTriangle[0], LIGHTS[k].Transform.Position);
                     }
                 }
 
@@ -205,6 +219,7 @@ namespace MyEngine
             LightEffect.Parameters["InnerIntensity"].SetValue(InnerIntensity);
             LightEffect.Parameters["Attenuation"].SetValue(Attenuation);
             LightEffect.Parameters["CastShadows"].SetValue(CastShadows);
+            LightEffect.Parameters["ShadowConstant"].SetValue(1 - ShadowIntensity);
 
             Setup.GraphicsDevice.SetRenderTarget(null);
             Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightEffect, Setup.Camera.GetViewTransformationMatrix());
