@@ -10,7 +10,6 @@ namespace MyEngine
     public class Light: GameObjectComponent
     {
         public static bool CastShadows = true;
-        public static float ShadowIntensity = 0.5f;
 
         private static bool ShaderLoaded = false;
         private static int MAX_LIGHT_COUNT = 8;
@@ -21,6 +20,22 @@ namespace MyEngine
         private static List<LineOccluder> HandyList;
         private static List<Vector2> Points;
         private static List<Vector2> PointsTriangle;
+        private static LineOccluder[] BorderOccluders;
+
+        private static EffectParameter ShadowMap_param;
+        private static EffectParameter DirectionalIntensity_param;
+        private static EffectParameter LightCount_param;
+        private static EffectParameter AngularRadius_param;
+        private static EffectParameter X_Bias_param;
+        private static EffectParameter Y_Bias_param;
+        private static EffectParameter YOverX_param;
+        private static EffectParameter Color_param;
+        private static EffectParameter Radius_param;
+        private static EffectParameter InnerRadius_param;
+        private static EffectParameter InnerIntensity_param;
+        private static EffectParameter Attenuation_param;
+        private static EffectParameter CastShadows_param;
+        private static EffectParameter ShadowConstant_param;
 
         public LightTypes Type = LightTypes.Point;
         public Color color = Color.White;
@@ -30,6 +45,7 @@ namespace MyEngine
         public float InnerInensity = 1.5f; // 1 is the same as the outer radius Intensity
         public float Attenuation = 1;
         public float DirectionalIntensity = 0.2f;
+        public float ShadowIntensity = 0.5f;
 
         private Transform Transform;
         private float YOVERX;
@@ -46,6 +62,26 @@ namespace MyEngine
                 LightEffect = Setup.Content.Load<Effect>("LightTest");
                 ShaderLoaded = true;
                 ShadowMap = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None); //Depth is not needed
+                BorderOccluders = new LineOccluder[4];
+                BorderOccluders[0] = new LineOccluder();
+                BorderOccluders[1] = new LineOccluder();
+                BorderOccluders[2] = new LineOccluder();
+                BorderOccluders[3] = new LineOccluder();
+
+                ShadowMap_param = LightEffect.Parameters["ShadowMap"];
+                DirectionalIntensity_param = LightEffect.Parameters["DirectionalIntensity"];
+                LightCount_param = LightEffect.Parameters["LightCount"];
+                AngularRadius_param = LightEffect.Parameters["AngularRadius"];
+                X_Bias_param = LightEffect.Parameters["X_Bias"];
+                Y_Bias_param = LightEffect.Parameters["Y_Bias"];
+                YOverX_param = LightEffect.Parameters["YOverX"];
+                Color_param = LightEffect.Parameters["Color"];
+                Radius_param = LightEffect.Parameters["Radius"];
+                InnerRadius_param = LightEffect.Parameters["InnerRadius"];
+                InnerIntensity_param = LightEffect.Parameters["InnerIntensity"];
+                Attenuation_param = LightEffect.Parameters["Attenuation"];
+                CastShadows_param = LightEffect.Parameters["CastShadows"];
+                ShadowConstant_param = LightEffect.Parameters["ShadowConstant"];
             }
 
             LIGHTS.Add(this);
@@ -82,6 +118,7 @@ namespace MyEngine
             float[] Y_Bias = new float[LightCount];
             float[] AngularRadius = new float[LightCount];
             float[] InnerIntensity = new float[LightCount];
+            float[] ShadowIntensity = new float[LightCount];
 
             HandyList.Clear();
             Points.Clear();
@@ -103,10 +140,15 @@ namespace MyEngine
                     Points.Add(Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth + Vector2.UnitY * Setup.graphics.PreferredBackBufferHeight);
                     Points.Add(Vector2.UnitY * Setup.graphics.PreferredBackBufferHeight);
 
-                    HandyList.Add(new LineOccluder(Vector2.Zero, Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth));
-                    HandyList.Add(new LineOccluder(Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth, new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight)));
-                    HandyList.Add(new LineOccluder(Vector2.Zero, new Vector2(0, Setup.graphics.PreferredBackBufferHeight)));
-                    HandyList.Add(new LineOccluder(new Vector2(0, Setup.graphics.PreferredBackBufferHeight), new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight)));
+                    BorderOccluders[0].SetOccluder(Vector2.Zero, Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth);
+                    BorderOccluders[1].SetOccluder(Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth, new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight));
+                    BorderOccluders[2].SetOccluder(Vector2.Zero, new Vector2(0, Setup.graphics.PreferredBackBufferHeight));
+                    BorderOccluders[3].SetOccluder(new Vector2(0, Setup.graphics.PreferredBackBufferHeight), new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight));
+
+                    HandyList.Add(BorderOccluders[0]);
+                    HandyList.Add(BorderOccluders[1]);
+                    HandyList.Add(BorderOccluders[2]);
+                    HandyList.Add(BorderOccluders[3]);
 
                     Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix()); // -> Mandatory
 
@@ -147,19 +189,6 @@ namespace MyEngine
 
                             foreach (LineOccluder LOC in HandyList) //Needs Optimization
                             {
-                                //Rectangle LineBoundingBox = Rectangle.Empty;
-                                //LineBoundingBox.X = (int)Math.Min(LOC.StartPoint.X, LOC.EndPoint.X);
-                                //LineBoundingBox.Y = (int)Math.Min(LOC.StartPoint.Y, LOC.EndPoint.Y);
-                                //LineBoundingBox.Width = (int)Math.Abs(LOC.StartPoint.X - LOC.EndPoint.X);
-                                //LineBoundingBox.Height = (int)Math.Abs(LOC.StartPoint.Y - LOC.EndPoint.Y);
-
-                                //bool X1 = MathCompanion.Abs(LIGHTS[k].Transform.Position.X - LineBoundingBox.Center.X) > LIGHTS[k].OuterRadius + LineBoundingBox.Width / 2;
-
-                                //bool X2 = MathCompanion.Abs(LIGHTS[k].Transform.Position.Y - LineBoundingBox.Center.Y) > LIGHTS[k].OuterRadius + LineBoundingBox.Height / 2;
-
-                                //if (X1 && X2)
-                                //    continue;
-
                                 Distance = ray.GetRayToLineSegmentIntersection(LOC);
 
                                 if (Distance != -1 && Distance < ClosestIntersection)
@@ -184,7 +213,7 @@ namespace MyEngine
                     }
                 }
 
-                LightEffect.Parameters["ShadowMap"].SetValue(ShadowMap);
+                ShadowMap_param.SetValue(ShadowMap);
 
                 Setup.spriteBatch.End();
             }
@@ -199,31 +228,32 @@ namespace MyEngine
                 Y_Bias[i] = (LIGHTS[i].Transform.Position.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f) / Setup.graphics.PreferredBackBufferHeight;
                 AngularRadius[i] = LIGHTS[i].AngularRadius;
                 InnerIntensity[i] = LIGHTS[i].InnerInensity;
+                ShadowIntensity[i] = 1 - LIGHTS[i].ShadowIntensity;
 
                 if (LIGHTS[i].Type == LightTypes.Directional)
                 {
-                    LightEffect.Parameters["DirectionalIntensity"].SetValue(LIGHTS[i].DirectionalIntensity);
+                    DirectionalIntensity_param.SetValue(LIGHTS[i].DirectionalIntensity);
                     InnerRadius[i] = 0;
                     Radius[i] = 0;
                 }
             }
 
-            LightEffect.Parameters["LightCount"].SetValue(LightCount);
-            LightEffect.Parameters["AngularRadius"].SetValue(AngularRadius);
-            LightEffect.Parameters["X_Bias"].SetValue(X_Bias);
-            LightEffect.Parameters["Y_Bias"].SetValue(Y_Bias);
-            LightEffect.Parameters["YOverX"].SetValue(LIGHTS[0].YOVERX);
-            LightEffect.Parameters["Color"].SetValue(COLOR);
-            LightEffect.Parameters["Radius"].SetValue(Radius);
-            LightEffect.Parameters["InnerRadius"].SetValue(InnerRadius);
-            LightEffect.Parameters["InnerIntensity"].SetValue(InnerIntensity);
-            LightEffect.Parameters["Attenuation"].SetValue(Attenuation);
-            LightEffect.Parameters["CastShadows"].SetValue(CastShadows);
-            LightEffect.Parameters["ShadowConstant"].SetValue(1 - ShadowIntensity);
+            LightCount_param.SetValue(LightCount);
+            AngularRadius_param.SetValue(AngularRadius);
+            X_Bias_param.SetValue(X_Bias);
+            Y_Bias_param.SetValue(Y_Bias);
+            YOverX_param.SetValue(LIGHTS[0].YOVERX);
+            Color_param.SetValue(COLOR);
+            Radius_param.SetValue(Radius);
+            InnerRadius_param.SetValue(InnerRadius);
+            InnerIntensity_param.SetValue(InnerIntensity);
+            Attenuation_param.SetValue(Attenuation);
+            CastShadows_param.SetValue(CastShadows);
+            ShadowConstant_param.SetValue(ShadowIntensity);
 
             Setup.GraphicsDevice.SetRenderTarget(null);
             Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightEffect, Setup.Camera.GetViewTransformationMatrix());
-            Setup.spriteBatch.Draw(RenderTarget2D, new Vector2(0, 0), new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight), Color.White);
+            Setup.spriteBatch.Draw(RenderTarget2D, Vector2.Zero, new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight), Color.White);
             Setup.spriteBatch.End();
         }
 

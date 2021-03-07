@@ -88,7 +88,7 @@ namespace MyEngine
             // TODO: use this.Content to load your game content here
             spriteFont = Content.Load<SpriteFont>("Font");
 
-            Light.CastShadows = true;
+            //Light.CastShadows = true;
             GameObject Test = new GameObject();
             Test.Tag = "Test";
             Test.AddComponent<Transform>(new Transform());
@@ -129,20 +129,20 @@ namespace MyEngine
             Test6.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, 1.2f * graphics.PreferredBackBufferHeight / 2);
 
             Test.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Red);
-            Test.Transform.Scale = 50 * Vector2.One;
+            Test.Transform.Scale = 100 * Vector2.One;
             Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
-            Test3.GetComponent<Light>().Attenuation = 1;
-            Test3.GetComponent<Light>().OuterRadius = 0.1f;
+            Test3.GetComponent<Light>().Attenuation = 3;
+            Test3.GetComponent<Light>().OuterRadius = 0.2f;
             Test.GetComponent<Light>().Type = LightTypes.Directional;
             Test.GetComponent<Light>().DirectionalIntensity = 0.4f;
-            //Test2.Layer = 0.5f;
+            Test2.Layer = 0.5f;
 
             //Test2.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
-            //Test2.Transform.Scale = Vector2.One;
+            Test2.Transform.Scale = Vector2.One;
 
             Test.Layer = 0.1f;
             Test.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
-            Test.Transform.Position = new Vector2(1.5f*graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
+            Test.Transform.Position = new Vector2(1.5f * graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
             //Camera.Position = new Vector2(0, 0);
 
             //GameObject Test4 = GameObject.Instantiate(Test);

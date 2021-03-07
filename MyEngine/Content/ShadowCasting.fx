@@ -8,6 +8,7 @@
 #endif
 
 Texture2D SpriteTexture;
+float2 Step;
 
 sampler2D SpriteTextureSampler = sampler_state
 {
@@ -24,16 +25,35 @@ struct VertexShaderOutput
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
     float4 color = tex2D(SpriteTextureSampler, input.TextureCoordinates);
+    float Alpha = color.a;
     
-    if(color.a != 0)
-        return float4(1, 1, 1, 1);
-    else
-        return float4(0, 0, 0, 0);
+    color += tex2D(SpriteTextureSampler, input.TextureCoordinates + float2(-Step.x, -Step.y));
+    color += tex2D(SpriteTextureSampler, input.TextureCoordinates + float2(0, -Step.y));
+    color += tex2D(SpriteTextureSampler, input.TextureCoordinates + float2(Step.x, -Step.y));
+    color += tex2D(SpriteTextureSampler, input.TextureCoordinates + float2(-Step.x, 0));
+    color += tex2D(SpriteTextureSampler, input.TextureCoordinates + float2(Step.x, 0));
+    color += tex2D(SpriteTextureSampler, input.TextureCoordinates + float2(-Step.x, Step.y));
+    color += tex2D(SpriteTextureSampler, input.TextureCoordinates + float2(0, Step.y));
+    color += tex2D(SpriteTextureSampler, input.TextureCoordinates + float2(Step.x, Step.y));
+    
+    color /= 9;
+    
+    color.a = Alpha;
+    
+    return color;
 }
 
 technique SpriteDrawing
 {
     pass P0
+    {
+        PixelShader = compile PS_SHADERMODEL MainPS();
+        AlphaBlendEnable = TRUE;
+        //DestBlend = INVSRCALPHA;
+        //SrcBlend = SRCALPHA;
+    }
+
+    pass P1
     {
         PixelShader = compile PS_SHADERMODEL MainPS();
         AlphaBlendEnable = TRUE;

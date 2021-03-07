@@ -22,7 +22,7 @@ float Y_Bias[MAX_LIGHTS];
 float AngularRadius[MAX_LIGHTS];
 float InnerIntensity[MAX_LIGHTS];
 float DirectionalIntensity;
-float ShadowConstant = 1;
+float ShadowConstant[MAX_LIGHTS];
 bool CastShadows;
 
 //Shadows
@@ -73,7 +73,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
                     float ShadowAttenuation = 1;
                 
                     if (CastShadows && Shadow.r != 1) //There is no Shadow
-                        ShadowAttenuation = clamp(ShadowConstant, 0, 1);
+                        ShadowAttenuation = clamp(ShadowConstant[i], 0, 1);
                                         
                     float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
 
@@ -87,7 +87,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
                     float ShadowAttenuation = 1;
                 
                     if (CastShadows && Shadow.r != 1) //There is no Shadow
-                        ShadowAttenuation = clamp(ShadowConstant, 0, 1);
+                        ShadowAttenuation = clamp(ShadowConstant[i], 0, 1);
                     
                     float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
 
