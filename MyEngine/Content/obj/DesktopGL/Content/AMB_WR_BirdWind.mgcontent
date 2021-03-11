@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/AMB_WR_BirdWind.ogg</SourceFile>
+  <SourceTime>2019-08-16T21:00:38.4187233+02:00</SourceTime>
+  <DestFile>C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/AMB_WR_BirdWind.xnb</DestFile>
+  <DestTime>2021-03-07T12:24:42.0797789+02:00</DestTime>
+  <Importer>OggImporter</Importer>
+  <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
+  <Processor>SongProcessor</Processor>
+  <ProcessorTime>2018-12-08T18:35:54+02:00</ProcessorTime>
+  <Parameters>
+    <Key>Quality</Key>
+    <Value>Best</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput>
+    <string>C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/AMB_WR_BirdWind.wma</string>
+  </BuildOutput>
+</PipelineBuildEvent>

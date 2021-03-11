@@ -9,7 +9,7 @@ namespace MyEngine
 
     public class Light: GameObjectComponent
     {
-        public static bool CastShadows = true;
+        public static bool CastShadows_Global = true;
 
         private static bool ShaderLoaded = false;
         private static int MAX_LIGHT_COUNT = 8;
@@ -35,8 +35,10 @@ namespace MyEngine
         private static EffectParameter InnerIntensity_param;
         private static EffectParameter Attenuation_param;
         private static EffectParameter CastShadows_param;
+        private static EffectParameter CastShadow_param;
         private static EffectParameter ShadowConstant_param;
 
+        public bool CastShadow = false;
         public LightTypes Type = LightTypes.Point;
         public Color color = Color.White;
         public float AngularRadius = 360;
@@ -81,6 +83,7 @@ namespace MyEngine
                 InnerIntensity_param = LightEffect.Parameters["InnerIntensity"];
                 Attenuation_param = LightEffect.Parameters["Attenuation"];
                 CastShadows_param = LightEffect.Parameters["CastShadows"];
+                CastShadow_param = LightEffect.Parameters["CastShadow"];
                 ShadowConstant_param = LightEffect.Parameters["ShadowConstant"];
             }
 
@@ -119,13 +122,14 @@ namespace MyEngine
             float[] AngularRadius = new float[LightCount];
             float[] InnerIntensity = new float[LightCount];
             float[] ShadowIntensity = new float[LightCount];
+            float[] CastShadow = new float[LightCount];
 
             HandyList.Clear();
             Points.Clear();
 
             //1- Needs some optimization, like if light is out of bounds of screen, it shouldn't be updated or sent to the light shader
 
-            if (CastShadows)
+            if (CastShadows_Global)
             {
                 //Rendering ShadowMap Here
                 Setup.GraphicsDevice.SetRenderTarget(ShadowMap);
@@ -229,6 +233,7 @@ namespace MyEngine
                 AngularRadius[i] = LIGHTS[i].AngularRadius;
                 InnerIntensity[i] = LIGHTS[i].InnerInensity;
                 ShadowIntensity[i] = 1 - LIGHTS[i].ShadowIntensity;
+                CastShadow[i] = LIGHTS[i].CastShadow? 1:0;
 
                 if (LIGHTS[i].Type == LightTypes.Directional)
                 {
@@ -248,7 +253,8 @@ namespace MyEngine
             InnerRadius_param.SetValue(InnerRadius);
             InnerIntensity_param.SetValue(InnerIntensity);
             Attenuation_param.SetValue(Attenuation);
-            CastShadows_param.SetValue(CastShadows);
+            CastShadows_param.SetValue(CastShadows_Global);
+            CastShadow_param.SetValue(CastShadow);
             ShadowConstant_param.SetValue(ShadowIntensity);
 
             Setup.GraphicsDevice.SetRenderTarget(null);

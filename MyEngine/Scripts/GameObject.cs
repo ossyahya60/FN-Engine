@@ -15,6 +15,7 @@ namespace MyEngine
         public bool Active { set; get; }
         public string Name = "Default";
         public bool ShouldBeDeleted = false;
+        public int UI_Layer = 1;
 
         private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect", "CircleCollider" };
         private List<GameObject> Children;
@@ -238,11 +239,24 @@ namespace MyEngine
             }
         }
 
+        public virtual void DrawUI()
+        {
+            if (Active)
+            {
+                if (Parent == null || Parent.Active)
+                {
+                    foreach (GameObjectComponent GOC in GameObjectComponents)
+                        if (GOC.Enabled)
+                            GOC.DrawUI();
+                }
+            }
+        }
+
         //public static void Destroy(GameObject GO)  //Scene not yet implemented
         //{
         //    Scene.DestroyGameObject(GO); 
         //}
-        
+
         //Update: Implemented using recursion, this means, you don't have to add every child to the simulation, just add the parent and you are good to go
         public static GameObject Instantiate(GameObject GO)  //=> Implement it using "Recursion"
         {

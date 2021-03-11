@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
+using MonoGame.ImGui;
+using ImGuiNET;
 
 namespace MyEngine
 {
@@ -15,7 +15,6 @@ namespace MyEngine
         SpriteBatch spriteBatch;
         ResolutionIndependentRenderer RIR;
         Camera2D Camera;
-
         ////////<Variables>/////
         Vector2 Resolution;
         public static SpriteFont spriteFont;
@@ -27,6 +26,13 @@ namespace MyEngine
             Content.RootDirectory = "Content";
             RIR = new ResolutionIndependentRenderer(this);
 
+            // use reflection to figure out if Shader.Profile is OpenGL (0) or DirectX (1)
+            //var mgAssembly = Assembly.GetAssembly(typeof(Game));
+            //var shaderType = mgAssembly.GetType("Microsoft.Xna.Framework.Graphics.Shader");
+            //var profileProperty = shaderType.GetProperty("Profile");
+            //var value = (int)profileProperty.GetValue(null);
+            //var extension = value == 1 ? "dx11" : "ogl";
+            
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
         }
@@ -93,15 +99,15 @@ namespace MyEngine
             Test.Tag = "Test";
             Test.AddComponent<Transform>(new Transform());
             Test.AddComponent<SpriteRenderer>(new SpriteRenderer());
-            Test.AddComponent<Light>(new Light());
-            Test.AddComponent<ShadowCaster>(new ShadowCaster());
+            //Test.AddComponent<Light>(new Light());
+            //Test.AddComponent<ShadowCaster>(new ShadowCaster());
 
             GameObject Test6 = new GameObject();
             Test6.Tag = "Test6";
             Test6.AddComponent<Transform>(new Transform());
             Test6.AddComponent<SpriteRenderer>(new SpriteRenderer());
-            //Test.AddComponent<Light>(new Light());
-            Test6.AddComponent<ShadowCaster>(new ShadowCaster());
+            Test6.AddComponent<Light>(new Light());
+            //Test6.AddComponent<ShadowCaster>(new ShadowCaster());
 
             GameObject Test3 = new GameObject();
             Test3.Tag = "Test3";
@@ -113,9 +119,9 @@ namespace MyEngine
             Test2.AddComponent<Transform>(new Transform());
             Test2.AddComponent<SpriteRenderer>(new SpriteRenderer());
 
-            SceneManager.ActiveScene.AddGameObject(Test);
-            SceneManager.ActiveScene.AddGameObject(Test2);
-            SceneManager.ActiveScene.AddGameObject(Test3);
+            //SceneManager.ActiveScene.AddGameObject(Test);
+            //SceneManager.ActiveScene.AddGameObject(Test2);
+            //SceneManager.ActiveScene.AddGameObject(Test3);
             SceneManager.ActiveScene.AddGameObject(Test6);
 
             SceneManager.ActiveScene.Start();
@@ -128,21 +134,21 @@ namespace MyEngine
             Test6.Layer = 0.1f;
             Test6.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, 1.2f * graphics.PreferredBackBufferHeight / 2);
 
-            Test.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Red);
-            Test.Transform.Scale = 100 * Vector2.One;
-            Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
-            Test3.GetComponent<Light>().Attenuation = 3;
-            Test3.GetComponent<Light>().OuterRadius = 0.2f;
-            Test.GetComponent<Light>().Type = LightTypes.Directional;
-            Test.GetComponent<Light>().DirectionalIntensity = 0.4f;
-            Test2.Layer = 0.5f;
+            //Test.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Red);
+            //Test.Transform.Scale = 100 * Vector2.One;
+            //Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
+            ////Test3.GetComponent<Light>().Attenuation = 3;
+            ////Test3.GetComponent<Light>().OuterRadius = 0.2f;
+            ////Test.GetComponent<Light>().Type = LightTypes.Directional;
+            ////Test.GetComponent<Light>().DirectionalIntensity = 0.4f;
+            //Test2.Layer = 0.5f;
 
-            //Test2.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
-            Test2.Transform.Scale = Vector2.One;
+            ////Test2.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
+            //Test2.Transform.Scale = Vector2.One;
 
-            Test.Layer = 0.1f;
-            Test.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
-            Test.Transform.Position = new Vector2(1.5f * graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
+            //Test.Layer = 0.1f;
+            //Test.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
+            //Test.Transform.Position = new Vector2(1.5f * graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
             //Camera.Position = new Vector2(0, 0);
 
             //GameObject Test4 = GameObject.Instantiate(Test);
@@ -199,7 +205,7 @@ namespace MyEngine
                 SceneManager.LoadScene(new Scene("MainScene", 0));
 
             if (Input.GetKey(Keys.W))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithTag("Test6").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.S))
                 SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.A))
@@ -230,27 +236,21 @@ namespace MyEngine
             if (!this.IsActive) //Pause Game when minimized
                 return;
 
+            SceneManager.ActiveScene.DrawUI(gameTime); //Draw UI
+
             ///
             Light.Init_Light();
             RIR.BeginDraw(); //Resolution related -> Mandatory
+
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
             SpriteRenderer.LastEffect = null; // This should be the same effect as in the begin method above
-            ///
-            // TODO: Add your drawing code here
             SceneManager.ActiveScene.Draw(spriteBatch);
-
             spriteBatch.End();
 
-            //Render Targets //Light (Experimental)
+            //Light (Experimental)
             Light.ApplyLighting();
 
-            //UI Rendering
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Camera.GetViewTransformationMatrix()); // -> Mandatory
-
-            //spriteBatch.DrawString(spriteFont, Input.GetMousePosition().ToString(), Vector2.Zero, Color.Red);
-            spriteBatch.DrawString(spriteFont, ((int)(1 / this.TargetElapsedTime.TotalSeconds)).ToString(), Vector2.Zero, Color.Red); //=>FPS
-
-            spriteBatch.End();
+            SceneManager.ActiveScene.ShowUI(spriteBatch);
 
             base.Draw(gameTime);
 

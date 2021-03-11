@@ -23,6 +23,7 @@ float AngularRadius[MAX_LIGHTS];
 float InnerIntensity[MAX_LIGHTS];
 float DirectionalIntensity;
 float ShadowConstant[MAX_LIGHTS];
+float CastShadow[MAX_LIGHTS];
 bool CastShadows;
 
 //Shadows
@@ -72,7 +73,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
                     float4 Shadow = tex2D(ShadowMapSampler, input.TextureCoordinates);
                     float ShadowAttenuation = 1;
                 
-                    if (CastShadows && Shadow.r != 1) //There is no Shadow
+                    if (CastShadows && CastShadow[i] == 1 && Shadow.r != 1) //There is no Shadow
                         ShadowAttenuation = clamp(ShadowConstant[i], 0, 1);
                                         
                     float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
@@ -86,7 +87,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
                     float4 Shadow = tex2D(ShadowMapSampler, input.TextureCoordinates);
                     float ShadowAttenuation = 1;
                 
-                    if (CastShadows && Shadow.r != 1) //There is no Shadow
+                    if (CastShadows && CastShadow[i] == 1 && Shadow.r != 1) //There is no Shadow
                         ShadowAttenuation = clamp(ShadowConstant[i], 0, 1);
                     
                     float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);

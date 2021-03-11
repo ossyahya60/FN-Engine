@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.ImGui;
 using System.Collections.Generic;
 
 namespace MyEngine
@@ -29,6 +30,9 @@ namespace MyEngine
         private int Id;
         private int GameObjectCount = 0;
         private List<GameObject> HandyList;
+
+        private static RenderTarget2D ImGUI_RenderTarget = null;
+        private static ImGUIRenderer GuiRenderer = null; //This is the ImGuiRenderer
 
         public Scene(string name)
         {
@@ -107,6 +111,12 @@ namespace MyEngine
 
         public void Start()
         {
+            if(GuiRenderer == null)
+                GuiRenderer = new ImGUIRenderer(Setup.Game).Initialize().RebuildFontAtlas();
+
+            if(ImGUI_RenderTarget == null)
+                ImGUI_RenderTarget = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+
             int Count = GameObjects.Count - 1;
 
             if (Active)
@@ -136,6 +146,32 @@ namespace MyEngine
             if (Active)
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].Draw(spriteBatch);
+        }
+
+        public void DrawUI(GameTime gameTime)
+        {
+            Setup.GraphicsDevice.SetRenderTarget(ImGUI_RenderTarget);
+            Setup.GraphicsDevice.Clear(Color.Transparent);
+
+            GuiRenderer.BeginLayout(gameTime); // Must be called prior to calling any ImGui controls
+            
+            int Count = GameObjects.Count - 1;
+
+            if (Active)
+                for (int i = Count; i >= 0; i--)
+                    GameObjects[Count - i].DrawUI();
+
+            GuiRenderer.EndLayout(); // Must be called after ImGui control calls
+            Setup.GraphicsDevice.SetRenderTarget(null);
+        }
+
+        public void ShowUI(SpriteBatch spriteBatch)
+        {
+            // Drawing ImGUI Stuff
+            Setup.GraphicsDevice.SetRenderTarget(null);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix());
+            spriteBatch.Draw(ImGUI_RenderTarget, Vector2.Zero, new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight), Color.White);
+            spriteBatch.End();
         }
 
         public GameObject FindGameObjectWithTag(string Tag)

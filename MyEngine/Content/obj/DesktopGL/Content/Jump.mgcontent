@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/Jump.WAV</SourceFile>
+  <SourceTime>2020-09-15T13:03:47.0567331+02:00</SourceTime>
+  <DestFile>C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/Jump.xnb</DestFile>
+  <DestTime>2021-03-07T12:24:42.9187462+02:00</DestTime>
+  <Importer>WavImporter</Importer>
+  <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
+  <Processor>SoundEffectProcessor</Processor>
+  <ProcessorTime>2018-12-08T18:35:54+02:00</ProcessorTime>
+  <Parameters>
+    <Key>Quality</Key>
+    <Value>Best</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>

@@ -33,6 +33,11 @@ namespace MyEngine
 
         }
 
+        public virtual void DrawUI() //Called every frame (For UI Purposes)
+        {
+
+        }
+
         public virtual void Destroy()
         {
             //gameObject.RemoveComponent<GameObjectComponent>(this);
