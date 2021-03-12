@@ -103,6 +103,7 @@ namespace MyEngine
             //Test.AddComponent<ShadowCaster>(new ShadowCaster());
 
             GameObject Test6 = new GameObject();
+            Test6.Name = "Test 6";
             Test6.Tag = "Test6";
             Test6.AddComponent<Transform>(new Transform());
             Test6.AddComponent<SpriteRenderer>(new SpriteRenderer());
@@ -115,28 +116,42 @@ namespace MyEngine
             Test3.AddComponent<Light>(new Light());
 
             GameObject Test2 = new GameObject();
+            Test2.Name = "Test2";
             Test2.Tag = "Test2";
             Test2.AddComponent<Transform>(new Transform());
             Test2.AddComponent<SpriteRenderer>(new SpriteRenderer());
 
+            GameObject GameObjectsTab = new GameObject();
+            GameObjectsTab.Name = "GameObjectsTab";
+            GameObjectsTab.AddComponent<Transform>(new Transform());
+            GameObjectsTab.AddComponent<FN_Editor.GameObjects_Tab>(new FN_Editor.GameObjects_Tab());
+
             //SceneManager.ActiveScene.AddGameObject(Test);
-            //SceneManager.ActiveScene.AddGameObject(Test2);
+            SceneManager.ActiveScene.AddGameObject(Test2);
             //SceneManager.ActiveScene.AddGameObject(Test3);
             SceneManager.ActiveScene.AddGameObject(Test6);
+            SceneManager.ActiveScene.AddGameObject(GameObjectsTab);
 
             SceneManager.ActiveScene.Start();
 
             //Initialization here
             //Use matrices to make transformations!!!!
 
+            //GameObjectsTab.Transform.Scale = Vector2.One * 200;
+
             Test6.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Yellow);
             Test6.Transform.Scale = 100 * Vector2.One;
             Test6.Layer = 0.1f;
             Test6.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, 1.2f * graphics.PreferredBackBufferHeight / 2);
 
+            GameObject Test6_Inst = GameObject.Instantiate(Test6);
+            Test6_Inst.Name = "Test6_Inst";
+            Test6.AddChild(Test6_Inst);
+            Test6_Inst.AddChild(GameObjectsTab);
+
             //Test.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Red);
             //Test.Transform.Scale = 100 * Vector2.One;
-            //Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
+            Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
             ////Test3.GetComponent<Light>().Attenuation = 3;
             ////Test3.GetComponent<Light>().OuterRadius = 0.2f;
             ////Test.GetComponent<Light>().Type = LightTypes.Directional;
@@ -161,7 +176,9 @@ namespace MyEngine
             //GameObject Test5 = GameObject.Instantiate(Test3);
             //Test5.Tag = "Test5";
 
-            SceneManager.ActiveScene.SortGameObjectsWithLayer();
+            GameObject.Instantiate(Test2).Name = "Test2_1";
+
+            //SceneManager.ActiveScene.SortGameObjectsWithLayer();
         }
 
         /// <summary>

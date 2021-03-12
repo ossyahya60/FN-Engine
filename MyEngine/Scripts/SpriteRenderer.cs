@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ImGuiNET;
 
 namespace MyEngine
 {
@@ -55,6 +56,15 @@ namespace MyEngine
 
                 LastEffect = Effect;
             }
+        }
+
+        public override void DrawUI()
+        {
+            //ImGui.Begin("LOOL");
+            //ImGui.SetWindowPos(System.Numerics.Vector2.Zero);
+            //ImGui.SetWindowSize(new System.Numerics.Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight));
+            //ImGui.TextColored(new System.Numerics.Vector4(1, 0, 0, 1), "This is Cool");
+            //ImGui.End();
         }
 
         public override GameObjectComponent DeepCopy(GameObject clone)

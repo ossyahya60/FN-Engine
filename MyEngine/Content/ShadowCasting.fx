@@ -52,12 +52,4 @@ technique SpriteDrawing
         //DestBlend = INVSRCALPHA;
         //SrcBlend = SRCALPHA;
     }
-
-    pass P1
-    {
-        PixelShader = compile PS_SHADERMODEL MainPS();
-        AlphaBlendEnable = TRUE;
-        //DestBlend = INVSRCALPHA;
-        //SrcBlend = SRCALPHA;
-    }
 };

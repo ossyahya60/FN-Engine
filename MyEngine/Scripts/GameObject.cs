@@ -16,9 +16,9 @@ namespace MyEngine
         public string Name = "Default";
         public bool ShouldBeDeleted = false;
         public int UI_Layer = 1;
+        public List<GameObject> Children;
 
         private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect", "CircleCollider" };
-        private List<GameObject> Children;
 
         public GameObject()
         {
@@ -192,16 +192,19 @@ namespace MyEngine
                 return null;
 
             List<GameObject> Arr = new List<GameObject>();
-            GetAllChildrenRecursive(Arr);
+            GetAllChildrenRecursive(Arr, Children);
 
             return Arr.ToArray();
         }
 
-        private void GetAllChildrenRecursive(List<GameObject> Arr)
+        private void GetAllChildrenRecursive(List<GameObject> Arr, List<GameObject> children)
         {
-            foreach(GameObject Child in Children)
+            if (children.Count == 0)
+                return;
+
+            foreach(GameObject Child in children)
             {
-                GetAllChildrenRecursive(Arr);
+                GetAllChildrenRecursive(Arr, Child.Children);
                 Arr.Add(Child);
             }
         }
