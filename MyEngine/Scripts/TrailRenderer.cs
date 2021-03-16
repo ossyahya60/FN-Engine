@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections;
 using System;
+using System.IO;
 
 //You can smooth edges by drawing additional segments between angles
 namespace MyEngine
@@ -31,7 +32,6 @@ namespace MyEngine
 
         private int maxparticles = 100;
         private Queue Particles;
-        private Transform transform;
         private float SpawnRateCounter = 0;
         private Random random;
         private Color Color1, Color2, Color3, ColorDefault = Color.White;
@@ -44,7 +44,6 @@ namespace MyEngine
         public override void Start()
         {
             Particles = new Queue();
-            transform = gameObject.Transform;
             SpawnRateCounter = SpawnRate;
             if(OffsetPosition == null)
                 OffsetPosition = Vector2.Zero;
@@ -59,10 +58,10 @@ namespace MyEngine
                 if (Particles.Count >= MaxParticles)
                     Particles.Dequeue();
 
-                if (transform.Position - transform.LastPosition != Vector2.Zero)
+                if (gameObject.Transform.Position - gameObject.Transform.LastPosition != Vector2.Zero)
                 {
                     Particle particle = new Particle(false);
-                    particle.Position = transform.LastPosition + OffsetPosition;
+                    particle.Position = gameObject.Transform.LastPosition + OffsetPosition;
                     particle.LifeTime = VanishAfter;
                     //if (RandomSize)
                     //    particle.Size = (int)(ParticleSize * random.NextDouble());
@@ -81,8 +80,8 @@ namespace MyEngine
                     else
                         particle.Color = Color;
 
-                    particle.Rotation = MathCompanion.GetAngle(transform.LastPosition, transform.Position);
-                    particle.Length = 1 + (int)Math.Ceiling((transform.Position - transform.LastPosition).Length());
+                    particle.Rotation = MathCompanion.GetAngle(gameObject.Transform.LastPosition, gameObject.Transform.Position);
+                    particle.Length = 1 + (int)Math.Ceiling((gameObject.Transform.Position - gameObject.Transform.LastPosition).Length());
                     particle.Height = SegmentWidth;
                     particle.Layer = gameObject.Layer;
 
@@ -118,10 +117,26 @@ namespace MyEngine
         {
             TrailRenderer Clone = this.MemberwiseClone() as TrailRenderer;
             Clone.Particles = new Queue();
-            Clone.transform = clone.Transform;
             Clone.SpawnRateCounter = 0;
 
             return Clone;
+        }
+
+        public override void Serialize(StreamWriter SW) //get the transform in deserialization
+        {
+            SW.WriteLine(ToString());
+
+            base.Serialize(SW);
+            SW.Write("SpawnRate:\t" + SpawnRate.ToString() + "\n");
+            SW.Write("OffsetPosition:\t" + OffsetPosition.X.ToString() + "\t" + OffsetPosition.Y.ToString() + "\n");
+            SW.Write("SegmentWidth:\t" + SegmentWidth.ToString() + "\n");
+            SW.Write("Color:\t" + Color.R.ToString() + "\t" + Color.G.ToString() + "\t" + Color.B.ToString() + "\t" + Color.A.ToString() + "\n");
+            SW.Write("VanishAfter:\t" + VanishAfter.ToString() + "\n");
+            SW.Write("RandomColor:\t" + RandomColor.ToString() + "\n");
+            SW.Write("ShrinkWithTime:\t" + ShrinkWithTime.ToString() + "\n");
+            SW.Write("maxparticles:\t" + maxparticles.ToString() + "\n");
+
+            SW.WriteLine("End Of " + ToString());
         }
     }
 }

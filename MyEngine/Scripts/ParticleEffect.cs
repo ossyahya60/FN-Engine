@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections;
+using System.IO;
 //Implement Burst Mode
 namespace MyEngine
 {
@@ -51,7 +52,6 @@ namespace MyEngine
             }
         }
 
-        private Transform Transform;
         private float minimumShrinkScale;
         private Queue Particles;
         private bool FinishedEffect = false;
@@ -60,7 +60,6 @@ namespace MyEngine
         private Random random;
         private Color Color1, Color2, Color3, ColorDefault = Color.White;
         private float rotation = 0;
-        private Vector2 HandyDirection; //avoid alot of memory allocation in short time
 
         public ParticleEffect()
         {
@@ -70,7 +69,6 @@ namespace MyEngine
 
         public override void Start()
         {
-            Transform = gameObject.Transform;
             FireCounter = TimeBetweenFiring;
             FireDirection = new Vector2(0, 1);
         }
@@ -130,7 +128,7 @@ namespace MyEngine
                             else
                                 particle.Color = Color;
                             particle.Size = ParticleSize;
-                            particle.Position = Transform.Position;
+                            particle.Position = gameObject.Transform.Position;
                             particle.LifeTime = VanishAfter;
                             particle.ShrinkMode = ShrinkWithTime;
                             particle.MinimumSize = minimumShrinkScale;
@@ -152,6 +150,7 @@ namespace MyEngine
                                 particle.Rotation = rotation;
                             if (RandomDirection)
                             {
+                                Vector2 HandyDirection = Vector2.Zero;
                                 HandyDirection.X = (float)(random.NextDouble() * 2 - 1);
                                 HandyDirection.Y = (float)(random.NextDouble() * 2 - 1);
                                 particle.Direction = HandyDirection;
@@ -192,12 +191,44 @@ namespace MyEngine
         {
             ParticleEffect Clone = this.MemberwiseClone() as ParticleEffect;
             Clone.Particles = new Queue();
-            Clone.Transform = clone.Transform;
             Clone.FireCounter = TimeBetweenFiring;
             Clone.ParticleCounter = 0;
             Clone.FinishedEffect = false;
 
             return Clone;
+        }
+
+        public override void Serialize(StreamWriter SW) //
+        {
+            SW.WriteLine(ToString());
+
+            base.Serialize(SW);
+            SW.Write("LineParticle:\t" + LineParticle.ToString() + "\n");
+            SW.Write("FaceDirection:\t" + FaceDirection.ToString() + "\n");
+            SW.Write("DestroyWhenFinished:\t" + DestroyWhenFinished.ToString() + "\n");
+            SW.Write("BurstMode:\t" + BurstMode.ToString() + "\n");
+            SW.Write("ParticlesAtaTime:\t" + ParticlesAtaTime.ToString() + "\n");
+            if(CustomTexture != null && CustomTexture.Name != null)
+                SW.Write("CustomTexture:\t" + CustomTexture.Name + "\n");
+            else
+                SW.Write("CustomTexture:\t" + "null\n"); //This doesn't necessarily mean that there is no custom texture, but there might be one that wasn't loaded but assigned
+            SW.Write("FireDirection:\t" + FireDirection.X.ToString() + "\t" + FireDirection.Y.ToString() + "\n");
+            SW.Write("Speed:\t" + Speed.ToString() + "\n");
+            SW.Write("Color:\t" + Color.R.ToString() + "\t" + Color.G.ToString() + "\t" + Color.B.ToString() + "\t" + Color.A.ToString() + "\n");
+            SW.Write("RandomDirection:\t" + RandomDirection.ToString() + "\n");
+            SW.Write("RandomColor:\t" + RandomColor.ToString() + "\n");
+            SW.Write("RandomRotation:\t" + RandomRotation.ToString() + "\n");
+            SW.Write("IsLooping:\t" + IsLooping.ToString() + "\n");
+            SW.Write("VanishAfter:\t" + VanishAfter.ToString() + "\n");
+            SW.Write("TimeBetweenFiring:\t" + TimeBetweenFiring.ToString() + "\n");
+            SW.Write("rotation:\t" + rotation.ToString() + "\n");
+            SW.Write("MaxParticles:\t" + MaxParticles.ToString() + "\n");
+            SW.Write("ParticleSize:\t" + ParticleSize.ToString() + "\n");
+            SW.Write("ConstantVelocity:\t" + ConstantVelocity.ToString() + "\n");
+            SW.Write("ShrinkWithTime:\t" + ShrinkWithTime.ToString() + "\n");
+            SW.Write("minimumShrinkScale:\t" + minimumShrinkScale.ToString() + "\n");
+
+            SW.WriteLine("End Of " + ToString());
         }
     }
 }

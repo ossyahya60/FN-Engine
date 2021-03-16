@@ -46,8 +46,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="FN_Editor\Editor.cs" />
     <Compile Include="FN_Editor\GameObjects_Tab.cs" />
+    <Compile Include="FN_Editor\InspectorWindow.cs" />
     <Compile Include="Scripts\Button.cs" />
     <Compile Include="Scripts\Canvas.cs" />
     <Compile Include="Main.cs" />

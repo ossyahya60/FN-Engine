@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.ImGui;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MyEngine
 {
@@ -232,6 +233,94 @@ namespace MyEngine
         public void SortGameObjectsWithLayer()
         {
             GameObjects.Sort(GameObject.SortByLayer());
+        }
+
+        public void Serialize()
+        {
+            using (StreamWriter SW = new StreamWriter(Setup.Content.RootDirectory + "/" + Name + ".txt", false)) //This Path might be platform specific!
+            {
+                List<GameObject> EditorGOs = GameObjects.FindAll(item => item.IsEditor == true);
+                int NumberOfEditorObjects = (EditorGOs == null) ? 0 : EditorGOs.Count;
+
+                SW.WriteLine(ToString());
+
+                SW.Write("Active:\t" + Active.ToString() + "\n");
+                SW.Write("Name:\t" + Name + "\n");
+                SW.Write("Id:\t" + Id + "\n");
+                SW.Write("GameObjectCount:\t" + (GameObjectCount - NumberOfEditorObjects).ToString() + "\n");
+
+                MediaSource.Serialize(SW);
+                Setup.Camera.Serialize(SW);
+
+                foreach (GameObject GO in GameObjects)
+                    if(!GO.IsEditor)
+                        GO.Serialize(SW);
+
+                SW.WriteLine("End Of " + ToString());
+
+                SW.Close();
+            }
+        }
+
+        public void Deserialize(string Path)
+        {
+            using (StreamReader SR = new StreamReader(Setup.Content.RootDirectory + "/" + Path + ".txt", false)) //This Path might be platform specific!
+            {
+                SR.ReadLine();
+
+                Active = bool.Parse(SR.ReadLine().Split('\t')[1]);
+                Name = SR.ReadLine().Split('\t')[1];
+                Id = int.Parse(SR.ReadLine().Split('\t')[1]);
+                int _GameObjectCount = int.Parse(SR.ReadLine().Split('\t')[1]);
+
+                //MediaSource Stuff
+                SR.ReadLine();
+
+                MediaSource.Volume = float.Parse(SR.ReadLine().Split('\t')[1]);
+                MediaSource.IsMuted = bool.Parse(SR.ReadLine().Split('\t')[1]);
+                MediaSource.IsLooping = bool.Parse(SR.ReadLine().Split('\t')[1]);
+                string SongName = SR.ReadLine().Split('\t')[1];
+                if(SongName != "null")
+                    MediaSource.LoadTrack(SongName);
+
+                SR.ReadLine();
+
+                //Camera Stuff
+                SR.ReadLine();
+
+                Setup.Camera.Zoom  = float.Parse(SR.ReadLine().Split('\t')[1]);
+                Setup.Camera.Rotation  = float.Parse(SR.ReadLine().Split('\t')[1]);
+                string[] CamPos = SR.ReadLine().Split('\t');
+                Setup.Camera.Position = new Vector2(float.Parse(CamPos[1]), float.Parse(CamPos[2]));
+
+                SR.ReadLine();
+
+                //Deserializing GameObjects
+                for (int i = 0; i < _GameObjectCount; i++)
+                {
+                    GameObject GO = new GameObject();
+                    GO.Deserialize(SR);
+                    AddGameObject(GO);
+                }
+
+                SR.ReadLine();
+
+                SR.Close();
+
+                //Assiging parents and children properly
+                for (int i = 0; i < _GameObjectCount; i++)
+                {
+                    //Finding Parent if there is one
+                    if (GameObjects[i].Parent.Name == "null")
+                        GameObjects[i].Parent = null;
+                    else
+                        GameObjects[i].Parent = FindGameObjectWithName(GameObjects[i].Parent.Name);
+
+                    //Finding children
+                    for (int j = 0; j < GameObjects[i].Children.Count; j++)
+                        GameObjects[i].Children[j] = FindGameObjectWithName(GameObjects[i].Children[j].Name);
+                }
+            }
         }
     }
 }

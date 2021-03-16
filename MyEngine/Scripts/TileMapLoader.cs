@@ -24,7 +24,10 @@ namespace MyEngine
 
         public static string SerializeObjectToJson<T>(T OBJ)
         {
-            return JsonConvert.SerializeObject(OBJ);
+            return JsonConvert.SerializeObject(OBJ, Formatting.Indented, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            });
         }
     }
 }

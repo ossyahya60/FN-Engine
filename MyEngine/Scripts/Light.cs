@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MyEngine
 {
@@ -49,7 +50,6 @@ namespace MyEngine
         public float DirectionalIntensity = 0.2f;
         public float ShadowIntensity = 0.5f;
 
-        private Transform Transform;
         private float YOVERX;
 
         public override void Start()
@@ -88,7 +88,6 @@ namespace MyEngine
             }
 
             LIGHTS.Add(this);
-            Transform = gameObject.Transform;
             YOVERX = (float)Setup.graphics.PreferredBackBufferHeight / Setup.graphics.PreferredBackBufferWidth;
         }
 
@@ -188,7 +187,7 @@ namespace MyEngine
                             Vector2 FoundClosestPoint = Vector2.Zero;
 
                             float Distance = -1;
-                            ray.Origin = LIGHTS[k].Transform.Position;
+                            ray.Origin = LIGHTS[k].gameObject.Transform.Position;
                             ray.Direction = P - ray.Origin; //Don't Normalize!
 
                             foreach (LineOccluder LOC in HandyList) //Needs Optimization
@@ -206,14 +205,14 @@ namespace MyEngine
                                 PointsTriangle.Add(FoundClosestPoint);
                         }
 
-                        PointsTriangle.Sort((x, y) => MathCompanion.GetAngle(x, LIGHTS[k].Transform.Position).CompareTo(MathCompanion.GetAngle(y, LIGHTS[k].Transform.Position)));
+                        PointsTriangle.Sort((x, y) => MathCompanion.GetAngle(x, LIGHTS[k].gameObject.Transform.Position).CompareTo(MathCompanion.GetAngle(y, LIGHTS[k].gameObject.Transform.Position)));
 
                         //DrawTriangles
                         for (int i = 0; i < PointsTriangle.Count - 1; i++)
                         {
-                            HitBoxDebuger.DrawTriangle(PointsTriangle[i], PointsTriangle[i + 1], LIGHTS[k].Transform.Position); //White Color
+                            HitBoxDebuger.DrawTriangle(PointsTriangle[i], PointsTriangle[i + 1], LIGHTS[k].gameObject.Transform.Position); //White Color
                         }
-                        HitBoxDebuger.DrawTriangle(PointsTriangle[PointsTriangle.Count - 1], PointsTriangle[0], LIGHTS[k].Transform.Position);
+                        HitBoxDebuger.DrawTriangle(PointsTriangle[PointsTriangle.Count - 1], PointsTriangle[0], LIGHTS[k].gameObject.Transform.Position);
                     }
                 }
 
@@ -224,12 +223,15 @@ namespace MyEngine
 
             for (int i = 0; i < LightCount; i++)
             {
+                if (LIGHTS[i].Enabled == false || LIGHTS[i].gameObject.Active == false)
+                    continue;
+
                 COLOR[i] = LIGHTS[i].color.ToVector3();
                 InnerRadius[i] = LIGHTS[i].InnerRadius;
                 Radius[i] = LIGHTS[i].OuterRadius;
                 Attenuation[i] = LIGHTS[i].Attenuation;
-                X_Bias[i] = (LIGHTS[i].Transform.Position.X - Setup.graphics.PreferredBackBufferWidth * 0.5f) / Setup.graphics.PreferredBackBufferWidth;
-                Y_Bias[i] = (LIGHTS[i].Transform.Position.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f) / Setup.graphics.PreferredBackBufferHeight;
+                X_Bias[i] = (LIGHTS[i].gameObject.Transform.Position.X - Setup.graphics.PreferredBackBufferWidth * 0.5f) / Setup.graphics.PreferredBackBufferWidth;
+                Y_Bias[i] = (LIGHTS[i].gameObject.Transform.Position.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f) / Setup.graphics.PreferredBackBufferHeight;
                 AngularRadius[i] = LIGHTS[i].AngularRadius;
                 InnerIntensity[i] = LIGHTS[i].InnerInensity;
                 ShadowIntensity[i] = 1 - LIGHTS[i].ShadowIntensity;
@@ -267,11 +269,51 @@ namespace MyEngine
         {
             Light clone = this.MemberwiseClone() as Light;
 
-            clone.Transform = Clone.Transform;
-
             LIGHTS.Add(clone);
 
             return clone;
+        }
+
+        public override void Serialize(StreamWriter SW) //get the transform in deserialization
+        {
+            SW.WriteLine(ToString());
+
+            base.Serialize(SW);
+            //Call Start in Deserialize
+            SW.Write("CastShadows_Global:\t" + CastShadows_Global.ToString() + "\n");
+            SW.Write("CastShadow:\t" + CastShadow.ToString() + "\n");
+            SW.Write("Type:\t" + Type.ToString() + "\n");
+            SW.Write("color:\t" + color.R.ToString() + "\t" + color.G.ToString() + "\t" + color.B.ToString() + "\t" + color.A.ToString() + "\n");
+            SW.Write("AngularRadius:\t" + AngularRadius.ToString() + "\n");
+            SW.Write("OuterRadius:\t" + OuterRadius.ToString() + "\n");
+            SW.Write("InnerRadius:\t" + InnerRadius.ToString() + "\n");
+            SW.Write("InnerInensity:\t" + InnerInensity.ToString() + "\n");
+            SW.Write("Attenuation:\t" + Attenuation.ToString() + "\n");
+            SW.Write("DirectionalIntensity:\t" + DirectionalIntensity.ToString() + "\n");
+            SW.Write("ShadowIntensity:\t" + ShadowIntensity.ToString() + "\n");
+
+            SW.WriteLine("End Of " + ToString());
+        }
+
+        public override void Deserialize(StreamReader SR)
+        {
+            //SR.ReadLine();
+
+            base.Deserialize(SR);
+            CastShadows_Global = bool.Parse(SR.ReadLine().Split('\t')[1]);
+            CastShadow = bool.Parse(SR.ReadLine().Split('\t')[1]);
+            Type = (LightTypes)Enum.Parse(Type.GetType(), SR.ReadLine().Split('\t')[1]);
+            string[] COLOR = SR.ReadLine().Split('\t');
+            color = new Color(byte.Parse(COLOR[1]), byte.Parse(COLOR[2]), byte.Parse(COLOR[3]), byte.Parse(COLOR[4]));
+            AngularRadius = float.Parse(SR.ReadLine().Split('\t')[1]);
+            OuterRadius = float.Parse(SR.ReadLine().Split('\t')[1]);
+            InnerRadius = float.Parse(SR.ReadLine().Split('\t')[1]);
+            InnerInensity = float.Parse(SR.ReadLine().Split('\t')[1]);
+            Attenuation = float.Parse(SR.ReadLine().Split('\t')[1]);
+            DirectionalIntensity = float.Parse(SR.ReadLine().Split('\t')[1]);
+            ShadowIntensity = float.Parse(SR.ReadLine().Split('\t')[1]);
+
+            SR.ReadLine();
         }
     }
 }

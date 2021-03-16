@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MyEngine
 {
-    public class ParticleSimulator: GameObjectComponent
+    public class ParticleSimulator: GameObjectComponent //This shit is broken XD
     {
         private List<UnitParticle> unitParticles; //One list for now
 

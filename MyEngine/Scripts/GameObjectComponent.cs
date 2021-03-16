@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.IO;
 
 namespace MyEngine
 {
@@ -36,6 +37,18 @@ namespace MyEngine
         public virtual void DrawUI() //Called every frame (For UI Purposes)
         {
 
+        }
+
+        public virtual void Serialize(StreamWriter SW)
+        {
+            SW.Write("gameObject:\t" + gameObject.Name + "\n");
+            SW.Write("Enabled:\t" + Enabled.ToString() + "\n");
+        }
+
+        public virtual void Deserialize(StreamReader SR)
+        {
+            SR.ReadLine();
+            Enabled = bool.Parse(SR.ReadLine().Split('\t')[1]);
         }
 
         public virtual void Destroy()

@@ -13,7 +13,7 @@
         public string GenerateName()
         {
             Counter++;
-            return BaseName + " " + Counter.ToString();
+            return BaseName + "\t" + Counter.ToString();
         }
     }
 }

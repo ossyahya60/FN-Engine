@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.ImGui;
 using ImGuiNET;
+using System.IO;
 
 namespace MyEngine
 {
@@ -64,7 +65,7 @@ namespace MyEngine
             RIR.VirtualHeight = 768;
             graphics.ApplyChanges();
             /////////Camera And Resolution Independent Renderer/////// -> Mandatory
-            Camera = new Camera2D(RIR);
+            Camera = new Camera2D();
             Camera.Zoom = 1f;
             Camera.Position = new Vector2(RIR.VirtualWidth / 2, RIR.VirtualHeight / 2);
 
@@ -94,91 +95,101 @@ namespace MyEngine
             // TODO: use this.Content to load your game content here
             spriteFont = Content.Load<SpriteFont>("Font");
 
-            //Light.CastShadows = true;
-            GameObject Test = new GameObject();
-            Test.Tag = "Test";
-            Test.AddComponent<Transform>(new Transform());
-            Test.AddComponent<SpriteRenderer>(new SpriteRenderer());
-            //Test.AddComponent<Light>(new Light());
-            //Test.AddComponent<ShadowCaster>(new ShadowCaster());
-
-            GameObject Test6 = new GameObject();
-            Test6.Name = "Test 6";
-            Test6.Tag = "Test6";
-            Test6.AddComponent<Transform>(new Transform());
-            Test6.AddComponent<SpriteRenderer>(new SpriteRenderer());
-            Test6.AddComponent<Light>(new Light());
-            //Test6.AddComponent<ShadowCaster>(new ShadowCaster());
-
-            GameObject Test3 = new GameObject();
-            Test3.Tag = "Test3";
-            Test3.AddComponent<Transform>(new Transform());
-            Test3.AddComponent<Light>(new Light());
-
-            GameObject Test2 = new GameObject();
-            Test2.Name = "Test2";
-            Test2.Tag = "Test2";
-            Test2.AddComponent<Transform>(new Transform());
-            Test2.AddComponent<SpriteRenderer>(new SpriteRenderer());
-
-            GameObject GameObjectsTab = new GameObject();
-            GameObjectsTab.Name = "GameObjectsTab";
-            GameObjectsTab.AddComponent<Transform>(new Transform());
-            GameObjectsTab.AddComponent<FN_Editor.GameObjects_Tab>(new FN_Editor.GameObjects_Tab());
-
-            //SceneManager.ActiveScene.AddGameObject(Test);
-            SceneManager.ActiveScene.AddGameObject(Test2);
-            //SceneManager.ActiveScene.AddGameObject(Test3);
-            SceneManager.ActiveScene.AddGameObject(Test6);
-            SceneManager.ActiveScene.AddGameObject(GameObjectsTab);
-
             SceneManager.ActiveScene.Start();
+            SceneManager.ActiveScene.Deserialize("MainScene");
+            //Light.CastShadows = true;
+            //GameObject Test = new GameObject();
+            //Test.Tag = "Test";
+            //Test.AddComponent<Transform>(new Transform());
+            //Test.AddComponent<SpriteRenderer>(new SpriteRenderer());
+            ////Test.AddComponent<Light>(new Light());
+            ////Test.AddComponent<ShadowCaster>(new ShadowCaster());
 
-            //Initialization here
-            //Use matrices to make transformations!!!!
+            //GameObject Test6 = new GameObject();
+            //Test6.Name = "Test 6";
+            //Test6.Tag = "Test6";
+            //Test6.AddComponent<Transform>(new Transform());
+            //Test6.AddComponent<SpriteRenderer>(new SpriteRenderer());
+            //Test6.AddComponent<Light>(new Light());
+            ////Test6.AddComponent<ShadowCaster>(new ShadowCaster());
 
-            //GameObjectsTab.Transform.Scale = Vector2.One * 200;
+            //GameObject Test3 = new GameObject();
+            //Test3.Tag = "Test3";
+            //Test3.AddComponent<Transform>(new Transform());
+            //Test3.AddComponent<Light>(new Light());
 
-            Test6.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Yellow);
-            Test6.Transform.Scale = 100 * Vector2.One;
-            Test6.Layer = 0.1f;
-            Test6.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, 1.2f * graphics.PreferredBackBufferHeight / 2);
+            //GameObject Test2 = new GameObject();
+            //Test2.Name = "Test2";
+            //Test2.Tag = "Test2";
+            //Test2.AddComponent<Transform>(new Transform());
+            //Test2.AddComponent<SpriteRenderer>(new SpriteRenderer());
 
-            GameObject Test6_Inst = GameObject.Instantiate(Test6);
-            Test6_Inst.Name = "Test6_Inst";
-            Test6.AddChild(Test6_Inst);
-            Test6_Inst.AddChild(GameObjectsTab);
+            //GameObject GameObjectsTab = new GameObject(true);
+            //GameObjectsTab.Name = "GameObjectsTab";
+            //GameObjectsTab.AddComponent<Transform>(new Transform());
+            //GameObjectsTab.AddComponent<FN_Editor.GameObjects_Tab>(new FN_Editor.GameObjects_Tab());
 
-            //Test.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Red);
-            //Test.Transform.Scale = 100 * Vector2.One;
-            Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
-            ////Test3.GetComponent<Light>().Attenuation = 3;
-            ////Test3.GetComponent<Light>().OuterRadius = 0.2f;
-            ////Test.GetComponent<Light>().Type = LightTypes.Directional;
-            ////Test.GetComponent<Light>().DirectionalIntensity = 0.4f;
-            //Test2.Layer = 0.5f;
+            //GameObject InspectorWindow = new GameObject(true);
+            //GameObjectsTab.Name = "InspectorWindow";
+            //GameObjectsTab.AddComponent<Transform>(new Transform());
+            //GameObjectsTab.AddComponent<FN_Editor.InspectorWindow>(new FN_Editor.InspectorWindow());
 
-            ////Test2.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
-            //Test2.Transform.Scale = Vector2.One;
+            ////SceneManager.ActiveScene.AddGameObject(Test);
+            //SceneManager.ActiveScene.AddGameObject(Test2);
+            ////SceneManager.ActiveScene.AddGameObject(Test3);
+            //SceneManager.ActiveScene.AddGameObject(Test6);
+            //SceneManager.ActiveScene.AddGameObject(GameObjectsTab);
+            //SceneManager.ActiveScene.AddGameObject(InspectorWindow);
 
-            //Test.Layer = 0.1f;
-            //Test.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
-            //Test.Transform.Position = new Vector2(1.5f * graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
-            //Camera.Position = new Vector2(0, 0);
+            //SceneManager.ActiveScene.Start();
 
-            //GameObject Test4 = GameObject.Instantiate(Test);
-            //Test4.RemoveComponent<Light>(Test4.GetComponent<Light>());
-            //Test4.RemoveComponent<ShadowCaster>(Test4.GetComponent<ShadowCaster>());
-            //Test4.Tag = "Test4";
-            //Test4.Transform.MoveX(-100);
-            //Test4.Active = true;
+            ////Initialization here
+            ////Use matrices to make transformations!!!!
 
-            //GameObject Test5 = GameObject.Instantiate(Test3);
-            //Test5.Tag = "Test5";
+            ////GameObjectsTab.Transform.Scale = Vector2.One * 200;
 
-            GameObject.Instantiate(Test2).Name = "Test2_1";
+            //Test6.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Yellow);
+            //Test6.Transform.Scale = 100 * Vector2.One;
+            //Test6.Layer = 0.1f;
+            //Test6.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, 1.2f * graphics.PreferredBackBufferHeight / 2);
 
-            //SceneManager.ActiveScene.SortGameObjectsWithLayer();
+            //GameObject Test6_Inst = GameObject.Instantiate(Test6);
+            //Test6_Inst.Name = "Test6_Inst";
+            //Test6.AddChild(Test6_Inst);
+
+            ////Test.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Red);
+            ////Test.Transform.Scale = 100 * Vector2.One;
+            //Test2.GetComponent<SpriteRenderer>().Sprite.LoadTexture("Temp");
+
+            //////Test3.GetComponent<Light>().Attenuation = 3;
+            //////Test3.GetComponent<Light>().OuterRadius = 0.2f;
+            //////Test.GetComponent<Light>().Type = LightTypes.Directional;
+            //////Test.GetComponent<Light>().DirectionalIntensity = 0.4f;
+            ////Test2.Layer = 0.5f;
+
+            //////Test2.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
+            ////Test2.Transform.Scale = Vector2.One;
+
+            ////Test.Layer = 0.1f;
+            ////Test.GetComponent<SpriteRenderer>().Sprite.SetCenterAsOrigin();
+            ////Test.Transform.Position = new Vector2(1.5f * graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
+            ////Camera.Position = new Vector2(0, 0);
+
+            ////GameObject Test4 = GameObject.Instantiate(Test);
+            ////Test4.RemoveComponent<Light>(Test4.GetComponent<Light>());
+            ////Test4.RemoveComponent<ShadowCaster>(Test4.GetComponent<ShadowCaster>());
+            ////Test4.Tag = "Test4";
+            ////Test4.Transform.MoveX(-100);
+            ////Test4.Active = true;
+
+            ////GameObject Test5 = GameObject.Instantiate(Test3);
+            ////Test5.Tag = "Test5";
+
+            ////GameObject.Instantiate(Test2).Name = "Test2_1";
+
+            //Test6.GetComponent<SpriteRenderer>().Effect = Content.Load<Effect>("ShadowCasting");
+
+            ////SceneManager.ActiveScene.SortGameObjectsWithLayer();
         }
 
         /// <summary>
@@ -222,13 +233,16 @@ namespace MyEngine
                 SceneManager.LoadScene(new Scene("MainScene", 0));
 
             if (Input.GetKey(Keys.W))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test6").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.S))
                 SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.A))
                 SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.D))
                 SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+
+            if (Input.GetKeyUp(Keys.O))
+                SceneManager.ActiveScene.Serialize();
 
             if (Input.GetKey(Keys.Up))
                 SceneManager.ActiveScene.FindGameObjectWithTag("Test5").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);

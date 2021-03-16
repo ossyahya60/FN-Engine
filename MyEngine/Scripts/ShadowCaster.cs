@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+using System.IO;
 
 namespace MyEngine
 {
@@ -65,6 +65,16 @@ namespace MyEngine
             clone.lineOccluders[3] = new LineOccluder(new Vector2(Occluder.Left, Occluder.Bottom), new Vector2(Occluder.Left, Occluder.Top));
 
             return clone;
+        }
+
+        public override void Serialize(StreamWriter SW) //get the transform in deserialization
+        {
+            SW.WriteLine(ToString());
+
+            base.Serialize(SW);
+            //Call Start in Deserialize
+
+            SW.WriteLine("End Of " + ToString());
         }
     }
 }

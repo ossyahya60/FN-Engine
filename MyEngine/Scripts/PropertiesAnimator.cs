@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using Microsoft.Xna.Framework;
 
 namespace MyEngine
@@ -73,6 +74,18 @@ namespace MyEngine
         public int KeyFramesCount()
         {
             return keyFrames.Count;
+        }
+
+        public override void Serialize(StreamWriter SW) //get the transform in deserialization
+        {
+            SW.WriteLine(ToString());
+
+            base.Serialize(SW);
+            SW.WriteLine("KeyFramesCount:\t" + keyFrames.Count.ToString());
+            foreach (KeyFrame KF in keyFrames)
+                KF.Serialize(SW);
+
+            SW.WriteLine("End Of " + ToString());
         }
     }
 }

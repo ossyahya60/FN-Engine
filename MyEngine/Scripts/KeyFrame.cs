@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.IO;
 
 namespace MyEngine
 {
@@ -11,7 +12,7 @@ namespace MyEngine
         public bool ReverseAfterFinishing = false;
         public bool Finished = true;
         public bool IsLooping = false;
-        public string Tag;
+        public string Tag = "Default";
 
         private float SourceValue = 0;
         private float DestinationValue = 1;
@@ -165,6 +166,26 @@ namespace MyEngine
         public bool IsReversed()
         {
             return OriginalSourceValue == DestinationValue && OriginalDestinationValue == SourceValue;
+        }
+
+        public void Serialize(StreamWriter SW)
+        {
+            SW.WriteLine(ToString());
+
+            SW.Write("PlayAfterFinishing:\t" + PlayAfterFinishing.ToString() + "\n");
+            SW.Write("FinishedButIsLooping:\t" + FinishedButIsLooping.ToString() + "\n");
+            SW.Write("DeleteAfterFinishing:\t" + DeleteAfterFinishing.ToString() + "\n");
+            SW.Write("ReverseAfterFinishing:\t" + ReverseAfterFinishing.ToString() + "\n");
+            SW.Write("IsLooping:\t" + IsLooping.ToString() + "\n");
+            SW.Write("Tag:\t" + Tag + "\n");
+            SW.Write("SourceValue:\t" + SourceValue.ToString() + "\n");
+            SW.Write("DestinationValue:\t" + DestinationValue.ToString() + "\n");
+            SW.Write("TimeDuration:\t" + TimeDuration.ToString() + "\n");
+            SW.Write("Paused:\t" + Paused.ToString() + "\n");
+            SW.Write("OriginalColor:\t" + OriginalColor.R.ToString() + "\t" + OriginalColor.G.ToString() + "\t" + OriginalColor.B.ToString() + "\t" + OriginalColor.A.ToString() + "\n");
+            //Original Source and Destination values are assigned the source and destination value in deserialization
+
+            SW.WriteLine("End Of " + ToString());
         }
     }
 }

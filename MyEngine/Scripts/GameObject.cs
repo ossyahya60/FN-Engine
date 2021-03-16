@@ -1,11 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.IO;
+using System;
 
 namespace MyEngine
 {
     public class GameObject: IComparer<GameObject>
     {
+        public bool IsEditor = false;
+
         public Transform Transform;
         public float Layer = 1;
         public GameObject Parent = null; 
@@ -22,6 +26,14 @@ namespace MyEngine
 
         public GameObject()
         {
+            Active = true;
+            GameObjectComponents = new List<GameObjectComponent>();
+            Children = new List<GameObject>();
+        }
+
+        public GameObject(bool IsEditor)
+        {
+            this.IsEditor = IsEditor;
             Active = true;
             GameObjectComponents = new List<GameObjectComponent>();
             Children = new List<GameObject>();
@@ -347,6 +359,57 @@ namespace MyEngine
         public static IComparer<GameObject> SortByLayer()
         {
             return new GameObject();
+        }
+
+        public void Serialize(StreamWriter SW) //Parent should be assigned after finding all gameObjects
+        {
+            SW.WriteLine("Start Of " + Name);
+
+            SW.Write("GameComponentsCount:\t" + GameComponentsCount.ToString() + "\n"); // Get It First
+            SW.Write("Layer:\t" + Layer.ToString() + "\n");
+            if(Parent != null)
+                SW.Write("Parent:\t" + Parent.Name + "\n");
+            else
+                SW.Write("Parent:\t" + "null\n");
+            SW.Write("Tag:\t" + Tag + "\n");
+            SW.Write("Active:\t" + Active.ToString() + "\n");
+            SW.Write("Name:\t" + Name + "\n");
+
+            string _Children = "Children:\t" + Children.Count.ToString() + "\t";
+            foreach (GameObject Child in Children)
+                _Children += Child.Name.ToString() + "\t";
+            SW.Write(_Children + "\n");
+
+            foreach (GameObjectComponent GOC in GameObjectComponents)
+                GOC.Serialize(SW);
+
+            SW.WriteLine("End Of " + Name);
+        }
+
+        public void Deserialize(StreamReader SR)
+        {
+            SR.ReadLine();
+
+            int _GameComponentsCount = int.Parse(SR.ReadLine().Split('\t')[1]);
+            Layer = float.Parse(SR.ReadLine().Split('\t')[1]);
+            Parent = new GameObject() { Name = SR.ReadLine().Split('\t')[1] };
+            Tag = SR.ReadLine().Split('\t')[1];
+            Active = bool.Parse(SR.ReadLine().Split('\t')[1]);
+            Name = SR.ReadLine().Split('\t')[1];
+            string[] children = SR.ReadLine().Split('\t');
+            for (int i = 0; i < int.Parse(children[1]); i++)
+                Children.Add(new GameObject() { Name = children[i + 2] });
+
+            for (int i = 0; i < _GameComponentsCount; i++)
+            {
+                GameObjectComponent GOC = Utility.GetInstance(SR.ReadLine()) as GameObjectComponent;
+                GOC.gameObject = this;
+                GOC.Start();
+                GOC.Deserialize(SR);
+                AddComponent(GOC);
+            }
+
+            SR.ReadLine();
         }
     }
 }

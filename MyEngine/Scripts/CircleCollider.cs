@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.IO;
 
 namespace MyEngine
 {
@@ -73,6 +74,17 @@ namespace MyEngine
             CircleCollider clone = this.MemberwiseClone() as CircleCollider;
 
             return clone;
+        }
+
+        public override void Serialize(StreamWriter SW) //Pass transform in deserialization
+        {
+            SW.WriteLine(ToString());
+
+            base.Serialize(SW);
+            SW.Write("IsTrigger:\t" + isTrigger.ToString() + "\n");
+            SW.Write("Radius:\t" + Radius.ToString() + "\n");
+
+            SW.WriteLine("End Of " + ToString());
         }
     }
 }

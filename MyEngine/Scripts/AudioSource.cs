@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
+using System.IO;
 
 namespace MyEngine
 {
@@ -116,6 +117,19 @@ namespace MyEngine
         public void Dispose() //Used if you will not use this sound effect on this object again
         {
             SoundEffectInstance.Dispose();
+        }
+
+        public override void Serialize(StreamWriter SW) //Load effect using audio name in deserialization
+        {
+            SW.WriteLine(ToString());
+
+            base.Serialize(SW);
+            SW.Write("volume:\t" + volume.ToString() + "\n");
+            SW.Write("pitch:\t" + pitch.ToString() + "\n");
+            SW.Write("pan:\t" + pan.ToString() + "\n");
+            SW.Write("AudioName:\t" + AudioName + "\n");
+
+            SW.WriteLine("End Of " + ToString());
         }
     }
 }

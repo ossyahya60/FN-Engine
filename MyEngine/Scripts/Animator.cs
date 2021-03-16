@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MyEngine
 {
@@ -51,7 +52,19 @@ namespace MyEngine
             foreach (Animation animation in AnimationClips)
                 clone.AddClip(animation.DeepCopy(Clone));
 
-            return clone;
+            return clone; 
+        }
+
+        public override void Serialize(StreamWriter SW)
+        {
+            SW.WriteLine(ToString());
+
+            base.Serialize(SW);
+            foreach (Animation AM in AnimationClips)
+                AM.Serialize(SW);
+            //SW.Write("ActiveClip:\t" + ActiveClip.Tag.ToString() + "\n");
+
+            SW.WriteLine("End Of " + ToString());
         }
     }
 }

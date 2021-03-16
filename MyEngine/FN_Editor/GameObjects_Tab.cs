@@ -1,13 +1,16 @@
-﻿using System.Numerics;
+﻿using System.Collections.Generic;
+using System.Numerics;
 using ImGuiNET;
 
 namespace MyEngine.FN_Editor
 {
-    class GameObjects_Tab: GameObjectComponent, Editor
+    class GameObjects_Tab: GameObjectComponent
     {
+        public static GameObject WhoIsSelected = null;
+
         public override void Start()
         {
-
+            WhoIsSelected = null;
         }
 
         public override void DrawUI()
@@ -17,10 +20,13 @@ namespace MyEngine.FN_Editor
             //Scene Tab
             ImGui.Begin(SceneManager.ActiveScene.Name);
 
+            if (ImGui.IsMouseClicked(0) && ImGui.IsWindowHovered(ImGuiHoveredFlags.RootWindow))
+                WhoIsSelected = null;
+
             ImGui.Indent();
 
             foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
-                if (GO.Parent == null)
+                if (!GO.IsEditor && GO.Parent == null)
                     TreeRecursive(GO, true);
 
             ImGui.End();
@@ -32,14 +38,21 @@ namespace MyEngine.FN_Editor
 
             if(ChildrenCount == 0)
             {
-                ImGui.Selectable(GO.Name);
+                ImGui.Selectable(GO.Name, WhoIsSelected == GO);
+
+                if (ImGui.IsItemClicked())
+                    WhoIsSelected = GO;
+
                 return;
             }
 
             if(Root)
                 ImGui.Unindent();
 
-            bool Open = ImGui.TreeNode(GO.Name);
+            bool Open = ImGui.TreeNodeEx(GO.Name, (GO == WhoIsSelected)?ImGuiTreeNodeFlags.Selected:ImGuiTreeNodeFlags.None);
+
+            if (ImGui.IsItemClicked())
+                WhoIsSelected = GO;
 
             for (int i = 0; i < ChildrenCount; i++)
             {

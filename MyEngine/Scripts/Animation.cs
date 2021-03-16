@@ -1,141 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.IO;
 
 namespace MyEngine
 {
-    //public class Animation
-    //{
-    //    public Sprite Sprite { get; set; }
-    //    public bool IsLooping = true;
-    //    public bool IsPlaying = false;
-    //    public bool Reversed = false;
-    //    public bool Paused = false;
-    //    public bool PlayOnAwake = true;
-    //    public float Speed = 1;
-    //    public string Tag;
-
-    //    private int FramesCount;
-    //    private Point CurrentFrame;
-    //    private float Timer = 0;
-    //    public Point OrigSpriteSourceValues;
-
-    //    public Animation(Sprite sprite, int framesCount)
-    //    {
-    //        CurrentFrame = Point.Zero;
-    //        OrigSpriteSourceValues = sprite.SourceRectangle.Location;
-    //        Sprite = sprite;
-    //        FramesCount = framesCount;
-
-    //        if (PlayOnAwake)
-    //            Play();
-    //    }
-
-    //    public void Play()
-    //    {
-    //        if (!IsPlaying)
-    //        {
-    //            Timer = 0;
-    //            IsPlaying = true;
-    //            Resume();
-    //            CurrentFrame = (Reversed) ? GetLastFrame(ref CurrentFrame) : Point.Zero;
-    //        }
-    //    }
-
-    //    public void Pause()
-    //    {
-    //        Paused = true;
-    //    }
-
-    //    public void Resume()
-    //    {
-    //        Paused = false;
-    //    }
-
-    //    public void Reset()
-    //    {
-    //        IsPlaying = false;
-    //        Play();
-    //    }
-
-    //    public void ExitAnimation()
-    //    {
-    //        IsPlaying = false;
-    //    }
-
-    //    public void Update(GameTime gameTime)
-    //    {
-    //        if (IsPlaying && !Paused)
-    //        {
-    //            Timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-    //            if (Timer > Speed)
-    //            {
-    //                if (Reversed)
-    //                {
-    //                    if (CurrentFrame == Point.Zero)
-    //                    {
-    //                        IsPlaying = false;
-    //                        if (IsLooping)
-    //                            Play();
-    //                    }
-    //                    else
-    //                        DecrementFrame();
-    //                }
-    //                else
-    //                {
-    //                    if (IsLastFrame())
-    //                    {
-    //                        IsPlaying = false;
-    //                        if (IsLooping)
-    //                            Play();
-    //                    }
-    //                    else
-    //                        IncrementFrame();
-    //                }
-    //                Timer = 0;
-    //            }
-
-    //            Sprite.SourceRectangle.X = CurrentFrame.X * Sprite.SourceRectangle.Width + OrigSpriteSourceValues.X;
-    //            Sprite.SourceRectangle.Y = CurrentFrame.Y * Sprite.SourceRectangle.Height + OrigSpriteSourceValues.Y;
-    //        }
-    //    }
-
-    //    //Note: We assume that every consecutive Frame has the same Dimensions!
-    //    private Point GetLastFrame(ref Point point)
-    //    {
-    //        Point Temp = Point.Zero;
-    //        point.X = FramesCount % FramesCount - 1;
-    //        point.Y = FramesCount / FramesCount;
-
-    //        return point;
-    //    }
-
-    //    private bool IsLastFrame()
-    //    {
-    //        bool Valid = (CurrentFrame.X == FramesCount - 1) ? true : false; //=>Something Wrong
-    //        return Valid;
-    //    }
-
-    //    private void IncrementFrame()
-    //    {
-    //        CurrentFrame.X += 1;
-    //        CurrentFrame.X = CurrentFrame.X % FramesCount;
-    //        CurrentFrame.Y = CurrentFrame.Y / FramesCount;
-    //    }
-
-    //    private void DecrementFrame()
-    //    {
-    //        CurrentFrame.X -= 1;
-    //        CurrentFrame.X = CurrentFrame.X % FramesCount;
-    //        CurrentFrame.Y = CurrentFrame.Y / FramesCount;
-    //    }
-    //}
-
-
-
-
-
-
     public class Animation //SpriteSheets should have the animation consecuive
     {
         public string Tag = "Default";
@@ -152,13 +20,11 @@ namespace MyEngine
         private float Counter = 0;
         private bool stop = true;
         private int FramesPassed = 0;
-        private Point NewSize;
 
         public Animation(SpriteRenderer SR, int FrameCount)
         {
             spriteRenderer = SR;
             SourceRectangle = Rectangle.Empty;
-            NewSize = SourceRectangle.Size;
             this.FramesCount = FrameCount;
         }
 
@@ -202,10 +68,8 @@ namespace MyEngine
                         FramesPassed = 0;
                     }
 
-                    NewSize.X = Math.Abs(SourceRectangle.Size.X);
-                    NewSize.Y = Math.Abs(SourceRectangle.Size.Y);
                     spriteRenderer.Sprite.SourceRectangle.Location = CurrentFrame;
-                    spriteRenderer.Sprite.SourceRectangle.Size = NewSize;
+                    spriteRenderer.Sprite.SourceRectangle.Size = new Point(Math.Abs(SourceRectangle.Size.X), Math.Abs(SourceRectangle.Size.Y));
                 }
             }
         }
@@ -232,6 +96,20 @@ namespace MyEngine
             clone.spriteRenderer = Clone.GetComponent<SpriteRenderer>();
 
             return clone;
+        }
+
+        public void Serialize(StreamWriter SW) // Pass spriterenderer in deserialization
+        {
+            SW.WriteLine(ToString());
+
+            SW.Write("Tag:\t" + Tag + "\n");
+            SW.Write("Looping:\t" + Looping.ToString() + "\n");
+            SW.Write("Speed:\t" + Speed.ToString() + "\n");
+            SW.Write("FramesCount:\t" + FramesCount.ToString() + "\n");
+            SW.Write("SourceRectangle:\t" + SourceRectangle.X.ToString() + "\t" + SourceRectangle.Y.ToString() + "\t" + SourceRectangle.Width.ToString() + "\t" + SourceRectangle.Height.ToString() + "\n");
+            SW.Write("stop:\t" + stop.ToString() + "\n");
+
+            SW.WriteLine("End Of " + ToString());
         }
     }
 }

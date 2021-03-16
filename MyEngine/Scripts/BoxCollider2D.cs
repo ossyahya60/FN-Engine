@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.IO;
 
 namespace MyEngine
 {
@@ -17,21 +18,20 @@ namespace MyEngine
             }
             get
             {
-                return new Rectangle(bounds.X, bounds.Y, (int)(bounds.Width * Transform.Scale.X), (int)(bounds.Height * Transform.Scale.Y));
+                return new Rectangle(bounds.X, bounds.Y, (int)(bounds.Width * gameObject.Transform.Scale.X), (int)(bounds.Height * gameObject.Transform.Scale.Y));
             }
         }
         public bool isTrigger = false;
 
-        private Transform Transform;
         private double GameTime = 1.0f / 60;
         private Rectangle bounds;
-        private Rectangle HandyRectangle; //To avoid stack allocating a lot if memory in a short time
         //private float DisplaceMagnitude = 0.01f; //1 pixel
 
         public Rectangle GetDynamicCollider()
         {
-            HandyRectangle.X = (int)(Transform.Position.X + Bounds.X);
-            HandyRectangle.Y = (int)(Transform.Position.Y + Bounds.Y);
+            Rectangle HandyRectangle = Rectangle.Empty;
+            HandyRectangle.X = (int)(gameObject.Transform.Position.X + Bounds.X);
+            HandyRectangle.Y = (int)(gameObject.Transform.Position.Y + Bounds.Y);
             HandyRectangle.Width = Bounds.Width;
             HandyRectangle.Height = Bounds.Height;
 
@@ -40,9 +40,6 @@ namespace MyEngine
         
         public override void Start()
         {
-            Transform = gameObject.Transform;
-            HandyRectangle = new Rectangle();
-
             if (gameObject.GetComponent<SpriteRenderer>() != null && bounds.Width == 0)  //Initializing Collider bounds with the sprite bounds if exists
             {
                 if (gameObject.GetComponent<SpriteRenderer>().Sprite != null)
@@ -76,7 +73,7 @@ namespace MyEngine
                 BoxCollider2D boxCollider = collider as BoxCollider2D;
                 Rigidbody2D RB = gameObject.GetComponent<Rigidbody2D>();
 
-                Transform.Move(-RB.Velocity.X * (float)GameTime, -RB.Velocity.Y * (float)GameTime);
+                gameObject.Transform.Move(-RB.Velocity.X * (float)GameTime, -RB.Velocity.Y * (float)GameTime);
             }
         }
 
@@ -88,7 +85,6 @@ namespace MyEngine
         public override GameObjectComponent DeepCopy(GameObject clone)
         {
             BoxCollider2D Clone = this.MemberwiseClone() as BoxCollider2D;
-            Clone.Transform = clone.Transform;
             Clone.bounds = new Rectangle(bounds.Location, bounds.Size);
 
             return Clone;
@@ -122,6 +118,17 @@ namespace MyEngine
         public void OnTriggerExit2D()
         {
             throw new System.NotImplementedException();
+        }
+
+        public override void Serialize(StreamWriter SW)
+        {
+            SW.WriteLine(ToString());
+
+            base.Serialize(SW);
+            SW.Write("SourceRectangle:\t" + bounds.X.ToString() + "\t" + bounds.Y.ToString() + "\t" + bounds.Width.ToString() + "\t" + bounds.Height.ToString() + "\n");
+            SW.Write("IsTrigger:\t" + isTrigger.ToString() + "\n");
+
+            SW.WriteLine("End Of " + ToString());
         }
     }
 }

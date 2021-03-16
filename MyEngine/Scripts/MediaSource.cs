@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Media;
+using System.IO;
 
 namespace MyEngine
 {
@@ -38,7 +39,7 @@ namespace MyEngine
             }
         }
 
-        private static Song Song = null;
+        public static Song Song = null;
 
         public static void LoadTrack(string TrackName)
         {
@@ -70,6 +71,21 @@ namespace MyEngine
         {
             if (Song != null)
                 MediaPlayer.Stop();
+        }
+
+        public static void Serialize(StreamWriter SW)
+        {
+            SW.WriteLine("MediaSource");
+
+            SW.Write("Volume:\t" + Volume.ToString() + "\n");
+            SW.Write("IsMuted:\t" + IsMuted.ToString() + "\n");
+            SW.Write("IsLooping:\t" + IsLooping.ToString() + "\n");
+            if(Song != null)
+                SW.Write("Song:\t" + Song.Name + "\n");
+            else
+                SW.Write("Song:\t" + "null\n");
+
+            SW.WriteLine("End Of MediaSource");
         }
     }
 }

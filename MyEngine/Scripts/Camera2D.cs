@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.IO;
 
 namespace MyEngine
 {
@@ -13,16 +14,12 @@ namespace MyEngine
         private Matrix _camRotationMatrix = Matrix.Identity;
         private Matrix _camScaleMatrix = Matrix.Identity;
         private Matrix _resTranslationMatrix = Matrix.Identity;
-
-        protected ResolutionIndependentRenderer ResolutionIndependentRenderer;
         private Vector3 _camTranslationVector = Vector3.Zero;
         private Vector3 _camScaleVector = Vector3.Zero;
         private Vector3 _resTranslationVector = Vector3.Zero;
 
-        public Camera2D(ResolutionIndependentRenderer resolutionIndependence)
+        public Camera2D()
         {
-            ResolutionIndependentRenderer = resolutionIndependence;
-
             _zoom = 0.1f;
             _rotation = 0.0f;
             _position = Vector2.Zero;
@@ -91,8 +88,8 @@ namespace MyEngine
 
                 Matrix.CreateScale(ref _camScaleVector, out _camScaleMatrix);
 
-                _resTranslationVector.X = ResolutionIndependentRenderer.VirtualWidth * 0.5f;
-                _resTranslationVector.Y = ResolutionIndependentRenderer.VirtualHeight * 0.5f;
+                _resTranslationVector.X = Setup.resolutionIndependentRenderer.VirtualWidth * 0.5f;
+                _resTranslationVector.Y = Setup.resolutionIndependentRenderer.VirtualHeight * 0.5f;
                 _resTranslationVector.Z = 0;
 
                 Matrix.CreateTranslation(ref _resTranslationVector, out _resTranslationMatrix);
@@ -101,7 +98,7 @@ namespace MyEngine
                              _camRotationMatrix *
                              _camScaleMatrix *
                              _resTranslationMatrix *
-                             ResolutionIndependentRenderer.GetTransformationMatrix();
+                             Setup.resolutionIndependentRenderer.GetTransformationMatrix();
 
                 _isViewTransformationDirty = false;
             }
@@ -112,6 +109,17 @@ namespace MyEngine
         public void RecalculateTransformationMatrices()
         {
             _isViewTransformationDirty = true;
+        }
+
+        public void Serialize(StreamWriter SW)
+        {
+            SW.WriteLine(ToString());
+
+            SW.Write("_zoom:\t" + _zoom.ToString() + "\n");
+            SW.Write("_rotation:\t" + _rotation.ToString() + "\n");
+            SW.Write("_position:\t" + _position.X.ToString() + "\t" + _position.Y.ToString() + "\n");
+
+            SW.WriteLine("End Of " + ToString());
         }
     }
 }
