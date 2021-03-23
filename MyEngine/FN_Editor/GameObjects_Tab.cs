@@ -15,7 +15,7 @@ namespace MyEngine.FN_Editor
 
         public override void DrawUI()
         {
-            ImGui.ShowDemoWindow();
+            //ImGui.ShowDemoWindow();
 
             //Scene Tab
             ImGui.Begin(SceneManager.ActiveScene.Name);
@@ -38,7 +38,23 @@ namespace MyEngine.FN_Editor
 
             if(ChildrenCount == 0)
             {
+                if (!Root)
+                    ImGui.Indent();
+
+                if (!GO.IsActive())
+                {
+                    ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1));
+                    ImGui.PushStyleColor(ImGuiCol.HeaderHovered, new Vector4(0.8f, 0.8f, 0.8f, 1));
+                }
                 ImGui.Selectable(GO.Name, WhoIsSelected == GO);
+                if (!GO.IsActive())
+                {
+                    ImGui.PopStyleColor();
+                    ImGui.PopStyleColor();
+                }
+
+                if (!Root)
+                    ImGui.Unindent();
 
                 if (ImGui.IsItemClicked())
                     WhoIsSelected = GO;
@@ -46,10 +62,22 @@ namespace MyEngine.FN_Editor
                 return;
             }
 
-            if(Root)
+            if (Root)
                 ImGui.Unindent();
 
+            if (!GO.IsActive())
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1));
+                ImGui.PushStyleColor(ImGuiCol.HeaderHovered, new Vector4(0.8f, 0.8f, 0.8f, 1));
+            }
+
             bool Open = ImGui.TreeNodeEx(GO.Name, (GO == WhoIsSelected)?ImGuiTreeNodeFlags.Selected:ImGuiTreeNodeFlags.None);
+
+            if (!GO.IsActive())
+            {
+                ImGui.PopStyleColor();
+                ImGui.PopStyleColor();
+            }
 
             if (ImGui.IsItemClicked())
                 WhoIsSelected = GO;

@@ -2,7 +2,7 @@ MyEngine.Scene
 Active:	True
 Name:	MainScene
 Id:	0
-GameObjectCount:	3
+GameObjectCount:	5
 MediaSource
 Volume:	1
 IsMuted:	False
@@ -96,7 +96,7 @@ Parent:	Test 6
 Tag:	Test6
 Active:	True
 Name:	Test6_Inst
-Children:	0	
+Children:	1	Default	
 MyEngine.Transform
 gameObject:	Test6_Inst
 Enabled:	True
@@ -134,4 +134,64 @@ DirectionalIntensity:	0.2
 ShadowIntensity:	0.5
 End Of MyEngine.Light
 End Of Test6_Inst
+Start Of Test6_Inst2
+GameComponentsCount:	2
+Layer:	1
+Parent:	null
+Tag:	Test2
+Active:	True
+Name:	Test6_Inst2
+Children:	0	
+MyEngine.Transform
+gameObject:	Test6_Inst2
+Enabled:	True
+LastPosition:	0	0
+scale:	1	1
+position:	0	0
+rotation:	0
+localScale:	1	1
+End Of MyEngine.Transform
+MyEngine.SpriteRenderer
+gameObject:	Test6_Inst2
+Enabled:	True
+MyEngine.Sprite
+SourceRectangle:	0	0	1280	720
+Origin:	0	0
+texture:	Temp
+End Of MyEngine.Sprite
+SpriteEffects:	None
+Color:	255	255	255	255
+Effect:	null
+End Of MyEngine.SpriteRenderer
+End Of Test6_Inst2
+Start Of Default
+GameComponentsCount:	2
+Layer:	1
+Parent:	Test6_Inst
+Tag:	Test2
+Active:	True
+Name:	Default
+Children:	0	
+MyEngine.Transform
+gameObject:	Default
+Enabled:	True
+LastPosition:	0	0
+scale:	1	1
+position:	0	0
+rotation:	0
+localScale:	1	1
+End Of MyEngine.Transform
+MyEngine.SpriteRenderer
+gameObject:	Default
+Enabled:	True
+MyEngine.Sprite
+SourceRectangle:	0	0	1280	720
+Origin:	0	0
+texture:	Temp
+End Of MyEngine.Sprite
+SpriteEffects:	None
+Color:	255	255	255	255
+Effect:	null
+End Of MyEngine.SpriteRenderer
+End Of Default
 End Of MyEngine.Scene

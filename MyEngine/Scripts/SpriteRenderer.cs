@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 using System.IO;
+using System;
 
 namespace MyEngine
 {
@@ -9,7 +10,7 @@ namespace MyEngine
     {
         public Sprite Sprite { set; get; }
         public SpriteEffects SpriteEffects;
-        public Color Color;
+        public Color Color = Color.Aqua;
         public Effect Effect;
         public static Effect LastEffect;
 
@@ -21,7 +22,7 @@ namespace MyEngine
         public SpriteRenderer()
         {
             Sprite = null;
-            Color = Color.White;
+            //Color = Color.White;
             SpriteEffects = SpriteEffects.None;
             Effect = null;
         }
@@ -45,7 +46,6 @@ namespace MyEngine
                 }
 
                 Rectangle DestRect = Rectangle.Empty;
-
                 //spriteBatch.Draw(Sprite.Texture, Transform.Position, Sprite.SourceRectangle, Color, Transform.Rotation, Sprite.Origin, Transform.Scale, SpriteEffects, gameObject.Layer);
                 DestRect.Location = gameObject.Transform.Position.ToPoint();
                 DestRect.Width = (int)(Sprite.SourceRectangle.Width * gameObject.Transform.Scale.X);
@@ -86,7 +86,7 @@ namespace MyEngine
                 SW.WriteLine("null\n"); // Make a check in deserialization
             SW.Write("SpriteEffects:\t" + SpriteEffects.ToString() + "\n");
             SW.Write("Color:\t" + Color.R.ToString() + "\t" + Color.G.ToString() + "\t" + Color.B.ToString() + "\t" + Color.A.ToString() + "\n");
-            if(Effect != null)
+            if (Effect != null)
                 SW.Write("Effect:\t" + Effect.Name + "\n");
             else
                 SW.Write("Effect:\t" + "null\n");

@@ -60,7 +60,7 @@ namespace MyEngine
 
         public bool IsCursorInRange()
         {
-            if (!gameObject.Active)
+            if (!gameObject.IsActive())
                 return false;
 
             Bounds.Location = Transform.Position.ToPoint();
@@ -76,7 +76,7 @@ namespace MyEngine
 
         public bool ClickedOnButton()
         {
-            if (!gameObject.Active)
+            if (!gameObject.IsActive())
                 return false;
 
             try

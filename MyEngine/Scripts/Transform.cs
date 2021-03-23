@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 
 namespace MyEngine
@@ -45,6 +47,7 @@ namespace MyEngine
                 return position;
             }
         }
+
         public float Rotation //Gets rotation in radians
         {
             set
@@ -63,6 +66,7 @@ namespace MyEngine
                 return rotation;
             }
         }
+
         public Vector2 Scale //Scale of a gameobject in x-y coordinate system
         {
             set

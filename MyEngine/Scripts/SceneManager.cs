@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace MyEngine
@@ -10,6 +12,7 @@ namespace MyEngine
 
         private static Scene SceneToBeLoaded = null;
         private static bool FirstTimeLoading = true;
+        private static Vector2 Resolution = Vector2.Zero;
 
         public static void Start()
         {
@@ -60,6 +63,87 @@ namespace MyEngine
 
             scene.GameObjects.Clear();
             SceneToBeLoaded = scene;
+        }
+
+        public static void LoadScene_Serialization(string Name) //Use this
+        {
+            FN_Editor.InspectorWindow.Members.Clear();
+
+            if (FirstTimeLoading)
+            {
+                SceneToBeLoaded = new Scene(Name);
+                LoadSceneNow_Serialization();
+                FirstTimeLoading = false;
+                return;
+            }
+
+            SceneToBeLoaded = new Scene(Name);
+        }
+
+        public static void LoadSceneNow_Serialization() //Not For High level user
+        {
+            FN_Editor.InspectorWindow.Members.Clear();
+
+            if (SceneToBeLoaded == null)
+                return;
+
+            UnloadScene();
+            ActiveScene = SceneToBeLoaded;
+
+            SceneToBeLoaded.Start();
+            SceneToBeLoaded.Deserialize(SceneToBeLoaded.Name);
+
+            SceneToBeLoaded = null;
+        }
+
+        public static void Initialize()
+        {
+            if (ActiveScene != null)
+                ActiveScene.Start();
+        }
+
+        public static void Update(GameTime gameTime)
+        {
+            if (!Setup.Game.IsActive) //Pause Game when minimized
+                return;
+
+            Input.GetState(); //This has to be called at the start of update method!!
+
+            /////////Resolution related//////////// -> Mandatory
+            if (Resolution != new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight))
+                Setup.resolutionIndependentRenderer.InitializeResolutionIndependence(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, Setup.Camera);
+
+            Resolution = new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
+
+            if (ActiveScene != null)
+                ActiveScene.Update(gameTime);
+        }
+
+        public static void Draw(GameTime gameTime)
+        {
+            if (ActiveScene != null)
+            {
+                if (!Setup.Game.IsActive) //Pause Game when minimized
+                    return;
+
+                ActiveScene.DrawUI(gameTime); //Draw UI
+
+                ///
+                Light.Init_Light();
+                Setup.resolutionIndependentRenderer.BeginDraw(); //Resolution related -> Mandatory
+
+                Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix()); // -> Mandatory
+                SpriteRenderer.LastEffect = null; // This should be the same effect as in the begin method above
+                ActiveScene.Draw(Setup.spriteBatch);
+                Setup.spriteBatch.End();
+
+                //Light (Experimental)
+                Light.ApplyLighting();
+
+                ActiveScene.ShowUI(Setup.spriteBatch);
+
+                LoadSceneNow();
+            }
         }
     }
 }

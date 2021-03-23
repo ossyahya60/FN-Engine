@@ -92,22 +92,12 @@ namespace MyEngine
             if (GO == null)
                 return;
 
-            GameObject[] Children = GO.GetALLChildren();
+            foreach (GameObject Child in GO.Children)
+                RemoveGameObject(Child);
 
-            if (Children != null)
-            {
-                int Count = GameObjects.Count - 1;
-
-                for (int i = Count; i >= 0; i--)
-                    if (GameObjects.Remove(GameObjects[Count - i]))
-                        GameObjectCount--;
-            }
-
-            if (GO.Parent != null)
-                GO.Parent.RemoveChild(GO);
-
-            if (GameObjects.Remove(GO))
-                GameObjectCount--;
+            GO.Destroy();
+            GameObjects.Remove(GO);
+            GameObjectCount--;
         }
 
         public void Start()
@@ -132,12 +122,6 @@ namespace MyEngine
             if (Active)
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].Update(gameTime);
-
-            foreach (GameObject GO in GameObjects.FindAll(item => item.ShouldBeDeleted == true))
-                GO.Destroy();
-
-            int Length = GameObjects.RemoveAll(item => item.ShouldBeDeleted == true);
-            GameObjectCount -= Length;
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -147,6 +131,12 @@ namespace MyEngine
             if (Active)
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].Draw(spriteBatch);
+
+            foreach (GameObject GO in GameObjects.FindAll(item => item.ShouldBeDeleted == true))
+            {
+                GO.Destroy();
+                RemoveGameObject(GO);
+            }
         }
 
         public void DrawUI(GameTime gameTime)
@@ -221,7 +211,7 @@ namespace MyEngine
             for (int i = Count; i >= 0; i--)
             {
                 var GOC = GameObjects[Count - i].GetComponent<T>();
-                if (GOC != null && GOC.gameObject.Active == true)
+                if (GOC != null && GOC.gameObject.IsActive() == true)
                 {
                     HandyList2.Insert(Counter++, GOC);
                 }

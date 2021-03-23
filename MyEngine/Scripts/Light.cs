@@ -178,7 +178,7 @@ namespace MyEngine
                     for(int k=0; k<LIGHTS.Count; k++)
                     {
                         PointsTriangle.Clear();
-                        if (!LIGHTS[k].gameObject.Active || !LIGHTS[k].Enabled)
+                        if (!LIGHTS[k].gameObject.IsActive() || !LIGHTS[k].Enabled)
                             continue;
 
                         foreach (Vector2 P in Points)
@@ -223,18 +223,18 @@ namespace MyEngine
 
             for (int i = 0; i < LightCount; i++)
             {
-                if (LIGHTS[i].Enabled == false || LIGHTS[i].gameObject.Active == false)
+                if (LIGHTS[i].Enabled == false || LIGHTS[i].gameObject.IsActive() == false)
                     continue;
 
                 COLOR[i] = LIGHTS[i].color.ToVector3();
-                InnerRadius[i] = LIGHTS[i].InnerRadius;
-                Radius[i] = LIGHTS[i].OuterRadius;
-                Attenuation[i] = LIGHTS[i].Attenuation;
+                InnerRadius[i] = MathHelper.Clamp(LIGHTS[i].InnerRadius, 0, LIGHTS[i].OuterRadius);
+                Radius[i] = MathHelper.Clamp(LIGHTS[i].OuterRadius, 0, 1);
+                Attenuation[i] = MathHelper.Clamp(LIGHTS[i].Attenuation, 0, float.MaxValue);
                 X_Bias[i] = (LIGHTS[i].gameObject.Transform.Position.X - Setup.graphics.PreferredBackBufferWidth * 0.5f) / Setup.graphics.PreferredBackBufferWidth;
                 Y_Bias[i] = (LIGHTS[i].gameObject.Transform.Position.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f) / Setup.graphics.PreferredBackBufferHeight;
-                AngularRadius[i] = LIGHTS[i].AngularRadius;
-                InnerIntensity[i] = LIGHTS[i].InnerInensity;
-                ShadowIntensity[i] = 1 - LIGHTS[i].ShadowIntensity;
+                AngularRadius[i] = MathHelper.Clamp(LIGHTS[i].AngularRadius, 0, 360);
+                InnerIntensity[i] = MathHelper.Clamp(LIGHTS[i].InnerInensity, 1, float.MaxValue);
+                ShadowIntensity[i] = MathHelper.Clamp(1 - LIGHTS[i].ShadowIntensity, 0, 1);
                 CastShadow[i] = LIGHTS[i].CastShadow? 1:0;
 
                 if (LIGHTS[i].Type == LightTypes.Directional)
@@ -245,7 +245,7 @@ namespace MyEngine
                 }
             }
 
-            LightCount_param.SetValue(LightCount);
+            LightCount_param.SetValue(MathHelper.Clamp(LightCount, 0, MAX_LIGHT_COUNT));
             AngularRadius_param.SetValue(AngularRadius);
             X_Bias_param.SetValue(X_Bias);
             Y_Bias_param.SetValue(Y_Bias);

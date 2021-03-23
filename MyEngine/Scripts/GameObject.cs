@@ -16,7 +16,7 @@ namespace MyEngine
         public List<GameObjectComponent> GameObjectComponents; //List of all  GO componets in a certain scene(scene is not yet implemented)
         public string Tag = null;
         public int GameComponentsCount = 0;
-        public bool Active { set; get; }
+        public bool Active { set; private get; }
         public string Name = "Default";
         public bool ShouldBeDeleted = false;
         public int UI_Layer = 1;
@@ -29,6 +29,21 @@ namespace MyEngine
             Active = true;
             GameObjectComponents = new List<GameObjectComponent>();
             Children = new List<GameObject>();
+        }
+
+        public bool IsActive()
+        {
+            GameObject parent = Parent;
+
+            while (parent != null)
+            {
+                if (!parent.Active)
+                    return false;
+
+                parent = parent.Parent;
+            }
+
+            return Active;
         }
 
         public GameObject(bool IsEditor)
@@ -230,41 +245,26 @@ namespace MyEngine
 
         public virtual void Update(GameTime gameTime)
         {
-            if (Active)
-            {
-                if (Parent == null || Parent.Active)
-                {
-                    foreach (GameObjectComponent GOC in GameObjectComponents)
-                        if (GOC.Enabled)
-                            GOC.Update(gameTime);
-                }
-            }
+            if (IsActive())
+                foreach (GameObjectComponent GOC in GameObjectComponents)
+                    if (GOC.Enabled)
+                        GOC.Update(gameTime);
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            if (Active)
-            {
-                if (Parent == null || Parent.Active)
-                {
-                    foreach (GameObjectComponent GOC in GameObjectComponents)
-                        if (GOC.Enabled)
-                            GOC.Draw(spriteBatch);
-                }
-            }
+            if (IsActive())
+                foreach (GameObjectComponent GOC in GameObjectComponents)
+                    if (GOC.Enabled)
+                        GOC.Draw(spriteBatch);
         }
 
         public virtual void DrawUI()
         {
-            if (Active)
-            {
-                if (Parent == null || Parent.Active)
-                {
-                    foreach (GameObjectComponent GOC in GameObjectComponents)
-                        if (GOC.Enabled)
-                            GOC.DrawUI();
-                }
-            }
+            if (IsActive())
+                foreach (GameObjectComponent GOC in GameObjectComponents)
+                    if (GOC.Enabled)
+                        GOC.DrawUI();
         }
 
         //public static void Destroy(GameObject GO)  //Scene not yet implemented
