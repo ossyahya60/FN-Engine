@@ -2,7 +2,7 @@ MyEngine.Scene
 Active:	True
 Name:	MainScene
 Id:	0
-GameObjectCount:	5
+GameObjectCount:	3
 MediaSource
 Volume:	1
 IsMuted:	False
@@ -14,184 +14,206 @@ _zoom:	1
 _rotation:	0
 _position:	683	384
 End Of MyEngine.Camera2D
-Start Of Test2
-GameComponentsCount:	2
-Layer:	1
-Parent:	null
-Tag:	Test2
-Active:	True
-Name:	Test2
-Children:	0	
+MyEngine.GameObject
+GeneratedID	1
+SerializableFields	11
+System.Boolean	IsEditor	False	False
 MyEngine.Transform
-gameObject:	Test2
-Enabled:	True
-LastPosition:	0	0
-scale:	1	1
-position:	0	0
-rotation:	0
-localScale:	1	1
+GeneratedID	2
+SerializableFields	2
+--SerializedBefore--	MyEngine.GameObject	1
+System.Boolean	Enabled	True	False
+SerializableProps	7
+Microsoft.Xna.Framework.Vector2	LastPosition	{X:0 Y:0}	False
+Microsoft.Xna.Framework.Vector2	Position	{X:0 Y:0}	False
+System.Single	Rotation	0	False
+Microsoft.Xna.Framework.Vector2	Scale	{X:1 Y:1}	False
+Microsoft.Xna.Framework.Vector2	LocalPosition	{X:0 Y:0}	False
+System.Single	LocalRotation	0	False
+Microsoft.Xna.Framework.Vector2	LocalScale	{X:1 Y:1}	False
 End Of MyEngine.Transform
+System.Single	Layer	1	False
+MyEngine.GameObject	Parent		True
+--SerializedBefore--	MyEngine.Transform	2
 MyEngine.SpriteRenderer
-gameObject:	Test2
-Enabled:	True
+GeneratedID	3
+SerializableFields	5
+Microsoft.Xna.Framework.Graphics.SpriteEffects	SpriteEffects	None	False
+Microsoft.Xna.Framework.Color	Color	{R:0 G:255 B:255 A:255}	False
+Microsoft.Xna.Framework.Graphics.Effect	Effect		True
+--SerializedBefore--	MyEngine.GameObject	1
+System.Boolean	Enabled	True	False
+SerializableProps	1
 MyEngine.Sprite
-SourceRectangle:	0	0	1280	720
-Origin:	0	0
-texture:	Temp
+GeneratedID	4
+SerializableFields	3
+Microsoft.Xna.Framework.Rectangle	SourceRectangle	{X:0 Y:0 Width:1280 Height:720}	False
+Microsoft.Xna.Framework.Vector2	Origin	{X:0 Y:0}	False
+--SerializedBefore--	MyEngine.Transform	2
+SerializableProps	1
+*	Microsoft.Xna.Framework.Graphics.Texture2D	Texture	Temp.png	True
 End Of MyEngine.Sprite
-SpriteEffects:	None
-Color:	255	255	255	255
-Effect:	null
 End Of MyEngine.SpriteRenderer
+Test2
+GeneratedID	5
+SerializableFields	0
+SerializableProps	2
+System.Int32	Length	5	False
 End Of Test2
-Start Of Test 6
-GameComponentsCount:	3
-Layer:	0.1
-Parent:	null
-Tag:	Test6
-Active:	True
-Name:	Test 6
-Children:	1	Test6_Inst	
+System.Int32	GameComponentsCount	2	False
+--SerializedBefore--	System.String	5
+System.Boolean	ShouldBeDeleted	False	False
+System.Int32	UI_Layer	1	False
+SerializableProps	1
+System.Boolean	Active	True	False
+End Of MyEngine.GameObject
+End Of Test2
+MyEngine.GameObject
+GeneratedID	6
+SerializableFields	11
+System.Boolean	IsEditor	False	False
 MyEngine.Transform
-gameObject:	Test 6
-Enabled:	True
-LastPosition:	0	0
-scale:	100	100
-position:	683	460.8
-rotation:	0
-localScale:	1	1
+GeneratedID	7
+SerializableFields	2
+--SerializedBefore--	MyEngine.GameObject	6
+System.Boolean	Enabled	True	False
+SerializableProps	7
+Microsoft.Xna.Framework.Vector2	LastPosition	{X:0 Y:0}	False
+Microsoft.Xna.Framework.Vector2	Position	{X:683 Y:460.8}	False
+System.Single	Rotation	0	False
+Microsoft.Xna.Framework.Vector2	Scale	{X:100 Y:100}	False
+Microsoft.Xna.Framework.Vector2	LocalPosition	{X:683 Y:460.8}	False
+System.Single	LocalRotation	0	False
+Microsoft.Xna.Framework.Vector2	LocalScale	{X:100 Y:100}	False
 End Of MyEngine.Transform
+System.Single	Layer	0.1	False
+MyEngine.GameObject	Parent		True
+--SerializedBefore--	MyEngine.Transform	7
 MyEngine.SpriteRenderer
-gameObject:	Test 6
-Enabled:	True
+GeneratedID	8
+SerializableFields	5
+Microsoft.Xna.Framework.Graphics.SpriteEffects	SpriteEffects	None	False
+Microsoft.Xna.Framework.Color	Color	{R:0 G:255 B:255 A:255}	False
+*	Microsoft.Xna.Framework.Graphics.Effect	Effect	ShadowCasting	True
+--SerializedBefore--	MyEngine.GameObject	6
+System.Boolean	Enabled	True	False
+SerializableProps	1
 MyEngine.Sprite
-SourceRectangle:	0	0	1	1
-Origin:	0	0
-texture:	Content/Test 6.png
+GeneratedID	9
+SerializableFields	3
+Microsoft.Xna.Framework.Rectangle	SourceRectangle	{X:0 Y:0 Width:1 Height:1}	False
+Microsoft.Xna.Framework.Vector2	Origin	{X:0 Y:0}	False
+--SerializedBefore--	MyEngine.Transform	7
+SerializableProps	1
+*	Microsoft.Xna.Framework.Graphics.Texture2D	Texture	CT1.png	True
 End Of MyEngine.Sprite
-SpriteEffects:	None
-Color:	255	255	255	255
-Effect:	ShadowCasting
 End Of MyEngine.SpriteRenderer
 MyEngine.Light
-gameObject:	Test 6
-Enabled:	True
-CastShadows_Global:	True
-CastShadow:	False
-Type:	Point
-color:	255	255	255	255
-AngularRadius:	360
-OuterRadius:	0.25
-InnerRadius:	0.025
-InnerInensity:	1.5
-Attenuation:	1
-DirectionalIntensity:	0.2
-ShadowIntensity:	0.5
+GeneratedID	10
+SerializableFields	12
+System.Boolean	CastShadow	False	False
+MyEngine.LightTypes	Type	Point	False
+Microsoft.Xna.Framework.Color	color	{R:255 G:255 B:255 A:255}	False
+System.Single	AngularRadius	360	False
+System.Single	OuterRadius	0.25	False
+System.Single	InnerRadius	0.025	False
+System.Single	InnerInensity	1.5	False
+System.Single	Attenuation	1	False
+System.Single	DirectionalIntensity	0.2	False
+System.Single	ShadowIntensity	0.5	False
+--SerializedBefore--	MyEngine.GameObject	6
+System.Boolean	Enabled	True	False
+SerializableProps	0
 End Of MyEngine.Light
+Test6
+GeneratedID	11
+SerializableFields	0
+SerializableProps	2
+System.Int32	Length	5	False
+End Of Test6
+System.Int32	GameComponentsCount	3	False
+Test 6
+GeneratedID	12
+SerializableFields	0
+SerializableProps	2
+System.Int32	Length	6	False
 End Of Test 6
-Start Of Test6_Inst
-GameComponentsCount:	3
-Layer:	0.1
-Parent:	Test 6
-Tag:	Test6
-Active:	True
-Name:	Test6_Inst
-Children:	1	Default	
+System.Boolean	ShouldBeDeleted	False	False
+System.Int32	UI_Layer	1	False
+MyEngine.GameObject
+GeneratedID	13
+SerializableFields	11
+System.Boolean	IsEditor	False	False
 MyEngine.Transform
-gameObject:	Test6_Inst
-Enabled:	True
-LastPosition:	0	0
-scale:	100	100
-position:	683	460.8
-rotation:	0
-localScale:	1	1
+GeneratedID	14
+SerializableFields	2
+--SerializedBefore--	MyEngine.GameObject	13
+System.Boolean	Enabled	True	False
+SerializableProps	7
+Microsoft.Xna.Framework.Vector2	LastPosition	{X:0 Y:0}	False
+Microsoft.Xna.Framework.Vector2	Position	{X:683 Y:460.8}	False
+System.Single	Rotation	0	False
+Microsoft.Xna.Framework.Vector2	Scale	{X:100 Y:100}	False
+Microsoft.Xna.Framework.Vector2	LocalPosition	{X:0 Y:0}	False
+System.Single	LocalRotation	0	False
+Microsoft.Xna.Framework.Vector2	LocalScale	{X:1 Y:1}	False
 End Of MyEngine.Transform
+System.Single	Layer	0.1	False
+--SerializedBefore--	MyEngine.GameObject	6
+--SerializedBefore--	MyEngine.Transform	14
 MyEngine.SpriteRenderer
-gameObject:	Test6_Inst
-Enabled:	True
+GeneratedID	15
+SerializableFields	5
+Microsoft.Xna.Framework.Graphics.SpriteEffects	SpriteEffects	None	False
+Microsoft.Xna.Framework.Color	Color	{R:0 G:255 B:255 A:255}	False
+Microsoft.Xna.Framework.Graphics.Effect	Effect		True
+--SerializedBefore--	MyEngine.GameObject	13
+System.Boolean	Enabled	True	False
+SerializableProps	1
 MyEngine.Sprite
-SourceRectangle:	0	0	1	1
-Origin:	0	0
-texture:	Content/Test6_Inst.png
+GeneratedID	16
+SerializableFields	3
+Microsoft.Xna.Framework.Rectangle	SourceRectangle	{X:0 Y:0 Width:1 Height:1}	False
+Microsoft.Xna.Framework.Vector2	Origin	{X:0 Y:0}	False
+--SerializedBefore--	MyEngine.Transform	14
+SerializableProps	1
+*	Microsoft.Xna.Framework.Graphics.Texture2D	Texture	CT1.png	True
 End Of MyEngine.Sprite
-SpriteEffects:	None
-Color:	255	255	255	255
-Effect:	null
 End Of MyEngine.SpriteRenderer
 MyEngine.Light
-gameObject:	Test6_Inst
-Enabled:	True
-CastShadows_Global:	True
-CastShadow:	False
-Type:	Point
-color:	255	255	255	255
-AngularRadius:	360
-OuterRadius:	0.25
-InnerRadius:	0.025
-InnerInensity:	1.5
-Attenuation:	1
-DirectionalIntensity:	0.2
-ShadowIntensity:	0.5
+GeneratedID	17
+SerializableFields	12
+System.Boolean	CastShadow	False	False
+MyEngine.LightTypes	Type	Point	False
+Microsoft.Xna.Framework.Color	color	{R:255 G:255 B:255 A:255}	False
+System.Single	AngularRadius	360	False
+System.Single	OuterRadius	0.25	False
+System.Single	InnerRadius	0.025	False
+System.Single	InnerInensity	1.5	False
+System.Single	Attenuation	1	False
+System.Single	DirectionalIntensity	0.2	False
+System.Single	ShadowIntensity	0.5	False
+--SerializedBefore--	MyEngine.GameObject	13
+System.Boolean	Enabled	True	False
+SerializableProps	0
 End Of MyEngine.Light
+--SerializedBefore--	System.String	11
+System.Int32	GameComponentsCount	3	False
+Test6_Inst
+GeneratedID	18
+SerializableFields	0
+SerializableProps	2
+System.Int32	Length	10	False
 End Of Test6_Inst
-Start Of Test6_Inst2
-GameComponentsCount:	2
-Layer:	1
-Parent:	null
-Tag:	Test2
-Active:	True
-Name:	Test6_Inst2
-Children:	0	
-MyEngine.Transform
-gameObject:	Test6_Inst2
-Enabled:	True
-LastPosition:	0	0
-scale:	1	1
-position:	0	0
-rotation:	0
-localScale:	1	1
-End Of MyEngine.Transform
-MyEngine.SpriteRenderer
-gameObject:	Test6_Inst2
-Enabled:	True
-MyEngine.Sprite
-SourceRectangle:	0	0	1280	720
-Origin:	0	0
-texture:	Temp
-End Of MyEngine.Sprite
-SpriteEffects:	None
-Color:	255	255	255	255
-Effect:	null
-End Of MyEngine.SpriteRenderer
-End Of Test6_Inst2
-Start Of Default
-GameComponentsCount:	2
-Layer:	1
-Parent:	Test6_Inst
-Tag:	Test2
-Active:	True
-Name:	Default
-Children:	0	
-MyEngine.Transform
-gameObject:	Default
-Enabled:	True
-LastPosition:	0	0
-scale:	1	1
-position:	0	0
-rotation:	0
-localScale:	1	1
-End Of MyEngine.Transform
-MyEngine.SpriteRenderer
-gameObject:	Default
-Enabled:	True
-MyEngine.Sprite
-SourceRectangle:	0	0	1280	720
-Origin:	0	0
-texture:	Temp
-End Of MyEngine.Sprite
-SpriteEffects:	None
-Color:	255	255	255	255
-Effect:	null
-End Of MyEngine.SpriteRenderer
-End Of Default
+System.Boolean	ShouldBeDeleted	False	False
+System.Int32	UI_Layer	1	False
+SerializableProps	1
+System.Boolean	Active	True	False
+End Of MyEngine.GameObject
+SerializableProps	1
+System.Boolean	Active	True	False
+End Of MyEngine.GameObject
+End Of Test 6
+--SerializedBefore--	MyEngine.GameObject	13
+End Of Test6_Inst
 End Of MyEngine.Scene

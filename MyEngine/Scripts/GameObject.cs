@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
-using System;
+using System.Reflection;
 
 namespace MyEngine
 {
@@ -361,27 +361,34 @@ namespace MyEngine
             return new GameObject();
         }
 
+        //public void Serialize(StreamWriter SW) //Parent should be assigned after finding all gameObjects
+        //{
+        //    SW.WriteLine("Start Of " + Name);
+
+        //    SW.Write("GameComponentsCount:\t" + GameComponentsCount.ToString() + "\n"); // Get It First
+        //    SW.Write("Layer:\t" + Layer.ToString() + "\n");
+        //    if(Parent != null)
+        //        SW.Write("Parent:\t" + Parent.Name + "\n");
+        //    else
+        //        SW.Write("Parent:\t" + "null\n");
+        //    SW.Write("Tag:\t" + Tag + "\n");
+        //    SW.Write("Active:\t" + Active.ToString() + "\n");
+        //    SW.Write("Name:\t" + Name + "\n");
+
+        //    string _Children = "Children:\t" + Children.Count.ToString() + "\t";
+        //    foreach (GameObject Child in Children)
+        //        _Children += Child.Name.ToString() + "\t";
+        //    SW.Write(_Children + "\n");
+
+        //    foreach (GameObjectComponent GOC in GameObjectComponents)
+        //        GOC.Serialize(SW);
+
+        //    SW.WriteLine("End Of " + Name);
+        //}
+
         public void Serialize(StreamWriter SW) //Parent should be assigned after finding all gameObjects
         {
-            SW.WriteLine("Start Of " + Name);
-
-            SW.Write("GameComponentsCount:\t" + GameComponentsCount.ToString() + "\n"); // Get It First
-            SW.Write("Layer:\t" + Layer.ToString() + "\n");
-            if(Parent != null)
-                SW.Write("Parent:\t" + Parent.Name + "\n");
-            else
-                SW.Write("Parent:\t" + "null\n");
-            SW.Write("Tag:\t" + Tag + "\n");
-            SW.Write("Active:\t" + Active.ToString() + "\n");
-            SW.Write("Name:\t" + Name + "\n");
-
-            string _Children = "Children:\t" + Children.Count.ToString() + "\t";
-            foreach (GameObject Child in Children)
-                _Children += Child.Name.ToString() + "\t";
-            SW.Write(_Children + "\n");
-
-            foreach (GameObjectComponent GOC in GameObjectComponents)
-                GOC.Serialize(SW);
+            Utility.Serialize(SW, this);
 
             SW.WriteLine("End Of " + Name);
         }

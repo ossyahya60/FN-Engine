@@ -157,28 +157,28 @@ namespace MyEngine
             }
         }
 
-        public Vector2 Left
+        public static Vector2 Left
         {
             get
             {
                 return new Vector2(-1, 0);
             }
         }
-        public Vector2 Right
+        public static Vector2 Right
         {
             get
             {
                 return new Vector2(1, 0);
             }
         }
-        public Vector2 Up
+        public static Vector2 Up
         {
             get
             {
                 return new Vector2(0, -1);
             }
         }
-        public Vector2 Down
+        public static Vector2 Down
         {
             get
             {

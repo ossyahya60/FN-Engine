@@ -40,19 +40,24 @@ namespace MyEngine
             }
         }
         public bool IsLooping = false;
+        public string AudioName;
 
         private SoundEffect SoundEffect;
         private SoundEffectInstance SoundEffectInstance;
         private float volume = 1;
         private float pitch = 0;
         private float pan = 0;
-        private string AudioName;
 
         public AudioSource(string AudioName)
         {
             this.AudioName = AudioName;
             SoundEffect = Setup.Content.Load<SoundEffect>(AudioName);
             SoundEffectInstance = SoundEffect.CreateInstance();
+        }
+
+        public AudioSource()
+        {
+            AudioName = "null";
         }
 
         public override void Start()

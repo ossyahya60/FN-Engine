@@ -227,6 +227,8 @@ namespace MyEngine
 
         public void Serialize()
         {
+            Utility.Texture_OIG = new System.Runtime.Serialization.ObjectIDGenerator();
+
             using (StreamWriter SW = new StreamWriter(Setup.Content.RootDirectory + "/" + Name + ".txt", false)) //This Path might be platform specific!
             {
                 List<GameObject> EditorGOs = GameObjects.FindAll(item => item.IsEditor == true);

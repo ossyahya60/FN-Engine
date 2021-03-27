@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
@@ -47,29 +45,6 @@ namespace MyEngine
             SW.Write("gameObject:\t" + gameObject.Name + "\n");
             SW.Write("Enabled:\t" + Enabled.ToString() + "\n");
         }
-
-        //public virtual void Serialize(StreamWriter SW)  //Make this the default one
-        //{
-        //    SW.WriteLine(ToString());
-
-        //    FieldInfo[] SerializableFields = GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
-
-        //    SW.WriteLine("SerializableFields\t" + SerializableFields.Length);
-        //    foreach (FieldInfo FI in SerializableFields)
-        //    {
-        //        if (FI.Name[0] == '<') //Setter or getter
-        //        {
-        //            string NAME = FI.Name;
-        //            NAME = NAME.Remove(0, 1);
-        //            NAME = NAME.Remove(NAME.Length - 16, 16);
-        //            SW.Write(FI.FieldType.FullName + "\t" + NAME + "\t" + FI.GetValue(this) + "\n");
-        //        }
-        //         else
-        //            SW.Write(FI.FieldType.FullName + "\t" + FI.Name + "\t" + FI.GetValue(this) + "\n");
-        //    }
-
-        //    SW.WriteLine("End Of " + ToString());
-        //}
 
         public virtual void Deserialize(StreamReader SR)
         {

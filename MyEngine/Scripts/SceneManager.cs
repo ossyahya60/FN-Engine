@@ -67,7 +67,8 @@ namespace MyEngine
 
         public static void LoadScene_Serialization(string Name) //Use this
         {
-            FN_Editor.InspectorWindow.Members.Clear();
+            if(FN_Editor.InspectorWindow.Members != null)
+                FN_Editor.InspectorWindow.Members.Clear();
 
             if (FirstTimeLoading)
             {
@@ -82,7 +83,8 @@ namespace MyEngine
 
         public static void LoadSceneNow_Serialization() //Not For High level user
         {
-            FN_Editor.InspectorWindow.Members.Clear();
+            if (FN_Editor.InspectorWindow.Members != null)
+                FN_Editor.InspectorWindow.Members.Clear();
 
             if (SceneToBeLoaded == null)
                 return;

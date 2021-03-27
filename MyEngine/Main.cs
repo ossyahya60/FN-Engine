@@ -2,9 +2,11 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace MyEngine
 {
@@ -96,6 +98,18 @@ namespace MyEngine
             // TODO: use this.Content to load your game content here
             spriteFont = Content.Load<SpriteFont>("Font");
 
+            //Hast set
+            //SceneManager.LoadScene_Serialization("MainScene");
+
+            //GameObject Test1 = new GameObject();
+            //GameObject Test2 = Test1;
+            //ObjectIDGenerator OIG = new ObjectIDGenerator();
+            //bool FirstTime = false;
+            //long ID1 = OIG.GetId(Test1, out FirstTime);
+            //long ID2 = OIG.GetId(Test2, out FirstTime);
+            //if (FirstTime.GetType().IsClass)
+            //    FirstTime = !FirstTime;
+
             //Light.CastShadows = true;
             GameObject Test = new GameObject();
             Test.Tag = "Test";
@@ -144,6 +158,7 @@ namespace MyEngine
 
             //Initialization here
             //Use matrices to make transformations!!!!
+            //Type FI = typeof(GameObject).GetMember("IsActive")[0];
 
             //GameObjectsTab.Transform.Scale = Vector2.One * 200;
 
@@ -200,7 +215,7 @@ namespace MyEngine
 
             Test6.GetComponent<SpriteRenderer>().Effect = Content.Load<Effect>("ShadowCasting");
 
-            //SceneManager.ActiveScene.SortGameObjectsWithLayer();
+            SceneManager.ActiveScene.SortGameObjectsWithLayer();
         }
 
         /// <summary>
