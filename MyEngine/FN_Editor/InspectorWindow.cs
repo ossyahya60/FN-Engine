@@ -9,8 +9,6 @@ namespace MyEngine.FN_Editor
 {
     class InspectorWindow: GameObjectComponent
     {
-        public static List<List<FieldInfo>> Members;
-
         private IntPtr intPointer;
         private IntPtr intPointerL;
         private IntPtr intPointerU32;
@@ -20,7 +18,6 @@ namespace MyEngine.FN_Editor
 
         public override void Start()
         {
-            Members = new List<List<FieldInfo>>();
             intPointer = Marshal.AllocHGlobal(sizeof(short));
             intPointerL = Marshal.AllocHGlobal(sizeof(long));
             intPointerU32 = Marshal.AllocHGlobal(sizeof(uint));

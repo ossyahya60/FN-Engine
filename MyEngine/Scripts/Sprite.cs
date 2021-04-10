@@ -33,6 +33,13 @@ namespace MyEngine
             texture = null;
         }
 
+        public Sprite()
+        {
+            Origin = Vector2.Zero;
+            SourceRectangle = new Rectangle();
+            texture = null;
+        }
+
         public void LoadTexture(string path)
         {
             Texture = Setup.Content.Load<Texture2D>(path);

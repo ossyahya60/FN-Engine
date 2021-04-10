@@ -386,37 +386,35 @@ namespace MyEngine
         //    SW.WriteLine("End Of " + Name);
         //}
 
-        public void Serialize(StreamWriter SW) //Parent should be assigned after finding all gameObjects
-        {
-            Utility.Serialize(SW, this);
+        //public void Serialize(StreamWriter SW) //Parent should be assigned after finding all gameObjects
+        //{
+        //    Utility.Serialize(SW, this);
+        //}
 
-            SW.WriteLine("End Of " + Name);
-        }
+        //public void Deserialize(StreamReader SR)
+        //{
+        //    SR.ReadLine();
 
-        public void Deserialize(StreamReader SR)
-        {
-            SR.ReadLine();
+        //    int _GameComponentsCount = int.Parse(SR.ReadLine().Split('\t')[1]);
+        //    Layer = float.Parse(SR.ReadLine().Split('\t')[1]);
+        //    Parent = new GameObject() { Name = SR.ReadLine().Split('\t')[1] };
+        //    Tag = SR.ReadLine().Split('\t')[1];
+        //    Active = bool.Parse(SR.ReadLine().Split('\t')[1]);
+        //    Name = SR.ReadLine().Split('\t')[1];
+        //    string[] children = SR.ReadLine().Split('\t');
+        //    for (int i = 0; i < int.Parse(children[1]); i++)
+        //        Children.Add(new GameObject() { Name = children[i + 2] });
 
-            int _GameComponentsCount = int.Parse(SR.ReadLine().Split('\t')[1]);
-            Layer = float.Parse(SR.ReadLine().Split('\t')[1]);
-            Parent = new GameObject() { Name = SR.ReadLine().Split('\t')[1] };
-            Tag = SR.ReadLine().Split('\t')[1];
-            Active = bool.Parse(SR.ReadLine().Split('\t')[1]);
-            Name = SR.ReadLine().Split('\t')[1];
-            string[] children = SR.ReadLine().Split('\t');
-            for (int i = 0; i < int.Parse(children[1]); i++)
-                Children.Add(new GameObject() { Name = children[i + 2] });
+        //    for (int i = 0; i < _GameComponentsCount; i++)
+        //    {
+        //        GameObjectComponent GOC = Utility.GetInstance(SR.ReadLine()) as GameObjectComponent;
+        //        GOC.gameObject = this;
+        //        GOC.Start();
+        //        GOC.Deserialize(SR);
+        //        AddComponent(GOC);
+        //    }
 
-            for (int i = 0; i < _GameComponentsCount; i++)
-            {
-                GameObjectComponent GOC = Utility.GetInstance(SR.ReadLine()) as GameObjectComponent;
-                GOC.gameObject = this;
-                GOC.Start();
-                GOC.Deserialize(SR);
-                AddComponent(GOC);
-            }
-
-            SR.ReadLine();
-        }
+        //    SR.ReadLine();
+        //}
     }
 }

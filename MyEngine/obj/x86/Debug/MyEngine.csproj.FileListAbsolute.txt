@@ -147,3 +147,16 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpDX.DXGI.xml
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpDX.Direct3D11.xml
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpDX.Direct2D1.xml
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpDX.XInput.xml
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MonoGame.Framework.Content.Pipeline.dll
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\CppNet.dll
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpFont.dll
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpDX.D3DCompiler.dll
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\AssimpNet.dll
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\FreeImageNET.dll
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\ATI.TextureConverter.dll
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Nvidia.TextureTools.dll
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\PVRTexLibNET.dll
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MonoGame.Framework.Content.Pipeline.xml
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpFont.xml
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpDX.D3DCompiler.xml
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\AssimpNet.xml

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Content.Pipeline.Builder;
 
 namespace MyEngine
 {
@@ -14,9 +15,11 @@ namespace MyEngine
         public static GameWindow GameWindow { get; private set; }
         public static Camera2D Camera { get; private set; }
         public static Game Game { get; private set; }
+        public static PipelineManager PM { get; private set; }
 
-    public static void Initialize(GraphicsDeviceManager GDM, ContentManager CM, SpriteBatch SB, ResolutionIndependentRenderer RIR, GameWindow GW, Camera2D camera, Game game)
+        public static void Initialize(GraphicsDeviceManager GDM, ContentManager CM, SpriteBatch SB, ResolutionIndependentRenderer RIR, GameWindow GW, Camera2D camera, Game game)
         {
+            PM = new PipelineManager(@"C:\MyEngine\MyEngine\MyEngine\Content", @"C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content", @"C:\MyEngine\MyEngine\MyEngine\Content\obj\Windows");
             graphics = GDM;
             Content = CM;
             GraphicsDevice = GDM.GraphicsDevice;

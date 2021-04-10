@@ -62,7 +62,8 @@ namespace MyEngine
 
         public override void Start()
         {
-            
+            if (AudioName != "null" && SoundEffect == null)
+                LoadSoundEffect(AudioName);
         }
 
         public void LoadSoundEffect(string Path)
@@ -124,17 +125,17 @@ namespace MyEngine
             SoundEffectInstance.Dispose();
         }
 
-        public override void Serialize(StreamWriter SW) //Load effect using audio name in deserialization
-        {
-            SW.WriteLine(ToString());
+        //public override void Serialize(StreamWriter SW) //Load effect using audio name in deserialization
+        //{
+        //    SW.WriteLine(ToString());
 
-            base.Serialize(SW);
-            SW.Write("volume:\t" + volume.ToString() + "\n");
-            SW.Write("pitch:\t" + pitch.ToString() + "\n");
-            SW.Write("pan:\t" + pan.ToString() + "\n");
-            SW.Write("AudioName:\t" + AudioName + "\n");
+        //    base.Serialize(SW);
+        //    SW.Write("volume:\t" + volume.ToString() + "\n");
+        //    SW.Write("pitch:\t" + pitch.ToString() + "\n");
+        //    SW.Write("pan:\t" + pan.ToString() + "\n");
+        //    SW.Write("AudioName:\t" + AudioName + "\n");
 
-            SW.WriteLine("End Of " + ToString());
-        }
+        //    SW.WriteLine("End Of " + ToString());
+        //}
     }
 }

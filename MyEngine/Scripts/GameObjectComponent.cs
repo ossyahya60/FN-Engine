@@ -40,12 +40,14 @@ namespace MyEngine
 
         }
 
+        //Not used now...
         public virtual void Serialize(StreamWriter SW)
         {
             SW.Write("gameObject:\t" + gameObject.Name + "\n");
             SW.Write("Enabled:\t" + Enabled.ToString() + "\n");
         }
 
+        //Not used now...
         public virtual void Deserialize(StreamReader SR)
         {
             SR.ReadLine();
