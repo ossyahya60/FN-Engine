@@ -8,18 +8,18 @@ namespace MyEngine
 {
     public class GameObject: IComparer<GameObject>
     {
-        public bool IsEditor = false;
+        public bool IsEditor { private set; get; }
 
-        public Transform Transform;
+        public GameObject Parent = null;
         public float Layer = 1;
-        public GameObject Parent = null; 
-        public List<GameObjectComponent> GameObjectComponents; //List of all  GO componets in a certain scene(scene is not yet implemented)
         public string Tag = null;
         public int GameComponentsCount = 0;
         public bool Active { set; private get; }
         public string Name = "Default";
         public bool ShouldBeDeleted = false;
         public int UI_Layer = 1;
+        public Transform Transform;
+        public List<GameObjectComponent> GameObjectComponents; //List of all  GO componets in a certain scene(scene is not yet implemented)
         public List<GameObject> Children;
 
         private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect", "CircleCollider" };
@@ -173,19 +173,42 @@ namespace MyEngine
             return null;
         }
 
-        public void AddComponent<T>(T component) where T : GameObjectComponent  //Add a component to a gameobject
+        public bool AddComponent<T>(T component) where T : GameObjectComponent  //Add a component to a gameobject
         {
             bool CanBeAdded = false;
             foreach (string s in CanBeAddedMultipleTimes)
                 if (s == component.GetType().ToString())
                     CanBeAdded = true;
 
-            if (!GameObjectComponents.Contains(component) || CanBeAdded)
+            if (GameObjectComponents.Find(Item => Item.GetType() == component.GetType()) == null || CanBeAdded)
             {
                 GameObjectComponents.Insert(GameComponentsCount, component);
                 GameObjectComponents[GameComponentsCount].gameObject = this;
                 GameComponentsCount++;
+
+                return true;
             }
+
+            return false;
+        }
+
+        public bool AddComponent_Generic(GameObjectComponent component)  //Add a component to a gameobject
+        {
+            bool CanBeAdded = false;
+            foreach (string s in CanBeAddedMultipleTimes)
+                if (s == component.GetType().ToString())
+                    CanBeAdded = true;
+
+            if (GameObjectComponents.Find(Item => Item.GetType() == component.GetType()) == null || CanBeAdded)
+            {
+                GameObjectComponents.Insert(GameComponentsCount, component);
+                GameObjectComponents[GameComponentsCount].gameObject = this;
+                GameComponentsCount++;
+
+                return true;
+            }
+
+            return false;
         }
 
         public void RemoveComponent<T>(T component) where T : GameObjectComponent  //Remove a component from a gameobject

@@ -3,11 +3,16 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Numerics;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
 
 namespace MyEngine.FN_Editor
 {
     class InspectorWindow: GameObjectComponent
     {
+        public static List<Type> ComponentsTypes = new List<Type>();
+
         private IntPtr intPointer;
         private IntPtr intPointerL;
         private IntPtr intPointerU32;
@@ -16,6 +21,16 @@ namespace MyEngine.FN_Editor
         private PropertyInfo ActivePI = null;
         private GameObjectComponent ActiveGOC = null;
         private bool Subscribed = false;
+        private int ChosenComponent = -1;
+
+        static InspectorWindow()
+        {
+            
+            var q = from t in Assembly.GetExecutingAssembly().GetTypes()
+                    where t.IsClass && t.Namespace == Assembly.GetExecutingAssembly().GetName().Name && t.BaseType == typeof(GameObjectComponent)
+                    select t;
+            q.ToList().ForEach(item => ComponentsTypes.Add(item));
+        }
 
         public override void Start()
         {
@@ -580,6 +595,31 @@ namespace MyEngine.FN_Editor
                         }
                     }
                 }
+
+                ImGui.NewLine();
+                ImGui.Separator();
+                ImGui.NewLine();
+
+                if (ImGui.Button("Add Component", new Vector2(ImGui.GetWindowSize().X, 20)) && ChosenComponent != -1)
+                {
+                    var GOC = Utility.GetInstance(ComponentsTypes[ChosenComponent]) as GameObjectComponent;
+                    bool AddedSuccessfully = Selected_GO.AddComponent_Generic(GOC);
+
+                    if (AddedSuccessfully)
+                        GOC.Start();
+                    else
+                    {
+                        GOC.Destroy();
+                        GOC = null;
+                    }
+                }
+
+                string[] Names = new string[ComponentsTypes.Count];
+                for (int i = 0; i < Names.Length; i++)
+                    Names[i] = ComponentsTypes[i].Name;
+
+                ImGui.Combo("Components", ref ChosenComponent, Names, Names.Length);
+                ImGui.PopID();
             }
 
             ImGui.End();

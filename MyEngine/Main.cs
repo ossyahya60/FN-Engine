@@ -112,7 +112,7 @@ namespace MyEngine
             Test6.AddComponent<Transform>(new Transform());
             Test6.AddComponent<SpriteRenderer>(new SpriteRenderer());
             Test6.AddComponent<Light>(new Light());
-            Test6.AddComponent<TrailRenderer>(new TrailRenderer());
+            //Test6.AddComponent<TrailRenderer>(new TrailRenderer());
             //Test6.AddComponent<ShadowCaster>(new ShadowCaster());
 
             GameObject Test3 = new GameObject();
@@ -240,23 +240,26 @@ namespace MyEngine
             if (Input.GetKey(Keys.W))
                 SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.S))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.A))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.D))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test3").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             if (Input.GetKeyUp(Keys.O))
                 SceneManager.ActiveScene.Serialize();
 
+            if (Input.GetKeyUp(Keys.R))
+                SceneManager.LoadScene_Serialization("MainScene");
+
             if (Input.GetKey(Keys.Up))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test5").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithName("Test6_Inst").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.Down))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test5").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithName("Test6_Inst").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.Left))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test5").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithName("Test6_Inst").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.Right))
-                SceneManager.ActiveScene.FindGameObjectWithTag("Test5").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
+                SceneManager.ActiveScene.FindGameObjectWithName("Test6_Inst").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             SceneManager.Update(gameTime);
 

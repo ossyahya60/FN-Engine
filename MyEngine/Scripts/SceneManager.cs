@@ -138,7 +138,7 @@ namespace MyEngine
 
                 ActiveScene.ShowUI(Setup.spriteBatch);
 
-                LoadSceneNow();
+                LoadSceneNow_Serialization();
             }
         }
     }

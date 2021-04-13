@@ -29,6 +29,11 @@ namespace MyEngine.FN_Editor
                 if (!GO.IsEditor && GO.Parent == null && !GO.ShouldBeDeleted)
                     TreeRecursive(GO, true);
 
+            //Deleting a GameObject
+            if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Delete)) && ImGui.IsWindowFocused())
+                if (WhoIsSelected != null)
+                    WhoIsSelected.ShouldBeDeleted = true;
+
             ImGui.End();
         }
 

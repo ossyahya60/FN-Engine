@@ -118,6 +118,11 @@ namespace MyEngine
             return Activator.CreateInstance(T);
         }
 
+        public static object GetInstance(Type ObjectType)
+        {
+            return Activator.CreateInstance(ObjectType);
+        }
+
         public static void Serialize(StreamWriter SW, object OBJ)  //Make this the default one
         {
             bool FirstTime = false;

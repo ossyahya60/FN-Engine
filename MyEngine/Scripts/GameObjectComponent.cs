@@ -12,7 +12,7 @@ namespace MyEngine
 
         public GameObjectComponent()
         {
-
+            
         }
 
         public virtual void Start() //Called once per component
