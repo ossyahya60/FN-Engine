@@ -26,7 +26,7 @@ namespace MyEngine.FN_Editor
             ImGui.Indent();
 
             foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
-                if (!GO.IsEditor && GO.Parent == null)
+                if (!GO.IsEditor && GO.Parent == null && !GO.ShouldBeDeleted)
                     TreeRecursive(GO, true);
 
             ImGui.End();
@@ -34,6 +34,9 @@ namespace MyEngine.FN_Editor
 
         private void TreeRecursive(GameObject GO, bool Root)
         {
+            if (GO.ShouldBeDeleted)
+                return;
+
             int ChildrenCount = GO.Children.Count;
 
             if(ChildrenCount == 0)
