@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Numerics;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
 
 namespace MyEngine.FN_Editor
@@ -22,10 +21,15 @@ namespace MyEngine.FN_Editor
         private GameObjectComponent ActiveGOC = null;
         private bool Subscribed = false;
         private int ChosenComponent = -1;
+        private List<bool> ComponentsNotRemoved = new List<bool>();
 
-        static InspectorWindow()
+        static InspectorWindow() //This should be called again on 'Hot reloading'
         {
-            
+            GetGOCs();
+        }
+
+        private static void GetGOCs()
+        {
             var q = from t in Assembly.GetExecutingAssembly().GetTypes()
                     where t.IsClass && t.Namespace == Assembly.GetExecutingAssembly().GetName().Name && t.BaseType == typeof(GameObjectComponent)
                     select t;
@@ -313,9 +317,16 @@ namespace MyEngine.FN_Editor
                 ImGui.Unindent((ImGui.GetWindowSize().X - ImGui.CalcTextSize("Components" + "---- ").X) * 0.5f);
                 ImGui.Text("\n");
 
+                GameObjectComponent GOC_Removed = null;
+                int T_Counter = 0;
+
+                while (ComponentsNotRemoved.Count < Selected_GO.GameObjectComponents.Count)
+                    ComponentsNotRemoved.Add(true);
+
+                bool[] ComponentsNotRemoved_Arr = ComponentsNotRemoved.ToArray();
                 foreach (GameObjectComponent GOC in Selected_GO.GameObjectComponents)
                 {
-                    if (ImGui.CollapsingHeader(GOC.ToString().Remove(0, 9), ImGuiTreeNodeFlags.DefaultOpen))
+                    if (ImGui.CollapsingHeader(GOC.GetType().Name, ref ComponentsNotRemoved_Arr[T_Counter], ImGuiTreeNodeFlags.DefaultOpen))
                     {
                         FieldInfo[] FIS = GOC.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
                         foreach (FieldInfo FI in FIS)
@@ -593,12 +604,22 @@ namespace MyEngine.FN_Editor
                                     //    break;
                             }
                         }
+
+
                     }
+
+                    if (!ComponentsNotRemoved_Arr[T_Counter])
+                    {
+                        GOC_Removed = GOC;
+                        ComponentsNotRemoved.RemoveAt(T_Counter++);
+                    }
+
+                    ImGui.NewLine();
+                    ImGui.Separator();
+                    ImGui.NewLine();
                 }
 
-                ImGui.NewLine();
-                ImGui.Separator();
-                ImGui.NewLine();
+                Selected_GO.RemoveComponent(GOC_Removed);
 
                 if (ImGui.Button("Add Component", new Vector2(ImGui.GetWindowSize().X, 20)) && ChosenComponent != -1)
                 {

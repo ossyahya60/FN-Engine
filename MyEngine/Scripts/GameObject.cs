@@ -211,13 +211,20 @@ namespace MyEngine
             return false;
         }
 
-        public void RemoveComponent<T>(T component) where T : GameObjectComponent  //Remove a component from a gameobject
+        public bool RemoveComponent<T>(T component) where T : GameObjectComponent  //Remove a component from a gameobject
         {
+            if (component == null)
+                return false;
+
             if (GameObjectComponents.Contains(component))
             {
                 GameObjectComponents.Remove(component);
+                component.Destroy();
                 GameComponentsCount--;
+                return true;
             }
+
+            return false;
         }
 
         public GameObjectComponent[] GetAllComponents()

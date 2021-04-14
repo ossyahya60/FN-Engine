@@ -34,7 +34,40 @@ namespace MyEngine.FN_Editor
                 if (WhoIsSelected != null)
                     WhoIsSelected.ShouldBeDeleted = true;
 
+            //Some Scene window functionalities
+            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered())
+            {
+                ImGui.OpenPopup("Functionalities");
+            }
+
+            if(Input.GetKey(Microsoft.Xna.Framework.Input.Keys.LeftControl) && Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.C) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered())
+            {
+                if (WhoIsSelected != null)
+                    ImGui.SetClipboardText(WhoIsSelected.Name);
+            }
+
+            if(ImGui.BeginPopup("Functionalities"))
+            {
+                if(ImGui.Selectable("New GameObject"))
+                {
+                    GameObject GO = new GameObject();
+                    GO.Name = "Unique Name";
+                    GO.AddComponent(new Transform());
+
+                    GO.Start();
+                    SceneManager.ActiveScene.AddGameObject(GO);
+
+                    //Should sort game objects?
+                }
+                //ImGui.Separator();
+                //ImGui.Selectable("Noice");
+
+                ImGui.EndPopup();
+            }
+
             ImGui.End();
+
+            ImGui.ShowDemoWindow();
         }
 
         private void TreeRecursive(GameObject GO, bool Root)
