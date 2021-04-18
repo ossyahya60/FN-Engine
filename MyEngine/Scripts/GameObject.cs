@@ -10,19 +10,33 @@ namespace MyEngine
     {
         public bool IsEditor { private set; get; }
 
-        public GameObject Parent = null;
+        public GameObject PrevParent { private set; get; }
+        public GameObject Parent
+        {
+            set
+            {
+                PrevParent = parent;
+                parent = value;
+            }
+            get
+            {
+                return parent;
+            }
+        }
         public float Layer = 1;
         public string Tag = null;
         public int GameComponentsCount = 0;
         public bool Active { set; private get; }
         public string Name = "Default";
         public bool ShouldBeDeleted = false;
+        public bool ShouldBeRemoved = false;
         public int UI_Layer = 1;
         public Transform Transform;
         public List<GameObjectComponent> GameObjectComponents; //List of all  GO componets in a certain scene(scene is not yet implemented)
         public List<GameObject> Children;
 
         private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect", "CircleCollider" };
+        private GameObject parent = null;
 
         public GameObject()
         {
@@ -303,7 +317,7 @@ namespace MyEngine
         //}
 
         //Update: Implemented using recursion, this means, you don't have to add every child to the simulation, just add the parent and you are good to go
-        public static GameObject Instantiate(GameObject GO)  //=> Implement it using "Recursion"
+        public static GameObject Instantiate(GameObject GO)  //=> Implement it using "Recursion" //This function needs a rework
         {
             GameObject Clone = new GameObject(); //Add Children pls
             if (GO.Parent != null)
@@ -373,8 +387,16 @@ namespace MyEngine
 
         public void Destroy()
         {
+            foreach (GameObject Child in Children)
+                Child.ShouldBeDeleted = true;
+
             foreach (GameObjectComponent GOC in GameObjectComponents)
                 GOC.Destroy();
+
+            if (Parent != null)
+                Parent.RemoveChild(this);
+
+            Children.Clear();
         }
 
         public int Compare(GameObject x, GameObject y)

@@ -61,6 +61,18 @@ namespace MyEngine
             }
         }
 
+        public void AddGameObject_Recursive(GameObject GO) // Adds the GO along with its children and so on
+        {
+            if (!GameObjects.Contains(GO))
+            {
+                GameObjects.Insert(GameObjectCount, GO);
+                GameObjectCount++;
+
+                foreach (GameObject Child in GO.Children)
+                    AddGameObject_Recursive(Child);
+            }
+        }
+
         /* //Didn't work as Gameobjects have to be in the simulation in order to be find by "GetChildrenMethod" :(
         public void AddGameObject(GameObject GO) //=> Implement it using "Recursion"
         {
@@ -87,15 +99,20 @@ namespace MyEngine
         }
         */
 
-        public void RemoveGameObject(GameObject GO) //=> Implement it using "Recursion"
+        public void RemoveGameObject(GameObject GO, bool DestroyToo = true, bool Root = true) //=> Implement it using "Recursion"
         {
             if (GO == null)
                 return;
 
-            foreach (GameObject Child in GO.Children)
-                RemoveGameObject(Child);
+            for (int i = 0; i < GO.Children.Count; i++)
+                RemoveGameObject(GO.Children[i], DestroyToo, false);
 
-            GO.Destroy();
+            if (GO.Parent != null && Root)
+                GO.Parent.RemoveChild(GO);
+
+            if (DestroyToo)
+                GO.Destroy();
+
             GameObjects.Remove(GO);
             GameObjectCount--;
         }
@@ -132,10 +149,11 @@ namespace MyEngine
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].Draw(spriteBatch);
 
-            foreach (GameObject GO in GameObjects.FindAll(item => item.ShouldBeDeleted == true))
+            foreach (GameObject GO in GameObjects.FindAll(item => item.ShouldBeDeleted | item.ShouldBeRemoved))
             {
-                GO.Destroy();
-                RemoveGameObject(GO);
+                if(GO.ShouldBeDeleted)
+                    GO.Destroy();
+                RemoveGameObject(GO, GO.ShouldBeDeleted);
             }
         }
 

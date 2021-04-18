@@ -7,7 +7,7 @@
 #define PS_SHADERMODEL ps_5_0
 #endif
 
-static const int MAX_LIGHTS = 8;
+static const int MAX_LIGHTS = 20;
 static const int MAX_Shadows = 50;
 
 int LightCount;
@@ -52,11 +52,11 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     
     bool Dirty = false;
     float3 SumColors[MAX_LIGHTS];
-    [unroll(9)]
+    [unroll(MAX_LIGHTS)]
     for (int k = 0; k < LightCount; k++)
         SumColors[k] = float3(0, 0, 0);
     
-    [unroll(9)]
+    [unroll(MAX_LIGHTS)]
     for (int i = 0; i < LightCount; i++)
     {
         float2 Direction = float2((input.TextureCoordinates.x - 0.5 - X_Bias[i]), input.TextureCoordinates.y - 0.5 - Y_Bias[i]);
@@ -103,7 +103,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float3 BaseColor = color.rgb;
     
     color.rgb = BaseColor * DirectionalIntensity;
-    [unroll(9)]
+    [unroll(MAX_LIGHTS)]
     for (int j = 0; j < LightCount; j++)
         color.rgb += SumColors[j];
         

@@ -46,6 +46,7 @@ namespace MyEngine
         {
             // TODO: Add your initialization logic here
             graphics.GraphicsProfile = GraphicsProfile.HiDef;
+            graphics.SynchronizeWithVerticalRetrace = true;
             graphics.PreferMultiSampling = true;
             GraphicsDevice.PresentationParameters.MultiSampleCount = 8;
             graphics.ApplyChanges();
@@ -59,9 +60,11 @@ namespace MyEngine
             spriteBatch = new SpriteBatch(GraphicsDevice);
             graphics.PreferredBackBufferWidth = 1366;
             graphics.PreferredBackBufferHeight = 768;
-            RIR.VirtualWidth = 1366;
-            RIR.VirtualHeight = 768;
+            //graphics.IsFullScreen = true;
             graphics.ApplyChanges();
+
+            RIR.VirtualWidth = graphics.PreferredBackBufferWidth;
+            RIR.VirtualHeight = graphics.PreferredBackBufferHeight;
             /////////Camera And Resolution Independent Renderer/////// -> Mandatory
             Camera = new Camera2D();
             Camera.Zoom = 1f;
@@ -128,13 +131,15 @@ namespace MyEngine
 
             GameObject GameObjectsTab = new GameObject(true);
             GameObjectsTab.Name = "GameObjectsTab";
-            GameObjectsTab.AddComponent<Transform>(new Transform());
-            GameObjectsTab.AddComponent<FN_Editor.GameObjects_Tab>(new FN_Editor.GameObjects_Tab());
+            GameObjectsTab.AddComponent(new FN_Editor.GameObjects_Tab());
 
             GameObject InspectorWindow = new GameObject(true);
             GameObjectsTab.Name = "InspectorWindow";
-            GameObjectsTab.AddComponent<Transform>(new Transform());
-            GameObjectsTab.AddComponent<FN_Editor.InspectorWindow>(new FN_Editor.InspectorWindow());
+            GameObjectsTab.AddComponent(new FN_Editor.InspectorWindow());
+
+            GameObject ContentManager = new GameObject(true);
+            GameObjectsTab.Name = "ContentManager";
+            GameObjectsTab.AddComponent(new FN_Editor.ContentWindow());
 
             //SceneManager.ActiveScene.AddGameObject(Test);
             SceneManager.ActiveScene.AddGameObject(Test2);
@@ -142,6 +147,7 @@ namespace MyEngine
             SceneManager.ActiveScene.AddGameObject(Test6);
             SceneManager.ActiveScene.AddGameObject(GameObjectsTab);
             SceneManager.ActiveScene.AddGameObject(InspectorWindow);
+            SceneManager.ActiveScene.AddGameObject(ContentManager);
 
             SceneManager.ActiveScene.Start();
 
@@ -227,16 +233,13 @@ namespace MyEngine
                 Exit();
 
             ///////////////////////////////////////
-            if (Keyboard.GetState().IsKeyDown(Keys.Z))
+            if (Input.GetKey(Keys.Z, KeyboardFlags.SHIFT))
                 Camera.Zoom += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            else if (Keyboard.GetState().IsKeyDown(Keys.X))
+            else if (Input.GetKey(Keys.X, KeyboardFlags.SHIFT))
                 Camera.Zoom -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             //passing a property as a refrence using delegates
             //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(value => Arrow.Transform.Rotation = value);
-            if (Input.GetKeyUp(Keys.R))
-                SceneManager.LoadScene(new Scene("MainScene", 0));
-
             if (Input.GetKey(Keys.W))
                 SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
             if (Input.GetKey(Keys.S))
@@ -246,10 +249,10 @@ namespace MyEngine
             if (Input.GetKey(Keys.D))
                 SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
-            if (Input.GetKeyUp(Keys.O))
+            if (Input.GetKeyUp(Keys.O, KeyboardFlags.CTRL))
                 SceneManager.ActiveScene.Serialize();
 
-            if (Input.GetKeyUp(Keys.R))
+            if (Input.GetKeyUp(Keys.R, KeyboardFlags.CTRL))
                 SceneManager.LoadScene_Serialization("MainScene");
 
             if (Input.GetKey(Keys.Up))

@@ -13,7 +13,7 @@ namespace MyEngine
         public static bool CastShadows_Global = true;
 
         private static bool ShaderLoaded = false;
-        private static int MAX_LIGHT_COUNT = 8;
+        private static int MAX_LIGHT_COUNT = 20;
         private static List<Light> LIGHTS;
         private static RenderTarget2D RenderTarget2D;
         private static Effect LightEffect;

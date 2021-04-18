@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/CT11.png</SourceFile>
-  <SourceTime>2021-04-13T12:58:43.2602043+02:00</SourceTime>
+  <SourceTime>2021-04-15T21:08:06.7443993+02:00</SourceTime>
   <DestFile>C:/MyEngine/MyEngine/MyEngine/bin/Windows/x86/Debug/Content/CT11.xnb</DestFile>
-  <DestTime>2021-04-13T12:58:43.8393078+02:00</DestTime>
+  <DestTime>2021-04-15T21:08:12.1448443+02:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

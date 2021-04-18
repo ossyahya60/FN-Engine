@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 namespace MyEngine
 {
     public enum MouseButtons { LeftClick, RightClick, MouseWheelClick}
+    public enum KeyboardFlags { SOLO, CTRL, SHIFT, ALT, ANY}
 
     public static class Input //Supports Mouse and Keyboard
     {
@@ -19,9 +20,21 @@ namespace MyEngine
         private static MouseState LastMouseState, CurrentMouseState;
         private static TouchCollection LastFrameTouch, CurrentFrameTouch;
 
-        public static bool GetKey(Keys Key)
+        public static bool GetKey(Keys Key, KeyboardFlags keyboardFlags = KeyboardFlags.ANY)
         {
-            return Keyboard.GetState().IsKeyDown(Key);
+            switch(keyboardFlags)
+            {
+                case KeyboardFlags.ANY:
+                    return Keyboard.GetState().IsKeyDown(Key);
+                case KeyboardFlags.SOLO:
+                    return Keyboard.GetState().IsKeyDown(Key) && !Keyboard.GetState().IsKeyDown(Keys.LeftAlt) && !Keyboard.GetState().IsKeyDown(Keys.LeftShift) && !Keyboard.GetState().IsKeyDown(Keys.LeftControl);
+                case KeyboardFlags.SHIFT:
+                    return Keyboard.GetState().IsKeyDown(Key) && Keyboard.GetState().IsKeyDown(Keys.LeftShift);
+                case KeyboardFlags.ALT:
+                    return Keyboard.GetState().IsKeyDown(Key) && Keyboard.GetState().IsKeyDown(Keys.LeftAlt);
+                default:
+                    return Keyboard.GetState().IsKeyDown(Key) && Keyboard.GetState().IsKeyDown(Keys.LeftControl);
+            }
         }
 
         public static void GetState() //Has to be called in the start of every update
@@ -36,20 +49,40 @@ namespace MyEngine
             CurrentFrameTouch = TouchPanel.GetState();
         }
 
-        public static bool GetKeyDown(Keys Key)
+        public static bool GetKeyDown(Keys Key, KeyboardFlags keyboardFlags = KeyboardFlags.ANY)
         {
-            if (CurrentKeyState.IsKeyDown(Key) && !LastKeyState.IsKeyDown(Key))
-                return true;
-
-            return false;
+            bool BaseCond = CurrentKeyState.IsKeyDown(Key) && !LastKeyState.IsKeyDown(Key);
+            switch (keyboardFlags)
+            {
+                case KeyboardFlags.ANY:
+                    return BaseCond;
+                case KeyboardFlags.SOLO:
+                    return BaseCond && !Keyboard.GetState().IsKeyDown(Keys.LeftAlt) && !Keyboard.GetState().IsKeyDown(Keys.LeftShift) && !Keyboard.GetState().IsKeyDown(Keys.LeftControl);
+                case KeyboardFlags.SHIFT:
+                    return BaseCond && Keyboard.GetState().IsKeyDown(Keys.LeftShift);
+                case KeyboardFlags.ALT:
+                    return BaseCond && Keyboard.GetState().IsKeyDown(Keys.LeftAlt);
+                default:
+                    return BaseCond && Keyboard.GetState().IsKeyDown(Keys.LeftControl);
+            }
         }
 
-        public static bool GetKeyUp(Keys Key)
+        public static bool GetKeyUp(Keys Key, KeyboardFlags keyboardFlags = KeyboardFlags.ANY)
         {
-            if (CurrentKeyState.IsKeyUp(Key) && LastKeyState.IsKeyDown(Key))
-                return true;
-
-            return false;
+            bool BaseCond = CurrentKeyState.IsKeyUp(Key) && LastKeyState.IsKeyDown(Key);
+            switch (keyboardFlags)
+            {
+                case KeyboardFlags.ANY:
+                    return BaseCond;
+                case KeyboardFlags.SOLO:
+                    return BaseCond && !Keyboard.GetState().IsKeyDown(Keys.LeftAlt) && !Keyboard.GetState().IsKeyDown(Keys.LeftShift) && !Keyboard.GetState().IsKeyDown(Keys.LeftControl);
+                case KeyboardFlags.SHIFT:
+                    return BaseCond && Keyboard.GetState().IsKeyDown(Keys.LeftShift);
+                case KeyboardFlags.ALT:
+                    return BaseCond && Keyboard.GetState().IsKeyDown(Keys.LeftAlt);
+                default:
+                    return BaseCond && Keyboard.GetState().IsKeyDown(Keys.LeftControl);
+            }
         }
 
         public static bool GetMouseClick(MouseButtons mouseButton)

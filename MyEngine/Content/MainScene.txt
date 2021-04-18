@@ -88,11 +88,11 @@ MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	6
 System.Boolean	Enabled	True	False
 SerializableProps	7
-Microsoft.Xna.Framework.Vector2	LastPosition	{X:625 Y:460.8}	False
-Microsoft.Xna.Framework.Vector2	Position	{X:623 Y:460.8}	False
+Microsoft.Xna.Framework.Vector2	LastPosition	{X:0 Y:0}	False
+Microsoft.Xna.Framework.Vector2	Position	{X:683 Y:460.8}	False
 System.Single	Rotation	0	False
 Microsoft.Xna.Framework.Vector2	Scale	{X:100 Y:100}	False
-Microsoft.Xna.Framework.Vector2	LocalPosition	{X:623 Y:460.8}	False
+Microsoft.Xna.Framework.Vector2	LocalPosition	{X:683 Y:460.8}	False
 System.Single	LocalRotation	0	False
 Microsoft.Xna.Framework.Vector2	LocalScale	{X:100 Y:100}	False
 End Of MyEngine.Transform
@@ -160,11 +160,11 @@ MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	13
 System.Boolean	Enabled	True	False
 SerializableProps	7
-Microsoft.Xna.Framework.Vector2	LastPosition	{X:907 Y:272.8}	False
-Microsoft.Xna.Framework.Vector2	Position	{X:907 Y:270.8}	False
+Microsoft.Xna.Framework.Vector2	LastPosition	{X:0 Y:0}	False
+Microsoft.Xna.Framework.Vector2	Position	{X:683 Y:460.8}	False
 System.Single	Rotation	0	False
 Microsoft.Xna.Framework.Vector2	Scale	{X:100 Y:100}	False
-Microsoft.Xna.Framework.Vector2	LocalPosition	{X:284 Y:-190}	False
+Microsoft.Xna.Framework.Vector2	LocalPosition	{X:0 Y:0}	False
 System.Single	LocalRotation	0	False
 Microsoft.Xna.Framework.Vector2	LocalScale	{X:1 Y:1}	False
 End Of MyEngine.Transform
