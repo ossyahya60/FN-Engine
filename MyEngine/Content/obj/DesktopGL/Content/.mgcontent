@@ -11,6 +11,8 @@
     <File>C:/MyEngine/MyEngine/MyEngine/Content/FireWorks_M.ogg</File>
     <File>C:/MyEngine/MyEngine/MyEngine/Content/Font.spritefont</File>
     <File>C:/MyEngine/MyEngine/MyEngine/Content/Hornet.png</File>
+    <File>C:/MyEngine/MyEngine/MyEngine/Content/Icons/FolderIcon.png</File>
+    <File>C:/MyEngine/MyEngine/MyEngine/Content/Icons/MusicIcon.png</File>
     <File>C:/MyEngine/MyEngine/MyEngine/Content/Jump.WAV</File>
     <File>C:/MyEngine/MyEngine/MyEngine/Content/LightTest.fx</File>
     <File>C:/MyEngine/MyEngine/MyEngine/Content/ShadowCasting.fx</File>
@@ -20,6 +22,8 @@
     <File>C:/MyEngine/MyEngine/MyEngine/Content/TileSet1.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

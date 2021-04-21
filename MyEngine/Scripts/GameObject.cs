@@ -31,9 +31,9 @@ namespace MyEngine
         public bool ShouldBeDeleted = false;
         public bool ShouldBeRemoved = false;
         public int UI_Layer = 1;
+        public List<GameObject> Children;
         public Transform Transform;
         public List<GameObjectComponent> GameObjectComponents; //List of all  GO componets in a certain scene(scene is not yet implemented)
-        public List<GameObject> Children;
 
         private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect", "CircleCollider" };
         private GameObject parent = null;

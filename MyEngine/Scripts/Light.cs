@@ -52,6 +52,11 @@ namespace MyEngine
 
         private float YOVERX;
 
+        public static void Reset()
+        {
+            ShaderLoaded = false;
+        }
+
         public override void Start()
         {
             if (!ShaderLoaded || LightEffect.IsDisposed)

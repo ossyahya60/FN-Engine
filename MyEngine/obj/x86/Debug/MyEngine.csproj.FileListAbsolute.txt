@@ -160,3 +160,5 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MonoGame.Framework.Content.P
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpFont.xml
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpDX.D3DCompiler.xml
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\AssimpNet.xml
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\Icons\MusicIcon.xnb
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\Icons\FolderIcon.xnb

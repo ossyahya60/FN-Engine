@@ -160,3 +160,5 @@ C:\MyEngine\MyEngine\MyEngine\obj\x64\Debug\MyEngine.csproj.CoreCompileInputs.ca
 C:\MyEngine\MyEngine\MyEngine\obj\x64\Debug\MyEngine.csproj.CopyComplete
 C:\MyEngine\MyEngine\MyEngine\obj\x64\Debug\MyEngine.exe
 C:\MyEngine\MyEngine\MyEngine\obj\x64\Debug\MyEngine.pdb
+C:\MyEngine\MyEngine\MyEngine\bin\x64\Debug\Content\Icons\FolderIcon.xnb
+C:\MyEngine\MyEngine\MyEngine\bin\x64\Debug\Content\Icons\MusicIcon.xnb

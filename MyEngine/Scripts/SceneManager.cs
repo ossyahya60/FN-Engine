@@ -86,8 +86,11 @@ namespace MyEngine
             UnloadScene();
             ActiveScene = SceneToBeLoaded;
 
+
             SceneToBeLoaded.Start();
             SceneToBeLoaded.Deserialize(SceneToBeLoaded.Name);
+            Light.Reset();
+            SceneToBeLoaded.Start();
 
             SceneToBeLoaded = null;
         }
@@ -100,8 +103,8 @@ namespace MyEngine
 
         public static void Update(GameTime gameTime)
         {
-            if (!Setup.Game.IsActive) //Pause Game when minimized
-                return;
+            //if (!Setup.Game.IsActive) //Pause Game when minimized
+            //    return;
 
             Input.GetState(); //This has to be called at the start of update method!!
 
@@ -119,8 +122,8 @@ namespace MyEngine
         {
             if (ActiveScene != null)
             {
-                if (!Setup.Game.IsActive) //Pause Game when minimized
-                    return;
+                //if (!Setup.Game.IsActive) //Pause Game when minimized
+                //    return;
 
                 ActiveScene.DrawUI(gameTime); //Draw UI
 

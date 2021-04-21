@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Reflection;
+using System.Linq;
 
 namespace MyEngine
 {
@@ -128,6 +129,7 @@ namespace MyEngine
             Test2.Tag = "Test2";
             Test2.AddComponent<Transform>(new Transform());
             Test2.AddComponent<SpriteRenderer>(new SpriteRenderer());
+            Test2.AddComponent<AudioSource>(new AudioSource("FireWorks_M"));
 
             GameObject GameObjectsTab = new GameObject(true);
             GameObjectsTab.Name = "GameObjectsTab";
@@ -156,7 +158,6 @@ namespace MyEngine
             //Type FI = typeof(GameObject).GetMember("IsActive")[0];
 
             //GameObjectsTab.Transform.Scale = Vector2.One * 200;
-
             Test6.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Yellow);
             Test6.Transform.Scale = 100 * Vector2.One;
             Test6.Layer = 0.1f;
@@ -250,7 +251,7 @@ namespace MyEngine
                 SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             if (Input.GetKeyUp(Keys.O, KeyboardFlags.CTRL))
-                SceneManager.ActiveScene.Serialize();
+                SceneManager.ActiveScene.Serialize(true);
 
             if (Input.GetKeyUp(Keys.R, KeyboardFlags.CTRL))
                 SceneManager.LoadScene_Serialization("MainScene");

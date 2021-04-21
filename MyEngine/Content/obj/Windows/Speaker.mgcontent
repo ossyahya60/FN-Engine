@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/Speaker.png</SourceFile>
+  <SourceTime>2021-04-11T00:34:08.826943+02:00</SourceTime>
+  <DestFile>C:/MyEngine/MyEngine/MyEngine/bin/Windows/x86/Debug/Content/Speaker.xnb</DestFile>
+  <DestTime>2021-04-21T14:14:45.9355026+02:00</DestTime>
+  <Importer>TextureImporter</Importer>
+  <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
+  <Processor>TextureProcessor</Processor>
+  <ProcessorTime>2018-12-08T18:35:54+02:00</ProcessorTime>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>

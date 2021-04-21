@@ -43,6 +43,7 @@ namespace MyEngine
                 {
                     spriteBatch.End();
                     spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, Effect, Setup.Camera.GetViewTransformationMatrix());
+                    LastEffect = Effect;
                 }
 
                 Rectangle DestRect = Rectangle.Empty;
@@ -51,14 +52,7 @@ namespace MyEngine
                 DestRect.Width = (int)(Sprite.SourceRectangle.Width * gameObject.Transform.Scale.X);
                 DestRect.Height = (int)(Sprite.SourceRectangle.Height * gameObject.Transform.Scale.Y);
                 spriteBatch.Draw(Sprite.Texture, null, DestRect, Sprite.SourceRectangle, Sprite.Origin, gameObject.Transform.Rotation, Vector2.One, Color, SpriteEffects, gameObject.Layer);
-
-                LastEffect = Effect;
             }
-        }
-
-        public override void DrawUI()
-        {
-
         }
 
         public override GameObjectComponent DeepCopy(GameObject clone)

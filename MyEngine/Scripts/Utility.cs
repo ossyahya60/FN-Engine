@@ -7,12 +7,14 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Content.Pipeline.Builder;
 
 namespace MyEngine
 {
     public static class Utility
     {
         public static ObjectIDGenerator OIG = new ObjectIDGenerator();
+        public static string OutputFilePath = @"C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content";
         //public static readonly Type[] SupportedTypes = { typeof(float), typeof(int), typeof(string), typeof(Vector2), typeof(bool) };
 
         public static void Vector2Int(ref Vector2 vector)
@@ -185,13 +187,13 @@ namespace MyEngine
                         bool SendOneTime = true;
                         foreach (var item in (IEnumerable)FI.GetValue(OBJ))
                         {
-                            if(SendOneTime)
+                            if (SendOneTime)
                             {
                                 SW.WriteLine(item.GetType().IsValueType.ToString());
                                 SendOneTime = false;
                             }
 
-                            if(item.GetType().IsValueType)
+                            if (item.GetType().IsValueType)
                                 SW.Write(item.GetType().FullName + "\t" + item.GetType().Name + "\t" + item.ToString() + "\t" + item.GetType().IsClass.ToString() + "\n");
                             else
                                 Serialize(SW, item);
@@ -472,10 +474,10 @@ namespace MyEngine
                     else
                         FI.SetValue(ActiveObject, GetValueOfAValueType(LineArr));
                 }
-                else if (FI.FieldType.Name == "String")
-                    FI.SetValue(ActiveObject, Line.Split('\t')[2]);
                 else if (Line == "null")
                     FI.SetValue(ActiveObject, null);
+                else if (FI.FieldType.Name == "String")
+                    FI.SetValue(ActiveObject, Line.Split('\t')[2]);
                 else
                     FI.SetValue(ActiveObject, Deserialize(SR, SOs));
             }
@@ -677,6 +679,22 @@ namespace MyEngine
                 default:
                     throw new Exception("Type Not Handled");
             }
+        }
+
+        public static void BuildContentItem(string Path) //Path should include the name of the asset (Relative to the Content Folder)
+        {
+            //Registering and Building an Item in the Content Manager
+            Setup.PM.RegisterContent(Path);
+            PipelineBuildEvent T = null;
+            try
+            {
+                T = Setup.PM.BuildContent(Path);
+            }
+            catch (FileNotFoundException)
+            {
+                System.Console.Out.WriteLine("NOICE");
+            }
+            Setup.PM.ProcessContent(T);
         }
     }
 }

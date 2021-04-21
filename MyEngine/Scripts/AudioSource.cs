@@ -39,7 +39,21 @@ namespace MyEngine
                 return pan;
             }
         }
-        public bool IsLooping = false;
+        public bool IsLooping
+        {
+            set
+            {
+                if(SoundEffectInstance != null)
+                    SoundEffectInstance.IsLooped = value;
+            }
+            get
+            {
+                if (SoundEffectInstance != null)
+                    return SoundEffectInstance.IsLooped;
+
+                return false;
+            }
+        }
         public string AudioName;
 
         private SoundEffect SoundEffect;
@@ -68,17 +82,16 @@ namespace MyEngine
 
         public void LoadSoundEffect(string Path)
         {
-            SoundEffect = Setup.Content.Load<SoundEffect>(Path);
-
             if (SoundEffect != null)
                 SoundEffectInstance.Dispose();
+
+            SoundEffect = Setup.Content.Load<SoundEffect>(Path);
 
             SoundEffectInstance = SoundEffect.CreateInstance();
         }
 
         public void Play()
         {
-            SoundEffectInstance.IsLooped = IsLooping;
             SoundEffectInstance.Volume = volume;
             SoundEffectInstance.Pitch = pitch;
             SoundEffectInstance.Pan = pan;

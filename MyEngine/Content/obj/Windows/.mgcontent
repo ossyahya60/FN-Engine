@@ -4,6 +4,8 @@
   <Platform>Windows</Platform>
   <Config />
   <SourceFiles>
+    <File>C:/MyEngine/MyEngine/MyEngine/Content/Icons/FolderIcon.png</File>
+    <File>C:/MyEngine/MyEngine/MyEngine/Content/Icons/MusicIcon.png</File>
     <File>C:/MyEngine/MyEngine/MyEngine/Content/AMB_WR_BirdWind.ogg</File>
     <File>C:/MyEngine/MyEngine/MyEngine/Content/Arrow.png</File>
     <File>C:/MyEngine/MyEngine/MyEngine/Content/CharacterIdleAnimation.PNG</File>
@@ -20,19 +22,6 @@
     <File>C:/MyEngine/MyEngine/MyEngine/Content/TileSet1.png</File>
   </SourceFiles>
   <DestFiles>
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
 </SourceFileCollection>

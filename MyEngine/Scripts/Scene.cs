@@ -8,6 +8,8 @@ namespace MyEngine
 {
     public class Scene
     {
+        public static ImGUIRenderer GuiRenderer { private set; get; } = null; //This is the ImGuiRenderer
+
         public bool Active = true;
         public List<GameObject> GameObjects;
         public string Name;
@@ -33,7 +35,6 @@ namespace MyEngine
         private List<GameObject> HandyList;
 
         private static RenderTarget2D ImGUI_RenderTarget = null;
-        private static ImGUIRenderer GuiRenderer = null; //This is the ImGuiRenderer
 
         public Scene(string name)
         {
@@ -122,7 +123,7 @@ namespace MyEngine
             if(GuiRenderer == null)
                 GuiRenderer = new ImGUIRenderer(Setup.Game).Initialize().RebuildFontAtlas();
 
-            if(ImGUI_RenderTarget == null)
+            if (ImGUI_RenderTarget == null)
                 ImGUI_RenderTarget = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
 
             int Count = GameObjects.Count - 1;
@@ -243,7 +244,7 @@ namespace MyEngine
             GameObjects.Sort(GameObject.SortByLayer());
         }
 
-        public void Serialize()
+        public void Serialize(bool SerializerEditorStuff = false)
         {
             Utility.OIG = new System.Runtime.Serialization.ObjectIDGenerator();
 
@@ -257,13 +258,13 @@ namespace MyEngine
                 SW.Write("Active:\t" + Active.ToString() + "\n");
                 SW.Write("Name:\t" + Name + "\n");
                 SW.Write("Id:\t" + Id + "\n");
-                SW.Write("GameObjectCount:\t" + (GameObjectCount - NumberOfEditorObjects).ToString() + "\n");
+                SW.Write("GameObjectCount:\t" + (SerializerEditorStuff? GameObjectCount : GameObjectCount - NumberOfEditorObjects).ToString() + "\n");
 
                 MediaSource.Serialize(SW);
                 Setup.Camera.Serialize(SW);
 
                 foreach (GameObject GO in GameObjects)
-                    if(!GO.IsEditor)
+                    if(!GO.IsEditor || SerializerEditorStuff)
                         Utility.Serialize(SW, GO);
 
                 SW.WriteLine("End Of " + ToString());
@@ -318,8 +319,6 @@ namespace MyEngine
 
                 SR.Close();
             }
-
-            Start();
         }
 
         //public void Deserialize(string Path)

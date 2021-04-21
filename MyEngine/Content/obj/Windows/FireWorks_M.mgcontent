@@ -3,10 +3,10 @@
   <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/FireWorks_M.ogg</SourceFile>
   <SourceTime>2020-04-23T16:15:51.664066+02:00</SourceTime>
   <DestFile>C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/FireWorks_M.xnb</DestFile>
-  <DestTime>2021-02-22T15:06:27.2697801+02:00</DestTime>
+  <DestTime>2021-04-18T21:06:33.634852+02:00</DestTime>
   <Importer>OggImporter</Importer>
   <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
-  <Processor>SongProcessor</Processor>
+  <Processor>SoundEffectProcessor</Processor>
   <ProcessorTime>2018-12-08T18:35:54+02:00</ProcessorTime>
   <Parameters>
     <Key>Quality</Key>
@@ -14,7 +14,5 @@
   </Parameters>
   <Dependencies />
   <BuildAsset />
-  <BuildOutput>
-    <string>C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/FireWorks_M.wma</string>
-  </BuildOutput>
+  <BuildOutput />
 </PipelineBuildEvent>

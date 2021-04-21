@@ -1,0 +1,9 @@
+1- Build Content when directory changes?
+
+2- Make an editor file that visulaizes something like transform and colliders.
+
+3- Making a new project and working in its directory?
+
+4- Hot Reloading.
+
+5- Debugging imgui crashes...
