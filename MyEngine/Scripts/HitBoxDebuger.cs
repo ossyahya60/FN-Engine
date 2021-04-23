@@ -27,10 +27,26 @@ namespace MyEngine
             _effect.TextureEnabled = true;
         }
 
-        public static Texture2D RectTexture(Color color)
+        public static Texture2D RectTexture(Color color) //Constant
         {
             Texture2D textureFilled = new Texture2D(Setup.GraphicsDevice, 1, 1);
             textureFilled.SetData(new Color[] { color });
+
+            return textureFilled;
+        }
+
+        public static Texture2D RectTexture() // Allowing Changing RGB
+        {
+            Texture2D textureFilled = new Texture2D(Setup.GraphicsDevice, 1, 1);
+            textureFilled.SetData(new Color[] { Color.White });
+
+            return textureFilled;
+        }
+
+        public static Texture2D RectTexture(float Alpha) //Allow setting Alpha value and RGB
+        {
+            Texture2D textureFilled = new Texture2D(Setup.GraphicsDevice, 1, 1);
+            textureFilled.SetData(new Color[] { new Color(1.0f, 1.0f, 1.0f, MathHelper.Clamp(Alpha, 0, 1)) });
 
             return textureFilled;
         }

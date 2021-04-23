@@ -15,15 +15,17 @@ namespace MyEngine.FN_Editor
         private HashSet<GameObject> SelectedGOs;
         private GameObject[] GOs_Clipboard = null;
         private bool IsCopy = true;
-        private Stack<KeyValuePair<object, Operation>> Undo_Buffer;
-        private Stack<KeyValuePair<object, Operation>> Redo_Buffer;
+        private LinkedList<KeyValuePair<object, Operation>> Undo_Buffer;
+        private LinkedList<KeyValuePair<object, Operation>> Redo_Buffer;
+        private int BufferLimit = 200; //200 Items
 
         public override void Start()
         {
             WhoIsSelected = null;
             SelectedGOs = new HashSet<GameObject>();
-            Undo_Buffer = new Stack<KeyValuePair<object, Operation>>();
-            Redo_Buffer = new Stack<KeyValuePair<object, Operation>>();
+            Undo_Buffer = new LinkedList<KeyValuePair<object, Operation>>();
+            Redo_Buffer = new LinkedList<KeyValuePair<object, Operation>>();
+            LinkedList<int> T = new LinkedList<int>();
         }
 
         public override void DrawUI()
@@ -47,17 +49,18 @@ namespace MyEngine.FN_Editor
             if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Delete)) && ImGui.IsWindowFocused())
             {
                 if (SelectedGOs.Count != 0)
-                    Undo_Buffer.Push(new KeyValuePair<object, Operation>(SelectedGOs.ToArray(), Operation.Delete));
+                {
+                    AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(SelectedGOs.ToArray(), Operation.Delete));
+                    Redo_Buffer.Clear();
+                }
 
                 foreach (GameObject GO in SelectedGOs)
                     GO.ShouldBeRemoved = true;
             }
 
             //Some Scene window functionalities
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered() && !ImGui.IsAnyItemHovered())
-            {
+            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered())
                 ImGui.OpenPopup("Functionalities");
-            }
 
             //Copy GOs
             if (ImGui.GetIO().KeyCtrl && ImGui.IsWindowFocused())
@@ -74,15 +77,15 @@ namespace MyEngine.FN_Editor
                     if (SelectedGOs.Count != 0)
                     {
                         GOs_Clipboard = SelectedGOs.ToArray();
-                        Undo_Buffer.Push(new KeyValuePair<object, Operation>(GOs_Clipboard, Operation.Delete));
+                        AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(GOs_Clipboard, Operation.Delete));
+                        Redo_Buffer.Clear();
 
                         foreach (GameObject GO in SelectedGOs)
                             GO.ShouldBeRemoved = true;
                     }
-
                     IsCopy = false;
                 }
-                else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.D)) //Duplicate
+                else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.D)) //Duplicate //Not functioning well...
                 {
                     GameObject[] Instances = SelectedGOs.ToArray();
                     for (int i = 0; i < SelectedGOs.Count; i++)
@@ -92,12 +95,15 @@ namespace MyEngine.FN_Editor
                     }
 
                     if (SelectedGOs.Count != 0)
-                        Undo_Buffer.Push(new KeyValuePair<object, Operation>(Instances, Operation.Create));
+                    {
+                        AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(Instances, Operation.Create));
+                        Redo_Buffer.Clear();
+                    }
                 }
-                else if(ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Z)) && Undo_Buffer.Count != 0) //Handling Undo and Redo actions
+                else if(ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Z), true) && Undo_Buffer.Count != 0) //Handling Undo and Redo actions
                 {
-                    KeyValuePair<object, Operation> KVP = Undo_Buffer.Pop();
-                    Redo_Buffer.Push(KVP);
+                    KeyValuePair<object, Operation> KVP = RemoveFromACircularBuffer(Undo_Buffer);
+                    AddToACircularBuffer(Redo_Buffer, KVP);
 
                     object GOs = KVP.Key;
                     switch (KVP.Value)
@@ -121,7 +127,6 @@ namespace MyEngine.FN_Editor
 
                                 for (int i = 0; i < gameObjects.Length; i++)
                                 {
-                                    gameObjects[i].ShouldBeRemoved = false;
                                     if(gameObjects[i].PrevParent != null)
                                         gameObjects[i].PrevParent.AddChild(gameObjects[i]);
                                     SceneManager.ActiveScene.AddGameObject_Recursive(gameObjects[i]);
@@ -130,7 +135,6 @@ namespace MyEngine.FN_Editor
                             else
                             {
                                 GameObject GO = GOs as GameObject;
-                                GO.ShouldBeRemoved = false;
                                 if (GO.PrevParent != null)
                                     GO.PrevParent.AddChild(GO);
                                 SceneManager.ActiveScene.AddGameObject_Recursive(GO);
@@ -139,10 +143,10 @@ namespace MyEngine.FN_Editor
                             break;
                     }
                 }
-                else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Y)) && Redo_Buffer.Count != 0) //Handling Undo and Redo actions
+                else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Y), true) && Redo_Buffer.Count != 0) //Handling Undo and Redo actions
                 {
-                    KeyValuePair<object, Operation> KVP = Redo_Buffer.Pop();
-                    Undo_Buffer.Push(KVP);
+                    KeyValuePair<object, Operation> KVP = RemoveFromACircularBuffer(Redo_Buffer);
+                    AddToACircularBuffer(Undo_Buffer, KVP);
 
                     object GOs = KVP.Key;
                     switch (KVP.Value)
@@ -154,7 +158,6 @@ namespace MyEngine.FN_Editor
 
                                 for (int i = 0; i < gameObjects.Length; i++)
                                 {
-                                    gameObjects[i].ShouldBeRemoved = false;
                                     if (gameObjects[i].PrevParent != null)
                                         gameObjects[i].PrevParent.AddChild(gameObjects[i]);
                                     SceneManager.ActiveScene.AddGameObject_Recursive(gameObjects[i]);
@@ -163,7 +166,6 @@ namespace MyEngine.FN_Editor
                             else
                             {
                                 GameObject GO = GOs as GameObject;
-                                GO.ShouldBeRemoved = false;
                                 if (GO.PrevParent != null)
                                     GO.PrevParent.AddChild(GO);
                                 SceneManager.ActiveScene.AddGameObject_Recursive(GO);
@@ -188,7 +190,8 @@ namespace MyEngine.FN_Editor
                 {
                     if (GOs_Clipboard != null)
                     {
-                        Undo_Buffer.Push(new KeyValuePair<object, Operation>(GOs_Clipboard, Operation.Create));
+                        AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(GOs_Clipboard, Operation.Create));
+                        Redo_Buffer.Clear();
 
                         GameObject Parent = null;
                         if (SelectedGOs.Count == 1)
@@ -199,7 +202,7 @@ namespace MyEngine.FN_Editor
                             foreach (GameObject GO in GOs_Clipboard)
                             {
                                 GameObject Instance = GameObject.Instantiate(GO);
-
+                                
                                 if (Parent != null)
                                 {
                                     if (Instance.Parent != null)
@@ -240,6 +243,12 @@ namespace MyEngine.FN_Editor
                         }
                     }
                 }
+                else if(ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.A))) //Select All
+                {
+                    foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
+                        if(!GO.IsEditor)
+                            SelectedGOs.Add(GO);
+                }
             }
             if (ImGui.BeginPopup("Functionalities"))
             {
@@ -248,11 +257,15 @@ namespace MyEngine.FN_Editor
                     GameObject GO = new GameObject();
                     GO.Name = "Unique Name";
                     GO.AddComponent(new Transform());
+                    if (WhoIsSelected != null)
+                        WhoIsSelected.AddChild(GO);
 
                     GO.Start();
+
                     SceneManager.ActiveScene.AddGameObject(GO);
 
-                    Undo_Buffer.Push(new KeyValuePair<object, Operation>(GO, Operation.Create));
+                    AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(GO, Operation.Create));
+                    Redo_Buffer.Clear();
 
                     //Should sort game objects?
                 }
@@ -270,7 +283,8 @@ namespace MyEngine.FN_Editor
                         WhoIsSelected.Name = NameBuffer;
                     ImGui.CloseCurrentPopup();
 
-                    Undo_Buffer.Push(new KeyValuePair<object, Operation>(NameBuffer, Operation.Rename));
+                    AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(NameBuffer, Operation.Rename));
+                    Redo_Buffer.Clear();
                 }
 
                 ImGui.EndPopup();
@@ -289,6 +303,31 @@ namespace MyEngine.FN_Editor
             ImGui.End();
 
             //ImGui.ShowDemoWindow();
+        }
+
+        private void AddToACircularBuffer(LinkedList<KeyValuePair<object, Operation>> Buffer, KeyValuePair<object, Operation> KVP)
+        {
+            if (Buffer.Count >= BufferLimit) // OverFlow
+            {
+                GameObject Deleted = Buffer.Last.Value.Key as GameObject;
+                if (Deleted != null)
+                    Deleted.Destroy();
+                Buffer.RemoveLast();
+            }
+
+            Buffer.AddFirst(KVP);
+        }
+
+        private KeyValuePair<object, Operation> RemoveFromACircularBuffer(LinkedList<KeyValuePair<object, Operation>> Buffer)
+        {
+            if (Buffer.Count > 0) // Empty
+            {
+                var KVP = Buffer.First.Value;
+                Buffer.RemoveFirst();
+                return KVP;
+            }
+
+            return default(KeyValuePair<object, Operation>);
         }
 
         private void TreeRecursive(GameObject GO, bool Root)
@@ -320,7 +359,7 @@ namespace MyEngine.FN_Editor
                 if (!Root)
                     ImGui.Unindent();
 
-                if (ImGui.IsItemClicked())
+                if (ImGui.IsItemClicked(ImGuiMouseButton.Left) || ImGui.IsItemClicked(ImGuiMouseButton.Right))
                 {
                     if (ImGui.GetIO().KeyCtrl)
                     {
@@ -362,7 +401,7 @@ namespace MyEngine.FN_Editor
                 ImGui.PopStyleColor();
             }
 
-            if (ImGui.IsItemClicked())
+            if (ImGui.IsItemClicked(ImGuiMouseButton.Left) || ImGui.IsItemClicked(ImGuiMouseButton.Right))
             {
                 if (ImGui.GetIO().KeyCtrl)
                 {

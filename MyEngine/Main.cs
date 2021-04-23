@@ -82,7 +82,23 @@ namespace MyEngine
         /// </summary>
         protected override void LoadContent()
         {
-            Environment.CurrentDirectory = @"C:\MyEngine\MyEngine\MyEngine\Content"; //Change this later
+            // This bit of code handles the directories from a PC to another
+            string WorkingDirectory = "";
+            foreach (string S in Environment.CurrentDirectory.Split('\\'))
+            {
+                if (S == "bin")
+                {
+                    WorkingDirectory = WorkingDirectory.Remove(WorkingDirectory.Length-1, 1);
+                    break;
+                }
+
+                WorkingDirectory += S + '\\';
+            }
+            Environment.CurrentDirectory = WorkingDirectory + @"\Content";
+            Setup.SourceFilePath = Environment.CurrentDirectory;
+            Setup.IntermediateFilePath = Setup.SourceFilePath + @"\obj\Windows";
+            Setup.OutputFilePath = WorkingDirectory + @"\bin\Windows\x86\Debug\Content";
+            ///////////////////////////////////
 
             ImportantIntialization();
             RIR.BackgroundColor = new Color(0, 0, 0, 0);
@@ -230,6 +246,8 @@ namespace MyEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            Input.GetState(); //This has to be called at the start of update method!!
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 

@@ -22,18 +22,19 @@ namespace MyEngine
 
         public static bool GetKey(Keys Key, KeyboardFlags keyboardFlags = KeyboardFlags.ANY)
         {
-            switch(keyboardFlags)
+            bool BaseCond = Keyboard.GetState().IsKeyDown(Key);
+            switch (keyboardFlags)
             {
                 case KeyboardFlags.ANY:
-                    return Keyboard.GetState().IsKeyDown(Key);
+                    return BaseCond;
                 case KeyboardFlags.SOLO:
-                    return Keyboard.GetState().IsKeyDown(Key) && !Keyboard.GetState().IsKeyDown(Keys.LeftAlt) && !Keyboard.GetState().IsKeyDown(Keys.LeftShift) && !Keyboard.GetState().IsKeyDown(Keys.LeftControl);
+                    return BaseCond && Keyboard.GetState().IsKeyUp(Keys.LeftAlt) && Keyboard.GetState().IsKeyUp(Keys.LeftShift) && Keyboard.GetState().IsKeyUp(Keys.LeftControl);
                 case KeyboardFlags.SHIFT:
-                    return Keyboard.GetState().IsKeyDown(Key) && Keyboard.GetState().IsKeyDown(Keys.LeftShift);
+                    return BaseCond && Keyboard.GetState().IsKeyDown(Keys.LeftShift);
                 case KeyboardFlags.ALT:
-                    return Keyboard.GetState().IsKeyDown(Key) && Keyboard.GetState().IsKeyDown(Keys.LeftAlt);
+                    return BaseCond && Keyboard.GetState().IsKeyDown(Keys.LeftAlt);
                 default:
-                    return Keyboard.GetState().IsKeyDown(Key) && Keyboard.GetState().IsKeyDown(Keys.LeftControl);
+                    return BaseCond && Keyboard.GetState().IsKeyDown(Keys.LeftControl);
             }
         }
 
@@ -51,13 +52,13 @@ namespace MyEngine
 
         public static bool GetKeyDown(Keys Key, KeyboardFlags keyboardFlags = KeyboardFlags.ANY)
         {
-            bool BaseCond = CurrentKeyState.IsKeyDown(Key) && !LastKeyState.IsKeyDown(Key);
+            bool BaseCond = CurrentKeyState.IsKeyDown(Key) && LastKeyState.IsKeyUp(Key);
             switch (keyboardFlags)
             {
                 case KeyboardFlags.ANY:
                     return BaseCond;
                 case KeyboardFlags.SOLO:
-                    return BaseCond && !Keyboard.GetState().IsKeyDown(Keys.LeftAlt) && !Keyboard.GetState().IsKeyDown(Keys.LeftShift) && !Keyboard.GetState().IsKeyDown(Keys.LeftControl);
+                    return BaseCond && Keyboard.GetState().IsKeyUp(Keys.LeftAlt) && Keyboard.GetState().IsKeyUp(Keys.LeftShift) && Keyboard.GetState().IsKeyUp(Keys.LeftControl);
                 case KeyboardFlags.SHIFT:
                     return BaseCond && Keyboard.GetState().IsKeyDown(Keys.LeftShift);
                 case KeyboardFlags.ALT:
@@ -75,7 +76,7 @@ namespace MyEngine
                 case KeyboardFlags.ANY:
                     return BaseCond;
                 case KeyboardFlags.SOLO:
-                    return BaseCond && !Keyboard.GetState().IsKeyDown(Keys.LeftAlt) && !Keyboard.GetState().IsKeyDown(Keys.LeftShift) && !Keyboard.GetState().IsKeyDown(Keys.LeftControl);
+                    return BaseCond && Keyboard.GetState().IsKeyUp(Keys.LeftAlt) && Keyboard.GetState().IsKeyUp(Keys.LeftShift) && Keyboard.GetState().IsKeyUp(Keys.LeftControl);
                 case KeyboardFlags.SHIFT:
                     return BaseCond && Keyboard.GetState().IsKeyDown(Keys.LeftShift);
                 case KeyboardFlags.ALT:

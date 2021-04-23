@@ -16,10 +16,13 @@ namespace MyEngine
         public static Camera2D Camera { get; private set; }
         public static Game Game { get; private set; }
         public static PipelineManager PM { get; private set; }
+        public static string OutputFilePath = @"C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content";
+        public static string SourceFilePath = @"C:\MyEngine\MyEngine\MyEngine\Content";
+        public static string IntermediateFilePath = @"C:\MyEngine\MyEngine\MyEngine\Content\obj\Windows";
 
         public static void Initialize(GraphicsDeviceManager GDM, ContentManager CM, SpriteBatch SB, ResolutionIndependentRenderer RIR, GameWindow GW, Camera2D camera, Game game)
         {
-            PM = new PipelineManager(@"C:\MyEngine\MyEngine\MyEngine\Content", @"C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content", @"C:\MyEngine\MyEngine\MyEngine\Content\obj\Windows");
+            PM = new PipelineManager(SourceFilePath, OutputFilePath, IntermediateFilePath);
             graphics = GDM;
             Content = CM;
             GraphicsDevice = GDM.GraphicsDevice;

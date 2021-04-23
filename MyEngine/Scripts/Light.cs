@@ -14,7 +14,6 @@ namespace MyEngine
 
         private static bool ShaderLoaded = false;
         private static int MAX_LIGHT_COUNT = 20;
-        private static List<Light> LIGHTS;
         private static RenderTarget2D RenderTarget2D;
         private static Effect LightEffect;
         private static RenderTarget2D ShadowMap;
@@ -22,6 +21,7 @@ namespace MyEngine
         private static List<Vector2> Points;
         private static List<Vector2> PointsTriangle;
         private static LineOccluder[] BorderOccluders;
+        private static List<Light> LIGHTS;
 
         private static EffectParameter ShadowMap_param;
         private static EffectParameter DirectionalIntensity_param;
@@ -99,6 +99,11 @@ namespace MyEngine
         public override void Destroy()
         {
             LIGHTS.Remove(this);
+        }
+
+        public void Rebuild() //Not for high level users
+        {
+            LIGHTS.Add(this);
         }
 
         public static void Init_Light()
@@ -180,7 +185,7 @@ namespace MyEngine
 
                 if (HandyList.Count != 0)
                 {
-                    for(int k=0; k<LIGHTS.Count; k++)
+                    for (int k = 0; k < LIGHTS.Count; k++)
                     {
                         PointsTriangle.Clear();
                         if (!LIGHTS[k].gameObject.IsActive() || !LIGHTS[k].Enabled)

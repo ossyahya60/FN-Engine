@@ -14,7 +14,6 @@ namespace MyEngine
     public static class Utility
     {
         public static ObjectIDGenerator OIG = new ObjectIDGenerator();
-        public static string OutputFilePath = @"C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content";
         //public static readonly Type[] SupportedTypes = { typeof(float), typeof(int), typeof(string), typeof(Vector2), typeof(bool) };
 
         public static void Vector2Int(ref Vector2 vector)
@@ -223,9 +222,7 @@ namespace MyEngine
                                             }
 
                                             //Registering and Building an Item in the Content Manager
-                                            Setup.PM.RegisterContent("CT" + ObjectGID.ToString() + ".png");
-                                            var T = Setup.PM.BuildContent(@"C:\MyEngine\MyEngine\MyEngine\Content\" + "CT" + ObjectGID.ToString() + ".png");
-                                            Setup.PM.ProcessContent(T);
+                                            BuildContentItem(Setup.SourceFilePath + @"\CT" + ObjectGID.ToString() + ".png");
                                         }
                                         SW.Write("*\t" + FI.FieldType.FullName + "\t" + FI.Name + "\t" + "CT" + ObjectGID.ToString() + "\t" + FI.FieldType.IsClass.ToString() + "\t" + ObjectGID.ToString() + "\n");
                                     }
@@ -283,9 +280,7 @@ namespace MyEngine
                                             }
 
                                             //Registering and Building an Item in the Content Manager
-                                            Setup.PM.RegisterContent("CT" + ObjectGID.ToString() + ".png");
-                                            var T = Setup.PM.BuildContent(@"C:\MyEngine\MyEngine\MyEngine\Content\" + "CT" + ObjectGID.ToString() + ".png");
-                                            Setup.PM.ProcessContent(T);
+                                            BuildContentItem(Setup.SourceFilePath + @"\CT" + ObjectGID.ToString() + ".png");
                                         }
 
                                         SW.Write("*\t" + PI.PropertyType.FullName + "\t" + PI.Name + "\t" + "CT" + ObjectGID.ToString() + "\t" + PI.PropertyType.IsClass.ToString() + "\t" + ObjectGID.ToString() + "\n");
@@ -686,14 +681,7 @@ namespace MyEngine
             //Registering and Building an Item in the Content Manager
             Setup.PM.RegisterContent(Path);
             PipelineBuildEvent T = null;
-            try
-            {
-                T = Setup.PM.BuildContent(Path);
-            }
-            catch (FileNotFoundException)
-            {
-                System.Console.Out.WriteLine("NOICE");
-            }
+            T = Setup.PM.BuildContent(Path);
             Setup.PM.ProcessContent(T);
         }
     }

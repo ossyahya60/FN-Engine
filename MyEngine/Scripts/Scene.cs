@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.ImGui;
 using System.Collections.Generic;
@@ -57,6 +58,16 @@ namespace MyEngine
         {
             if (!GameObjects.Contains(GO))
             {
+                Light L = GO.GetComponent<Light>();
+                if (GO.ShouldBeRemoved || GO.ShouldBeDeleted)
+                {
+                    GO.ShouldBeRemoved = false;
+                    GO.ShouldBeDeleted = false;
+
+                    if (L != null)
+                        L.Rebuild();
+                }
+
                 GameObjects.Insert(GameObjectCount, GO);
                 GameObjectCount++;
             }
@@ -69,8 +80,23 @@ namespace MyEngine
                 GameObjects.Insert(GameObjectCount, GO);
                 GameObjectCount++;
 
+                bool RemovedOrDeleted = false;
+                Light L = GO.GetComponent<Light>();
+                if (GO.ShouldBeRemoved || GO.ShouldBeDeleted)
+                {
+                    RemovedOrDeleted = true;
+                    GO.ShouldBeRemoved = false;
+                    GO.ShouldBeDeleted = false;
+
+                    if (L != null)
+                        L.Rebuild();
+                }
+
                 foreach (GameObject Child in GO.Children)
+                {
+                    Child.ShouldBeRemoved = RemovedOrDeleted;
                     AddGameObject_Recursive(Child);
+                }
             }
         }
 
@@ -113,6 +139,12 @@ namespace MyEngine
 
             if (DestroyToo)
                 GO.Destroy();
+            else
+            {
+                Light L = GO.GetComponent<Light>();
+                if (L != null)
+                    L.Destroy();
+            }
 
             GameObjects.Remove(GO);
             GameObjectCount--;
@@ -152,8 +184,6 @@ namespace MyEngine
 
             foreach (GameObject GO in GameObjects.FindAll(item => item.ShouldBeDeleted | item.ShouldBeRemoved))
             {
-                if(GO.ShouldBeDeleted)
-                    GO.Destroy();
                 RemoveGameObject(GO, GO.ShouldBeDeleted);
             }
         }
@@ -164,7 +194,10 @@ namespace MyEngine
             Setup.GraphicsDevice.Clear(Color.Transparent);
 
             GuiRenderer.BeginLayout(gameTime); // Must be called prior to calling any ImGui controls
-            
+
+            //FPS
+            ImGui.Text((1.0f / (float)gameTime.ElapsedGameTime.TotalSeconds).ToString());
+
             int Count = GameObjects.Count - 1;
 
             if (Active)

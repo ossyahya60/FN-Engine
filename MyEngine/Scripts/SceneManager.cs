@@ -103,10 +103,8 @@ namespace MyEngine
 
         public static void Update(GameTime gameTime)
         {
-            //if (!Setup.Game.IsActive) //Pause Game when minimized
-            //    return;
-
-            Input.GetState(); //This has to be called at the start of update method!!
+            if (!Setup.Game.IsActive) //Pause Game when minimized
+                return;
 
             /////////Resolution related//////////// -> Mandatory
             if (Resolution != new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight))
@@ -122,8 +120,8 @@ namespace MyEngine
         {
             if (ActiveScene != null)
             {
-                //if (!Setup.Game.IsActive) //Pause Game when minimized
-                //    return;
+                if (!Setup.Game.IsActive) //Pause Game when minimized
+                    return;
 
                 ActiveScene.DrawUI(gameTime); //Draw UI
 

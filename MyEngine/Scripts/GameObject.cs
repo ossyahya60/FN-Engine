@@ -26,7 +26,7 @@ namespace MyEngine
         public float Layer = 1;
         public string Tag = null;
         public int GameComponentsCount = 0;
-        public bool Active { set; private get; }
+        public bool Active { set; get; }
         public string Name = "Default";
         public bool ShouldBeDeleted = false;
         public bool ShouldBeRemoved = false;
@@ -395,6 +395,8 @@ namespace MyEngine
 
             if (Parent != null)
                 Parent.RemoveChild(this);
+
+            ShouldBeDeleted = true;
 
             Children.Clear();
         }
