@@ -75,6 +75,7 @@ namespace MyEngine
 
             Child.Parent = this;
             Children.Add(Child);
+            //SceneManager.ActiveScene.AddGameObject_Recursive(Child);
 
             return true;
         }
@@ -320,18 +321,19 @@ namespace MyEngine
         public static GameObject Instantiate(GameObject GO)  //=> Implement it using "Recursion" //This function needs a rework
         {
             GameObject Clone = new GameObject(); //Add Children pls
+            Clone.Tag = GO.Tag;
+            Clone.Active = GO.Active;
+            Clone.Layer = GO.Layer;
+            Clone.Name = GO.Name;
             if (GO.Parent != null)
                 GO.Parent.AddChild(Clone);
             else
                 Clone.Parent = null;
-            Clone.Tag = GO.Tag;
-            Clone.Active = GO.Active;
-            Clone.Layer = GO.Layer;
 
             for (int i = 0; i < GO.GameObjectComponents.Count; i++)
                 Clone.AddComponent<GameObjectComponent>(GO.GameObjectComponents[i].DeepCopy(Clone));
 
-            SceneManager.ActiveScene.AddGameObject(Clone);
+            SceneManager.ActiveScene.AddGameObject_Recursive(Clone);
 
             InstantiateRecursive(GO, Clone);
 
@@ -341,18 +343,19 @@ namespace MyEngine
         public static GameObject Instantiate(GameObject GO, GameObject parent)  //=> Implement it using "Recursion"
         {
             GameObject Clone = new GameObject();
+            Clone.Name = GO.Name;
+            Clone.Tag = GO.Tag;
+            Clone.Active = GO.Active;
+            Clone.Layer = GO.Layer;
             if (parent != null)
                 parent.AddChild(Clone);
             else
                 Clone.Parent = null;
-            Clone.Tag = GO.Tag;
-            Clone.Active = GO.Active;
-            Clone.Layer = GO.Layer;
 
             for (int i = 0; i < GO.GameObjectComponents.Count; i++)
                 Clone.AddComponent<GameObjectComponent>(GO.GameObjectComponents[i].DeepCopy(Clone));
 
-            SceneManager.ActiveScene.AddGameObject(Clone);
+            SceneManager.ActiveScene.AddGameObject_Recursive(Clone);
 
             InstantiateRecursive(GO, Clone);
 
@@ -368,18 +371,19 @@ namespace MyEngine
                 foreach (GameObject Child in GO.Children)
                 {
                     GameObject ChildClone = new GameObject();
+                    ChildClone.Name = Child.Name;
+                    ChildClone.Tag = Child.Tag;
+                    ChildClone.Active = Child.Active;
+                    ChildClone.Layer = Child.Layer;
                     if (Parent != null)
                         Parent.AddChild(ChildClone);
                     else
                         ChildClone.Parent = null;
-                    ChildClone.Tag = Child.Tag;
-                    ChildClone.Active = Child.Active;
-                    ChildClone.Layer = Child.Layer;
 
                     for (int i = 0; i < Child.GameObjectComponents.Count; i++)
                         ChildClone.AddComponent<GameObjectComponent>(Child.GameObjectComponents[i].DeepCopy(ChildClone));
 
-                    SceneManager.ActiveScene.AddGameObject(ChildClone);
+                    SceneManager.ActiveScene.AddGameObject_Recursive(ChildClone);
 
                     InstantiateRecursive(Child, ChildClone);
                 }

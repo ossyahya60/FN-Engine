@@ -94,7 +94,6 @@
     <Compile Include="Scripts\LineOccluder.cs" />
     <Compile Include="Scripts\MathCompanion.cs" />
     <Compile Include="Scripts\MediaSource.cs" />
-    <Compile Include="Scripts\NameGenerator.cs" />
     <Compile Include="Scripts\Panel.cs" />
     <Compile Include="Scripts\Particle.cs" />
     <Compile Include="Scripts\ParticleEffect.cs" />

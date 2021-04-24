@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,11 @@ namespace MyEngine
         public static void Reset()
         {
             ShaderLoaded = false;
+        }
+
+        public override void DrawUI()
+        {
+            ImGui.Text(LIGHTS.Count.ToString());
         }
 
         public override void Start()

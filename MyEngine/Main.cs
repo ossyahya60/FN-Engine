@@ -159,13 +159,13 @@ namespace MyEngine
             GameObjectsTab.Name = "ContentManager";
             GameObjectsTab.AddComponent(new FN_Editor.ContentWindow());
 
-            //SceneManager.ActiveScene.AddGameObject(Test);
-            SceneManager.ActiveScene.AddGameObject(Test2);
-            //SceneManager.ActiveScene.AddGameObject(Test3);
-            SceneManager.ActiveScene.AddGameObject(Test6);
-            SceneManager.ActiveScene.AddGameObject(GameObjectsTab);
-            SceneManager.ActiveScene.AddGameObject(InspectorWindow);
-            SceneManager.ActiveScene.AddGameObject(ContentManager);
+            //SceneManager.ActiveScene.AddGameObject_Recursive(Test);
+            SceneManager.ActiveScene.AddGameObject_Recursive(Test2);
+            //SceneManager.ActiveScene.AddGameObject_Recursive(Test3);
+            SceneManager.ActiveScene.AddGameObject_Recursive(Test6);
+            SceneManager.ActiveScene.AddGameObject_Recursive(GameObjectsTab);
+            SceneManager.ActiveScene.AddGameObject_Recursive(InspectorWindow);
+            SceneManager.ActiveScene.AddGameObject_Recursive(ContentManager);
 
             SceneManager.ActiveScene.Start();
 

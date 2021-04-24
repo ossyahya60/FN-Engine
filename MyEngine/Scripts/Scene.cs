@@ -54,29 +54,31 @@ namespace MyEngine
             HandyList = new List<GameObject>();
         }
 
-        public void AddGameObject(GameObject GO) //=> Implement it using "Recursion"
-        {
-            if (!GameObjects.Contains(GO))
-            {
-                Light L = GO.GetComponent<Light>();
-                if (GO.ShouldBeRemoved || GO.ShouldBeDeleted)
-                {
-                    GO.ShouldBeRemoved = false;
-                    GO.ShouldBeDeleted = false;
+        //public void AddGameObject(GameObject GO) //=> Implement it using "Recursion"
+        //{
+        //    if (!GameObjects.Contains(GO))
+        //    {
+        //        Light L = GO.GetComponent<Light>();
+        //        if (GO.ShouldBeRemoved || GO.ShouldBeDeleted)
+        //        {
+        //            GO.ShouldBeRemoved = false;
+        //            GO.ShouldBeDeleted = false;
 
-                    if (L != null)
-                        L.Rebuild();
-                }
+        //            if (L != null)
+        //                L.Rebuild();
+        //        }
 
-                GameObjects.Insert(GameObjectCount, GO);
-                GameObjectCount++;
-            }
-        }
+        //        GO.Name = Utility.UniqueGameObjectName(GO.Name);
+        //        GameObjects.Insert(GameObjectCount, GO);
+        //        GameObjectCount++;
+        //    }
+        //}
 
         public void AddGameObject_Recursive(GameObject GO) // Adds the GO along with its children and so on
         {
             if (!GameObjects.Contains(GO))
             {
+                GO.Name = Utility.UniqueGameObjectName(GO.Name);
                 GameObjects.Insert(GameObjectCount, GO);
                 GameObjectCount++;
 
@@ -100,31 +102,30 @@ namespace MyEngine
             }
         }
 
-        /* //Didn't work as Gameobjects have to be in the simulation in order to be find by "GetChildrenMethod" :(
-        public void AddGameObject(GameObject GO) //=> Implement it using "Recursion"
-        {
-            GameObjects.Insert(GameObjectCount, GO);
-            GameObjectCount++;
+         //Didn't work as Gameobjects have to be in the simulation in order to be find by "GetChildrenMethod" :(
+        //public void AddGameObject(GameObject GO) //=> Implement it using "Recursion"
+        //{
+        //    GameObjects.Insert(GameObjectCount, GO);
+        //    GameObjectCount++;
 
-            AddGameObjectRecursive(GO);
-        }
+        //    AddGameObjectRecursive(GO);
+        //}
 
-        private void AddGameObjectRecursive(GameObject GO)
-        {
-            GameObject[] Children = GO.GetChildrenIfExist();
+        //private void AddGameObjectRecursive(GameObject GO)
+        //{
+        //    GameObject[] Children = GO.GetChildrenIfExist();
 
-            if (Children.Length == 0)
-                return;
+        //    if (Children.Length == 0)
+        //        return;
 
-            foreach (GameObject Child in Children)
-            {
-                GameObjects.Insert(GameObjectCount, Child);
-                GameObjectCount++;
+        //    foreach (GameObject Child in Children)
+        //    {
+        //        GameObjects.Insert(GameObjectCount, Child);
+        //        GameObjectCount++;
 
-                AddGameObjectRecursive(Child);
-            }
-        }
-        */
+        //        AddGameObjectRecursive(Child);
+        //    }
+        //}
 
         public void RemoveGameObject(GameObject GO, bool DestroyToo = true, bool Root = true) //=> Implement it using "Recursion"
         {
@@ -345,7 +346,7 @@ namespace MyEngine
                 {
                     GameObject GO = new GameObject();
                     GO = Utility.Deserialize(SR, SerializedObjects) as GameObject;
-                    AddGameObject(GO);
+                    AddGameObject_Recursive(GO);
                 }
 
                 SR.ReadLine();

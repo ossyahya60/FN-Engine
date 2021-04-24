@@ -68,7 +68,31 @@ namespace MyEngine.FN_Editor
                 if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.C))) //Copy
                 {
                     if (SelectedGOs.Count != 0)
+                    {
                         GOs_Clipboard = SelectedGOs.ToArray();
+                        
+                        for(int i=0; i<GOs_Clipboard.Length; i++)
+                        {
+                            string OrignalName = GOs_Clipboard[i].Name;
+
+                            string[] OrigNames = new string[GOs_Clipboard.Length];
+                            GameObject[] AllChildren = GOs_Clipboard[i].GetALLChildren();
+
+                            if(AllChildren != null)
+                                for (int j = 0; j < AllChildren.Length; j++)
+                                    OrigNames[j] = AllChildren[j].Name;
+
+                            GOs_Clipboard[i] = GameObject.Instantiate(GOs_Clipboard[i]);
+                            GOs_Clipboard[i].Name = OrignalName;
+
+                            AllChildren = GOs_Clipboard[i].GetALLChildren();
+                            if (AllChildren != null)
+                                for (int j = 0; j < AllChildren.Length; j++)
+                                    AllChildren[j].Name = OrigNames[j];
+
+                            SceneManager.ActiveScene.RemoveGameObject(GOs_Clipboard[i], false);
+                        }
+                    }
 
                     IsCopy = true;
                 }
@@ -77,7 +101,6 @@ namespace MyEngine.FN_Editor
                     if (SelectedGOs.Count != 0)
                     {
                         GOs_Clipboard = SelectedGOs.ToArray();
-                        AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(GOs_Clipboard, Operation.Delete));
                         Redo_Buffer.Clear();
 
                         foreach (GameObject GO in SelectedGOs)
@@ -129,6 +152,8 @@ namespace MyEngine.FN_Editor
                                 {
                                     if(gameObjects[i].PrevParent != null)
                                         gameObjects[i].PrevParent.AddChild(gameObjects[i]);
+
+                                    gameObjects[i].Name = Utility.UniqueGameObjectName(gameObjects[i].Name);
                                     SceneManager.ActiveScene.AddGameObject_Recursive(gameObjects[i]);
                                 }
                             }
@@ -137,6 +162,8 @@ namespace MyEngine.FN_Editor
                                 GameObject GO = GOs as GameObject;
                                 if (GO.PrevParent != null)
                                     GO.PrevParent.AddChild(GO);
+
+                                GO.Name = Utility.UniqueGameObjectName(GO.Name);
                                 SceneManager.ActiveScene.AddGameObject_Recursive(GO);
                             }
 
@@ -160,6 +187,7 @@ namespace MyEngine.FN_Editor
                                 {
                                     if (gameObjects[i].PrevParent != null)
                                         gameObjects[i].PrevParent.AddChild(gameObjects[i]);
+
                                     SceneManager.ActiveScene.AddGameObject_Recursive(gameObjects[i]);
                                 }
                             }
@@ -168,6 +196,7 @@ namespace MyEngine.FN_Editor
                                 GameObject GO = GOs as GameObject;
                                 if (GO.PrevParent != null)
                                     GO.PrevParent.AddChild(GO);
+
                                 SceneManager.ActiveScene.AddGameObject_Recursive(GO);
                             }
 
@@ -190,57 +219,33 @@ namespace MyEngine.FN_Editor
                 {
                     if (GOs_Clipboard != null)
                     {
-                        AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(GOs_Clipboard, Operation.Create));
-                        Redo_Buffer.Clear();
-
                         GameObject Parent = null;
                         if (SelectedGOs.Count == 1)
                             Parent = SelectedGOs.ToArray()[0];
 
-                        if (IsCopy)
+                        GameObject[] Instances = new GameObject[GOs_Clipboard.Length];
+                        for (int i = 0; i < GOs_Clipboard.Length; i++)
                         {
-                            foreach (GameObject GO in GOs_Clipboard)
+                            GameObject Instance = GameObject.Instantiate(GOs_Clipboard[i]);
+                            Instances[i] = Instance;
+                            if (Parent != null)
                             {
-                                GameObject Instance = GameObject.Instantiate(GO);
-                                
-                                if (Parent != null)
-                                {
-                                    if (Instance.Parent != null)
-                                        Instance.Parent.RemoveChild(Instance);
-                                    Parent.AddChild(Instance);
-                                }
-                                else
-                                {
-                                    if (Instance.Parent != null)
-                                        Instance.Parent.RemoveChild(Instance);
-                                }
-
-                                Instance.Start();
+                                if (Instance.Parent != null)
+                                    Instance.Parent.RemoveChild(Instance);
+                                Parent.AddChild(Instance);
+                            }
+                            else
+                            {
+                                if (Instance.Parent != null)
+                                    Instance.Parent.RemoveChild(Instance);
                             }
                         }
-                        else
-                        {
-                            foreach (GameObject GO in GOs_Clipboard)
-                            {
-                                GameObject Instance = GameObject.Instantiate(GO);
-                                if (Parent != null)
-                                {
-                                    if (Instance.Parent != null)
-                                        Instance.Parent.RemoveChild(Instance);
-                                    Parent.AddChild(Instance);
-                                }
-                                else
-                                {
-                                    if (Instance.Parent != null)
-                                        Instance.Parent.RemoveChild(Instance);
-                                }
 
-                                Instance.Name = GO.Name;
-                                Instance.Start();
-                            }
-
+                        if (!IsCopy)
                             GOs_Clipboard = null;
-                        }
+
+                        AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(Instances, Operation.Create));
+                        Redo_Buffer.Clear();
                     }
                 }
                 else if(ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.A))) //Select All
@@ -255,14 +260,14 @@ namespace MyEngine.FN_Editor
                 if (ImGui.Selectable("New GameObject"))
                 {
                     GameObject GO = new GameObject();
-                    GO.Name = "Unique Name";
+                    GO.Name = Utility.UniqueGameObjectName("Unique Name");
                     GO.AddComponent(new Transform());
                     if (WhoIsSelected != null)
                         WhoIsSelected.AddChild(GO);
 
                     GO.Start();
 
-                    SceneManager.ActiveScene.AddGameObject(GO);
+                    SceneManager.ActiveScene.AddGameObject_Recursive(GO);
 
                     AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(GO, Operation.Create));
                     Redo_Buffer.Clear();
@@ -280,7 +285,10 @@ namespace MyEngine.FN_Editor
                 if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Enter)))
                 {
                     if (NameBuffer.Replace(" ", "").Length > 0)
+                    {
+                        NameBuffer = Utility.UniqueGameObjectName(NameBuffer);
                         WhoIsSelected.Name = NameBuffer;
+                    }
                     ImGui.CloseCurrentPopup();
 
                     AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(NameBuffer, Operation.Rename));

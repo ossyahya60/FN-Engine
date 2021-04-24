@@ -8,13 +8,22 @@ using System.Collections;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder;
+using System.Text.RegularExpressions;
 
 namespace MyEngine
 {
     public static class Utility
     {
         public static ObjectIDGenerator OIG = new ObjectIDGenerator();
-        //public static readonly Type[] SupportedTypes = { typeof(float), typeof(int), typeof(string), typeof(Vector2), typeof(bool) };
+
+        private static Regex NameRegex = null;
+        private static Regex NameFormatRegex = null;
+
+        static Utility()
+        {
+            NameRegex = new Regex(@"([][(][0-9]+[)])$");
+            NameFormatRegex = new Regex(@"([.]*[][(][0-9]+[)])");
+        }
 
         public static void Vector2Int(ref Vector2 vector)
         {
@@ -683,6 +692,72 @@ namespace MyEngine
             PipelineBuildEvent T = null;
             T = Setup.PM.BuildContent(Path);
             Setup.PM.ProcessContent(T);
+        }
+
+        public static string UniqueGameObjectName(string BaseName) // If base name is not present in the scene, then base name is returned
+        {
+            string UniqueName = BaseName;
+
+            bool Duplicate = false;
+            if (NameFormatRegex.IsMatch(BaseName))
+                Duplicate = true;
+
+            GameObject[] GOs = null;
+            int SearchNumber = 0;
+
+            if(Duplicate)
+            {
+                string[] SearchingName = BaseName.Remove(BaseName.Length - 1, 1).Split('(');
+                SearchNumber = int.Parse(SearchingName[SearchingName.Length - 1]) + 1;
+
+                GOs = SceneManager.ActiveScene.GameObjects.Where(Item => GetBaseName(Item.Name) == GetBaseName(UniqueName)).OrderBy(Item => Item.Name).ToArray();
+            }
+            else
+                GOs = SceneManager.ActiveScene.GameObjects.Where(Item => (Item.Name.StartsWith(BaseName) && NameRegex.IsMatch(Item.Name.Remove(0, BaseName.Length))) || Item.Name == BaseName).OrderBy(Item => Item.Name).ToArray();
+
+            for (int i = 0; i < GOs.Length; i++)
+            {
+                if (GOs[i].Name != BaseName)
+                {
+                    string[] ProcessingName = GOs[i].Name.Remove(GOs[i].Name.Length - 1, 1).Split('(');
+                    int Number = int.Parse(ProcessingName[ProcessingName.Length - 1]);
+
+                    if (SearchNumber == Number)
+                        SearchNumber++;
+                    else if(!Duplicate)
+                        break; //?
+                }
+                else if(!Duplicate)
+                    SearchNumber++;
+            }
+
+            if(!Duplicate && SearchNumber != 0)
+                UniqueName = BaseName + " (" + SearchNumber.ToString() + ")";
+            else if(Duplicate)
+            {
+                string[] ProcessingName = UniqueName.Remove(UniqueName.Length - 1, 1).Split('(');
+                UniqueName = "";
+                for (int i = 0; i < ProcessingName.Length - 1; i++)
+                    UniqueName = ProcessingName[i] + "(";
+                UniqueName += SearchNumber.ToString() + ")";
+            }
+
+            return UniqueName;
+        }
+
+        private static string GetBaseName(string Name)
+        {
+            string BaseName = "";
+
+            if (Name[Name.Length - 1] != ')')
+                return "";
+
+            string[] SearchingName = Name.Remove(Name.Length - 1, 1).Split('(');
+            int SearchNumber = int.Parse(SearchingName[SearchingName.Length - 1]) + 1;
+
+            BaseName = Name.Remove(Name.Length - 3 - SearchingName[SearchingName.Length - 1].Length, 3 + SearchingName[SearchingName.Length - 1].Length);
+
+            return BaseName;
         }
     }
 }
