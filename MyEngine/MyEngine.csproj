@@ -27,7 +27,7 @@
     <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="FN_Editor\ContentWindow.cs" />
     <Compile Include="FN_Editor\GameObjects_Tab.cs" />
+    <Compile Include="FN_Editor\GizmosVisualizer.cs" />
     <Compile Include="FN_Editor\InspectorWindow.cs" />
     <Compile Include="Scripts\Button.cs" />
     <Compile Include="Scripts\Canvas.cs" />

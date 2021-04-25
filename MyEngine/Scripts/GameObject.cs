@@ -70,7 +70,7 @@ namespace MyEngine
 
         public bool AddChild(GameObject Child)
         {
-            if (Child == null)
+            if (Child == null || Children.Contains(Child))
                 return false;
 
             Child.Parent = this;

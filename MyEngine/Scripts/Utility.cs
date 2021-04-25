@@ -710,10 +710,10 @@ namespace MyEngine
                 string[] SearchingName = BaseName.Remove(BaseName.Length - 1, 1).Split('(');
                 SearchNumber = int.Parse(SearchingName[SearchingName.Length - 1]) + 1;
 
-                GOs = SceneManager.ActiveScene.GameObjects.Where(Item => GetBaseName(Item.Name) == GetBaseName(UniqueName)).OrderBy(Item => Item.Name).ToArray();
+                GOs = SceneManager.ActiveScene.GameObjects.Where(Item => GetBaseName(Item.Name) == GetBaseName(UniqueName)).OrderBy(Item => GetSearchNumber(Item.Name)).ToArray();
             }
             else
-                GOs = SceneManager.ActiveScene.GameObjects.Where(Item => (Item.Name.StartsWith(BaseName) && NameRegex.IsMatch(Item.Name.Remove(0, BaseName.Length))) || Item.Name == BaseName).OrderBy(Item => Item.Name).ToArray();
+                GOs = SceneManager.ActiveScene.GameObjects.Where(Item => (Item.Name.StartsWith(BaseName) && NameRegex.IsMatch(Item.Name.Remove(0, BaseName.Length))) || Item.Name == BaseName).OrderBy(Item => GetSearchNumber(Item.Name)).ToArray();
 
             for (int i = 0; i < GOs.Length; i++)
             {
@@ -758,6 +758,16 @@ namespace MyEngine
             BaseName = Name.Remove(Name.Length - 3 - SearchingName[SearchingName.Length - 1].Length, 3 + SearchingName[SearchingName.Length - 1].Length);
 
             return BaseName;
+        }
+
+        private static int GetSearchNumber(string Name)
+        {
+            if (Name[Name.Length - 1] != ')')
+                return -1;
+
+            string[] SearchingName = Name.Remove(Name.Length - 1, 1).Split('(');
+
+            return int.Parse(SearchingName[SearchingName.Length - 1]);
         }
     }
 }

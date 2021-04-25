@@ -2,10 +2,11 @@
 using System.Numerics;
 using ImGuiNET;
 using System.Linq;
+using System;
 
 namespace MyEngine.FN_Editor
 {
-    enum Operation { Delete, Create, Rename};
+    enum Operation { Delete, Create, Rename, GO_DragAndDrop};
 
     class GameObjects_Tab : GameObjectComponent
     {
@@ -18,9 +19,14 @@ namespace MyEngine.FN_Editor
         private LinkedList<KeyValuePair<object, Operation>> Undo_Buffer;
         private LinkedList<KeyValuePair<object, Operation>> Redo_Buffer;
         private int BufferLimit = 200; //200 Items
+        private GameObject DraggedGO;
+        private int DropTarg = 1;
+        private int DropSrc = 1;
+        private int DraggedItem = 0;
 
         public override void Start()
         {
+            DraggedGO = null;
             WhoIsSelected = null;
             SelectedGOs = new HashSet<GameObject>();
             Undo_Buffer = new LinkedList<KeyValuePair<object, Operation>>();
@@ -30,14 +36,18 @@ namespace MyEngine.FN_Editor
 
         public override void DrawUI()
         {
+            //Debug
+            ImGui.Text("Undo Buffer Count: ");
+            ImGui.SameLine();
+            ImGui.Text(Undo_Buffer.Count.ToString());
+
+            ImGui.Text("Redo Buffer Count: ");
+            ImGui.SameLine();
+            ImGui.Text(Redo_Buffer.Count.ToString());
+            /////
+
             //Scene Tab
             ImGui.Begin(SceneManager.ActiveScene.Name);
-
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && ImGui.IsWindowHovered(ImGuiHoveredFlags.RootWindow) && !ImGui.IsAnyItemHovered())
-            {
-                WhoIsSelected = null;
-                SelectedGOs.Clear();
-            }
 
             ImGui.Indent();
 
@@ -112,10 +122,7 @@ namespace MyEngine.FN_Editor
                 {
                     GameObject[] Instances = SelectedGOs.ToArray();
                     for (int i = 0; i < SelectedGOs.Count; i++)
-                    {
                         Instances[i] = GameObject.Instantiate(Instances[i]);
-                        Instances[i].Start();
-                    }
 
                     if (SelectedGOs.Count != 0)
                     {
@@ -168,6 +175,19 @@ namespace MyEngine.FN_Editor
                             }
 
                             break;
+                        case Operation.GO_DragAndDrop:
+                            KeyValuePair<GameObject, GameObject> KVP_GO = (KeyValuePair<GameObject, GameObject>)KVP.Key;
+                            if (KVP_GO.Value == null) //Destination is null
+                                KVP_GO.Key.PrevParent.AddChild(KVP_GO.Key);
+                            else
+                            {
+                                if (KVP_GO.Key.PrevParent != null)
+                                    KVP_GO.Key.PrevParent.AddChild(KVP_GO.Key);
+
+                                KVP_GO.Value.RemoveChild(KVP_GO.Key);
+                            }
+
+                            break;
                     }
                 }
                 else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Y), true) && Redo_Buffer.Count != 0) //Handling Undo and Redo actions
@@ -211,6 +231,14 @@ namespace MyEngine.FN_Editor
                             }
                             else
                                 (GOs as GameObject).ShouldBeRemoved = true;
+
+                            break;
+                        case Operation.GO_DragAndDrop:
+                            KeyValuePair<GameObject, GameObject> KVP_GO = (KeyValuePair<GameObject, GameObject>)KVP.Key;
+                            if (KVP_GO.Value == null) //Destination is null
+                                KVP_GO.Key.Parent.RemoveChild(KVP_GO.Key);
+                            else
+                                KVP_GO.Key.PrevParent.AddChild(KVP_GO.Key);
 
                             break;
                     }
@@ -308,9 +336,31 @@ namespace MyEngine.FN_Editor
                 }
             }
 
-            ImGui.End();
+            if (ImGui.IsWindowHovered(ImGuiHoveredFlags.RootWindow) && !ImGui.IsAnyItemHovered())
+            {
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                {
+                    WhoIsSelected = null;
+                    SelectedGOs.Clear();
+                }
 
-            //ImGui.ShowDemoWindow();
+                if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                {
+                    if (DraggedGO != null && DraggedGO.Parent != null)
+                    {
+                        KeyValuePair<GameObject, GameObject> KVP_GO = new KeyValuePair<GameObject, GameObject>(DraggedGO, null);
+
+                        DraggedGO.Parent.RemoveChild(DraggedGO);
+
+                        AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(KVP_GO, Operation.GO_DragAndDrop));
+                        Redo_Buffer.Clear();
+                    }
+
+                    DraggedGO = null;
+                }
+            }
+
+            ImGui.End();
         }
 
         private void AddToACircularBuffer(LinkedList<KeyValuePair<object, Operation>> Buffer, KeyValuePair<object, Operation> KVP)
@@ -358,6 +408,40 @@ namespace MyEngine.FN_Editor
 
                 ImGui.Selectable(GO.Name, SelectedGOs.Contains(GO));
 
+                //Accept Drag and Drop
+                if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.SourceNoDisableHover))
+                {
+                    ImGui.SetDragDropPayload("GameObject", IntPtr.Zero, 0);
+                    DraggedGO = GO;
+
+                    ImGui.Text(GO.Name);
+
+                    ImGui.EndDragDropSource();
+                }
+
+                // The GameObject is a drag source and drop targer at the same time
+                if (ImGui.BeginDragDropTarget())
+                {
+                    if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                    {
+                        if (DraggedGO != null && GO.Parent != DraggedGO)
+                        {
+                            if (DraggedGO.Parent != null)
+                                DraggedGO.Parent.RemoveChild(DraggedGO);
+                            GO.AddChild(DraggedGO);
+
+                            // Undo and Redo Buffering
+                            KeyValuePair<GameObject, GameObject> KVP_GO = new KeyValuePair<GameObject, GameObject>(DraggedGO, GO);
+                            AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(KVP_GO, Operation.GO_DragAndDrop));
+                            Redo_Buffer.Clear();
+                        }
+
+                        DraggedGO = null;
+                    }
+
+                    ImGui.EndDragDropTarget();
+                }
+
                 if (!GO.IsActive())
                 {
                     ImGui.PopStyleColor();
@@ -403,6 +487,40 @@ namespace MyEngine.FN_Editor
 
             bool Open = ImGui.TreeNodeEx(GO.Name, SelectedGOs.Contains(GO) ? ImGuiTreeNodeFlags.Selected : ImGuiTreeNodeFlags.None);
 
+            //Accept Drag and Drop
+            if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.SourceNoDisableHover))
+            {
+                ImGui.SetDragDropPayload("GameObject", IntPtr.Zero, 0);
+                DraggedGO = GO;
+
+                ImGui.Text(GO.Name);
+
+                ImGui.EndDragDropSource();
+            }
+
+            // The GameObject is a drag source and drop targer at the same time
+            if (ImGui.BeginDragDropTarget())
+            {
+                if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                {
+                    if (DraggedGO != null && GO.Parent != DraggedGO)
+                    {
+                        if (DraggedGO.Parent != null)
+                            DraggedGO.Parent.RemoveChild(DraggedGO);
+                        GO.AddChild(DraggedGO);
+
+                        // Undo and Redo Buffering
+                        KeyValuePair<GameObject, GameObject> KVP_GO = new KeyValuePair<GameObject, GameObject>(DraggedGO, GO);
+                        AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(KVP_GO, Operation.GO_DragAndDrop));
+                        Redo_Buffer.Clear();
+                    }
+
+                    DraggedGO = null;
+                }
+
+                ImGui.EndDragDropTarget();
+            }
+
             if (!GO.IsActive())
             {
                 ImGui.PopStyleColor();
@@ -432,8 +550,13 @@ namespace MyEngine.FN_Editor
             }
 
             for (int i = 0; i < ChildrenCount; i++)
-                if(Open)
+            {
+                if (ChildrenCount != GO.Children.Count)
+                    break;
+
+                if (Open)
                     TreeRecursive(GO.Children[i], false);
+            }
 
             if (Open)
                 ImGui.TreePop();
