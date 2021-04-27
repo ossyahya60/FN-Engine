@@ -11,6 +11,8 @@ namespace MyEngine.FN_Editor
 {
     public class ContentWindow: GameObjectComponent
     {
+        public static object DraggedAsset = null;
+
         public string GameContentPath = null;
 
         private Microsoft.Xna.Framework.Graphics.Texture2D T2D = null;
@@ -19,6 +21,7 @@ namespace MyEngine.FN_Editor
         private bool DirectoryChanged = true;
         private Regex TexRegex = null;
         private Regex MusicRegex = null;
+        private Regex ShaderRegex = null;
         private string ContentFolderDirectory = null;
         private List<IntPtr> TexIDs;
         private string AssName = "";
@@ -28,8 +31,8 @@ namespace MyEngine.FN_Editor
             // Allowing Drag and Drop to Engine
             var form = Form.FromHandle(Setup.GameWindow.Handle);
             form.AllowDrop = true;
-            form.DragEnter += Test;
-            form.DragDrop += Test2;
+            form.DragEnter += DrageEnter;
+            form.DragDrop += DragDrop;
             /////////////////////////////
 
             if (GameContentPath == null)
@@ -41,14 +44,15 @@ namespace MyEngine.FN_Editor
             TexIDs = new List<IntPtr>();
             TexRegex = new Regex(@"([\.]\b(png|jpg|jpeg)\b)$", RegexOptions.IgnoreCase);
             MusicRegex = new Regex(@"([\.]\b(wav|ogg|wma|mp3)\b)$", RegexOptions.IgnoreCase);
+            ShaderRegex = new Regex(@"([\.]\b(fx)\b)$", RegexOptions.IgnoreCase);
         }
         
-        private void Test(object sender, DragEventArgs e)
+        private void DrageEnter(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.Link;
         }
 
-        private void Test2(object sender, DragEventArgs e)
+        private void DragDrop(object sender, DragEventArgs e)
         {
             string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop);
             foreach(string F in filePaths)
@@ -57,9 +61,7 @@ namespace MyEngine.FN_Editor
                 {
                     string[] AssetPath = F.Split('\\');
                     string AssetName = AssetPath[AssetPath.Length - 1];
-                    if (TexRegex.IsMatch(AssetName))
-                        File.Copy(F, GameContentPath + "\\" + AssetName);
-                    else if (MusicRegex.IsMatch(AssetName))
+                    if (TexRegex.IsMatch(AssetName) || MusicRegex.IsMatch(AssetName) || ShaderRegex.IsMatch(AssetName))
                         File.Copy(F, GameContentPath + "\\" + AssetName);
                     else
                         continue;
@@ -120,9 +122,10 @@ namespace MyEngine.FN_Editor
                 TexIDs.Clear(); //?
                 TexIDs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\FolderIcon")));
                 TexIDs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\MusicIcon")));
+                TexIDs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\ShaderIcon")));
             }
 
-            int Enumerator = 2;
+            int Enumerator = 3;
 
             //Folders
             bool Entered = false;
@@ -140,7 +143,9 @@ namespace MyEngine.FN_Editor
                     return;
                 }
                 ImGui.PopID();
+                ImGui.PushTextWrapPos(ImGui.GetItemRectMin().X + 64);
                 ImGui.Text(Dir.Remove(0, GameContentPath.Length + 1));
+                ImGui.PopTextWrapPos();
                 ImGui.EndGroup();
 
                 ImGui.SameLine();
@@ -182,9 +187,20 @@ namespace MyEngine.FN_Editor
                             ImGui.OpenPopup("AssetName");
                             AssName = AssetLoadName + "." + AssetLoadNameComposite[AssetLoadNameComposite.Length - 1];
                         }
+
+                        // Dragging an asset
+                        if (ImGui.BeginDragDropSource())
+                        {
+                            ImGui.SetDragDropPayload("Asset", IntPtr.Zero, 0);
+
+                            DraggedAsset = AssetLoadName;
+
+                            ImGui.EndDragDropSource();
+                        }
+
                         ImGui.SameLine();
                     }
-                    else if (MusicRegex.IsMatch(AssetName))
+                    else if (MusicRegex.IsMatch(AssetName)) //Found a song or a soundeffect
                     {
                         ImGui.PushID(ID_F++);
                         bool EnteredButton = false;
@@ -196,6 +212,45 @@ namespace MyEngine.FN_Editor
                             ImGui.OpenPopup("AssetName");
                             AssName = AssetLoadName + "." + AssetLoadNameComposite[AssetLoadNameComposite.Length - 1];
                         }
+
+                        // Dragging an asset
+                        if (ImGui.BeginDragDropSource())
+                        {
+                            ImGui.SetDragDropPayload("Asset", IntPtr.Zero, 0);
+
+                            DraggedAsset = AssetLoadName;
+
+                            ImGui.EndDragDropSource();
+                        }
+
+                        if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
+                            ImGui.PopID();
+
+                        ImGui.SameLine();
+                    }
+                    else if(ShaderRegex.IsMatch(AssetName)) // Found a shader
+                    {
+                        ImGui.PushID(ID_F++);
+                        bool EnteredButton = false;
+                        if (ImGui.ImageButton(TexIDs[2], new Vector2(64.0f, 64.0f)))
+                        {
+                            EnteredButton = true;
+                            ImGui.PopID();
+
+                            ImGui.OpenPopup("AssetName");
+                            AssName = AssetLoadName + "." + AssetLoadNameComposite[AssetLoadNameComposite.Length - 1];
+                        }
+
+                        // Dragging an asset
+                        if (ImGui.BeginDragDropSource())
+                        {
+                            ImGui.SetDragDropPayload("Asset", IntPtr.Zero, 0);
+
+                            DraggedAsset = AssetLoadName;
+
+                            ImGui.EndDragDropSource();
+                        }
+
                         if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
                             ImGui.PopID();
 

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Input;
 
 namespace MyEngine
 {
@@ -105,6 +106,9 @@ namespace MyEngine
         {
             if (!Setup.Game.IsActive) //Pause Game when minimized
                 return;
+
+            if (Input.GetKey(Keys.RightAlt) && Input.GetKeyUp(Keys.Enter))
+                Setup.graphics.ToggleFullScreen();
 
             /////////Resolution related//////////// -> Mandatory
             if (Resolution != new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight))

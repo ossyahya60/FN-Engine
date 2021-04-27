@@ -102,13 +102,13 @@ namespace MyEngine.FN_Editor
                     {
                         case "System.Single": //float
                             float T = (float)FI.GetValue(Selected_GO);
-                            ImGui.DragFloat(FI.Name, ref T);
+                            ImGui.DragFloat(FI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             FI.SetValue(Selected_GO, T);
                             ImGui.PopID();
                             break;
                         case "System.Double": //double
                             double D = (double)FI.GetValue(Selected_GO);
-                            ImGui.InputDouble(FI.Name, ref D);
+                            ImGui.InputDouble(FI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             FI.SetValue(Selected_GO, D);
                             ImGui.PopID();
                             break;
@@ -156,21 +156,21 @@ namespace MyEngine.FN_Editor
                         case "Microsoft.Xna.Framework.Vector2": //Vector2
                             Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)FI.GetValue(Selected_GO);
                             Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
-                            ImGui.DragFloat2(FI.Name, ref V2_IMGUI);
+                            ImGui.DragFloat2(FI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
                             ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Vector3": //Vector3
                             Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)FI.GetValue(Selected_GO);
                             Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
-                            ImGui.DragFloat3(FI.Name, ref V3_IMGUI);
+                            ImGui.DragFloat3(FI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
                             ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Vector4": //Vector4
                             Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)FI.GetValue(Selected_GO);
                             Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
-                            ImGui.DragFloat4(FI.Name, ref V4_IMGUI);
+                            ImGui.DragFloat4(FI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
                             ImGui.PopID();
                             break;
@@ -181,13 +181,8 @@ namespace MyEngine.FN_Editor
                             FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
                             ImGui.PopID();
                             break;
-                            //default:
-                            //    Enum EnumCandidate = Utility.GetInstance(FI.FieldType.FullName) as Enum;
-
-                            //    if (EnumCandidate != null)
-                            //        ImGui.Text(FI.)
-
-                            // break;
+                        default:
+                            break;
                     }
                 }
 
@@ -217,13 +212,13 @@ namespace MyEngine.FN_Editor
                     {
                         case "System.Single": //float
                             float T = (float)PI.GetValue(Selected_GO);
-                            ImGui.DragFloat(PI.Name, ref T);
+                            ImGui.DragFloat(PI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             PI.SetValue(Selected_GO, T);
                             ImGui.PopID();
                             break;
                         case "System.Double": //double
                             double D = (double)PI.GetValue(Selected_GO);
-                            ImGui.InputDouble(PI.Name, ref D);
+                            ImGui.InputDouble(PI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             PI.SetValue(Selected_GO, D);
                             ImGui.PopID();
                             break;
@@ -271,21 +266,21 @@ namespace MyEngine.FN_Editor
                         case "Microsoft.Xna.Framework.Vector2": //Vector2
                             Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)PI.GetValue(Selected_GO);
                             Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
-                            ImGui.DragFloat2(PI.Name, ref V2_IMGUI);
+                            ImGui.DragFloat2(PI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
                             ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Vector3": //Vector3
                             Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)PI.GetValue(Selected_GO);
                             Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
-                            ImGui.DragFloat3(PI.Name, ref V3_IMGUI);
+                            ImGui.DragFloat3(PI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
                             ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Vector4": //Vector4
                             Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)PI.GetValue(Selected_GO);
                             Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
-                            ImGui.DragFloat4(PI.Name, ref V4_IMGUI);
+                            ImGui.DragFloat4(PI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
                             ImGui.PopID();
                             break;
@@ -296,15 +291,8 @@ namespace MyEngine.FN_Editor
                             PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
                             ImGui.PopID();
                             break;
-                            //default:
-                            //    Enum EnumCandidate = Utility.GetInstance(FI.FieldType.FullName) as Enum;
-
-                            //    if (EnumCandidate != null)
-                            //        FI.SetValue(this, Enum.Parse(FI.FieldType, Line[2]));
-                            //    else
-                            //        FI.SetValue(this, null);
-                            //    fieldInfos.Add(FI);
-                            //    break;
+                        default:
+                            break;
                     }
                 }
 
@@ -331,6 +319,9 @@ namespace MyEngine.FN_Editor
                         FieldInfo[] FIS = GOC.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
                         foreach (FieldInfo FI in FIS)
                         {
+                            if (FI.GetValue(GOC) == null)
+                                continue;
+
                             var GOC_SO = FI.GetValue(GOC) as GameObjectComponent;
                             if (GOC_SO != null)
                             {
@@ -351,13 +342,13 @@ namespace MyEngine.FN_Editor
                             {
                                 case "System.Single": //float
                                     float T = (float)FI.GetValue(GOC);
-                                    ImGui.DragFloat(FI.Name, ref T);
+                                    ImGui.DragFloat(FI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(GOC, T);
                                     ImGui.PopID();
                                     break;
                                 case "System.Double": //double
                                     double D = (double)FI.GetValue(GOC);
-                                    ImGui.InputDouble(FI.Name, ref D);
+                                    ImGui.InputDouble(FI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(GOC, D);
                                     ImGui.PopID();
                                     break;
@@ -405,21 +396,21 @@ namespace MyEngine.FN_Editor
                                 case "Microsoft.Xna.Framework.Vector2": //Vector2
                                     Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)FI.GetValue(GOC);
                                     Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
-                                    ImGui.DragFloat2(FI.Name, ref V2_IMGUI);
+                                    ImGui.DragFloat2(FI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
                                     ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Vector3": //Vector3
                                     Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)FI.GetValue(GOC);
                                     Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
-                                    ImGui.DragFloat3(FI.Name, ref V3_IMGUI);
+                                    ImGui.DragFloat3(FI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
                                     ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Vector4": //Vector4
                                     Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)FI.GetValue(GOC);
                                     Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
-                                    ImGui.DragFloat4(FI.Name, ref V4_IMGUI);
+                                    ImGui.DragFloat4(FI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
                                     ImGui.PopID();
                                     break;
@@ -448,27 +439,45 @@ namespace MyEngine.FN_Editor
                                     break;
                                 case "Microsoft.Xna.Framework.Point": //Point
                                     Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)FI.GetValue(GOC);
-                                    int[] P2_ARR = new int[2] {P2.X, P2.Y };
+                                    int[] P2_ARR = new int[2] { P2.X, P2.Y };
                                     ImGui.DragInt2(FI.Name, ref P2_ARR[0]);
                                     FI.SetValue(GOC, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
                                     ImGui.PopID();
                                     break;
-                                    //default:
-                                    //    Enum EnumCandidate = Utility.GetInstance(FI.FieldType.FullName) as Enum;
+                                default:
+                                    if (FI.GetType().IsClass && !FI.GetType().IsArray)
+                                    {
+                                        var Name = FI.GetValue(GOC);
+                                        if (FI.GetType().IsClass && Name != null)
+                                        {
+                                            string DummyRef = Name.ToString();
+                                            ImGui.InputText(FI.Name, ref DummyRef, 20, ImGuiInputTextFlags.ReadOnly);
+                                        }
 
-                                    //    if (EnumCandidate != null)
-                                    //        FI.SetValue(this, Enum.Parse(FI.FieldType, Line[2]));
-                                    //    else
-                                    //        FI.SetValue(this, null);
-                                    //    fieldInfos.Add(FI);
-                                    //    break;
+                                        if (ImGui.BeginDragDropTarget())
+                                        {
+                                            if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                                            {
+                                                if (ContentWindow.DraggedAsset != null)
+                                                {
+                                                    if (FI.FieldType == ContentWindow.DraggedAsset.GetType())
+                                                        FI.SetValue(GOC, ContentWindow.DraggedAsset);
+
+                                                    ContentWindow.DraggedAsset = null;
+                                                }
+                                            }
+                                            ImGui.EndDragDropTarget();
+                                        }
+                                    }
+
+                                    break;
                             }
                         }
 
                         PropertyInfo[] PIS = GOC.GetType().GetProperties();
                         foreach (PropertyInfo PI in PIS)
                         {
-                            if (PI.GetMethod == null || !PI.GetMethod.IsPublic || PI.SetMethod == null || !PI.SetMethod.IsPublic)
+                            if (PI.GetMethod == null || !PI.GetMethod.IsPublic || PI.SetMethod == null || !PI.SetMethod.IsPublic || PI.GetValue(GOC) == null)
                                 continue;
 
                             var GOC_SO = PI.GetValue(GOC) as GameObjectComponent;
@@ -491,13 +500,13 @@ namespace MyEngine.FN_Editor
                             {
                                 case "System.Single": //float
                                     float T = (float)PI.GetValue(GOC);
-                                    ImGui.DragFloat(PI.Name, ref T);
+                                    ImGui.DragFloat(PI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(GOC, T);
                                     ImGui.PopID();
                                     break;
                                 case "System.Double": //double
                                     double D = (double)PI.GetValue(GOC);
-                                    ImGui.InputDouble(PI.Name, ref D);
+                                    ImGui.InputDouble(PI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(GOC, D);
                                     ImGui.PopID();
                                     break;
@@ -545,21 +554,21 @@ namespace MyEngine.FN_Editor
                                 case "Microsoft.Xna.Framework.Vector2": //Vector2
                                     Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)PI.GetValue(GOC);
                                     Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
-                                    ImGui.DragFloat2(PI.Name, ref V2_IMGUI);
+                                    ImGui.DragFloat2(PI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
                                     ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Vector3": //Vector3
                                     Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)PI.GetValue(GOC);
                                     Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
-                                    ImGui.DragFloat3(PI.Name, ref V3_IMGUI);
+                                    ImGui.DragFloat3(PI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
                                     ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Vector4": //Vector4
                                     Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)PI.GetValue(GOC);
                                     Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
-                                    ImGui.DragFloat4(PI.Name, ref V4_IMGUI);
+                                    ImGui.DragFloat4(PI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
                                     ImGui.PopID();
                                     break;
@@ -593,15 +602,34 @@ namespace MyEngine.FN_Editor
                                     PI.SetValue(GOC, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
                                     ImGui.PopID();
                                     break;
-                                    //default:
-                                    //    Enum EnumCandidate = Utility.GetInstance(PI.PropertyType.FullName) as Enum;
+                                default:
+                                    if (PI.GetType().IsClass && !PI.GetType().IsArray)
+                                    {
+                                        var Name = PI.GetValue(GOC);
+                                        if (PI.GetType().IsClass && Name != null)
+                                        {
+                                            string DummyRef = Name.ToString();
+                                            ImGui.InputText(PI.Name, ref DummyRef, 20, ImGuiInputTextFlags.ReadOnly);
+                                        }
+                                    }
 
-                                    //    if (EnumCandidate != null)
-                                    //        PI.SetValue(this, Enum.Parse(FI.FieldType, Line[2]));
-                                    //    else
-                                    //        PI.SetValue(this, null);
-                                    //    fieldInfos.Add(PI);
-                                    //    break;
+                                    if (ImGui.BeginDragDropTarget())
+                                    {
+                                        if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                                        {
+                                            if (ContentWindow.DraggedAsset != null)
+                                            {
+                                                if (PI.PropertyType == ContentWindow.DraggedAsset.GetType())
+                                                    PI.SetValue(GOC, ContentWindow.DraggedAsset);
+
+                                                ContentWindow.DraggedAsset = null;
+                                            }
+                                        }
+
+                                        ImGui.EndDragDropTarget();
+                                    }
+
+                                    break;
                             }
                         }
 

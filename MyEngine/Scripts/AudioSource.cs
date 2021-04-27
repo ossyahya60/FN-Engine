@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
+using System;
 using System.IO;
 
 namespace MyEngine
@@ -54,24 +55,55 @@ namespace MyEngine
                 return false;
             }
         }
-        public string AudioName;
+        public string AudioName
+        {
+            set
+            {
+                if (audioName == value)
+                    return;
+
+                audioName = value;
+                if (value != null)
+                {
+                    //Clean Up
+                    if(SoundEffectInstance != null && !SoundEffectInstance.IsDisposed)
+                        SoundEffectInstance.Dispose();
+                    if (SoundEffect != null && !SoundEffect.IsDisposed)
+                        SoundEffect.Dispose();
+
+                    try
+                    {
+                        SoundEffect = Setup.Content.Load<SoundEffect>(value);
+                    }
+                    catch (System.InvalidCastException)
+                    {
+                        throw new Exception("Usupported Sound Effect Type, must be wav, ogg or mp3");
+                    }
+
+                    SoundEffectInstance = SoundEffect.CreateInstance();
+                }
+            }
+            get
+            {
+                return audioName;
+            }
+        }
 
         private SoundEffect SoundEffect;
         private SoundEffectInstance SoundEffectInstance;
         private float volume = 1;
         private float pitch = 0;
         private float pan = 0;
+        private string audioName = null;
 
         public AudioSource(string AudioName)
         {
             this.AudioName = AudioName;
-            SoundEffect = Setup.Content.Load<SoundEffect>(AudioName);
-            SoundEffectInstance = SoundEffect.CreateInstance();
         }
 
         public AudioSource()
         {
-            AudioName = "null";
+            audioName = "null";
         }
 
         public override void Start()
@@ -82,12 +114,7 @@ namespace MyEngine
 
         public void LoadSoundEffect(string Path)
         {
-            if (SoundEffect != null)
-                SoundEffectInstance.Dispose();
-
-            SoundEffect = Setup.Content.Load<SoundEffect>(Path);
-
-            SoundEffectInstance = SoundEffect.CreateInstance();
+            AudioName = Path;
         }
 
         public void Play()
@@ -121,9 +148,8 @@ namespace MyEngine
             clone.volume = volume;
             clone.pitch = pitch;
             clone.pan = pan;
+            clone.AudioName = null;
             clone.AudioName = AudioName;
-            clone.SoundEffect = SoundEffect;
-            clone.SoundEffectInstance = clone.SoundEffect.CreateInstance();
 
             return clone;
         }

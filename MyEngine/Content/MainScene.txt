@@ -16,10 +16,9 @@ _position:	683	384
 End Of MyEngine.Camera2D
 MyEngine.GameObject
 GeneratedID	1
-SerializableFields	10
+SerializableFields	9
 System.Single	Layer	1	False
 System.String	Tag	Test2	True
-System.Int32	GameComponentsCount	3	False
 System.String	Name	Test2	True
 System.Boolean	ShouldBeDeleted	False	False
 System.Boolean	ShouldBeRemoved	False	False
@@ -53,7 +52,8 @@ null
 MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	1
 System.Boolean	Enabled	True	False
-SerializableProps	1
+SerializableProps	2
+System.String	TextureName	Temp	True
 MyEngine.Sprite
 MyEngine.Sprite
 GeneratedID	4
@@ -68,29 +68,29 @@ End Of MyEngine.Sprite
 End Of MyEngine.SpriteRenderer
 MyEngine.AudioSource
 GeneratedID	6
-SerializableFields	3
-System.String	AudioName	FireWorks_M	True
+SerializableFields	2
 MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	1
 System.Boolean	Enabled	True	False
-SerializableProps	4
+SerializableProps	5
 System.Single	Volume	1	False
 System.Single	Pitch	0	False
 System.Single	Pan	0	False
 System.Boolean	IsLooping	False	False
+System.String	AudioName	FireWorks_M	True
 End Of MyEngine.AudioSource
-SerializableProps	4
+SerializableProps	5
 System.Boolean	IsEditor	False	False
 null
 null
+System.Int32	GameComponentsCount	3	False
 System.Boolean	Active	True	False
 End Of MyEngine.GameObject
 MyEngine.GameObject
 GeneratedID	7
-SerializableFields	10
+SerializableFields	9
 System.Single	Layer	1	False
 null
-System.Int32	GameComponentsCount	3	False
 System.String	Name	ContentManager	True
 System.Boolean	ShouldBeDeleted	False	False
 System.Boolean	ShouldBeRemoved	False	False
@@ -124,18 +124,18 @@ MyEngine.GameObject
 System.Boolean	Enabled	True	False
 SerializableProps	0
 End Of MyEngine.FN_Editor.ContentWindow
-SerializableProps	4
+SerializableProps	5
 System.Boolean	IsEditor	True	False
 null
 null
+System.Int32	GameComponentsCount	3	False
 System.Boolean	Active	True	False
 End Of MyEngine.GameObject
 MyEngine.GameObject
 GeneratedID	11
-SerializableFields	10
+SerializableFields	9
 System.Single	Layer	1	False
 null
-System.Int32	GameComponentsCount	0	False
 System.String	Name	Default	True
 System.Boolean	ShouldBeDeleted	False	False
 System.Boolean	ShouldBeRemoved	False	False
@@ -143,37 +143,37 @@ System.Int32	UI_Layer	1	False
 @	System.Collections.Generic.List`1[[MyEngine.GameObject, MyEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]	Children	0
 null
 @	System.Collections.Generic.List`1[[MyEngine.GameObjectComponent, MyEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]	GameObjectComponents	0
-SerializableProps	4
+SerializableProps	5
 System.Boolean	IsEditor	True	False
 null
 null
+System.Int32	GameComponentsCount	0	False
 System.Boolean	Active	True	False
 End Of MyEngine.GameObject
 MyEngine.GameObject
 GeneratedID	12
-SerializableFields	10
+SerializableFields	9
 System.Single	Layer	1	False
 null
-System.Int32	GameComponentsCount	0	False
-System.String	Name	Default	True
+System.String	Name	Default (1)	True
 System.Boolean	ShouldBeDeleted	False	False
 System.Boolean	ShouldBeRemoved	False	False
 System.Int32	UI_Layer	1	False
 @	System.Collections.Generic.List`1[[MyEngine.GameObject, MyEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]	Children	0
 null
 @	System.Collections.Generic.List`1[[MyEngine.GameObjectComponent, MyEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]	GameObjectComponents	0
-SerializableProps	4
+SerializableProps	5
 System.Boolean	IsEditor	True	False
 null
 null
+System.Int32	GameComponentsCount	0	False
 System.Boolean	Active	True	False
 End Of MyEngine.GameObject
 MyEngine.GameObject
 GeneratedID	13
-SerializableFields	10
+SerializableFields	9
 System.Single	Layer	0.1	False
 System.String	Tag	Test6	True
-System.Int32	GameComponentsCount	3	False
 System.String	Name	Test 6	True
 System.Boolean	ShouldBeDeleted	False	False
 System.Boolean	ShouldBeRemoved	False	False
@@ -182,10 +182,9 @@ System.Int32	UI_Layer	1	False
 False
 MyEngine.GameObject
 GeneratedID	14
-SerializableFields	10
+SerializableFields	9
 System.Single	Layer	0.1	False
 System.String	Tag	Test6	True
-System.Int32	GameComponentsCount	3	False
 System.String	Name	Test6_Inst	True
 System.Boolean	ShouldBeDeleted	False	False
 System.Boolean	ShouldBeRemoved	False	False
@@ -199,11 +198,11 @@ MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	14
 System.Boolean	Enabled	True	False
 SerializableProps	7
-Microsoft.Xna.Framework.Vector2	LastPosition	{X:0 Y:0}	False
-Microsoft.Xna.Framework.Vector2	Position	{X:683 Y:460.8}	False
+Microsoft.Xna.Framework.Vector2	LastPosition	{X:561 Y:460.8}	False
+Microsoft.Xna.Framework.Vector2	Position	{X:561 Y:460.8}	False
 System.Single	Rotation	0	False
 Microsoft.Xna.Framework.Vector2	Scale	{X:100 Y:100}	False
-Microsoft.Xna.Framework.Vector2	LocalPosition	{X:0 Y:0}	False
+Microsoft.Xna.Framework.Vector2	LocalPosition	{X:-122 Y:0}	False
 System.Single	LocalRotation	0	False
 Microsoft.Xna.Framework.Vector2	LocalScale	{X:1 Y:1}	False
 End Of MyEngine.Transform
@@ -219,7 +218,8 @@ null
 MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	14
 System.Boolean	Enabled	True	False
-SerializableProps	1
+SerializableProps	2
+null
 MyEngine.Sprite
 MyEngine.Sprite
 GeneratedID	17
@@ -250,11 +250,12 @@ MyEngine.GameObject
 System.Boolean	Enabled	True	False
 SerializableProps	0
 End Of MyEngine.Light
-SerializableProps	4
+SerializableProps	5
 System.Boolean	IsEditor	False	False
 null
 MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	13
+System.Int32	GameComponentsCount	3	False
 System.Boolean	Active	True	False
 End Of MyEngine.GameObject
 MyEngine.Transform
@@ -265,7 +266,7 @@ MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	13
 System.Boolean	Enabled	True	False
 SerializableProps	7
-Microsoft.Xna.Framework.Vector2	LastPosition	{X:0 Y:0}	False
+Microsoft.Xna.Framework.Vector2	LastPosition	{X:683 Y:460.8}	False
 Microsoft.Xna.Framework.Vector2	Position	{X:683 Y:460.8}	False
 System.Single	Rotation	0	False
 Microsoft.Xna.Framework.Vector2	Scale	{X:100 Y:100}	False
@@ -285,7 +286,8 @@ Microsoft.Xna.Framework.Color	Color	{R:0 G:255 B:255 A:255}	False
 MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	13
 System.Boolean	Enabled	True	False
-SerializableProps	1
+SerializableProps	2
+null
 MyEngine.Sprite
 MyEngine.Sprite
 GeneratedID	23
@@ -316,10 +318,11 @@ MyEngine.GameObject
 System.Boolean	Enabled	True	False
 SerializableProps	0
 End Of MyEngine.Light
-SerializableProps	4
+SerializableProps	5
 System.Boolean	IsEditor	False	False
 null
 null
+System.Int32	GameComponentsCount	3	False
 System.Boolean	Active	True	False
 End Of MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	14

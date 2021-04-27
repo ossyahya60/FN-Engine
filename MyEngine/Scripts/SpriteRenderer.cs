@@ -8,11 +8,41 @@ namespace MyEngine
 {
     public class SpriteRenderer: GameObjectComponent
     {
-        public Sprite Sprite { set; get; }
+        public static Effect LastEffect;
+
+        public string TextureName
+        {
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    return;
+
+                if (Sprite == null)
+                {
+                    Sprite = new Sprite(gameObject.Transform);
+                    Sprite.LoadTexture("Default Textures\\DefaultTexture");
+                }
+
+                if (value == Sprite.Texture.Name)
+                    return;
+
+                if(string.IsNullOrEmpty(Sprite.Texture.Name))
+                    Sprite.Texture.Name = value;
+
+                Sprite.LoadTexture(value);
+            }
+            get
+            {
+                if (Sprite != null && Sprite.Texture != null)
+                    return Sprite.Texture.Name;
+                else
+                    return null;
+            }
+        }
+        public Sprite Sprite { private set; get; }
         public SpriteEffects SpriteEffects;
         public Color Color = Color.Aqua;
         public Effect Effect;
-        public static Effect LastEffect;
 
         static SpriteRenderer()
         {
@@ -21,7 +51,6 @@ namespace MyEngine
 
         public SpriteRenderer()
         {
-            Sprite = null;
             //Color = Color.White;
             SpriteEffects = SpriteEffects.None;
             Effect = null;
@@ -29,15 +58,13 @@ namespace MyEngine
 
         public override void Start()
         {
-            //gameObject.Layer = 1;
-
-            if (Sprite == null)
-                Sprite = new Sprite(gameObject.Transform);
+            if(string.IsNullOrEmpty(TextureName))
+                TextureName = "Default Textures\\DefaultTexture";
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (Sprite != null)
+            if (Sprite != null && Sprite.Texture != null)
             {
                 if (LastEffect != Effect)
                 {

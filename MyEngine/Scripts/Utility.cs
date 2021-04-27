@@ -356,6 +356,7 @@ namespace MyEngine
                             Texture2D ObjectIfExist = GetSerializedObjectIfExist(SOs, LineArr[5]) as Texture2D;
                             bool IsNull = ObjectIfExist == null;
                             ObjectIfExist = Setup.Content.Load<Texture2D>(LineArr[3]); //You Might have to handle assets in a custom folder in content folder
+                            ObjectIfExist.Name = LineArr[3];
 
                             if (IsNull) // A new Entry
                                 SOs.Add(long.Parse(LineArr[5]), ObjectIfExist);
@@ -501,6 +502,7 @@ namespace MyEngine
                             Texture2D ObjectIfExist = GetSerializedObjectIfExist(SOs, LineArr[5]) as Texture2D;
                             bool IsNull = ObjectIfExist == null;
                             ObjectIfExist = Setup.Content.Load<Texture2D>(LineArr[3]); //You Might have to handle assets in a custom folder in content folder
+                            ObjectIfExist.Name = LineArr[3];
 
                             if (IsNull) // A new Entry
                                 SOs.Add(long.Parse(LineArr[5]), ObjectIfExist);
@@ -623,10 +625,10 @@ namespace MyEngine
                     else
                         PI.SetValue(ActiveObject, GetValueOfAValueType(LineArr));
                 }
-                else if (PI.PropertyType.Name == "String")
-                    PI.SetValue(ActiveObject, Line.Split('\t')[2]);
                 else if (Line == "null")
                     PI.SetValue(ActiveObject, null);
+                else if (PI.PropertyType.Name == "String")
+                    PI.SetValue(ActiveObject, Line.Split('\t')[2]);
                 else
                     PI.SetValue(ActiveObject, Deserialize(SR, SOs));
             }

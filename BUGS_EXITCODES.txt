@@ -1,0 +1,5 @@
+has exited with code -1073740940 (0xc0000374).
+
+has exited with code -1073741819 (0xc0000005) 'Access violation'.
+
+has exited with code -1073740771 (0xc000041d).

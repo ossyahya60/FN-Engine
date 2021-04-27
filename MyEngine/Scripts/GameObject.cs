@@ -23,9 +23,23 @@ namespace MyEngine
                 return parent;
             }
         }
-        public float Layer = 1;
+        public float Layer
+        {
+            set
+            {
+                if(value != layer)
+                {
+                    layer = value;
+                    SceneManager.ActiveScene.SortGameObjectsWithLayer();
+                }
+            }
+            get
+            {
+                return layer;
+            }
+        }
         public string Tag = null;
-        public int GameComponentsCount = 0;
+        public int GameComponentsCount { private set; get; }
         public bool Active { set; get; }
         public string Name = "Default";
         public bool ShouldBeDeleted = false;
@@ -37,6 +51,7 @@ namespace MyEngine
 
         private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect", "CircleCollider" };
         private GameObject parent = null;
+        private float layer = 1;
 
         public GameObject()
         {

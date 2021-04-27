@@ -20,9 +20,6 @@ namespace MyEngine.FN_Editor
         private LinkedList<KeyValuePair<object, Operation>> Redo_Buffer;
         private int BufferLimit = 200; //200 Items
         private GameObject DraggedGO;
-        private int DropTarg = 1;
-        private int DropSrc = 1;
-        private int DraggedItem = 0;
 
         public override void Start()
         {
@@ -133,12 +130,13 @@ namespace MyEngine.FN_Editor
                 else if(ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Z), true) && Undo_Buffer.Count != 0) //Handling Undo and Redo actions
                 {
                     KeyValuePair<object, Operation> KVP = RemoveFromACircularBuffer(Undo_Buffer);
-                    AddToACircularBuffer(Redo_Buffer, KVP);
 
                     object GOs = KVP.Key;
                     switch (KVP.Value)
                     {
                         case Operation.Create:
+                            AddToACircularBuffer(Redo_Buffer, KVP);
+
                             if (GOs.GetType().IsArray)
                             {
                                 GameObject[] gameObjects = GOs as GameObject[];
@@ -151,6 +149,8 @@ namespace MyEngine.FN_Editor
 
                             break;
                         case Operation.Delete:
+                            AddToACircularBuffer(Redo_Buffer, KVP);
+
                             if (GOs.GetType().IsArray)
                             {
                                 GameObject[] gameObjects = GOs as GameObject[];
@@ -176,6 +176,8 @@ namespace MyEngine.FN_Editor
 
                             break;
                         case Operation.GO_DragAndDrop:
+                            AddToACircularBuffer(Redo_Buffer, KVP);
+
                             KeyValuePair<GameObject, GameObject> KVP_GO = (KeyValuePair<GameObject, GameObject>)KVP.Key;
                             if (KVP_GO.Value == null) //Destination is null
                                 KVP_GO.Key.PrevParent.AddChild(KVP_GO.Key);
@@ -188,17 +190,25 @@ namespace MyEngine.FN_Editor
                             }
 
                             break;
+                        case Operation.Rename:
+                            KeyValuePair<GameObject, string> NewKVP = (KeyValuePair<GameObject, string>)KVP.Key;
+                            AddToACircularBuffer(Redo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<GameObject, string>(NewKVP.Key, NewKVP.Key.Name), Operation.Rename));
+
+                            NewKVP.Key.Name = NewKVP.Value;
+
+                            break;
                     }
                 }
                 else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Y), true) && Redo_Buffer.Count != 0) //Handling Undo and Redo actions
                 {
                     KeyValuePair<object, Operation> KVP = RemoveFromACircularBuffer(Redo_Buffer);
-                    AddToACircularBuffer(Undo_Buffer, KVP);
 
                     object GOs = KVP.Key;
                     switch (KVP.Value)
                     {
                         case Operation.Create:
+                            AddToACircularBuffer(Undo_Buffer, KVP);
+
                             if (GOs.GetType().IsArray)
                             {
                                 GameObject[] gameObjects = GOs as GameObject[];
@@ -222,6 +232,8 @@ namespace MyEngine.FN_Editor
 
                             break;
                         case Operation.Delete:
+                            AddToACircularBuffer(Undo_Buffer, KVP);
+
                             if (GOs.GetType().IsArray)
                             {
                                 GameObject[] gameObjects = GOs as GameObject[];
@@ -234,11 +246,20 @@ namespace MyEngine.FN_Editor
 
                             break;
                         case Operation.GO_DragAndDrop:
+                            AddToACircularBuffer(Undo_Buffer, KVP);
+
                             KeyValuePair<GameObject, GameObject> KVP_GO = (KeyValuePair<GameObject, GameObject>)KVP.Key;
                             if (KVP_GO.Value == null) //Destination is null
                                 KVP_GO.Key.Parent.RemoveChild(KVP_GO.Key);
                             else
                                 KVP_GO.Key.PrevParent.AddChild(KVP_GO.Key);
+
+                            break;
+                        case Operation.Rename:
+                            KeyValuePair<GameObject, string> NewKVP = (KeyValuePair<GameObject, string>)KVP.Key;
+                            AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<GameObject, string>(NewKVP.Key, NewKVP.Key.Name), Operation.Rename));
+
+                            NewKVP.Key.Name = NewKVP.Value;
 
                             break;
                     }
@@ -312,15 +333,16 @@ namespace MyEngine.FN_Editor
                 ImGui.InputText("##edit", ref NameBuffer, 50, ImGuiInputTextFlags.AutoSelectAll);
                 if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Enter)))
                 {
-                    if (NameBuffer.Replace(" ", "").Length > 0)
+                    if (NameBuffer.Replace(" ", "").Length > 0 && NameBuffer != WhoIsSelected.Name)
                     {
+                        KeyValuePair<GameObject, string> BufferedObject = new KeyValuePair<GameObject, string>(WhoIsSelected, WhoIsSelected.Name);
+                        AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(BufferedObject, Operation.Rename));
+                        Redo_Buffer.Clear();
+
                         NameBuffer = Utility.UniqueGameObjectName(NameBuffer);
                         WhoIsSelected.Name = NameBuffer;
                     }
                     ImGui.CloseCurrentPopup();
-
-                    AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(NameBuffer, Operation.Rename));
-                    Redo_Buffer.Clear();
                 }
 
                 ImGui.EndPopup();

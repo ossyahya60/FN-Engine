@@ -259,13 +259,13 @@ namespace MyEngine
 
             //passing a property as a refrence using delegates
             //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(value => Arrow.Transform.Rotation = value);
-            if (Input.GetKey(Keys.W))
+            if (Input.GetKey(Keys.W, KeyboardFlags.SHIFT))
                 SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
-            if (Input.GetKey(Keys.S))
+            if (Input.GetKey(Keys.S, KeyboardFlags.SHIFT))
                 SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
-            if (Input.GetKey(Keys.A))
+            if (Input.GetKey(Keys.A, KeyboardFlags.SHIFT))
                 SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
-            if (Input.GetKey(Keys.D))
+            if (Input.GetKey(Keys.D, KeyboardFlags.SHIFT))
                 SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             if (Input.GetKeyUp(Keys.O, KeyboardFlags.CTRL))
@@ -274,13 +274,13 @@ namespace MyEngine
             if (Input.GetKeyUp(Keys.R, KeyboardFlags.CTRL))
                 SceneManager.LoadScene_Serialization("MainScene");
 
-            if (Input.GetKey(Keys.Up))
+            if (Input.GetKey(Keys.Up, KeyboardFlags.SHIFT))
                 SceneManager.ActiveScene.FindGameObjectWithName("Test6_Inst").Transform.MoveY(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
-            if (Input.GetKey(Keys.Down))
+            if (Input.GetKey(Keys.Down, KeyboardFlags.SHIFT))
                 SceneManager.ActiveScene.FindGameObjectWithName("Test6_Inst").Transform.MoveY((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
-            if (Input.GetKey(Keys.Left))
+            if (Input.GetKey(Keys.Left, KeyboardFlags.SHIFT))
                 SceneManager.ActiveScene.FindGameObjectWithName("Test6_Inst").Transform.MoveX(-(float)gameTime.ElapsedGameTime.TotalSeconds * 120);
-            if (Input.GetKey(Keys.Right))
+            if (Input.GetKey(Keys.Right, KeyboardFlags.SHIFT))
                 SceneManager.ActiveScene.FindGameObjectWithName("Test6_Inst").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             SceneManager.Update(gameTime);

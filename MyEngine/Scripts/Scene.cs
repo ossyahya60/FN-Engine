@@ -74,7 +74,7 @@ namespace MyEngine
         //    }
         //}
 
-        public void AddGameObject_Recursive(GameObject GO) // Adds the GO along with its children and so on
+        public void AddGameObject_Recursive(GameObject GO, bool Root = true) // Adds the GO along with its children and so on
         {
             if (!GameObjects.Contains(GO))
             {
@@ -97,8 +97,11 @@ namespace MyEngine
                 foreach (GameObject Child in GO.Children)
                 {
                     Child.ShouldBeRemoved = RemovedOrDeleted;
-                    AddGameObject_Recursive(Child);
+                    AddGameObject_Recursive(Child, false);
                 }
+
+                if(Root)
+                    SortGameObjectsWithLayer();
             }
         }
 
