@@ -641,15 +641,9 @@ namespace MyEngine
         private static object GetSerializedObjectIfExist(Dictionary<long, object> SOs, string Key, bool SpecialHandling = false)
         {
             object SerializedObject = null;
-            try
-            {
+
+            if(SOs.ContainsKey(long.Parse(Key)))
                 SerializedObject = SOs[long.Parse(Key)]; //Check if there is a failure?
-            }
-            catch (KeyNotFoundException)
-            {
-                if (SpecialHandling)
-                    throw new KeyNotFoundException("This case shouldn't happen, check special deserialized objects");
-            }
 
             return SerializedObject;
         }
@@ -692,7 +686,7 @@ namespace MyEngine
             //Registering and Building an Item in the Content Manager
             Setup.PM.RegisterContent(Path);
             PipelineBuildEvent T = null;
-            T = Setup.PM.BuildContent(Path);
+            T = Setup.PM.BuildContent(Path); // Excpetion "System.Reflection.ReflectionTypeLoadException" occurs here!
             Setup.PM.ProcessContent(T);
         }
 

@@ -441,7 +441,7 @@ namespace MyEngine.FN_Editor
                     ImGui.EndDragDropSource();
                 }
 
-                // The GameObject is a drag source and drop targer at the same time
+                // The GameObject is a drag source and drop target at the same time
                 if (ImGui.BeginDragDropTarget())
                 {
                     if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))

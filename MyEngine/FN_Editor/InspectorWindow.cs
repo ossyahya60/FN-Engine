@@ -63,6 +63,8 @@ namespace MyEngine.FN_Editor
                     return;
                 }
 
+                int IDs = 0;
+
                 //Name Of GameObject
                 ImGui.Indent((ImGui.GetWindowSize().X - ImGui.CalcTextSize(Selected_GO.Name + " ---- ").X) * 0.5f);
                 ImGui.Text("-- " + Selected_GO.Name + " --");
@@ -98,46 +100,41 @@ namespace MyEngine.FN_Editor
                         }
                     }
 
+                    ImGui.PushID(IDs++);
                     switch (FI.FieldType.FullName) //Here, I handle basic types
                     {
                         case "System.Single": //float
                             float T = (float)FI.GetValue(Selected_GO);
                             ImGui.DragFloat(FI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             FI.SetValue(Selected_GO, T);
-                            ImGui.PopID();
                             break;
                         case "System.Double": //double
                             double D = (double)FI.GetValue(Selected_GO);
                             ImGui.InputDouble(FI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             FI.SetValue(Selected_GO, D);
-                            ImGui.PopID();
                             break;
                         case "System.Int32": //int 32
                             int I = (int)FI.GetValue(Selected_GO);
                             ImGui.InputInt(FI.Name, ref I);
                             FI.SetValue(Selected_GO, I);
-                            ImGui.PopID();
                             break;
                         case "System.Int16": //int 16
                             short S = (short)FI.GetValue(Selected_GO);
                             Marshal.WriteInt16(intPointer, S);
                             ImGui.InputScalar(FI.Name, ImGuiDataType.S16, intPointer);
                             FI.SetValue(Selected_GO, Marshal.ReadInt16(intPointer));
-                            ImGui.PopID();
                             break;
                         case "System.Int64": //int 64
                             long L = (long)FI.GetValue(Selected_GO);
                             Marshal.WriteInt64(intPointerL, L);
                             ImGui.InputScalar(FI.Name, ImGuiDataType.S64, intPointerL);
                             FI.SetValue(Selected_GO, Marshal.ReadInt64(intPointerL));
-                            ImGui.PopID();
                             break;
                         case "System.UInt32": //uint 32
                             uint U32 = (uint)FI.GetValue(Selected_GO);
                             Marshal.WriteInt32(intPointerU32, (int)U32);
                             ImGui.InputScalar(FI.Name, ImGuiDataType.U32, intPointerU32);
                             FI.SetValue(Selected_GO, Marshal.ReadInt32(intPointerU32));
-                            ImGui.PopID();
                             break;
                         //case "System.UInt16": //uint 16
                         //    FI.SetValue(this, ushort.Parse(Line[2]));
@@ -151,39 +148,36 @@ namespace MyEngine.FN_Editor
                             bool B = (bool)FI.GetValue(Selected_GO);
                             ImGui.Checkbox(FI.Name, ref B);
                             FI.SetValue(Selected_GO, B);
-                            ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Vector2": //Vector2
                             Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)FI.GetValue(Selected_GO);
                             Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
                             ImGui.DragFloat2(FI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
-                            ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Vector3": //Vector3
                             Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)FI.GetValue(Selected_GO);
                             Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
                             ImGui.DragFloat3(FI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
-                            ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Vector4": //Vector4
                             Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)FI.GetValue(Selected_GO);
                             Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
                             ImGui.DragFloat4(FI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
-                            ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Point": //Point
                             Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)FI.GetValue(Selected_GO);
                             int[] P2_ARR = new int[2] { P2.X, P2.Y };
                             ImGui.DragInt2(FI.Name, ref P2_ARR[0]);
                             FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
-                            ImGui.PopID();
                             break;
                         default:
                             break;
                     }
+
+                    ImGui.PopID();
                 }
 
                 PropertyInfo[] PIS_GO = Selected_GO.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -208,46 +202,41 @@ namespace MyEngine.FN_Editor
                         }
                     }
 
+                    ImGui.PushID(IDs++);
                     switch (PI.PropertyType.FullName) //Here, I handle basic types
                     {
                         case "System.Single": //float
                             float T = (float)PI.GetValue(Selected_GO);
                             ImGui.DragFloat(PI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             PI.SetValue(Selected_GO, T);
-                            ImGui.PopID();
                             break;
                         case "System.Double": //double
                             double D = (double)PI.GetValue(Selected_GO);
                             ImGui.InputDouble(PI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             PI.SetValue(Selected_GO, D);
-                            ImGui.PopID();
                             break;
                         case "System.Int32": //int 32
                             int I = (int)PI.GetValue(Selected_GO);
                             ImGui.InputInt(PI.Name, ref I);
                             PI.SetValue(Selected_GO, I);
-                            ImGui.PopID();
                             break;
                         case "System.Int16": //int 16
                             short S = (short)PI.GetValue(Selected_GO);
                             Marshal.WriteInt16(intPointer, S);
                             ImGui.InputScalar(PI.Name, ImGuiDataType.S16, intPointer);
                             PI.SetValue(Selected_GO, Marshal.ReadInt16(intPointer));
-                            ImGui.PopID();
                             break;
                         case "System.Int64": //int 64
                             long L = (long)PI.GetValue(Selected_GO);
                             Marshal.WriteInt64(intPointerL, L);
                             ImGui.InputScalar(PI.Name, ImGuiDataType.S64, intPointerL);
                             PI.SetValue(Selected_GO, Marshal.ReadInt64(intPointerL));
-                            ImGui.PopID();
                             break;
                         case "System.UInt32": //uint 32
                             uint U32 = (uint)PI.GetValue(Selected_GO);
                             Marshal.WriteInt32(intPointerU32, (int)U32);
                             ImGui.InputScalar(PI.Name, ImGuiDataType.U32, intPointerU32);
                             PI.SetValue(Selected_GO, Marshal.ReadInt32(intPointerU32));
-                            ImGui.PopID();
                             break;
                         //case "System.UInt16": //uint 16
                         //    FI.SetValue(this, ushort.Parse(Line[2]));
@@ -261,39 +250,36 @@ namespace MyEngine.FN_Editor
                             bool B = (bool)PI.GetValue(Selected_GO);
                             ImGui.Checkbox(PI.Name, ref B);
                             PI.SetValue(Selected_GO, B);
-                            ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Vector2": //Vector2
                             Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)PI.GetValue(Selected_GO);
                             Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
                             ImGui.DragFloat2(PI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
-                            ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Vector3": //Vector3
                             Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)PI.GetValue(Selected_GO);
                             Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
                             ImGui.DragFloat3(PI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
-                            ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Vector4": //Vector4
                             Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)PI.GetValue(Selected_GO);
                             Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
                             ImGui.DragFloat4(PI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
-                            ImGui.PopID();
                             break;
                         case "Microsoft.Xna.Framework.Point": //Point
                             Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)PI.GetValue(Selected_GO);
                             int[] P2_ARR = new int[2] { P2.X, P2.Y };
                             ImGui.DragInt2(PI.Name, ref P2_ARR[0]);
                             PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
-                            ImGui.PopID();
                             break;
                         default:
                             break;
                     }
+
+                    ImGui.PopID();
                 }
 
                 ImGui.NewLine();
@@ -338,46 +324,41 @@ namespace MyEngine.FN_Editor
                                 }
                             }
 
+                            ImGui.PushID(IDs++);
                             switch (FI.FieldType.FullName) //Here, I handle basic types
                             {
                                 case "System.Single": //float
                                     float T = (float)FI.GetValue(GOC);
                                     ImGui.DragFloat(FI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(GOC, T);
-                                    ImGui.PopID();
                                     break;
                                 case "System.Double": //double
                                     double D = (double)FI.GetValue(GOC);
                                     ImGui.InputDouble(FI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(GOC, D);
-                                    ImGui.PopID();
                                     break;
                                 case "System.Int32": //int 32
                                     int I = (int)FI.GetValue(GOC);
                                     ImGui.InputInt(FI.Name, ref I);
                                     FI.SetValue(GOC, I);
-                                    ImGui.PopID();
                                     break;
                                 case "System.Int16": //int 16
                                     short S = (short)FI.GetValue(GOC);
                                     Marshal.WriteInt16(intPointer, S);
                                     ImGui.InputScalar(FI.Name, ImGuiDataType.S16, intPointer);
                                     FI.SetValue(GOC, Marshal.ReadInt16(intPointer));
-                                    ImGui.PopID();
                                     break;
                                 case "System.Int64": //int 64
                                     long L = (long)FI.GetValue(GOC);
                                     Marshal.WriteInt64(intPointerL, L);
                                     ImGui.InputScalar(FI.Name, ImGuiDataType.S64, intPointerL);
                                     FI.SetValue(GOC, Marshal.ReadInt64(intPointerL));
-                                    ImGui.PopID();
                                     break;
                                 case "System.UInt32": //uint 32
                                     uint U32 = (uint)FI.GetValue(GOC);
                                     Marshal.WriteInt32(intPointerU32, (int)U32);
                                     ImGui.InputScalar(FI.Name, ImGuiDataType.U32, intPointerU32);
                                     FI.SetValue(GOC, Marshal.ReadInt32(intPointerU32));
-                                    ImGui.PopID();
                                     break;
                                 //case "System.UInt16": //uint 16
                                 //    FI.SetValue(this, ushort.Parse(Line[2]));
@@ -391,28 +372,24 @@ namespace MyEngine.FN_Editor
                                     bool B = (bool)FI.GetValue(GOC);
                                     ImGui.Checkbox(FI.Name, ref B);
                                     FI.SetValue(GOC, B);
-                                    ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Vector2": //Vector2
                                     Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)FI.GetValue(GOC);
                                     Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
                                     ImGui.DragFloat2(FI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
-                                    ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Vector3": //Vector3
                                     Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)FI.GetValue(GOC);
                                     Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
                                     ImGui.DragFloat3(FI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
-                                    ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Vector4": //Vector4
                                     Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)FI.GetValue(GOC);
                                     Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
                                     ImGui.DragFloat4(FI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
-                                    ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Color": //Color
                                     Microsoft.Xna.Framework.Color V4_C = (Microsoft.Xna.Framework.Color)FI.GetValue(GOC);
@@ -430,19 +407,18 @@ namespace MyEngine.FN_Editor
 
                                     if (ActiveFI == FI && GOC == ActiveGOC && !ColorClicked)
                                     {
+                                        ImGui.PushID(IDs++);
                                         ImGui.ColorPicker4("Color", ref V4_IMGUI_C);
                                         ImGui.PopID();
                                     }
 
                                     FI.SetValue(GOC, new Microsoft.Xna.Framework.Color(V4_IMGUI_C.X, V4_IMGUI_C.Y, V4_IMGUI_C.Z, V4_IMGUI_C.W));
-                                    ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Point": //Point
                                     Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)FI.GetValue(GOC);
                                     int[] P2_ARR = new int[2] { P2.X, P2.Y };
                                     ImGui.DragInt2(FI.Name, ref P2_ARR[0]);
                                     FI.SetValue(GOC, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
-                                    ImGui.PopID();
                                     break;
                                 default:
                                     if (FI.GetType().IsClass && !FI.GetType().IsArray)
@@ -472,6 +448,8 @@ namespace MyEngine.FN_Editor
 
                                     break;
                             }
+
+                            ImGui.PopID();
                         }
 
                         PropertyInfo[] PIS = GOC.GetType().GetProperties();
@@ -496,46 +474,41 @@ namespace MyEngine.FN_Editor
                                 }
                             }
 
+                            ImGui.PushID(IDs++);
                             switch (PI.PropertyType.FullName) //Here, I handle basic types
                             {
                                 case "System.Single": //float
                                     float T = (float)PI.GetValue(GOC);
                                     ImGui.DragFloat(PI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(GOC, T);
-                                    ImGui.PopID();
                                     break;
                                 case "System.Double": //double
                                     double D = (double)PI.GetValue(GOC);
                                     ImGui.InputDouble(PI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(GOC, D);
-                                    ImGui.PopID();
                                     break;
                                 case "System.Int32": //int 32
                                     int I = (int)PI.GetValue(GOC);
                                     ImGui.InputInt(PI.Name, ref I);
                                     PI.SetValue(GOC, I);
-                                    ImGui.PopID();
                                     break;
                                 case "System.Int16": //int 16
                                     short S = (short)PI.GetValue(GOC);
                                     Marshal.WriteInt16(intPointer, S);
                                     ImGui.InputScalar(PI.Name, ImGuiDataType.S16, intPointer);
                                     PI.SetValue(GOC, Marshal.ReadInt16(intPointer));
-                                    ImGui.PopID();
                                     break;
                                 case "System.Int64": //int 64
                                     long L = (long)PI.GetValue(GOC);
                                     Marshal.WriteInt64(intPointerL, L);
                                     ImGui.InputScalar(PI.Name, ImGuiDataType.S64, intPointerL);
                                     PI.SetValue(GOC, Marshal.ReadInt64(intPointerL));
-                                    ImGui.PopID();
                                     break;
                                 case "System.UInt32": //uint 32
                                     uint U32 = (uint)PI.GetValue(GOC);
                                     Marshal.WriteInt32(intPointerU32, (int)U32);
                                     ImGui.InputScalar(PI.Name, ImGuiDataType.U32, intPointerU32);
                                     PI.SetValue(GOC, Marshal.ReadInt32(intPointerU32));
-                                    ImGui.PopID();
                                     break;
                                 //case "System.UInt16": //uint 16
                                 //    FI.SetValue(this, ushort.Parse(Line[2]));
@@ -549,28 +522,24 @@ namespace MyEngine.FN_Editor
                                     bool B = (bool)PI.GetValue(GOC);
                                     ImGui.Checkbox(PI.Name, ref B);
                                     PI.SetValue(GOC, B);
-                                    ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Vector2": //Vector2
                                     Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)PI.GetValue(GOC);
                                     Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
                                     ImGui.DragFloat2(PI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
-                                    ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Vector3": //Vector3
                                     Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)PI.GetValue(GOC);
                                     Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
                                     ImGui.DragFloat3(PI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
-                                    ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Vector4": //Vector4
                                     Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)PI.GetValue(GOC);
                                     Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
                                     ImGui.DragFloat4(PI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
-                                    ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Color": //Color
                                     Microsoft.Xna.Framework.Color V4_C = (Microsoft.Xna.Framework.Color)PI.GetValue(GOC);
@@ -588,19 +557,18 @@ namespace MyEngine.FN_Editor
 
                                     if (ActivePI == PI && GOC == ActiveGOC && !ColorClicked)
                                     {
+                                        ImGui.PushID(IDs++);
                                         ImGui.ColorPicker4("Color", ref V4_IMGUI_C);
                                         ImGui.PopID();
                                     }
 
                                     PI.SetValue(GOC, new Microsoft.Xna.Framework.Color(V4_IMGUI_C.X, V4_IMGUI_C.Y, V4_IMGUI_C.Z, V4_IMGUI_C.W));
-                                    ImGui.PopID();
                                     break;
                                 case "Microsoft.Xna.Framework.Point": //Point
                                     Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)PI.GetValue(GOC);
                                     int[] P2_ARR = new int[2] { P2.X, P2.Y };
                                     ImGui.DragInt2(PI.Name, ref P2_ARR[0]);
                                     PI.SetValue(GOC, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
-                                    ImGui.PopID();
                                     break;
                                 default:
                                     if (PI.GetType().IsClass && !PI.GetType().IsArray)
@@ -631,6 +599,8 @@ namespace MyEngine.FN_Editor
 
                                     break;
                             }
+
+                            ImGui.PopID();
                         }
 
 
@@ -668,7 +638,6 @@ namespace MyEngine.FN_Editor
                     Names[i] = ComponentsTypes[i].Name;
 
                 ImGui.Combo("Components", ref ChosenComponent, Names, Names.Length);
-                ImGui.PopID();
             }
 
             ImGui.End();

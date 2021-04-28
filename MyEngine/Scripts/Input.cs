@@ -164,5 +164,20 @@ namespace MyEngine
 
             return false;
         }
+
+        public static Vector2 MouseDelta()
+        {
+            return (CurrentMouseState.Position - LastMouseState.Position).ToVector2();
+        }
+
+        public static int MouseDeltaX()
+        {
+            return (CurrentMouseState.Position - LastMouseState.Position).X;
+        }
+
+        public static int MouseDeltaY()
+        {
+            return (CurrentMouseState.Position - LastMouseState.Position).Y;
+        }
     }
 }

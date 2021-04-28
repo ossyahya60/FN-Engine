@@ -159,6 +159,10 @@ namespace MyEngine
             GameObjectsTab.Name = "ContentManager";
             GameObjectsTab.AddComponent(new FN_Editor.ContentWindow());
 
+            GameObject Gizmos = new GameObject(true);
+            GameObjectsTab.Name = "Gizmos";
+            GameObjectsTab.AddComponent(new FN_Editor.GizmosVisualizer());
+
             //SceneManager.ActiveScene.AddGameObject_Recursive(Test);
             SceneManager.ActiveScene.AddGameObject_Recursive(Test2);
             //SceneManager.ActiveScene.AddGameObject_Recursive(Test3);
@@ -166,6 +170,7 @@ namespace MyEngine
             SceneManager.ActiveScene.AddGameObject_Recursive(GameObjectsTab);
             SceneManager.ActiveScene.AddGameObject_Recursive(InspectorWindow);
             SceneManager.ActiveScene.AddGameObject_Recursive(ContentManager);
+            SceneManager.ActiveScene.AddGameObject_Recursive(Gizmos);
 
             SceneManager.ActiveScene.Start();
 
@@ -269,7 +274,7 @@ namespace MyEngine
                 SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             if (Input.GetKeyUp(Keys.O, KeyboardFlags.CTRL))
-                SceneManager.ActiveScene.Serialize(true);
+                SceneManager.ActiveScene.Serialize(false);
 
             if (Input.GetKeyUp(Keys.R, KeyboardFlags.CTRL))
                 SceneManager.LoadScene_Serialization("MainScene");
