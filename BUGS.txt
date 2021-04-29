@@ -3,3 +3,5 @@
 2- Light is not removed when deleted (Destroy not called) => Solved
 
 3- Unique names and IDs for gameobjects since there is a bug that makes the game very slow. => Solved (I Think)
+
+4- Scale Error when Deserializing scene.

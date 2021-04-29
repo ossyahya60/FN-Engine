@@ -65,6 +65,11 @@ namespace MyEngine
             return MathHelper.ToDegrees((float)Atan(V2.Y - V1.Y, V2.X - V1.X));
         }
 
+        public static float GetAngle_Rad(Vector2 V1, Vector2 V2)
+        {
+            return (float)Atan(V2.Y - V1.Y, V2.X - V1.X);
+        }
+
         public static int GetNumerOfValuesBetween(int A1, int A2, float ScaleDownFactor)
         {
             float sign = 0;

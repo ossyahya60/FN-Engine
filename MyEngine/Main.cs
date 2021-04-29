@@ -274,7 +274,7 @@ namespace MyEngine
                 SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             if (Input.GetKeyUp(Keys.O, KeyboardFlags.CTRL))
-                SceneManager.ActiveScene.Serialize(false);
+                SceneManager.ActiveScene.Serialize(true);
 
             if (Input.GetKeyUp(Keys.R, KeyboardFlags.CTRL))
                 SceneManager.LoadScene_Serialization("MainScene");

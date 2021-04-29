@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/CT12.png</SourceFile>
-  <SourceTime>2021-04-29T01:05:35.8579191+02:00</SourceTime>
-  <DestFile>C:/MyEngine/MyEngine/MyEngine/bin/Windows/x86/Debug/Content/CT12.xnb</DestFile>
-  <DestTime>2021-04-29T01:05:36.4033669+02:00</DestTime>
+  <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/Icons/ScaleGizmo.png</SourceFile>
+  <SourceTime>2021-04-29T23:16:48.2616693+02:00</SourceTime>
+  <DestFile>C:/MyEngine/MyEngine/MyEngine/bin/Windows/x86/Debug/Content/Icons/ScaleGizmo.xnb</DestFile>
+  <DestTime>2021-04-29T23:17:25.2968667+02:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

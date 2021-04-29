@@ -25,6 +25,15 @@ namespace MyEngine
             NameFormatRegex = new Regex(@"([.]*[][(][0-9]+[)])");
         }
 
+        public static bool CircleContains(Vector2 Center, int Radius, Vector2 Point)
+        {
+            Vector2 Output = Center - Point;
+            if (MathCompanion.Abs(Output.Length()) > Radius)
+                return false;
+
+            return true;
+        }
+
         public static void Vector2Int(ref Vector2 vector)
         {
             vector.X = (int)vector.X;

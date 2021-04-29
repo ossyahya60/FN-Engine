@@ -80,11 +80,11 @@ System.String	AudioName	FireWorks_M	True
 End Of MyEngine.AudioSource
 SerializableProps	6
 System.Boolean	IsEditor	False	False
-null
-null
 System.Single	Layer	1	False
 System.Int32	GameComponentsCount	3	False
 System.Boolean	Active	True	False
+null
+null
 End Of MyEngine.GameObject
 MyEngine.GameObject
 GeneratedID	7
@@ -113,11 +113,11 @@ MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	8
 System.Boolean	Enabled	True	False
 SerializableProps	7
-Microsoft.Xna.Framework.Vector2	LastPosition	{X:0 Y:0}	False
-Microsoft.Xna.Framework.Vector2	Position	{X:683 Y:460.8}	False
+Microsoft.Xna.Framework.Vector2	LastPosition	{X:495 Y:365.8}	False
+Microsoft.Xna.Framework.Vector2	Position	{X:495 Y:365.8}	False
 System.Single	Rotation	0	False
-Microsoft.Xna.Framework.Vector2	Scale	{X:100 Y:100}	False
-Microsoft.Xna.Framework.Vector2	LocalPosition	{X:0 Y:0}	False
+Microsoft.Xna.Framework.Vector2	Scale	{X:20 Y:100}	False
+Microsoft.Xna.Framework.Vector2	LocalPosition	{X:-188 Y:-95}	False
 System.Single	LocalRotation	0	False
 Microsoft.Xna.Framework.Vector2	LocalScale	{X:1 Y:1}	False
 End Of MyEngine.Transform
@@ -167,12 +167,12 @@ SerializableProps	0
 End Of MyEngine.Light
 SerializableProps	6
 System.Boolean	IsEditor	False	False
-null
-MyEngine.GameObject
---SerializedBefore--	MyEngine.GameObject	7
 System.Single	Layer	0.1	False
 System.Int32	GameComponentsCount	3	False
 System.Boolean	Active	True	False
+null
+MyEngine.GameObject
+--SerializedBefore--	MyEngine.GameObject	7
 End Of MyEngine.GameObject
 MyEngine.Transform
 MyEngine.Transform
@@ -182,7 +182,7 @@ MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	7
 System.Boolean	Enabled	True	False
 SerializableProps	7
-Microsoft.Xna.Framework.Vector2	LastPosition	{X:0 Y:0}	False
+Microsoft.Xna.Framework.Vector2	LastPosition	{X:683 Y:460.8}	False
 Microsoft.Xna.Framework.Vector2	Position	{X:683 Y:460.8}	False
 System.Single	Rotation	0	False
 Microsoft.Xna.Framework.Vector2	Scale	{X:100 Y:100}	False
@@ -236,11 +236,11 @@ SerializableProps	0
 End Of MyEngine.Light
 SerializableProps	6
 System.Boolean	IsEditor	False	False
-null
-null
 System.Single	Layer	0.1	False
 System.Int32	GameComponentsCount	3	False
 System.Boolean	Active	True	False
+null
+null
 End Of MyEngine.GameObject
 --SerializedBefore--	MyEngine.GameObject	8
 End Of MyEngine.Scene
