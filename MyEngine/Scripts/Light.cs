@@ -39,6 +39,7 @@ namespace MyEngine
         private static EffectParameter CastShadows_param;
         private static EffectParameter CastShadow_param;
         private static EffectParameter ShadowConstant_param;
+        //private static EffectParameter CameraPosNorm_param;
 
         public bool CastShadow = false;
         public LightTypes Type = LightTypes.Point;
@@ -96,6 +97,7 @@ namespace MyEngine
                 CastShadows_param = LightEffect.Parameters["CastShadows"];
                 CastShadow_param = LightEffect.Parameters["CastShadow"];
                 ShadowConstant_param = LightEffect.Parameters["ShadowConstant"];
+                //CameraPosNorm_param = LightEffect.Parameters["CameraPosNorm"];
             }
 
             LIGHTS.Add(this);
@@ -169,7 +171,8 @@ namespace MyEngine
                     HandyList.Add(BorderOccluders[2]);
                     HandyList.Add(BorderOccluders[3]);
 
-                    Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix()); // -> Mandatory
+                    //Setup.spriteBatch.End();
+                    //Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix()); // -> Mandatory
 
                     foreach (ShadowCaster SC in Occluders)
                     {
@@ -233,8 +236,6 @@ namespace MyEngine
                 }
 
                 ShadowMap_param.SetValue(ShadowMap);
-
-                Setup.spriteBatch.End();
             }
 
             for (int i = 0; i < LightCount; i++)
@@ -243,11 +244,11 @@ namespace MyEngine
                     continue;
 
                 COLOR[i] = LIGHTS[i].color.ToVector3();
-                InnerRadius[i] = MathHelper.Clamp(LIGHTS[i].InnerRadius, 0, LIGHTS[i].OuterRadius);
-                Radius[i] = MathHelper.Clamp(LIGHTS[i].OuterRadius, 0, 1);
+                InnerRadius[i] = MathHelper.Clamp(LIGHTS[i].InnerRadius, 0, LIGHTS[i].OuterRadius) * Setup.Camera.Zoom;
+                Radius[i] = MathHelper.Clamp(LIGHTS[i].OuterRadius, 0, 1)  * Setup.Camera.Zoom;
                 Attenuation[i] = MathHelper.Clamp(LIGHTS[i].Attenuation, 0, float.MaxValue);
-                X_Bias[i] = (LIGHTS[i].gameObject.Transform.Position.X - Setup.graphics.PreferredBackBufferWidth * 0.5f) / Setup.graphics.PreferredBackBufferWidth;
-                Y_Bias[i] = (LIGHTS[i].gameObject.Transform.Position.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f) / Setup.graphics.PreferredBackBufferHeight;
+                X_Bias[i] = (LIGHTS[i].gameObject.Transform.Position.X - Setup.Camera.Position.X) / Setup.graphics.PreferredBackBufferWidth;
+                Y_Bias[i] = (LIGHTS[i].gameObject.Transform.Position.Y - Setup.Camera.Position.Y) / Setup.graphics.PreferredBackBufferHeight;
                 AngularRadius[i] = MathHelper.Clamp(LIGHTS[i].AngularRadius, 0, 360);
                 InnerIntensity[i] = MathHelper.Clamp(LIGHTS[i].InnerInensity, 1, float.MaxValue);
                 ShadowIntensity[i] = MathHelper.Clamp(1 - LIGHTS[i].ShadowIntensity, 0, 1);
@@ -262,6 +263,7 @@ namespace MyEngine
             }
 
             LightCount_param.SetValue(MathHelper.Clamp(LightCount, 0, MAX_LIGHT_COUNT));
+            //CameraPosNorm_param.SetValue(new Vector2(Setup.Camera.Position.X / Setup.resolutionIndependentRenderer.VirtualWidth, Setup.Camera.Position.Y / Setup.resolutionIndependentRenderer.VirtualHeight));
             AngularRadius_param.SetValue(AngularRadius);
             X_Bias_param.SetValue(X_Bias);
             Y_Bias_param.SetValue(Y_Bias);
@@ -275,10 +277,10 @@ namespace MyEngine
             CastShadow_param.SetValue(CastShadow);
             ShadowConstant_param.SetValue(ShadowIntensity);
 
+            Setup.spriteBatch.End();
             Setup.GraphicsDevice.SetRenderTarget(null);
             Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightEffect, Setup.Camera.GetViewTransformationMatrix());
             Setup.spriteBatch.Draw(RenderTarget2D, Vector2.Zero, new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight), Color.White);
-            Setup.spriteBatch.End();
         }
 
         public override GameObjectComponent DeepCopy(GameObject Clone)

@@ -71,6 +71,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="FN_Editor\ContentWindow.cs" />
+    <Compile Include="FN_Editor\EditorScene.cs" />
     <Compile Include="FN_Editor\GameObjects_Tab.cs" />
     <Compile Include="FN_Editor\GizmosVisualizer.cs" />
     <Compile Include="FN_Editor\InspectorWindow.cs" />

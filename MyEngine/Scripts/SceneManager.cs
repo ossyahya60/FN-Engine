@@ -136,10 +136,11 @@ namespace MyEngine
                 Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix()); // -> Mandatory
                 SpriteRenderer.LastEffect = null; // This should be the same effect as in the begin method above
                 ActiveScene.Draw(Setup.spriteBatch);
-                Setup.spriteBatch.End();
 
                 //Light (Experimental)
                 Light.ApplyLighting();
+
+                Setup.spriteBatch.End();
 
                 ActiveScene.ShowUI(Setup.spriteBatch);
 

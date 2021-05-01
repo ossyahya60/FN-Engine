@@ -25,6 +25,7 @@ float DirectionalIntensity;
 float ShadowConstant[MAX_LIGHTS];
 float CastShadow[MAX_LIGHTS];
 bool CastShadows;
+//float2 CameraPosNorm;
 
 //Shadows
 Texture2D ShadowMap;
@@ -59,10 +60,15 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     [unroll(MAX_LIGHTS)]
     for (int i = 0; i < LightCount; i++)
     {
-        float2 Direction = float2((input.TextureCoordinates.x - 0.5 - X_Bias[i]), input.TextureCoordinates.y - 0.5 - Y_Bias[i]);
+        float D_X = (input.TextureCoordinates.x - 0.5) - X_Bias[i];
+        float D_Y = ((input.TextureCoordinates.y - 0.5) - Y_Bias[i]) * YOverX;
+        float2 Direction = float2(D_X, D_Y);
         float Angle = degrees(atan2(Direction.y, Direction.x)) + 180.0;
+        
+        if (X_Bias[i] + 0.5 - Radius[i] > 1 || X_Bias[i] + 0.5 + Radius[i] < 0 || Y_Bias[i] + 0.5 - Radius[i] > 1 || Y_Bias[i] + 0.5 + Radius[i] < 0) //Skip if outside the screen;
+            continue;
     
-        float Dist_SQ = (input.TextureCoordinates.x - X_Bias[i] - 0.5) * (input.TextureCoordinates.x - X_Bias[i] - 0.5) + (input.TextureCoordinates.y - 0.5 - Y_Bias[i]) * YOverX * YOverX * (input.TextureCoordinates.y - 0.5 - Y_Bias[i]);
+        float Dist_SQ = D_X * D_X + D_Y * D_Y;
         
         if (Angle <= AngularRadius[i])
         {

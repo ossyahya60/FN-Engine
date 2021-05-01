@@ -41,6 +41,10 @@ namespace MyEngine.FN_Editor
             ImGui.Text("Redo Buffer Count: ");
             ImGui.SameLine();
             ImGui.Text(Redo_Buffer.Count.ToString());
+
+            ImGui.Text("Mouse Pos: ");
+            ImGui.SameLine();
+            ImGui.Text(Input.GetMousePosition().ToString());
             /////
 
             //Scene Tab

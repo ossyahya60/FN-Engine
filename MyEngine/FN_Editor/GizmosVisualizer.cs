@@ -31,6 +31,7 @@ namespace MyEngine.FN_Editor
             GameObject SelectedGO = GameObjects_Tab.WhoIsSelected;
             if (SelectedGO != null)
             {
+                //Transform Visualization
                 if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.Q))
                     ActiveGizmo = ActiveGizmo.Movement;
                 else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.W))
@@ -99,19 +100,19 @@ namespace MyEngine.FN_Editor
                         ImGui.ImageButton(ScaleGizmo, new Vector2(16, 64), Vector2.UnitX * (96.0f / 512.0f), new Vector2(159.0f / 512.0f, 1), 1, Vector4.Zero, new Vector4(0, 1, 0, 1));
                         ImGui.PopID();
 
-                        //Horizontal Scale
                         if (ImGui.IsItemActive())
                             SelectedGO.Transform.ScaleY(-Input.MouseDeltaY() * 0.01f);
 
+                        //Horizontal Scale
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X + 8, SelectedGO.Transform.Position.Y));
                         ImGui.PushID("HorizScale");
                         ImGui.ImageButton(ScaleGizmo, new Vector2(64, 16), new Vector2(256.0f / 512.0f, 96.0f / 256.0f), new Vector2(1, 159.0f / 256.0f), 1, Vector4.Zero, new Vector4(0, 1, 1, 1));
                         ImGui.PopID();
 
-                        //Cube (Full Scale)
                         if (ImGui.IsItemActive())
                             SelectedGO.Transform.ScaleX(Input.MouseDeltaX() * 0.01f);
 
+                        //Cube (Full Scale)
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 8, SelectedGO.Transform.Position.Y));
                         ImGui.PushID("FullScale");
                         ImGui.ImageButton(ScaleGizmo, new Vector2(16, 16), Vector2.Zero, new Vector2(32.0f / 512.0f, 32.0f / 256.0f), 1, Vector4.Zero, new Vector4(1, 1, 0, 1));
@@ -119,12 +120,20 @@ namespace MyEngine.FN_Editor
 
                         if (ImGui.IsItemActive())
                         {
+                            int Sign = Input.MouseDeltaX() >= 0 ? 1 : -1;
                             float AverageDelta = (float)Math.Sqrt(Input.MouseDelta().X * Input.MouseDelta().X + Input.MouseDelta().Y * Input.MouseDelta().Y) * 0.01f;
-                            SelectedGO.Transform.ScaleBoth(AverageDelta * Math.Sign(Input.MouseDelta().X), -AverageDelta * Math.Sign(Input.MouseDelta().Y));
+                            SelectedGO.Transform.ScaleBoth(Microsoft.Xna.Framework.Vector2.One * AverageDelta * Sign);
                         }
 
                         break;
                 }
+
+                //Collider Visualization
+                var Colliders = SelectedGO.GameObjectComponents.FindAll(Item => Item is Collider2D);
+
+                if (Colliders.Count != 0) // Scale with Scene Camera?
+                    foreach (Collider2D collider in Colliders)
+                        collider.Visualize();
             }
 
             ImGui.End();

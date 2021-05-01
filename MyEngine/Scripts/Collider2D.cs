@@ -17,5 +17,7 @@ namespace MyEngine
         void OnTriggerExit2D();
 
         bool IsTrigger();
+
+        void Visualize();
     }
 }

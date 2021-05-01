@@ -1,6 +1,6 @@
 1- Build Content when directory changes? (Is it worth it?)
 
-2- Make an editor file that visulaizes something like transform and colliders. (Transform Done)
+2- Make an editor file that visulaizes something like transform and colliders. (Transform Done, Colliders Done)
 
 3- Making a new project and working in its directory?
 

@@ -208,22 +208,22 @@ namespace MyEngine
 
         public void ScaleX(float x) //Move a gameobject a certain distance in x
         {
-            LocalScale += Vector2.UnitX * x;
+            Scale += Vector2.UnitX * x;
         }
 
         public void ScaleY(float y) //Move a gameobject a certain distance in y
         {
-            LocalScale += Vector2.UnitY * y;
+            Scale += Vector2.UnitY * y;
         }
 
         public void ScaleBoth(float x, float y) //Move a gameobject a certain distance in x and y axis
         {
-            LocalScale += Vector2.UnitX * x + Vector2.UnitY * y;
+            Scale += Vector2.UnitX * x + Vector2.UnitY * y;
         }
 
         public void ScaleBoth(Vector2 scale) //Move a gameobject a certain distance in x and y axis
         {
-            LocalScale += scale;
+            Scale += scale;
         }
 
         public override GameObjectComponent DeepCopy(GameObject clone)

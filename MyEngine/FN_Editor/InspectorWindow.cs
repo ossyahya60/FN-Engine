@@ -167,6 +167,12 @@ namespace MyEngine.FN_Editor
                             ImGui.DragFloat4(FI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
                             break;
+                        case "Microsoft.Xna.Framework.Rectangle": //Rectangle
+                            Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)FI.GetValue(Selected_GO);
+                            int[] Rec_ARR = new int[4] { Rec.X, Rec.Y, Rec.Width, Rec.Height };
+                            ImGui.DragInt4(FI.Name, ref Rec_ARR[0]);
+                            FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
+                            break;
                         case "Microsoft.Xna.Framework.Point": //Point
                             Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)FI.GetValue(Selected_GO);
                             int[] P2_ARR = new int[2] { P2.X, P2.Y };
@@ -269,6 +275,12 @@ namespace MyEngine.FN_Editor
                             ImGui.DragFloat4(PI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                             PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
                             break;
+                        case "Microsoft.Xna.Framework.Rectangle": //Rectangle
+                            Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)PI.GetValue(Selected_GO);
+                            int[] Rec_ARR = new int[4] { Rec.X, Rec.Y, Rec.Width, Rec.Height };
+                            ImGui.DragInt4(PI.Name, ref Rec_ARR[0]);
+                            PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
+                            break;
                         case "Microsoft.Xna.Framework.Point": //Point
                             Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)PI.GetValue(Selected_GO);
                             int[] P2_ARR = new int[2] { P2.X, P2.Y };
@@ -305,8 +317,8 @@ namespace MyEngine.FN_Editor
                         FieldInfo[] FIS = GOC.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
                         foreach (FieldInfo FI in FIS)
                         {
-                            if (FI.GetValue(GOC) == null)
-                                continue;
+                            //if (FI.GetValue(GOC) == null)
+                                //continue;
 
                             var GOC_SO = FI.GetValue(GOC) as GameObjectComponent;
                             if (GOC_SO != null)
@@ -391,6 +403,12 @@ namespace MyEngine.FN_Editor
                                     ImGui.DragFloat4(FI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
                                     break;
+                                case "Microsoft.Xna.Framework.Rectangle": //Rectangle
+                                    Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)FI.GetValue(GOC);
+                                    int[] Rec_ARR = new int[4] { Rec.X, Rec.Y, Rec.Width, Rec.Height };
+                                    ImGui.DragInt4(FI.Name, ref Rec_ARR[0]);
+                                    FI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
+                                    break;
                                 case "Microsoft.Xna.Framework.Color": //Color
                                     Microsoft.Xna.Framework.Color V4_C = (Microsoft.Xna.Framework.Color)FI.GetValue(GOC);
                                     Vector4 V4_IMGUI_C = new Vector4(V4_C.R / 255.0f, V4_C.G / 255.0f, V4_C.B / 255.0f, V4_C.A / 255.0f);
@@ -424,9 +442,9 @@ namespace MyEngine.FN_Editor
                                     if (FI.GetType().IsClass && !FI.GetType().IsArray)
                                     {
                                         var Name = FI.GetValue(GOC);
-                                        if (FI.GetType().IsClass && Name != null)
+                                        if (FI.GetType().IsClass)
                                         {
-                                            string DummyRef = Name.ToString();
+                                            string DummyRef = (Name != null) ? Name.ToString() : "null";
                                             ImGui.InputText(FI.Name, ref DummyRef, 20, ImGuiInputTextFlags.ReadOnly);
                                         }
 
@@ -455,7 +473,7 @@ namespace MyEngine.FN_Editor
                         PropertyInfo[] PIS = GOC.GetType().GetProperties();
                         foreach (PropertyInfo PI in PIS)
                         {
-                            if (PI.GetMethod == null || !PI.GetMethod.IsPublic || PI.SetMethod == null || !PI.SetMethod.IsPublic || PI.GetValue(GOC) == null)
+                            if (PI.GetMethod == null || !PI.GetMethod.IsPublic || PI.SetMethod == null || !PI.SetMethod.IsPublic)
                                 continue;
 
                             var GOC_SO = PI.GetValue(GOC) as GameObjectComponent;
@@ -541,6 +559,12 @@ namespace MyEngine.FN_Editor
                                     ImGui.DragFloat4(PI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
                                     break;
+                                case "Microsoft.Xna.Framework.Rectangle": //Rectangle
+                                    Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)PI.GetValue(GOC);
+                                    int[] Rec_ARR = new int[4] { Rec.X, Rec.Y, Rec.Width, Rec.Height };
+                                    ImGui.DragInt4(PI.Name, ref Rec_ARR[0]);
+                                    PI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
+                                    break;
                                 case "Microsoft.Xna.Framework.Color": //Color
                                     Microsoft.Xna.Framework.Color V4_C = (Microsoft.Xna.Framework.Color)PI.GetValue(GOC);
                                     Vector4 V4_IMGUI_C = new Vector4(V4_C.R / 255.0f, V4_C.G / 255.0f, V4_C.B / 255.0f, V4_C.A / 255.0f);
@@ -574,9 +598,9 @@ namespace MyEngine.FN_Editor
                                     if (PI.GetType().IsClass && !PI.GetType().IsArray)
                                     {
                                         var Name = PI.GetValue(GOC);
-                                        if (PI.GetType().IsClass && Name != null)
+                                        if (PI.GetType().IsClass)
                                         {
-                                            string DummyRef = Name.ToString();
+                                            string DummyRef = (Name != null)? Name.ToString() : "null";
                                             ImGui.InputText(PI.Name, ref DummyRef, 20, ImGuiInputTextFlags.ReadOnly);
                                         }
                                     }

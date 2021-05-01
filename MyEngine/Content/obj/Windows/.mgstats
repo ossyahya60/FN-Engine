@@ -9,7 +9,7 @@ Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Siz
 "C:/MyEngine/MyEngine/MyEngine/Content/Icons/FolderIcon.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Icons/FolderIcon.xnb","TextureProcessor","Texture2DContent",1149,61525,0.0088036
 "C:/MyEngine/MyEngine/MyEngine/Content/Icons/MusicIcon.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Icons/MusicIcon.xnb","TextureProcessor","Texture2DContent",4657,65621,0.0048807
 "C:/MyEngine/MyEngine/MyEngine/Content/Jump.WAV","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Jump.xnb","SoundEffectProcessor","SoundEffectContent",11346,11407,0.1883674
-"C:/MyEngine/MyEngine/MyEngine/Content/LightTest.fx","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/LightTest.xnb","EffectProcessor","CompiledEffectContent",4159,61968,2.656578
+"C:/MyEngine/MyEngine/MyEngine/Content/LightTest.fx","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/LightTest.xnb","EffectProcessor","CompiledEffectContent",4159,61968,2.737998
 "C:/MyEngine/MyEngine/MyEngine/Content/ShadowCasting.fx","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/ShadowCasting.xnb","EffectProcessor","CompiledEffectContent",1656,1629,0.1215111
 "C:/MyEngine/MyEngine/MyEngine/Content/SkyAndClouds.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/SkyAndClouds.xnb","TextureProcessor","Texture2DContent",41967,33554517,1.174747
 "C:/MyEngine/MyEngine/MyEngine/Content/SubmittingGame.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/SubmittingGame.xnb","TextureProcessor","Texture2DContent",9175,1048661,0.0769991

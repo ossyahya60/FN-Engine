@@ -7,10 +7,26 @@ namespace MyEngine
     {
         public bool isTrigger = true;
         public int Radius = 50;
+        public Vector2 Center
+        {
+            get
+            {
+                var SR = gameObject.GetComponent<SpriteRenderer>();
+                if (SR == null)
+                    return gameObject.Transform.Position + Radius * Vector2.One;
+                else
+                    return gameObject.Transform.Position + SR.Sprite.Origin;
+            }
+        }
 
         public CircleCollider(int Radius)
         {
             this.Radius = Radius;
+        }
+
+        public CircleCollider()
+        {
+            this.Radius = 50;
         }
 
         public bool Contains(Vector2 Point)
@@ -85,6 +101,16 @@ namespace MyEngine
             SW.Write("Radius:\t" + Radius.ToString() + "\n");
 
             SW.WriteLine("End Of " + ToString());
+        }
+
+        public GameObjectComponent ReturnGOC()
+        {
+            return this;
+        }
+
+        public void Visualize()
+        {
+            HitBoxDebuger.DrawCircle(Center, Radius);
         }
     }
 }

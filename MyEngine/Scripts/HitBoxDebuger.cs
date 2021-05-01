@@ -10,9 +10,12 @@ namespace MyEngine
     {
         public static Texture2D _textureFilled = null;
         public static Texture2D _textureNonFilled = null;
+
         private static Vector2 Origin = Vector2.Zero;
         private static BasicEffect _effect = null;
         private static int[] IntArr = new int[] { 0, 1, 2 };
+        private const int CircleSegments = 32;
+        private const int CircleSegmentsHQ = 64;
 
         static HitBoxDebuger()
         {
@@ -61,6 +64,11 @@ namespace MyEngine
             Setup.spriteBatch.Draw(_textureFilled, Position, color);
         }
 
+        public static void DrawRectangle(Rectangle Rect, Color color)  //Draw filledRectangle
+        {
+            Setup.spriteBatch.Draw(_textureFilled, Rect, color);
+        }
+
         public static void DrawRectangle(Rectangle Rect, Color color, float Angle, float Layer)  //Draw filledRectangle
         {
             Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(Angle), Vector2.Zero, SpriteEffects.None, Layer);
@@ -79,41 +87,50 @@ namespace MyEngine
             Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Left, Rect.Top, 1, Rect.Height), Color.LightGreen);
         }
 
-        //public static void DrawLine_Effect(Vector2 V1, Vector2 V2)
-        //{
-        //    VertexPositionTexture[] _vertices = new VertexPositionTexture[2];
+        public static void DrawNonFilledRectangle_Effect(Rectangle Rect) //Draw Non filledRectangle (Does it consume much memory?) use for debugging purposes only!!
+        {
+            DrawPolygon(new Vector2[] { new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Right, Rect.Top), new Vector2(Rect.Right, Rect.Bottom), new Vector2(Rect.Left, Rect.Bottom) });
+        }
 
-        //    V1.X -= Setup.graphics.PreferredBackBufferWidth;
-        //    //V2.X -= Setup.graphics.PreferredBackBufferWidth;
-        //    V1.Y = -V1.Y;
-        //    V2.Y = -V2.Y;
-        //    V1.Y += Setup.graphics.PreferredBackBufferHeight;
-        //    V2.Y += Setup.graphics.PreferredBackBufferHeight;
+        public static void DrawLine_Effect(Vector2 V1, Vector2 V2)
+        {
+            VertexPositionTexture[] _vertices = new VertexPositionTexture[2];
 
-        //    V1.X /= Setup.graphics.PreferredBackBufferWidth;
-        //    //V2.X /= Setup.graphics.PreferredBackBufferWidth;
-        //    V1.Y /= Setup.graphics.PreferredBackBufferHeight;
-        //    V2.Y /= Setup.graphics.PreferredBackBufferHeight;
+            // This step makes no sense to me but it works :D
+            V1 *= 2;
+            V2 *= 2;
 
-        //    _vertices[0].Position = new Vector3(V1, 0);
-        //    _vertices[1].Position = new Vector3(V2, 0);
+            V1.X -= Setup.graphics.PreferredBackBufferWidth;
+            V2.X -= Setup.graphics.PreferredBackBufferWidth;
+            V1.Y = -V1.Y;
+            V2.Y = -V2.Y;
+            V1.Y += Setup.graphics.PreferredBackBufferHeight;
+            V2.Y += Setup.graphics.PreferredBackBufferHeight;
 
-        //    foreach (var pass in _effect.CurrentTechnique.Passes)
-        //    {
-        //        pass.Apply();
+            V1.X /= Setup.graphics.PreferredBackBufferWidth;
+            V2.X /= Setup.graphics.PreferredBackBufferWidth;
+            V1.Y /= Setup.graphics.PreferredBackBufferHeight;
+            V2.Y /= Setup.graphics.PreferredBackBufferHeight;
 
-        //        Setup.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionTexture>
-        //        (
-        //            PrimitiveType.LineStrip, // same result with TriangleList
-        //            _vertices,
-        //            0,
-        //            _vertices.Length,
-        //            new int[] { 0, 1},
-        //            0,
-        //            1
-        //        );
-        //    }
-        //}
+            _vertices[0].Position = new Vector3(V1, 0);
+            _vertices[1].Position = new Vector3(V2, 0);
+
+            foreach (var pass in _effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+
+                Setup.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionTexture>
+                (
+                    PrimitiveType.LineStrip, // same result with TriangleList
+                    _vertices,
+                    0,
+                    _vertices.Length,
+                    new int[] { 0, 1 },
+                    0,
+                    1
+                );
+            }
+        }
 
         public static void DrawTriangle(Vector2 V1, Vector2 V2, Vector2 V3)
         {
@@ -160,10 +177,10 @@ namespace MyEngine
             }
         }
 
-        public static void DrawPolygon(List<Vector2> Vertices)
+        public static void DrawPolygon(Vector2[] Vertices)
         {
-            VertexPositionTexture[] _vertices = new VertexPositionTexture[Vertices.Count];
-            int Count = Vertices.Count;
+            VertexPositionTexture[] _vertices = new VertexPositionTexture[Vertices.Length];
+            int Count = Vertices.Length;
 
             for(int i=0; i< Count; i++)
             {
@@ -172,20 +189,15 @@ namespace MyEngine
                 Vertices[i] -= new Vector2(Setup.graphics.PreferredBackBufferWidth, -Setup.graphics.PreferredBackBufferHeight);
                 Vertices[i] /= new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
             }
-            //Vertices.ForEach(value => value *= 2); //? not changing any values...
-            //Vertices.ForEach(value => value.X -= Setup.graphics.PreferredBackBufferWidth);
-            //Vertices.ForEach(value => value.Y -= Setup.graphics.PreferredBackBufferHeight);
-            //Vertices.ForEach(value => value.X /= Setup.graphics.PreferredBackBufferWidth);
-            //Vertices.ForEach(value => value.Y /= Setup.graphics.PreferredBackBufferHeight);
 
-            int[] IntArr = new int[Vertices.Count + 1];
+            int[] IntArr = new int[Vertices.Length + 1];
 
-            for (int i = 0; i < Vertices.Count; i++)
+            for (int i = 0; i < Vertices.Length; i++)
             {
                 _vertices[i].Position = new Vector3(Vertices[i], 0);
                 IntArr[i] = i;
             }
-            IntArr[Vertices.Count] = 0;
+            IntArr[Vertices.Length] = 0;
 
             foreach (var pass in _effect.CurrentTechnique.Passes)
             {
@@ -193,7 +205,7 @@ namespace MyEngine
 
                 Setup.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionTexture>
                 (
-                    PrimitiveType.TriangleList, // same result with TriangleList
+                    PrimitiveType.LineStrip, // same result with TriangleList
                     _vertices,
                     0,
                     _vertices.Length,
@@ -217,13 +229,6 @@ namespace MyEngine
             Rect.Height = 2;
             Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(MathCompanion.GetAngle(Start, End)), Vector2.Zero, SpriteEffects.None, 0);
         }
-
-        //public static void DrawRay(Ray ray)
-        //{
-        //    Rectangle R = Rectangle.Empty;
-        //    R.Width = ray.Direction * ray.t;
-        //    Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(Angle), Vector2.Zero, SpriteEffects.None, 0);
-        //}
 
         public static void DrawCircleFilled(Vector2 Position, int Radius, Color color, float Layer, float Scale)
         {
@@ -249,6 +254,22 @@ namespace MyEngine
         {
             Origin = OuterRadius * Vector2.One;
             Setup.spriteBatch.Draw(CreateCircleTextureShell(OuterRadius, InnerRadius, color), transform.Position, null, color, 0, Origin, transform.Scale.X, SpriteEffects.None, transform.gameObject.Layer);
+        }
+
+        public static void DrawCircle(Vector2 Center, int Radius, bool HighQuality = false)
+        {
+            float Theta = 0;
+            int Segments = HighQuality ? CircleSegmentsHQ : CircleSegments;
+            float Increment = 2 * (float)Math.PI / Segments;
+
+            Vector2[] Vertices = new Vector2[Segments];
+            for (int i = 0; i < Segments; i++)
+            {
+                Vertices[i] = new Vector2((float)Math.Cos(Theta), (float)Math.Sin(Theta)) * Radius + Center;
+                Theta += Increment;
+            }
+
+            DrawPolygon(Vertices);
         }
 
         //You may use the following two functions to create a texture and use it, not creating a texture every frame!

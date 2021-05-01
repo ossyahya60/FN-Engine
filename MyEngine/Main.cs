@@ -148,29 +148,18 @@ namespace MyEngine
             Test2.AddComponent<AudioSource>(new AudioSource("FireWorks_M"));
 
             GameObject GameObjectsTab = new GameObject(true);
-            GameObjectsTab.Name = "GameObjectsTab";
+            GameObjectsTab.Name = "Scene Tab";
             GameObjectsTab.AddComponent(new FN_Editor.GameObjects_Tab());
-
-            GameObject InspectorWindow = new GameObject(true);
-            GameObjectsTab.Name = "InspectorWindow";
             GameObjectsTab.AddComponent(new FN_Editor.InspectorWindow());
-
-            GameObject ContentManager = new GameObject(true);
-            GameObjectsTab.Name = "ContentManager";
             GameObjectsTab.AddComponent(new FN_Editor.ContentWindow());
-
-            GameObject Gizmos = new GameObject(true);
-            GameObjectsTab.Name = "Gizmos";
             GameObjectsTab.AddComponent(new FN_Editor.GizmosVisualizer());
+            GameObjectsTab.AddComponent(new FN_Editor.EditorScene());
 
             //SceneManager.ActiveScene.AddGameObject_Recursive(Test);
             SceneManager.ActiveScene.AddGameObject_Recursive(Test2);
             //SceneManager.ActiveScene.AddGameObject_Recursive(Test3);
             SceneManager.ActiveScene.AddGameObject_Recursive(Test6);
             SceneManager.ActiveScene.AddGameObject_Recursive(GameObjectsTab);
-            SceneManager.ActiveScene.AddGameObject_Recursive(InspectorWindow);
-            SceneManager.ActiveScene.AddGameObject_Recursive(ContentManager);
-            SceneManager.ActiveScene.AddGameObject_Recursive(Gizmos);
 
             SceneManager.ActiveScene.Start();
 

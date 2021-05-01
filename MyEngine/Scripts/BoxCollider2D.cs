@@ -18,13 +18,14 @@ namespace MyEngine
             }
             get
             {
-                return new Rectangle(bounds.X, bounds.Y, (int)(bounds.Width * gameObject.Transform.Scale.X), (int)(bounds.Height * gameObject.Transform.Scale.Y));
+                return new Rectangle(bounds.X, bounds.Y, (int)(bounds.Width), (int)(bounds.Height));
             }
         }
         public bool isTrigger = false;
 
         private double GameTime = 1.0f / 60;
         private Rectangle bounds;
+        private Vector2 PrevScale;
         //private float DisplaceMagnitude = 0.01f; //1 pixel
 
         public Rectangle GetDynamicCollider()
@@ -43,12 +44,14 @@ namespace MyEngine
             if (gameObject.GetComponent<SpriteRenderer>() != null && bounds.Width == 0)  //Initializing Collider bounds with the sprite bounds if exists
             {
                 if (gameObject.GetComponent<SpriteRenderer>().Sprite != null)
-                    Bounds = new Rectangle(0, 0, gameObject.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Size.X, gameObject.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Size.Y);
+                    Bounds = new Rectangle(0, 0, (int)(gameObject.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Size.X * gameObject.Transform.Scale.X), (int)(gameObject.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Size.Y * gameObject.Transform.Scale.Y));
                 else
                     Bounds = new Rectangle(0, 0, 100, 100);
             }
             else if(bounds.Width == 0)
                 Bounds = new Rectangle(0, 0, 100, 100);
+
+            PrevScale = gameObject.Transform.Scale;
         }
 
         public bool IsTouching(Collider2D collider)  //Are the two colliders currently touching?
@@ -79,7 +82,11 @@ namespace MyEngine
 
         public override void Update(GameTime gameTime)
         {
+            Point Delta = (gameObject.Transform.Scale - PrevScale).ToPoint();
+            bounds.Size += new Point(Delta.X, Delta.Y);
+
             GameTime = gameTime.ElapsedGameTime.TotalSeconds;
+            PrevScale = gameObject.Transform.Scale;
         }
 
         public override GameObjectComponent DeepCopy(GameObject clone)
@@ -129,6 +136,17 @@ namespace MyEngine
             SW.Write("IsTrigger:\t" + isTrigger.ToString() + "\n");
 
             SW.WriteLine("End Of " + ToString());
+        }
+
+        public GameObjectComponent ReturnGOC()
+        {
+            return this;
+        }
+
+        public void Visualize()
+        {
+            //HitBoxDebuger.DrawNonFilledRectangle(GetDynamicCollider()); //This function eats resources, just find an alternative
+            HitBoxDebuger.DrawNonFilledRectangle_Effect(GetDynamicCollider());
         }
     }
 }
