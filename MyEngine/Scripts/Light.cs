@@ -59,11 +59,6 @@ namespace MyEngine
             ShaderLoaded = false;
         }
 
-        public override void DrawUI()
-        {
-            ImGui.Text(LIGHTS.Count.ToString());
-        }
-
         public override void Start()
         {
             if (!ShaderLoaded || LightEffect.IsDisposed)
@@ -171,8 +166,7 @@ namespace MyEngine
                     HandyList.Add(BorderOccluders[2]);
                     HandyList.Add(BorderOccluders[3]);
 
-                    //Setup.spriteBatch.End();
-                    //Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix()); // -> Mandatory
+                    Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix()); // -> Mandatory
 
                     foreach (ShadowCaster SC in Occluders)
                     {
@@ -180,6 +174,7 @@ namespace MyEngine
                             continue;
 
                         HitBoxDebuger.DrawRectangle(SC.gameObject.GetComponent<SpriteRenderer>().Sprite.DynamicScaledRect());
+                        //HitBoxDebuger.DrawRectangle_Effect(SC.gameObject.GetComponent<SpriteRenderer>().Sprite.DynamicScaledRect());
 
                         LineOccluder[] LOCS = SC.ConvertToLineOccluders();
                         for (int i = 0; i < 4; i++)
@@ -190,6 +185,8 @@ namespace MyEngine
                             HandyList.Add(LOCS[i]);
                         }
                     }
+
+                    Setup.spriteBatch.End();
                 }
 
                 if (HandyList.Count != 0)
@@ -277,10 +274,10 @@ namespace MyEngine
             CastShadow_param.SetValue(CastShadow);
             ShadowConstant_param.SetValue(ShadowIntensity);
 
-            Setup.spriteBatch.End();
             Setup.GraphicsDevice.SetRenderTarget(null);
             Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightEffect, Setup.Camera.GetViewTransformationMatrix());
             Setup.spriteBatch.Draw(RenderTarget2D, Vector2.Zero, new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight), Color.White);
+            Setup.spriteBatch.End();
         }
 
         public override GameObjectComponent DeepCopy(GameObject Clone)

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/MyAwesomeGuyV2.png</SourceFile>
+  <SourceTime>2020-05-21T00:45:44.3764944+02:00</SourceTime>
+  <DestFile>C:/MyEngine/MyEngine/MyEngine/bin/Windows/x86/Debug/Content/MyAwesomeGuyV2.xnb</DestFile>
+  <DestTime>2021-05-02T17:43:33.4552831+02:00</DestTime>
+  <Importer>TextureImporter</Importer>
+  <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
+  <Processor>TextureProcessor</Processor>
+  <ProcessorTime>2018-12-08T18:35:54+02:00</ProcessorTime>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>

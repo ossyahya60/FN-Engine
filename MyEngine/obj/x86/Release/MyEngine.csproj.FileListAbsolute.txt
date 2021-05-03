@@ -162,3 +162,4 @@ C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.csproj.CopyComplete
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.exe
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.pdb
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.csprojAssemblyReference.cache
+C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.exe.config

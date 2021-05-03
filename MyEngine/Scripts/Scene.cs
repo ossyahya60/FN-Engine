@@ -11,6 +11,7 @@ namespace MyEngine
     {
         public static ImGUIRenderer GuiRenderer { private set; get; } = null; //This is the ImGuiRenderer
 
+        public bool ShouldSort = false;
         public bool Active = true;
         public List<GameObject> GameObjects;
         public string Name;
@@ -200,13 +201,15 @@ namespace MyEngine
             GuiRenderer.BeginLayout(gameTime); // Must be called prior to calling any ImGui controls
 
             //FPS
-            ImGui.Text((1.0f / (float)gameTime.ElapsedGameTime.TotalSeconds).ToString());
+            ImGui.Text(((int)(1.0f / (float)gameTime.ElapsedGameTime.TotalSeconds)).ToString());
 
             int Count = GameObjects.Count - 1;
 
             if (Active)
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].DrawUI();
+
+            ImGui.Text(gameTime.IsRunningSlowly.ToString());
 
             GuiRenderer.EndLayout(); // Must be called after ImGui control calls
             Setup.GraphicsDevice.SetRenderTarget(null);
@@ -278,7 +281,7 @@ namespace MyEngine
 
         public void SortGameObjectsWithLayer()
         {
-            GameObjects.Sort(GameObject.SortByLayer());
+            ShouldSort = true;
         }
 
         public void Serialize(bool SerializerEditorStuff = false)

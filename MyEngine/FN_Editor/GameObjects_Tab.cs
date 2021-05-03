@@ -45,6 +45,9 @@ namespace MyEngine.FN_Editor
             ImGui.Text("Mouse Pos: ");
             ImGui.SameLine();
             ImGui.Text(Input.GetMousePosition().ToString());
+
+            ImGui.Text("Game RUnning Slowly: ");
+            //ImGui.SameLine();
             /////
 
             //Scene Tab
@@ -164,7 +167,7 @@ namespace MyEngine.FN_Editor
                                     if(gameObjects[i].PrevParent != null)
                                         gameObjects[i].PrevParent.AddChild(gameObjects[i]);
 
-                                    gameObjects[i].Name = Utility.UniqueGameObjectName(gameObjects[i].Name);
+                                    //gameObjects[i].Name = Utility.UniqueGameObjectName(gameObjects[i].Name);
                                     SceneManager.ActiveScene.AddGameObject_Recursive(gameObjects[i]);
                                 }
                             }
@@ -174,7 +177,7 @@ namespace MyEngine.FN_Editor
                                 if (GO.PrevParent != null)
                                     GO.PrevParent.AddChild(GO);
 
-                                GO.Name = Utility.UniqueGameObjectName(GO.Name);
+                                //GO.Name = Utility.UniqueGameObjectName(GO.Name);
                                 SceneManager.ActiveScene.AddGameObject_Recursive(GO);
                             }
 
@@ -253,9 +256,9 @@ namespace MyEngine.FN_Editor
                             AddToACircularBuffer(Undo_Buffer, KVP);
 
                             KeyValuePair<GameObject, GameObject> KVP_GO = (KeyValuePair<GameObject, GameObject>)KVP.Key;
-                            if (KVP_GO.Value == null) //Destination is null
+                            if (KVP_GO.Value == null && KVP_GO.Key.Parent != null) //Destination is null
                                 KVP_GO.Key.Parent.RemoveChild(KVP_GO.Key);
-                            else
+                            else if(KVP_GO.Key.PrevParent != null)
                                 KVP_GO.Key.PrevParent.AddChild(KVP_GO.Key);
 
                             break;
@@ -313,7 +316,7 @@ namespace MyEngine.FN_Editor
                 if (ImGui.Selectable("New GameObject"))
                 {
                     GameObject GO = new GameObject();
-                    GO.Name = Utility.UniqueGameObjectName("Unique Name");
+                    //GO.Name = Utility.UniqueGameObjectName("Unique Name");
                     GO.AddComponent(new Transform());
                     if (WhoIsSelected != null)
                         WhoIsSelected.AddChild(GO);

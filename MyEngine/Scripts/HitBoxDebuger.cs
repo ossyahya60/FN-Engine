@@ -92,6 +92,12 @@ namespace MyEngine
             DrawPolygon(new Vector2[] { new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Right, Rect.Top), new Vector2(Rect.Right, Rect.Bottom), new Vector2(Rect.Left, Rect.Bottom) });
         }
 
+        public static void DrawRectangle_Effect(Rectangle Rect) //Draw Non filledRectangle (Does it consume much memory?) use for debugging purposes only!!
+        {
+            DrawTriangle(new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Right, Rect.Top), new Vector2(Rect.Right, Rect.Bottom));
+            DrawTriangle(new Vector2(Rect.Left, Rect.Top), new Vector2(Rect.Left, Rect.Bottom), new Vector2(Rect.Right, Rect.Bottom));
+        }
+
         public static void DrawLine_Effect(Vector2 V1, Vector2 V2)
         {
             VertexPositionTexture[] _vertices = new VertexPositionTexture[2];

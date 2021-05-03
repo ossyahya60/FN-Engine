@@ -1,4 +1,4 @@
-1- Input class not responding at times?
+1- Input class not responding at times? ( Knew the reason )
 
 2- Light is not removed when deleted (Destroy not called) => Solved
 

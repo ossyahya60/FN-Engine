@@ -65,8 +65,8 @@ float4 MainPS(VertexShaderOutput input) : COLOR
         float2 Direction = float2(D_X, D_Y);
         float Angle = degrees(atan2(Direction.y, Direction.x)) + 180.0;
         
-        if (X_Bias[i] + 0.5 - Radius[i] > 1 || X_Bias[i] + 0.5 + Radius[i] < 0 || Y_Bias[i] + 0.5 - Radius[i] > 1 || Y_Bias[i] + 0.5 + Radius[i] < 0) //Skip if outside the screen;
-            continue;
+        //if (X_Bias[i] + 0.5 - Radius[i] > 1 || X_Bias[i] + 0.5 + Radius[i] < 0 || Y_Bias[i] + 0.5 - Radius[i] > 1 || Y_Bias[i] + 0.5 + Radius[i] < 0) //Skip if outside the screen;
+        //    continue;
     
         float Dist_SQ = D_X * D_X + D_Y * D_Y;
         

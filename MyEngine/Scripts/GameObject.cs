@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace MyEngine
 {
-    public class GameObject: IComparer<GameObject>
+    public class GameObject
     {
         public bool IsEditor { private set; get; }
 
@@ -418,20 +418,6 @@ namespace MyEngine
             ShouldBeDeleted = true;
 
             Children.Clear();
-        }
-
-        public int Compare(GameObject x, GameObject y)
-        {
-            if (x.Layer < y.Layer)
-                return 1;
-            if (x.Layer > y.Layer)
-                return -1;
-            return 0;
-        }
-
-        public static IComparer<GameObject> SortByLayer()
-        {
-            return new GameObject();
         }
 
         //public void Serialize(StreamWriter SW) //Parent should be assigned after finding all gameObjects

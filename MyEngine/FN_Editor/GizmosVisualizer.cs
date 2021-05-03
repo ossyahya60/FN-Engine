@@ -45,25 +45,25 @@ namespace MyEngine.FN_Editor
 
                         //Vertical Arrow
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 8, SelectedGO.Transform.Position.Y - 64));
-                        ImGui.PushID("VertArrow");
+                        ImGui.PushID("SelectedGO.Name + VertArrow");
                         ImGui.ImageButton(Arrow, new Vector2(16, 64), Vector2.UnitX * (96.0f / 512.0f), new Vector2(159.0f / 512.0f, 1), 1, Vector4.Zero, new Vector4(0, 1, 0, 1));
                         ImGui.PopID();
 
-                        //Horizontal Arrow
                         if (ImGui.IsItemActive())
                             SelectedGO.Transform.MoveY(Input.MouseDeltaY());
 
+                        //Horizontal Arrow
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X + 8, SelectedGO.Transform.Position.Y));
-                        ImGui.PushID("HorizArrow");
+                        ImGui.PushID(SelectedGO.Name + "HorizArrow");
                         ImGui.ImageButton(Arrow, new Vector2(64, 16), new Vector2(256.0f / 512.0f, 96.0f / 256.0f), new Vector2(1, 159.0f / 256.0f), 1, Vector4.Zero, new Vector4(0, 1, 1, 1));
                         ImGui.PopID();
 
-                        //Cube (Full Movement)
                         if (ImGui.IsItemActive())
                             SelectedGO.Transform.MoveX(Input.MouseDeltaX());
 
+                        //Cube (Full Movement)
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 8, SelectedGO.Transform.Position.Y));
-                        ImGui.PushID("Cube");
+                        ImGui.PushID("SelectedGO.Name + Cube");
                         ImGui.ImageButton(Arrow, new Vector2(16, 16), Vector2.Zero, new Vector2(32.0f / 512.0f, 32.0f / 256.0f), 1, Vector4.Zero, new Vector4(1, 1, 0, 1));
                         ImGui.PopID();
 
@@ -75,7 +75,7 @@ namespace MyEngine.FN_Editor
 
                         //Circular Shell
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 64, SelectedGO.Transform.Position.Y - 64));
-                        ImGui.PushID("RotationGizmo");
+                        ImGui.PushID("SelectedGO.Name + RotationGizmo");
                         ImGui.Image(RotationGizmo, new Vector2(128, 128));
                         ImGui.PopID();
 
@@ -96,7 +96,7 @@ namespace MyEngine.FN_Editor
 
                         //Vertical Scale
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 8, SelectedGO.Transform.Position.Y - 64));
-                        ImGui.PushID("VertScale");
+                        ImGui.PushID("SelectedGO.Name + VertScale");
                         ImGui.ImageButton(ScaleGizmo, new Vector2(16, 64), Vector2.UnitX * (96.0f / 512.0f), new Vector2(159.0f / 512.0f, 1), 1, Vector4.Zero, new Vector4(0, 1, 0, 1));
                         ImGui.PopID();
 
@@ -105,7 +105,7 @@ namespace MyEngine.FN_Editor
 
                         //Horizontal Scale
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X + 8, SelectedGO.Transform.Position.Y));
-                        ImGui.PushID("HorizScale");
+                        ImGui.PushID("SelectedGO.Name + HorizScale");
                         ImGui.ImageButton(ScaleGizmo, new Vector2(64, 16), new Vector2(256.0f / 512.0f, 96.0f / 256.0f), new Vector2(1, 159.0f / 256.0f), 1, Vector4.Zero, new Vector4(0, 1, 1, 1));
                         ImGui.PopID();
 
@@ -114,7 +114,7 @@ namespace MyEngine.FN_Editor
 
                         //Cube (Full Scale)
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 8, SelectedGO.Transform.Position.Y));
-                        ImGui.PushID("FullScale");
+                        ImGui.PushID("SelectedGO.Name + FullScale");
                         ImGui.ImageButton(ScaleGizmo, new Vector2(16, 16), Vector2.Zero, new Vector2(32.0f / 512.0f, 32.0f / 256.0f), 1, Vector4.Zero, new Vector4(1, 1, 0, 1));
                         ImGui.PopID();
 

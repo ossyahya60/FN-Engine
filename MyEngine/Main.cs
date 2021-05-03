@@ -2,8 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Reflection;
-using System.Linq;
 
 namespace MyEngine
 {
@@ -18,6 +16,7 @@ namespace MyEngine
         Camera2D Camera;
         ////////<Variables>/////
         public static SpriteFont spriteFont;
+        public bool IsRelease = false;
         ////////////////////////
 
         public Main()
@@ -97,7 +96,11 @@ namespace MyEngine
             Environment.CurrentDirectory = WorkingDirectory + @"\Content";
             Setup.SourceFilePath = Environment.CurrentDirectory;
             Setup.IntermediateFilePath = Setup.SourceFilePath + @"\obj\Windows";
+#if DEBUG
             Setup.OutputFilePath = WorkingDirectory + @"\bin\Windows\x86\Debug\Content";
+#else
+            Setup.OutputFilePath = WorkingDirectory + @"\bin\Windows\x86\Release\Content";
+#endif           
             ///////////////////////////////////
 
             ImportantIntialization();
@@ -247,9 +250,9 @@ namespace MyEngine
 
             ///////////////////////////////////////
             if (Input.GetKey(Keys.Z, KeyboardFlags.SHIFT))
-                Camera.Zoom += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Camera.Zoom += (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
             else if (Input.GetKey(Keys.X, KeyboardFlags.SHIFT))
-                Camera.Zoom -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Camera.Zoom -= (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
 
             //passing a property as a refrence using delegates
             //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(value => Arrow.Transform.Rotation = value);
@@ -278,6 +281,9 @@ namespace MyEngine
                 SceneManager.ActiveScene.FindGameObjectWithName("Test6_Inst").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             SceneManager.Update(gameTime);
+
+            // I moved this here, because Update rate is not the same as draw rate, so Input is not synchronized well
+            SceneManager.ActiveScene.DrawUI(gameTime); //Draw UI
 
             base.Update(gameTime);
         }

@@ -26,9 +26,6 @@ namespace MyEngine
                 if (value == Sprite.Texture.Name)
                     return;
 
-                if(string.IsNullOrEmpty(Sprite.Texture.Name))
-                    Sprite.Texture.Name = value;
-
                 Sprite.LoadTexture(value);
             }
             get

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
+using System.Linq;
 
 namespace MyEngine
 {
@@ -127,7 +128,11 @@ namespace MyEngine
                 if (!Setup.Game.IsActive) //Pause Game when minimized
                     return;
 
-                ActiveScene.DrawUI(gameTime); //Draw UI
+                if (ActiveScene.ShouldSort)
+                {
+                    ActiveScene.GameObjects = ActiveScene.GameObjects.OrderBy(Item => Item.Layer).ToList();
+                    ActiveScene.ShouldSort = false;
+                }
 
                 ///
                 Light.Init_Light();
@@ -136,11 +141,10 @@ namespace MyEngine
                 Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix()); // -> Mandatory
                 SpriteRenderer.LastEffect = null; // This should be the same effect as in the begin method above
                 ActiveScene.Draw(Setup.spriteBatch);
+                Setup.spriteBatch.End();
 
                 //Light (Experimental)
                 Light.ApplyLighting();
-
-                Setup.spriteBatch.End();
 
                 ActiveScene.ShowUI(Setup.spriteBatch);
 

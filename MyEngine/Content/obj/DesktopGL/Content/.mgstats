@@ -9,7 +9,7 @@ Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Siz
 "C:/MyEngine/MyEngine/MyEngine/Content/Icons/FolderIcon.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/Icons/FolderIcon.xnb","TextureProcessor","Texture2DContent",1149,61525,0.1220411
 "C:/MyEngine/MyEngine/MyEngine/Content/Icons/MusicIcon.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/Icons/MusicIcon.xnb","TextureProcessor","Texture2DContent",4657,65621,0.1399997
 "C:/MyEngine/MyEngine/MyEngine/Content/Jump.WAV","C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/Jump.xnb","SoundEffectProcessor","SoundEffectContent",11346,11407,0.1850015
-"C:/MyEngine/MyEngine/MyEngine/Content/LightTest.fx","C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/LightTest.xnb","EffectProcessor","CompiledEffectContent",4273,69268,7.230007
+"C:/MyEngine/MyEngine/MyEngine/Content/LightTest.fx","C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/LightTest.xnb","EffectProcessor","CompiledEffectContent",4277,60048,5.648012
 "C:/MyEngine/MyEngine/MyEngine/Content/ShadowCasting.fx","C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/ShadowCasting.xnb","EffectProcessor","CompiledEffectContent",1656,1629,0.6979955
 "C:/MyEngine/MyEngine/MyEngine/Content/SkyAndClouds.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/SkyAndClouds.xnb","TextureProcessor","Texture2DContent",41967,33554517,0.9800002
 "C:/MyEngine/MyEngine/MyEngine/Content/SubmittingGame.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/SubmittingGame.xnb","TextureProcessor","Texture2DContent",9175,1048661,0.0319999

@@ -63,6 +63,7 @@ namespace MyEngine
             Clone.SourceRectangle = new Rectangle(SourceRectangle.Location, SourceRectangle.Size);
             Clone.Origin = new Vector2(Origin.X, Origin.Y);
             Clone.Transform = clone.Transform;
+            Clone.texture = texture;
 
             return Clone;
         }
