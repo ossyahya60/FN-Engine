@@ -11,6 +11,7 @@ namespace MyEngine.FN_Editor
     class GameObjects_Tab : GameObjectComponent
     {
         public static GameObject WhoIsSelected = null;
+        public static Vector2[] MyRegion;
 
         private string NameBuffer = "";
         private HashSet<GameObject> SelectedGOs;
@@ -29,6 +30,7 @@ namespace MyEngine.FN_Editor
             Undo_Buffer = new LinkedList<KeyValuePair<object, Operation>>();
             Redo_Buffer = new LinkedList<KeyValuePair<object, Operation>>();
             LinkedList<int> T = new LinkedList<int>();
+            MyRegion = new Vector2[2];
         }
 
         public override void DrawUI()
@@ -46,18 +48,30 @@ namespace MyEngine.FN_Editor
             ImGui.SameLine();
             ImGui.Text(Input.GetMousePosition().ToString());
 
-            ImGui.Text("Game RUnning Slowly: ");
+            ImGui.Text("Game Running Slowly: ");
             //ImGui.SameLine();
+
+            ImGui.Text("Camera Pos: ");
+            ImGui.SameLine();
+            ImGui.Text(Setup.Camera.Position.ToString());
             /////
 
             //Scene Tab
             ImGui.Begin(SceneManager.ActiveScene.Name);
 
+            ///
+            MyRegion[0] = ImGui.GetWindowPos();
+            MyRegion[1] = ImGui.GetWindowSize();
+            ///
+
             ImGui.Indent();
 
-            foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
+            for (int i = SceneManager.ActiveScene.GameObjects.Count - 1; i >= 0; i--)
+            {
+                GameObject GO = SceneManager.ActiveScene.GameObjects[i];
                 if (!GO.IsEditor && GO.Parent == null && !GO.ShouldBeDeleted)
                     TreeRecursive(GO, true);
+            }
 
             //Deleting a GameObject
             if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Delete)) && ImGui.IsWindowFocused())

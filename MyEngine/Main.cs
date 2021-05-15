@@ -16,7 +16,6 @@ namespace MyEngine
         Camera2D Camera;
         ////////<Variables>/////
         public static SpriteFont spriteFont;
-        public bool IsRelease = false;
         ////////////////////////
 
         public Main()
@@ -112,6 +111,8 @@ namespace MyEngine
             SceneManager.AddInitializer(MainScene, 0);
             //////////////////////////////////////////////////////////
             SceneManager.LoadScene(new Scene("MainScene", 0)); //Main Scene
+
+            SceneManager.ShouldUpdate = false; //Editor only
         }
 
         private void MainScene()
@@ -150,7 +151,9 @@ namespace MyEngine
             Test2.AddComponent<SpriteRenderer>(new SpriteRenderer());
             Test2.AddComponent<AudioSource>(new AudioSource("FireWorks_M"));
 
+            //Editor GameObject
             GameObject GameObjectsTab = new GameObject(true);
+            GameObjectsTab.Layer = 2;
             GameObjectsTab.Name = "Scene Tab";
             GameObjectsTab.AddComponent(new FN_Editor.GameObjects_Tab());
             GameObjectsTab.AddComponent(new FN_Editor.InspectorWindow());

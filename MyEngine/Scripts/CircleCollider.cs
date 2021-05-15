@@ -108,9 +108,9 @@ namespace MyEngine
             return this;
         }
 
-        public void Visualize()
+        public void Visualize(float X_Bias = 0, float Y_Bias = 0)
         {
-            HitBoxDebuger.DrawCircle(Center, Radius);
+            HitBoxDebuger.DrawCircle(Center + new Vector2(X_Bias, Y_Bias), Radius);
         }
     }
 }

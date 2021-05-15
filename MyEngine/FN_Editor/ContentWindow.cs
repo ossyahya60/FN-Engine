@@ -12,6 +12,7 @@ namespace MyEngine.FN_Editor
     public class ContentWindow: GameObjectComponent
     {
         public static object DraggedAsset = null;
+        public static Vector2[] MyRegion;
 
         public string GameContentPath = null;
 
@@ -45,8 +46,9 @@ namespace MyEngine.FN_Editor
             TexRegex = new Regex(@"([\.]\b(png|jpg|jpeg)\b)$", RegexOptions.IgnoreCase);
             MusicRegex = new Regex(@"([\.]\b(wav|ogg|wma|mp3)\b)$", RegexOptions.IgnoreCase);
             ShaderRegex = new Regex(@"([\.]\b(fx)\b)$", RegexOptions.IgnoreCase);
+            MyRegion = new Vector2[2];
         }
-        
+
         private void DrageEnter(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.Link;
@@ -75,12 +77,17 @@ namespace MyEngine.FN_Editor
         {
             ImGui.Begin("Content Manager");
 
+            ///
+            MyRegion[0] = ImGui.GetWindowPos();
+            MyRegion[1] = ImGui.GetWindowSize();
+            ///
+
             //Update ContentWindow when there is a change in the directory
-            if (Directory.GetLastWriteTime(GameContentPath).CompareTo(StartingDate) > 0)
-            {
-                StartingDate = Directory.GetLastWriteTime(GameContentPath);
-                DirectoryChanged = true;
-            }
+            //if (Directory.GetLastWriteTime(GameContentPath).CompareTo(StartingDate) > 0)
+            //{
+            //    StartingDate = Directory.GetLastWriteTime(GameContentPath);
+            //    DirectoryChanged = true;
+            //}
 
             // Back Button
             if (ImGui.ArrowButton("Back", ImGuiDir.Left))
@@ -92,7 +99,6 @@ namespace MyEngine.FN_Editor
                     DirectoryChanged = true;
                 }
             }
-
             
             ImGui.SameLine(0, 15);
             
@@ -164,7 +170,6 @@ namespace MyEngine.FN_Editor
             string[] Files = Directory.GetFiles(GameContentPath);
 
             Files = Directory.GetFiles(GameContentPath);
-
             ID_F = 0;
 
             if (Files != null)
@@ -187,6 +192,9 @@ namespace MyEngine.FN_Editor
                             ImGui.OpenPopup("AssetName");
                             AssName = AssetLoadName + "." + AssetLoadNameComposite[AssetLoadNameComposite.Length - 1];
                         }
+
+                        //if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                        //    ImGui.OpenPopup("Rename File");
 
                         // Dragging an asset
                         if (ImGui.BeginDragDropSource())
@@ -265,6 +273,27 @@ namespace MyEngine.FN_Editor
                 ImGui.Text(AssName);
                 ImGui.EndPopup();
             }
+
+            //if (ImGui.BeginPopup("Rename File"))
+            //{
+            //    ImGui.Text("Edit name:");
+            //    ImGui.InputText("##editF", ref NameBuffer, 50, ImGuiInputTextFlags.AutoSelectAll);
+            //    if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Enter)))
+            //    {
+            //        if (NameBuffer.Replace(" ", "").Length > 0 && NameBuffer != WhoIsSelected.Name)
+            //        {
+            //            KeyValuePair<GameObject, string> BufferedObject = new KeyValuePair<GameObject, string>(WhoIsSelected, WhoIsSelected.Name);
+            //            AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(BufferedObject, Operation.Rename));
+            //            Redo_Buffer.Clear();
+
+            //            NameBuffer = Utility.UniqueGameObjectName(NameBuffer);
+            //            WhoIsSelected.Name = NameBuffer;
+            //        }
+            //        ImGui.CloseCurrentPopup();
+            //    }
+
+            //    ImGui.EndPopup();
+            //}
 
             ImGui.EndChild();
 

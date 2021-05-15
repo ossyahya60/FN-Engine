@@ -11,6 +11,7 @@ namespace MyEngine.FN_Editor
     class InspectorWindow: GameObjectComponent
     {
         public static List<Type> ComponentsTypes = new List<Type>();
+        public static Vector2[] MyRegion;
 
         private IntPtr intPointer;
         private IntPtr intPointerL;
@@ -47,11 +48,17 @@ namespace MyEngine.FN_Editor
             intPointer = Marshal.AllocHGlobal(sizeof(short));
             intPointerL = Marshal.AllocHGlobal(sizeof(long));
             intPointerU32 = Marshal.AllocHGlobal(sizeof(uint));
+            MyRegion = new Vector2[2];
         }
 
         public override void DrawUI()
         {
             ImGui.Begin("Inspector");
+
+            ///
+            MyRegion[0] = ImGui.GetWindowPos();
+            MyRegion[1] = ImGui.GetWindowSize();
+            ///
 
             GameObject Selected_GO = FN_Editor.GameObjects_Tab.WhoIsSelected;
 

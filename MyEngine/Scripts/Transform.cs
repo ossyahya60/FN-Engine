@@ -38,8 +38,8 @@ namespace MyEngine
 
                 GameObject[] GOs = gameObject.GetChildren();
 
-                if(GOs != null)
-                    foreach (GameObject GO in GOs)
+                foreach (GameObject GO in GOs)
+                    if(GO.Transform != null)
                         GO.Transform.Position += (position - LastPosition);
             }
             get
@@ -57,8 +57,8 @@ namespace MyEngine
 
                 GameObject[] GOs = gameObject.GetChildren();
 
-                if (GOs != null)
-                    foreach (GameObject GO in GOs)
+                foreach (GameObject GO in GOs)
+                    if (GO.Transform != null)
                         GO.Transform.Rotation += rotation - LastRotation;
             }
             get
@@ -78,8 +78,8 @@ namespace MyEngine
 
                 GameObject[] GOs = gameObject.GetChildren();
 
-                if (GOs != null)
-                    foreach (GameObject GO in GOs)
+                foreach (GameObject GO in GOs)
+                    if (GO.Transform != null)
                         GO.Transform.Scale += (scale - LastScale) * GO.Transform.LocalScale;
             }
             get
@@ -224,6 +224,11 @@ namespace MyEngine
         public void ScaleBoth(Vector2 scale) //Move a gameobject a certain distance in x and y axis
         {
             Scale += scale;
+        }
+
+        public override void Destroy()
+        {
+            gameObject.Transform = null;
         }
 
         public override GameObjectComponent DeepCopy(GameObject clone)

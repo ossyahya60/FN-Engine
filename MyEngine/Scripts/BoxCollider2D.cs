@@ -143,10 +143,12 @@ namespace MyEngine
             return this;
         }
 
-        public void Visualize()
+        public void Visualize(float X_Bias = 0, float Y_Bias = 0)
         {
-            //HitBoxDebuger.DrawNonFilledRectangle(GetDynamicCollider()); //This function eats resources, just find an alternative
-            HitBoxDebuger.DrawNonFilledRectangle_Effect(GetDynamicCollider());
+            Rectangle DynamicCollider = GetDynamicCollider();
+            DynamicCollider.X = (int)X_Bias + DynamicCollider.X;
+            DynamicCollider.Y = (int)Y_Bias + DynamicCollider.Y;
+            HitBoxDebuger.DrawNonFilledRectangle_Effect(DynamicCollider);
         }
     }
 }

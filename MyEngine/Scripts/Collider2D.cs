@@ -18,6 +18,6 @@ namespace MyEngine
 
         bool IsTrigger();
 
-        void Visualize();
+        void Visualize(float X_Bias = 0, float Y_Bias = 0);
     }
 }

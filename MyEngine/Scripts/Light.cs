@@ -111,14 +111,22 @@ namespace MyEngine
 
         public static void Init_Light()
         {
-            if(LIGHTS != null && LIGHTS.Count != 0)
-                Setup.GraphicsDevice.SetRenderTarget(RenderTarget2D); //Render Target
+            Setup.GraphicsDevice.SetRenderTarget(RenderTarget2D); //Render Target
         }
 
         public static void ApplyLighting()
         {
-            if (LIGHTS == null)
+            Rectangle BiasScene = new Rectangle((int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.X + -Setup.graphics.PreferredBackBufferWidth * 0.5f + Setup.Camera.Position.X), (int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f + Setup.Camera.Position.Y), (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.X, (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.Y);
+
+            if (LIGHTS == null || LIGHTS.Count == 0)
+            {
+                Setup.GraphicsDevice.SetRenderTarget(null);
+                Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix());
+                Setup.spriteBatch.Draw(RenderTarget2D, BiasScene.Location.ToVector2(), new Rectangle(Point.Zero, BiasScene.Size), Color.White);
+                Setup.spriteBatch.End();
+
                 return;
+            }
 
             int LightCount = LIGHTS.Count;
 
@@ -276,7 +284,7 @@ namespace MyEngine
 
             Setup.GraphicsDevice.SetRenderTarget(null);
             Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightEffect, Setup.Camera.GetViewTransformationMatrix());
-            Setup.spriteBatch.Draw(RenderTarget2D, Vector2.Zero, new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight), Color.White);
+            Setup.spriteBatch.Draw(RenderTarget2D, BiasScene.Location.ToVector2(), new Rectangle(Point.Zero, BiasScene.Size), Color.White);
             Setup.spriteBatch.End();
         }
 

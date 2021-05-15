@@ -267,9 +267,6 @@ namespace MyEngine
 
         public GameObject[] GetChildren() //Returns First-Level children
         {
-            if (Children.Count == 0)
-                return null;
-
             return Children.ToArray();
         }
 

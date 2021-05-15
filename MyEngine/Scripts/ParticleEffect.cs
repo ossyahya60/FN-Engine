@@ -10,19 +10,25 @@ namespace MyEngine
 
     public class ParticleEffect: GameObjectComponent
     {
+        public Color Color = Color.White;
+        public bool NoLifeTime = false;
+        public bool Accelerate = false;
         public bool LineParticle = false;
         public bool FaceDirection = false;
-        public bool DestroyWhenFinished = true;
         public bool BurstMode = false;
+        public bool RandomDirection = true;
+        public bool RandomColor = false;
+        public bool RandomAlpha = false;
+        public bool RandomRotation = false;
+        public bool IsLooping = false;
+        public bool ConstantVelocity = false;
+        public bool ShrinkWithTime = false;
         public int ParticlesAtaTime = 10;
         public Texture2D CustomTexture = null;
         public Vector2 FireDirection;
+        public float MinimumSize = 0.5f;
+        public float AccelerationMagnitude = 0.1f;
         public float Speed = 5f;
-        public Color Color = Color.White;
-        public bool RandomDirection = true;
-        public bool RandomColor = false;
-        public bool RandomRotation = false;
-        public bool IsLooping = false;
         public float VanishAfter = 1f;
         public float TimeBetweenFiring = 0.25f;
         public float Rotation //Angle
@@ -38,8 +44,6 @@ namespace MyEngine
         }
         public int MaxParticles = 1000;
         public int ParticleSize = 20;
-        public bool ConstantVelocity = false;
-        public bool ShrinkWithTime = false;
         public float MnimumShrinkScale
         {
             set
@@ -78,7 +82,10 @@ namespace MyEngine
             if (!BurstMode)
                 ParticlesAtaTime = 1;
 
-            if(!FinishedEffect)
+            if (IsLooping)
+                FinishedEffect = false;
+
+            if (!FinishedEffect)
             {
                 FireCounter += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 for (int i = 0; i < ParticlesAtaTime; i++)
@@ -98,12 +105,9 @@ namespace MyEngine
                             if ((Particles.Peek() as Particle).Expired)
                             {
                                 Particles.Dequeue();
+                                ParticleCounter--;
                                 if (ParticleCounter == MaxParticles)
-                                {
                                     FinishedEffect = true;
-                                    if (DestroyWhenFinished)
-                                        Threader.Invoke(Destroy, (uint)(VanishAfter * 1000));
-                                }
 
                                 if (IsLooping)
                                 {
@@ -126,19 +130,19 @@ namespace MyEngine
                                 particle.Color.B = Color3.B;
                             }
                             else
-                                particle.Color = Color;
+                                particle.Color = Color * (RandomAlpha ? (float)random.NextDouble() : 1);
                             particle.Size = ParticleSize;
                             particle.Position = gameObject.Transform.Position;
                             particle.LifeTime = VanishAfter;
                             particle.ShrinkMode = ShrinkWithTime;
                             particle.MinimumSize = minimumShrinkScale;
                             particle.Speed = Speed;
-                            particle.ConstantVelocity = false;
-                            particle.Accelerate = false;
-                            particle.AccelerationMagnitude = 0.1f;
-                            particle.ShrinkMode = true;
-                            particle.MinimumSize = 0.5f;
+                            particle.ConstantVelocity = ConstantVelocity;
+                            particle.Accelerate = Accelerate;
+                            particle.AccelerationMagnitude = AccelerationMagnitude;
+                            particle.MinimumSize = MinimumSize;
                             particle.Layer = gameObject.Layer;
+                            particle.NoLifeTime = NoLifeTime;
                             if (RandomRotation)
                             {
                                 Rotation = (float)random.NextDouble() * 360;
@@ -205,7 +209,6 @@ namespace MyEngine
             base.Serialize(SW);
             SW.Write("LineParticle:\t" + LineParticle.ToString() + "\n");
             SW.Write("FaceDirection:\t" + FaceDirection.ToString() + "\n");
-            SW.Write("DestroyWhenFinished:\t" + DestroyWhenFinished.ToString() + "\n");
             SW.Write("BurstMode:\t" + BurstMode.ToString() + "\n");
             SW.Write("ParticlesAtaTime:\t" + ParticlesAtaTime.ToString() + "\n");
             if(CustomTexture != null && CustomTexture.Name != null)

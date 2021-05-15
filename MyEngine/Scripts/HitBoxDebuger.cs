@@ -389,7 +389,7 @@ namespace MyEngine
             return Res.Y;
         }
 
-        public static void BezierLine(Point Start, Point Control, Point End, Color color, int Quality)
+        public static void BezierLine(Point Start, Point Control, Point End, Color color, float Layer, int Quality = 10)
         {
             Point Auxilary = Point.Zero;
             Point PrevPoint = Point.Zero;
@@ -423,11 +423,11 @@ namespace MyEngine
                 Rectangle Rect = Rectangle.Empty;
                 Rect.Location = PrevPoint;
                 Rect.Size = new Point((int)Math.Ceiling((Auxilary - PrevPoint).ToVector2().Length()), 3);
-                DrawLine(Rect, color, MathCompanion.GetAngle(PrevPoint.ToVector2(), Auxilary.ToVector2()), 0, Vector2.Zero);
+                DrawLine(Rect, color, MathCompanion.GetAngle(PrevPoint.ToVector2(), Auxilary.ToVector2()), Layer, Vector2.Zero);
             }
         }
 
-        public static void BezierLine(Point Start, Point Control1, Point Control2, Point End, Color color, int Quality)
+        public static void BezierLine(Point Start, Point Control1, Point Control2, Point End, Color color, float Layer, int Quality = 10)
         {
             Point Auxilary = Point.Zero;
             Point PrevPoint = Point.Zero;
@@ -477,7 +477,7 @@ namespace MyEngine
                 Rectangle Rect = Rectangle.Empty;
                 Rect.Location = PrevPoint;
                 Rect.Size = new Point((int)Math.Ceiling((Auxilary - PrevPoint).ToVector2().Length()), 3);
-                DrawLine(Rect, color, MathCompanion.GetAngle(PrevPoint.ToVector2(), Auxilary.ToVector2()), 0, Vector2.Zero);
+                DrawLine(Rect, color, MathCompanion.GetAngle(PrevPoint.ToVector2(), Auxilary.ToVector2()), Layer, Vector2.Zero);
             }
         }
     }

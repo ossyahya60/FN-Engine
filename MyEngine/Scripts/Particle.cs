@@ -5,6 +5,7 @@ namespace MyEngine
 {
     public class Particle
     {
+        public bool NoLifeTime = false;
         public Vector2 Position;
         public int Size = 1;
         public float LifeTime = 1f;
@@ -73,7 +74,7 @@ namespace MyEngine
                     else
                     {
                         AccelerationCounter = (Accelerate)? AccelerationCounter + AccelerationMagnitude: AccelerationCounter - AccelerationMagnitude;
-                        Position += (MathCompanion.Clamp(Speed + AccelerationCounter, 0, Speed + AccelerationCounter)) * Vector2.Normalize(Direction);
+                        Position += (Speed + AccelerationCounter) * Vector2.Normalize(Direction);
                     }
                 }
 
@@ -85,10 +86,13 @@ namespace MyEngine
                         height = (int)(((LifeTime - LifeTimeCounter * MinimumSize) / LifeTime) * OriginalSize);
                 }
 
-                if (LifeTimeCounter >= LifeTime)
-                    Expired = true;
-                else
-                    LifeTimeCounter += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (!NoLifeTime)
+                {
+                    if (LifeTimeCounter >= LifeTime)
+                        Expired = true;
+                    else
+                        LifeTimeCounter += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
             }
         }
 

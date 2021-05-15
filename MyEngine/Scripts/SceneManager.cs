@@ -11,6 +11,7 @@ namespace MyEngine
     {
         public static Scene ActiveScene;
         public static Dictionary<int, Action> InitializerList;
+        public static bool ShouldUpdate = true;
 
         private static Scene SceneToBeLoaded = null;
         private static bool FirstTimeLoading = true;
@@ -117,7 +118,7 @@ namespace MyEngine
 
             Resolution = new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
 
-            if (ActiveScene != null)
+            if (ActiveScene != null && ShouldUpdate)
                 ActiveScene.Update(gameTime);
         }
 
@@ -130,7 +131,7 @@ namespace MyEngine
 
                 if (ActiveScene.ShouldSort)
                 {
-                    ActiveScene.GameObjects = ActiveScene.GameObjects.OrderBy(Item => Item.Layer).ToList();
+                    ActiveScene.GameObjects = ActiveScene.GameObjects.OrderByDescending(Item => Item.Layer).ToList();
                     ActiveScene.ShouldSort = false;
                 }
 
