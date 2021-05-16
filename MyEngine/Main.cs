@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Reflection;
 
 namespace MyEngine
 {
@@ -67,7 +68,7 @@ namespace MyEngine
             /////////Camera And Resolution Independent Renderer/////// -> Mandatory
             Camera = new Camera2D();
             Camera.Zoom = 1f;
-            Camera.Position = new Vector2(RIR.VirtualWidth / 2, RIR.VirtualHeight / 2);
+            //Camera.Position = new Vector2(RIR.VirtualWidth / 2, RIR.VirtualHeight / 2);
 
             Setup.Initialize(graphics, Content, spriteBatch, RIR, Window, Camera, this);
 
@@ -177,7 +178,7 @@ namespace MyEngine
             Test6.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Yellow);
             Test6.Transform.Scale = 100 * Vector2.One;
             Test6.Layer = 0.1f;
-            Test6.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, 1.2f * graphics.PreferredBackBufferHeight / 2);
+            //Test6.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, 1.2f * graphics.PreferredBackBufferHeight / 2);
 
             GameObject Test6_Inst = GameObject.Instantiate(Test6);
             Test6_Inst.Name = "Test6_Inst";

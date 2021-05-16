@@ -241,7 +241,7 @@ namespace MyEngine
             return false;
         }
 
-        public bool RemoveComponent<T>(T component) where T : GameObjectComponent  //Remove a component from a gameobject
+        public bool RemoveComponent<T>(T component, bool Destroy = true) where T : GameObjectComponent  //Remove a component from a gameobject
         {
             if (component == null)
                 return false;
@@ -249,7 +249,8 @@ namespace MyEngine
             if (GameObjectComponents.Contains(component))
             {
                 GameObjectComponents.Remove(component);
-                component.Destroy();
+                if(Destroy)
+                    component.Destroy();
                 GameComponentsCount--;
                 return true;
             }

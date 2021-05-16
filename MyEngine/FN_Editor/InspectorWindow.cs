@@ -23,6 +23,7 @@ namespace MyEngine.FN_Editor
         private bool Subscribed = false;
         private int ChosenComponent = -1;
         private List<bool> ComponentsNotRemoved = new List<bool>();
+        private object ValueToChange = null;
 
         static InspectorWindow() //This should be called again on 'Hot reloading'
         {
@@ -107,6 +108,7 @@ namespace MyEngine.FN_Editor
                         }
                     }
 
+                    bool EnteredHere = true;
                     ImGui.PushID(IDs++);
                     switch (FI.FieldType.FullName) //Here, I handle basic types
                     {
@@ -187,7 +189,23 @@ namespace MyEngine.FN_Editor
                             FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
                             break;
                         default:
+                            EnteredHere = false;
                             break;
+                    }
+
+                    if (EnteredHere)
+                    {
+                        if (ImGui.IsItemActivated()) //Item Is In Edit Mode
+                            ValueToChange = FI.GetValue(Selected_GO);
+                        else if (ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
+                        {
+                            if (ValueToChange != FI.GetValue(Selected_GO))
+                            {
+                                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(Selected_GO, FI), ValueToChange), Operation.ChangeValue));
+                                GameObjects_Tab.Redo_Buffer.Clear();
+                            }
+                            ValueToChange = null;
+                        }
                     }
 
                     ImGui.PopID();
@@ -199,7 +217,7 @@ namespace MyEngine.FN_Editor
                     if (PI.GetMethod == null || !PI.GetMethod.IsPublic || PI.SetMethod == null || !PI.SetMethod.IsPublic)
                         continue;
 
-                    var GOC_SO = PI.GetValue(Selected_GO) as GameObjectComponent;
+                    GameObjectComponent GOC_SO = PI.GetValue(Selected_GO) as GameObjectComponent;
                     if (GOC_SO != null)
                     {
                         ImGui.InputText(PI.Name, ref GOC_SO.gameObject.Name, 50, ImGuiInputTextFlags.ReadOnly);
@@ -207,7 +225,7 @@ namespace MyEngine.FN_Editor
                     }
                     else
                     {
-                        var GO = PI.GetValue(Selected_GO) as GameObject;
+                        GameObject GO = PI.GetValue(Selected_GO) as GameObject;
                         if (GO != null)
                         {
                             ImGui.InputText(PI.Name, ref GO.Name, 50, ImGuiInputTextFlags.ReadOnly);
@@ -215,6 +233,7 @@ namespace MyEngine.FN_Editor
                         }
                     }
 
+                    bool EnteredHere = true;
                     ImGui.PushID(IDs++);
                     switch (PI.PropertyType.FullName) //Here, I handle basic types
                     {
@@ -295,7 +314,23 @@ namespace MyEngine.FN_Editor
                             PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
                             break;
                         default:
+                            EnteredHere = false;
                             break;
+                    }
+
+                    if(EnteredHere)
+                    {
+                        if (ImGui.IsItemActivated()) //Item Is In Edit Mode
+                            ValueToChange = PI.GetValue(Selected_GO);
+                        else if (ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
+                        {
+                            if (ValueToChange != PI.GetValue(Selected_GO))
+                            {
+                                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(Selected_GO, PI), ValueToChange), Operation.ChangeValue));
+                                GameObjects_Tab.Redo_Buffer.Clear();
+                            }
+                            ValueToChange = null;
+                        }
                     }
 
                     ImGui.PopID();
@@ -343,6 +378,7 @@ namespace MyEngine.FN_Editor
                                 }
                             }
 
+                            bool EnteredHere = true;
                             ImGui.PushID(IDs++);
                             switch (FI.FieldType.FullName) //Here, I handle basic types
                             {
@@ -446,8 +482,10 @@ namespace MyEngine.FN_Editor
                                     FI.SetValue(GOC, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
                                     break;
                                 default:
+                                    EnteredHere = false;
                                     if (FI.GetType().IsClass && !FI.GetType().IsArray)
                                     {
+                                        EnteredHere = true;
                                         var Name = FI.GetValue(GOC);
                                         if (FI.GetType().IsClass)
                                         {
@@ -461,8 +499,12 @@ namespace MyEngine.FN_Editor
                                             {
                                                 if (ContentWindow.DraggedAsset != null)
                                                 {
-                                                    if (FI.FieldType == ContentWindow.DraggedAsset.GetType())
+                                                    try
+                                                    {
                                                         FI.SetValue(GOC, ContentWindow.DraggedAsset);
+                                                    }
+                                                    catch (TargetInvocationException) // Log Error?
+                                                    { }
 
                                                     ContentWindow.DraggedAsset = null;
                                                 }
@@ -472,6 +514,21 @@ namespace MyEngine.FN_Editor
                                     }
 
                                     break;
+                            }
+
+                            if (EnteredHere)
+                            {
+                                if (ImGui.IsItemActivated()) //Item Is In Edit Mode
+                                    ValueToChange = FI.GetValue(GOC);
+                                else if (ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
+                                {
+                                    if (ValueToChange != FI.GetValue(GOC))
+                                    {
+                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), ValueToChange), Operation.ChangeValue));
+                                        GameObjects_Tab.Redo_Buffer.Clear();
+                                    }
+                                    ValueToChange = null;
+                                }
                             }
 
                             ImGui.PopID();
@@ -499,6 +556,7 @@ namespace MyEngine.FN_Editor
                                 }
                             }
 
+                            bool EnteredHere = true;
                             ImGui.PushID(IDs++);
                             switch (PI.PropertyType.FullName) //Here, I handle basic types
                             {
@@ -602,33 +660,59 @@ namespace MyEngine.FN_Editor
                                     PI.SetValue(GOC, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
                                     break;
                                 default:
+                                    EnteredHere = false;
                                     if (PI.GetType().IsClass && !PI.GetType().IsArray)
                                     {
+                                        EnteredHere = true;
                                         var Name = PI.GetValue(GOC);
                                         if (PI.GetType().IsClass)
                                         {
                                             string DummyRef = (Name != null)? Name.ToString() : "null";
                                             ImGui.InputText(PI.Name, ref DummyRef, 20, ImGuiInputTextFlags.ReadOnly);
                                         }
-                                    }
 
-                                    if (ImGui.BeginDragDropTarget())
-                                    {
-                                        if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                                        if (ImGui.BeginDragDropTarget())
                                         {
-                                            if (ContentWindow.DraggedAsset != null)
+                                            if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                                             {
-                                                if (PI.PropertyType == ContentWindow.DraggedAsset.GetType())
-                                                    PI.SetValue(GOC, ContentWindow.DraggedAsset);
+                                                if (ContentWindow.DraggedAsset != null)
+                                                {
+                                                    object OldVal = PI.GetValue(GOC);
 
-                                                ContentWindow.DraggedAsset = null;
+                                                    try
+                                                    {
+                                                        PI.SetValue(GOC, ContentWindow.DraggedAsset);
+
+                                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldVal), Operation.ChangeValue));
+                                                        GameObjects_Tab.Redo_Buffer.Clear();
+                                                    }
+                                                    catch(TargetInvocationException) // Log Error?
+                                                    { }
+
+                                                    ContentWindow.DraggedAsset = null;
+                                                }
                                             }
-                                        }
 
-                                        ImGui.EndDragDropTarget();
+                                            ImGui.EndDragDropTarget();
+                                        }
                                     }
 
                                     break;
+                            }
+
+                            if (EnteredHere)
+                            {
+                                if (ImGui.IsItemActivated()) //Item Is In Edit Mode
+                                    ValueToChange = PI.GetValue(GOC);
+                                else if (ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
+                                {
+                                    if (ValueToChange != PI.GetValue(GOC))
+                                    {
+                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), ValueToChange), Operation.ChangeValue));
+                                        GameObjects_Tab.Redo_Buffer.Clear();
+                                    }
+                                    ValueToChange = null;
+                                }
                             }
 
                             ImGui.PopID();
@@ -648,7 +732,13 @@ namespace MyEngine.FN_Editor
                     ImGui.NewLine();
                 }
 
-                Selected_GO.RemoveComponent(GOC_Removed);
+                if(Selected_GO.RemoveComponent(GOC_Removed, false))
+                {
+                    KeyValuePair<GameObject, GameObjectComponent> Info = new KeyValuePair<GameObject, GameObjectComponent>(Selected_GO, GOC_Removed);
+                    var KVP = new KeyValuePair<object, Operation>(Info, Operation.RemoveComponent);
+                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, KVP);
+                    GameObjects_Tab.Redo_Buffer.Clear();
+                }
 
                 if (ImGui.Button("Add Component", new Vector2(ImGui.GetWindowSize().X, 20)) && ChosenComponent != -1)
                 {
@@ -656,7 +746,14 @@ namespace MyEngine.FN_Editor
                     bool AddedSuccessfully = Selected_GO.AddComponent_Generic(GOC);
 
                     if (AddedSuccessfully)
+                    {
                         GOC.Start();
+
+                        KeyValuePair<GameObject, GameObjectComponent> Info = new KeyValuePair<GameObject, GameObjectComponent>(Selected_GO, GOC);
+                        var KVP = new KeyValuePair<object, Operation>(Info, Operation.AddComponent);
+                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, KVP);
+                        GameObjects_Tab.Redo_Buffer.Clear();
+                    }
                     else
                     {
                         GOC.Destroy();

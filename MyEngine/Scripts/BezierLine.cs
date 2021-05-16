@@ -28,7 +28,7 @@ namespace MyEngine
             {
                 ImGui.Begin("Gizoms");
 
-                System.Numerics.Vector2 TransPos = new System.Numerics.Vector2(gameObject.Transform.Position.X, gameObject.Transform.Position.Y);
+                System.Numerics.Vector2 TransPos = new System.Numerics.Vector2(gameObject.Transform.Position.X + Setup.graphics.PreferredBackBufferWidth * 0.5f, gameObject.Transform.Position.Y + Setup.graphics.PreferredBackBufferHeight * 0.5f);
 
                 //Point 1
                 ImGui.SetNextItemWidth(10);
@@ -38,7 +38,7 @@ namespace MyEngine
                 ImGui.PopID();
 
                 if (ImGui.IsItemActive())
-                    P1 = (Input.GetMousePosition() - gameObject.Transform.Position).ToPoint();
+                    P1 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + FN_Editor.GizmosVisualizer.BiasSceneWindow.X, TransPos.Y + FN_Editor.GizmosVisualizer.BiasSceneWindow.Y)).ToPoint();
 
                 //Point 2
                 ImGui.SetNextItemWidth(10);
@@ -48,7 +48,7 @@ namespace MyEngine
                 ImGui.PopID();
 
                 if (ImGui.IsItemActive())
-                    P2 = (Input.GetMousePosition() - gameObject.Transform.Position).ToPoint();
+                    P2 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + FN_Editor.GizmosVisualizer.BiasSceneWindow.X, TransPos.Y + FN_Editor.GizmosVisualizer.BiasSceneWindow.Y)).ToPoint();
 
                 //Point 3
                 ImGui.SetNextItemWidth(10);
@@ -58,7 +58,7 @@ namespace MyEngine
                 ImGui.PopID();
 
                 if (ImGui.IsItemActive())
-                    P3 = (Input.GetMousePosition() - gameObject.Transform.Position).ToPoint();
+                    P3 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + FN_Editor.GizmosVisualizer.BiasSceneWindow.X, TransPos.Y + FN_Editor.GizmosVisualizer.BiasSceneWindow.Y)).ToPoint();
 
                 //Point 4
                 if (Quadratic)
@@ -70,7 +70,7 @@ namespace MyEngine
                     ImGui.PopID();
 
                     if (ImGui.IsItemActive())
-                        P4 = (Input.GetMousePosition() - gameObject.Transform.Position).ToPoint();
+                        P4 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + FN_Editor.GizmosVisualizer.BiasSceneWindow.X, TransPos.Y + FN_Editor.GizmosVisualizer.BiasSceneWindow.Y)).ToPoint();
                 }
 
                 ImGui.End();

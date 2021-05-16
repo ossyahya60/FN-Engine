@@ -200,6 +200,9 @@ namespace MyEngine
 
             GuiRenderer.BeginLayout(gameTime); // Must be called prior to calling any ImGui controls
 
+            //Move windows using title bar only
+            ImGui.GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
+
             //FPS
             ImGui.Text(((int)(1.0f / (float)gameTime.ElapsedGameTime.TotalSeconds)).ToString());
 

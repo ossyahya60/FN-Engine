@@ -13,6 +13,7 @@ namespace MyEngine
             {
                 texture = value;
                 SourceRectangle = new Rectangle(0, 0, texture.Width, texture.Height);
+                Origin = new Vector2(texture.Width * 0.5f, texture.Height * 0.5f);
             }
             get
             {

@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 using System.IO;
-using System;
 
 namespace MyEngine
 {

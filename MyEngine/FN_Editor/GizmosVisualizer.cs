@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace MyEngine.FN_Editor
@@ -30,6 +31,8 @@ namespace MyEngine.FN_Editor
         private IntPtr RotationGizmo;
         private ActiveGizmo ActiveGizmo = ActiveGizmo.Movement;
         private bool EnteredRotationZone = false;
+        private bool WasMouseHeld = false;
+        private object OldTransVal = null;
 
         public override void Start()
         {
@@ -67,7 +70,13 @@ namespace MyEngine.FN_Editor
                         ImGui.PopID();
 
                         if (ImGui.IsItemActive())
+                        {
+                            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                OldTransVal = SelectedGO.Transform.Position;
+
                             SelectedGO.Transform.MoveY(Input.MouseDeltaY());
+                            WasMouseHeld = true;
+                        }
 
                         //Horizontal Arrow
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X + 8, SelectedGO.Transform.Position.Y) + Bias);
@@ -76,7 +85,13 @@ namespace MyEngine.FN_Editor
                         ImGui.PopID();
 
                         if (ImGui.IsItemActive())
+                        {
+                            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                OldTransVal = SelectedGO.Transform.Position;
+
                             SelectedGO.Transform.MoveX(Input.MouseDeltaX());
+                            WasMouseHeld = true;
+                        }
 
                         //Cube (Full Movement)
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 8, SelectedGO.Transform.Position.Y) + Bias);
@@ -85,7 +100,20 @@ namespace MyEngine.FN_Editor
                         ImGui.PopID();
 
                         if (ImGui.IsItemActive())
+                        {
+                            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                OldTransVal = SelectedGO.Transform.Position;
+
                             SelectedGO.Transform.Move(Input.MouseDelta());
+                            WasMouseHeld = true;
+                        }
+
+                        if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && WasMouseHeld)
+                        {
+                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(SelectedGO.Transform, typeof(Transform).GetMember("Position")[0]), OldTransVal), Operation.ChangeValue));
+                            GameObjects_Tab.Redo_Buffer.Clear();
+                            WasMouseHeld = false;
+                        }
 
                         break;
                     case ActiveGizmo.Rotation:
@@ -101,12 +129,24 @@ namespace MyEngine.FN_Editor
 
                         if(Input.GetMouseClick(MouseButtons.LeftClick))
                         {
+                            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                OldTransVal = SelectedGO.Transform.Rotation;
+
+                            WasMouseHeld = true;
+
                             Microsoft.Xna.Framework.Vector2 SameBias = new Microsoft.Xna.Framework.Vector2(Bias.X + BiasSceneWindow.X, Bias.Y + BiasSceneWindow.Y);
                             if (EnteredRotationZone || Utility.CircleContains(SelectedGO.Transform.Position + SameBias, 64, Input.GetMousePosition()))
                             {
                                 SelectedGO.Transform.Rotation = MathCompanion.GetAngle_Rad(SelectedGO.Transform.Position + SameBias, Input.GetMousePosition());
                                 EnteredRotationZone = true;
                             }
+                        }
+
+                        if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && WasMouseHeld)
+                        {
+                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(SelectedGO.Transform, typeof(Transform).GetMember("Rotation")[0]), OldTransVal), Operation.ChangeValue));
+                            GameObjects_Tab.Redo_Buffer.Clear();
+                            WasMouseHeld = false;
                         }
 
                         break;
@@ -119,7 +159,14 @@ namespace MyEngine.FN_Editor
                         ImGui.PopID();
 
                         if (ImGui.IsItemActive())
+                        {
+                            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                OldTransVal = SelectedGO.Transform.Scale;
+
+                            WasMouseHeld = true;
+
                             SelectedGO.Transform.ScaleY(-Input.MouseDeltaY() * 0.01f);
+                        }
 
                         //Horizontal Scale
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X + 8, SelectedGO.Transform.Position.Y) + Bias);
@@ -128,7 +175,14 @@ namespace MyEngine.FN_Editor
                         ImGui.PopID();
 
                         if (ImGui.IsItemActive())
+                        {
+                            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                OldTransVal = SelectedGO.Transform.Scale;
+
+                            WasMouseHeld = true;
+
                             SelectedGO.Transform.ScaleX(Input.MouseDeltaX() * 0.01f);
+                        }
 
                         //Cube (Full Scale)
                         ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 8, SelectedGO.Transform.Position.Y) + Bias);
@@ -138,9 +192,21 @@ namespace MyEngine.FN_Editor
 
                         if (ImGui.IsItemActive())
                         {
+                            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                OldTransVal = SelectedGO.Transform.Scale;
+
+                            WasMouseHeld = true;
+
                             int Sign = Input.MouseDeltaX() >= 0 ? 1 : -1;
                             float AverageDelta = (float)Math.Sqrt(Input.MouseDelta().X * Input.MouseDelta().X + Input.MouseDelta().Y * Input.MouseDelta().Y) * 0.01f;
                             SelectedGO.Transform.ScaleBoth(Microsoft.Xna.Framework.Vector2.One * AverageDelta * Sign);
+                        }
+
+                        if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && WasMouseHeld)
+                        {
+                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(SelectedGO.Transform, typeof(Transform).GetMember("Scale")[0]), OldTransVal), Operation.ChangeValue));
+                            GameObjects_Tab.Redo_Buffer.Clear();
+                            WasMouseHeld = false;
                         }
 
                         break;

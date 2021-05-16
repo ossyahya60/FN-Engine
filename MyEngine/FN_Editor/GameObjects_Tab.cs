@@ -3,23 +3,24 @@ using System.Numerics;
 using ImGuiNET;
 using System.Linq;
 using System;
+using System.Reflection;
 
 namespace MyEngine.FN_Editor
 {
-    enum Operation { Delete, Create, Rename, GO_DragAndDrop};
+    enum Operation { Delete, Create, Rename, GO_DragAndDrop, AddComponent, RemoveComponent, ChangeValue};
 
     class GameObjects_Tab : GameObjectComponent
     {
         public static GameObject WhoIsSelected = null;
         public static Vector2[] MyRegion;
+        public static LinkedList<KeyValuePair<object, Operation>> Undo_Buffer;
+        public static LinkedList<KeyValuePair<object, Operation>> Redo_Buffer;
+        public const int BufferLimit = 200; //200 Items
 
         private string NameBuffer = "";
         private HashSet<GameObject> SelectedGOs;
         private GameObject[] GOs_Clipboard = null;
         private bool IsCopy = true;
-        private LinkedList<KeyValuePair<object, Operation>> Undo_Buffer;
-        private LinkedList<KeyValuePair<object, Operation>> Redo_Buffer;
-        private int BufferLimit = 200; //200 Items
         private GameObject DraggedGO;
 
         public override void Start()
@@ -91,7 +92,7 @@ namespace MyEngine.FN_Editor
                 ImGui.OpenPopup("Functionalities");
 
             //Copy GOs
-            if (ImGui.GetIO().KeyCtrl && ImGui.IsWindowFocused())
+            if (ImGui.GetIO().KeyCtrl)
             {
                 if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.C))) //Copy
                 {
@@ -218,6 +219,36 @@ namespace MyEngine.FN_Editor
                             NewKVP.Key.Name = NewKVP.Value;
 
                             break;
+                        case Operation.AddComponent:
+                            KeyValuePair<GameObject, GameObjectComponent> Info = (KeyValuePair<GameObject, GameObjectComponent>)GOs;
+                            AddToACircularBuffer(Redo_Buffer, KVP);
+                            Info.Key.RemoveComponent(Info.Value, false);
+                            WhoIsSelected = Info.Key;
+
+                            break;
+                        case Operation.RemoveComponent:
+                            KeyValuePair<GameObject, GameObjectComponent> InfoRemove = (KeyValuePair<GameObject, GameObjectComponent>)GOs;
+                            AddToACircularBuffer(Redo_Buffer, KVP);
+                            InfoRemove.Key.AddComponent(InfoRemove.Value);
+                            WhoIsSelected = InfoRemove.Key;
+
+                            break;
+                        case Operation.ChangeValue:
+                            KeyValuePair<object, object> ValueChanged = (KeyValuePair<object, object>)GOs;
+                            KeyValuePair<object, object> ObjectAndField = (KeyValuePair<object, object>)ValueChanged.Key;
+
+                            if (ObjectAndField.Value is FieldInfo)
+                            {
+                                AddToACircularBuffer(Redo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(ObjectAndField, ((FieldInfo)ObjectAndField.Value).GetValue(ObjectAndField.Key)), Operation.ChangeValue));
+                                ((FieldInfo)ObjectAndField.Value).SetValue(ObjectAndField.Key, ValueChanged.Value);
+                            }
+                            else
+                            {
+                                AddToACircularBuffer(Redo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(ObjectAndField, ((PropertyInfo)ObjectAndField.Value).GetValue(ObjectAndField.Key)), Operation.ChangeValue));
+                                ((PropertyInfo)ObjectAndField.Value).SetValue(ObjectAndField.Key, ValueChanged.Value);
+                            }
+
+                            break;
                     }
                 }
                 else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Y), true) && Redo_Buffer.Count != 0) //Handling Undo and Redo actions
@@ -281,6 +312,36 @@ namespace MyEngine.FN_Editor
                             AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<GameObject, string>(NewKVP.Key, NewKVP.Key.Name), Operation.Rename));
 
                             NewKVP.Key.Name = NewKVP.Value;
+
+                            break;
+                        case Operation.AddComponent:
+                            KeyValuePair<GameObject, GameObjectComponent> Info = (KeyValuePair<GameObject, GameObjectComponent>)GOs;
+                            AddToACircularBuffer(Undo_Buffer, KVP);
+                            Info.Key.AddComponent(Info.Value);
+                            WhoIsSelected = Info.Key;
+
+                            break;
+                        case Operation.RemoveComponent:
+                            KeyValuePair<GameObject, GameObjectComponent> InfoRemove = (KeyValuePair<GameObject, GameObjectComponent>)GOs;
+                            AddToACircularBuffer(Undo_Buffer, KVP);
+                            InfoRemove.Key.RemoveComponent(InfoRemove.Value, false);
+                            WhoIsSelected = InfoRemove.Key;
+
+                            break;
+                        case Operation.ChangeValue:
+                            KeyValuePair<object, object> ValueChanged = (KeyValuePair<object, object>)GOs;
+                            KeyValuePair<object, object> ObjectAndField = (KeyValuePair<object, object>)ValueChanged.Key;
+
+                            if (ObjectAndField.Value is FieldInfo)
+                            {
+                                AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(ObjectAndField, ((FieldInfo)ObjectAndField.Value).GetValue(ObjectAndField.Key)), Operation.ChangeValue));
+                                ((FieldInfo)ObjectAndField.Value).SetValue(ObjectAndField.Key, ValueChanged.Value);
+                            }
+                            else
+                            {
+                                AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(ObjectAndField, ((PropertyInfo)ObjectAndField.Value).GetValue(ObjectAndField.Key)), Operation.ChangeValue));
+                                ((PropertyInfo)ObjectAndField.Value).SetValue(ObjectAndField.Key, ValueChanged.Value);
+                            }
 
                             break;
                     }
@@ -406,7 +467,7 @@ namespace MyEngine.FN_Editor
             ImGui.End();
         }
 
-        private void AddToACircularBuffer(LinkedList<KeyValuePair<object, Operation>> Buffer, KeyValuePair<object, Operation> KVP)
+        public static void AddToACircularBuffer(LinkedList<KeyValuePair<object, Operation>> Buffer, KeyValuePair<object, Operation> KVP)
         {
             if (Buffer.Count >= BufferLimit) // OverFlow
             {
@@ -419,7 +480,7 @@ namespace MyEngine.FN_Editor
             Buffer.AddFirst(KVP);
         }
 
-        private KeyValuePair<object, Operation> RemoveFromACircularBuffer(LinkedList<KeyValuePair<object, Operation>> Buffer)
+        public static KeyValuePair<object, Operation> RemoveFromACircularBuffer(LinkedList<KeyValuePair<object, Operation>> Buffer)
         {
             if (Buffer.Count > 0) // Empty
             {
