@@ -84,15 +84,15 @@ namespace MyEngine
                 GameObjectCount++;
 
                 bool RemovedOrDeleted = false;
-                Light L = GO.GetComponent<Light>();
+                //Light L = GO.GetComponent<Light>();
                 if (GO.ShouldBeRemoved || GO.ShouldBeDeleted)
                 {
                     RemovedOrDeleted = true;
                     GO.ShouldBeRemoved = false;
                     GO.ShouldBeDeleted = false;
 
-                    if (L != null)
-                        L.Rebuild();
+                    //if (L != null)
+                    //    L.Rebuild();
                 }
 
                 foreach (GameObject Child in GO.Children)

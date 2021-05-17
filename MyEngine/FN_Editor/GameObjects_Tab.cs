@@ -200,15 +200,17 @@ namespace MyEngine.FN_Editor
                         case Operation.GO_DragAndDrop:
                             AddToACircularBuffer(Redo_Buffer, KVP);
 
-                            KeyValuePair<GameObject, GameObject> KVP_GO = (KeyValuePair<GameObject, GameObject>)KVP.Key;
+                            KeyValuePair<object, GameObject> KVP_GO = (KeyValuePair<object, GameObject>)KVP.Key;
+                            KeyValuePair<GameObject, string> SourceAndPrevParent = (KeyValuePair<GameObject, string>)KVP_GO.Key;
+                            GameObject PrevParent = SceneManager.ActiveScene.FindGameObjectWithName(SourceAndPrevParent.Value);
                             if (KVP_GO.Value == null) //Destination is null
-                                KVP_GO.Key.PrevParent.AddChild(KVP_GO.Key);
+                                PrevParent.AddChild(SourceAndPrevParent.Key);
                             else
                             {
-                                if (KVP_GO.Key.PrevParent != null)
-                                    KVP_GO.Key.PrevParent.AddChild(KVP_GO.Key);
+                                if (PrevParent != null)
+                                    PrevParent.AddChild(SourceAndPrevParent.Key);
 
-                                KVP_GO.Value.RemoveChild(KVP_GO.Key);
+                                KVP_GO.Value.RemoveChild(SourceAndPrevParent.Key);
                             }
 
                             break;
@@ -300,11 +302,13 @@ namespace MyEngine.FN_Editor
                         case Operation.GO_DragAndDrop:
                             AddToACircularBuffer(Undo_Buffer, KVP);
 
-                            KeyValuePair<GameObject, GameObject> KVP_GO = (KeyValuePair<GameObject, GameObject>)KVP.Key;
-                            if (KVP_GO.Value == null && KVP_GO.Key.Parent != null) //Destination is null
-                                KVP_GO.Key.Parent.RemoveChild(KVP_GO.Key);
-                            else if(KVP_GO.Key.PrevParent != null)
-                                KVP_GO.Key.PrevParent.AddChild(KVP_GO.Key);
+                            KeyValuePair<object, GameObject> KVP_GO = (KeyValuePair<object, GameObject>)KVP.Key;
+                            KeyValuePair<GameObject, string> SourceAndPrevParent = (KeyValuePair<GameObject, string>)KVP_GO.Key;
+                            GameObject PrevParent = SceneManager.ActiveScene.FindGameObjectWithName(SourceAndPrevParent.Value);
+                            if (KVP_GO.Value == null && SourceAndPrevParent.Key.Parent != null) //Destination is null
+                                SourceAndPrevParent.Key.Parent.RemoveChild(SourceAndPrevParent.Key);
+                            else if(PrevParent != null)
+                                PrevParent.AddChild(SourceAndPrevParent.Key);
 
                             break;
                         case Operation.Rename:
@@ -452,7 +456,7 @@ namespace MyEngine.FN_Editor
                 {
                     if (DraggedGO != null && DraggedGO.Parent != null)
                     {
-                        KeyValuePair<GameObject, GameObject> KVP_GO = new KeyValuePair<GameObject, GameObject>(DraggedGO, null);
+                        KeyValuePair<object, GameObject> KVP_GO = new KeyValuePair<object, GameObject>(new KeyValuePair<GameObject, string>(DraggedGO, (DraggedGO.Parent == null) ? null : DraggedGO.Parent.Name), null);
 
                         DraggedGO.Parent.RemoveChild(DraggedGO);
 
@@ -535,7 +539,7 @@ namespace MyEngine.FN_Editor
                             GO.AddChild(DraggedGO);
 
                             // Undo and Redo Buffering
-                            KeyValuePair<GameObject, GameObject> KVP_GO = new KeyValuePair<GameObject, GameObject>(DraggedGO, GO);
+                            KeyValuePair<object, GameObject> KVP_GO = new KeyValuePair<object, GameObject>(new KeyValuePair<GameObject, string>(DraggedGO, (DraggedGO.Parent == null) ? null : DraggedGO.Parent.Name), GO);
                             AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(KVP_GO, Operation.GO_DragAndDrop));
                             Redo_Buffer.Clear();
                         }
@@ -614,7 +618,7 @@ namespace MyEngine.FN_Editor
                         GO.AddChild(DraggedGO);
 
                         // Undo and Redo Buffering
-                        KeyValuePair<GameObject, GameObject> KVP_GO = new KeyValuePair<GameObject, GameObject>(DraggedGO, GO);
+                        KeyValuePair<object, GameObject> KVP_GO = new KeyValuePair<object, GameObject>(new KeyValuePair<GameObject, string>(DraggedGO, (DraggedGO.Parent == null) ? null : DraggedGO.Parent.Name), GO);
                         AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(KVP_GO, Operation.GO_DragAndDrop));
                         Redo_Buffer.Clear();
                     }

@@ -22,7 +22,7 @@ namespace MyEngine
         private static List<Vector2> Points;
         private static List<Vector2> PointsTriangle;
         private static LineOccluder[] BorderOccluders;
-        private static List<Light> LIGHTS;
+        //private static List<Light> LIGHTS;
 
         private static EffectParameter ShadowMap_param;
         private static EffectParameter DirectionalIntensity_param;
@@ -67,7 +67,7 @@ namespace MyEngine
                 Points = new List<Vector2>();
                 HandyList = new List<LineOccluder>();
                 RenderTarget2D = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
-                LIGHTS = new List<Light>();
+                //LIGHTS = new List<Light>();
                 LightEffect = Setup.Content.Load<Effect>("LightTest");
                 ShaderLoaded = true;
                 ShadowMap = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None); //Depth is not needed
@@ -95,19 +95,19 @@ namespace MyEngine
                 //CameraPosNorm_param = LightEffect.Parameters["CameraPosNorm"];
             }
 
-            LIGHTS.Add(this);
+            //LIGHTS.Add(this);
             YOVERX = (float)Setup.graphics.PreferredBackBufferHeight / Setup.graphics.PreferredBackBufferWidth;
         }
 
         public override void Destroy()
         {
-            LIGHTS.Remove(this);
+            //LIGHTS.Remove(this);
         }
 
-        public void Rebuild() //Not for high level users
-        {
-            LIGHTS.Add(this);
-        }
+        //public void Rebuild() //Not for high level users
+        //{
+        //    //LIGHTS.Add(this);
+        //}
 
         public static void Init_Light()
         {
@@ -118,7 +118,8 @@ namespace MyEngine
         {
             Rectangle BiasScene = new Rectangle((int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.X + -Setup.graphics.PreferredBackBufferWidth * 0.5f + Setup.Camera.Position.X), (int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f + Setup.Camera.Position.Y), (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.X, (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.Y);
 
-            if (LIGHTS == null || LIGHTS.Count == 0)
+            Light[] LIGHTS = SceneManager.ActiveScene.FindGameObjectComponents<Light>();
+            if (LIGHTS == null || LIGHTS.Length == 0)
             {
                 Setup.GraphicsDevice.SetRenderTarget(null);
                 Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix());
@@ -128,7 +129,7 @@ namespace MyEngine
                 return;
             }
 
-            int LightCount = LIGHTS.Count;
+            int LightCount = LIGHTS.Length;
 
             if (LightCount == 0)
                 return;
@@ -199,7 +200,7 @@ namespace MyEngine
 
                 if (HandyList.Count != 0)
                 {
-                    for (int k = 0; k < LIGHTS.Count; k++)
+                    for (int k = 0; k < LIGHTS.Length; k++)
                     {
                         PointsTriangle.Clear();
                         if (!LIGHTS[k].gameObject.IsActive() || !LIGHTS[k].Enabled)
@@ -292,7 +293,7 @@ namespace MyEngine
         {
             Light clone = this.MemberwiseClone() as Light;
 
-            LIGHTS.Add(clone);
+            //LIGHTS.Add(clone);
 
             return clone;
         }
