@@ -111,12 +111,17 @@ namespace MyEngine
 
         public static void Init_Light()
         {
+            if(RenderTarget2D == null)
+                RenderTarget2D = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+
             Setup.GraphicsDevice.SetRenderTarget(RenderTarget2D); //Render Target
         }
 
         public static void ApplyLighting()
         {
-            Rectangle BiasScene = new Rectangle((int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.X + -Setup.graphics.PreferredBackBufferWidth * 0.5f + Setup.Camera.Position.X), (int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f + Setup.Camera.Position.Y), (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.X, (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.Y);
+            Rectangle BiasScene = new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
+            if (FN_Editor.EditorScene.IsThisTheEditor)
+                BiasScene = new Rectangle((int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.X + -Setup.graphics.PreferredBackBufferWidth * 0.5f + Setup.Camera.Position.X), (int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f + Setup.Camera.Position.Y), (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.X, (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.Y);
 
             Light[] LIGHTS = SceneManager.ActiveScene.FindGameObjectComponents<Light>();
             if (LIGHTS == null || LIGHTS.Length == 0)

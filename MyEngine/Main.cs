@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace MyEngine
 {
@@ -68,7 +70,9 @@ namespace MyEngine
             /////////Camera And Resolution Independent Renderer/////// -> Mandatory
             Camera = new Camera2D();
             Camera.Zoom = 1f;
-            //Camera.Position = new Vector2(RIR.VirtualWidth / 2, RIR.VirtualHeight / 2);
+
+            //You should look at this when deserializing scene for a game! (Note for the Engine Programmer)
+            //Camera.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
 
             Setup.Initialize(graphics, Content, spriteBatch, RIR, Window, Camera, this);
 
@@ -106,14 +110,10 @@ namespace MyEngine
             ImportantIntialization();
             RIR.BackgroundColor = new Color(0, 0, 0, 0);
 
-            SceneManager.Start();
-
             //SceneManager.LoadScene_Serialization("MainScene");
             SceneManager.AddInitializer(MainScene, 0);
             //////////////////////////////////////////////////////////
             SceneManager.LoadScene(new Scene("MainScene", 0)); //Main Scene
-
-            SceneManager.ShouldUpdate = false; //Editor only
         }
 
         private void MainScene()
@@ -153,20 +153,21 @@ namespace MyEngine
             Test2.AddComponent<AudioSource>(new AudioSource("FireWorks_M"));
 
             //Editor GameObject
-            GameObject GameObjectsTab = new GameObject(true);
-            GameObjectsTab.Layer = 2;
-            GameObjectsTab.Name = "Scene Tab";
-            GameObjectsTab.AddComponent(new FN_Editor.GameObjects_Tab());
-            GameObjectsTab.AddComponent(new FN_Editor.InspectorWindow());
-            GameObjectsTab.AddComponent(new FN_Editor.ContentWindow());
-            GameObjectsTab.AddComponent(new FN_Editor.GizmosVisualizer());
-            GameObjectsTab.AddComponent(new FN_Editor.EditorScene());
+            GameObject EditorGameObject = new GameObject(true);
+            EditorGameObject.Layer = 2;
+            EditorGameObject.Name = "EditorGameObject"; //Don't change this name!
+            EditorGameObject.AddComponent(new FN_Editor.GameObjects_Tab());
+            EditorGameObject.AddComponent(new FN_Editor.InspectorWindow());
+            EditorGameObject.AddComponent(new FN_Editor.ContentWindow());
+            EditorGameObject.AddComponent(new FN_Editor.GizmosVisualizer());
+            EditorGameObject.AddComponent(new FN_Editor.EditorScene());
+            //EditorGameObject.AddComponent(new FN_Project.VisualizeEngineStartup()); // Put it here
 
             //SceneManager.ActiveScene.AddGameObject_Recursive(Test);
             SceneManager.ActiveScene.AddGameObject_Recursive(Test2);
             //SceneManager.ActiveScene.AddGameObject_Recursive(Test3);
             SceneManager.ActiveScene.AddGameObject_Recursive(Test6);
-            SceneManager.ActiveScene.AddGameObject_Recursive(GameObjectsTab);
+            SceneManager.ActiveScene.AddGameObject_Recursive(EditorGameObject);
 
             SceneManager.ActiveScene.Start();
 
@@ -238,6 +239,7 @@ namespace MyEngine
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            Content.Unload();
         }
 
         /// <summary>
@@ -270,7 +272,7 @@ namespace MyEngine
                 SceneManager.ActiveScene.FindGameObjectWithName("Test 6").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             if (Input.GetKeyUp(Keys.O, KeyboardFlags.CTRL))
-                SceneManager.ActiveScene.Serialize(true);
+                SceneManager.SerializeScene("MainScene");
 
             if (Input.GetKeyUp(Keys.R, KeyboardFlags.CTRL))
                 SceneManager.LoadScene_Serialization("MainScene");
@@ -285,9 +287,6 @@ namespace MyEngine
                 SceneManager.ActiveScene.FindGameObjectWithName("Test6_Inst").Transform.MoveX((float)gameTime.ElapsedGameTime.TotalSeconds * 120);
 
             SceneManager.Update(gameTime);
-
-            // I moved this here, because Update rate is not the same as draw rate, so Input is not synchronized well
-            SceneManager.ActiveScene.DrawUI(gameTime); //Draw UI
 
             base.Update(gameTime);
         }

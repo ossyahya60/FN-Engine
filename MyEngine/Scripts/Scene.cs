@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.ImGui;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace MyEngine
 {
@@ -13,15 +14,16 @@ namespace MyEngine
 
         public bool ShouldSort = false;
         public bool Active = true;
-        public List<GameObject> GameObjects;
         public string Name;
+        public List<GameObject> GameObjects;
+
         public int ID
         {
             set
             {
-                foreach (int id in IDs)
-                    if (id == value)
-                        throw new System.Exception("Scene ID must be unique");
+                //foreach (int id in IDs)
+                //    if (id == value)
+                //        throw new System.Exception("Scene ID must be unique");
                 IDs.Add(value);
                 Id = value;
             }
@@ -33,7 +35,6 @@ namespace MyEngine
 
         private static List<int> IDs;
         private int Id;
-        private int GameObjectCount = 0;
         private List<GameObject> HandyList;
 
         private static RenderTarget2D ImGUI_RenderTarget = null;
@@ -43,6 +44,13 @@ namespace MyEngine
             GameObjects = new List<GameObject>();
             IDs = new List<int>();
             Name = name;
+            HandyList = new List<GameObject>();
+        }
+
+        public Scene()
+        {
+            GameObjects = new List<GameObject>();
+            IDs = new List<int>();
             HandyList = new List<GameObject>();
         }
 
@@ -77,11 +85,13 @@ namespace MyEngine
 
         public void AddGameObject_Recursive(GameObject GO, bool Root = true) // Adds the GO along with its children and so on
         {
+            if (GO == null)
+                return;
+
             if (!GameObjects.Contains(GO))
             {
                 GO.Name = Utility.UniqueGameObjectName(GO.Name);
-                GameObjects.Insert(GameObjectCount, GO);
-                GameObjectCount++;
+                GameObjects.Insert(GameObjects.Count, GO);
 
                 bool RemovedOrDeleted = false;
                 //Light L = GO.GetComponent<Light>();
@@ -152,7 +162,6 @@ namespace MyEngine
             }
 
             GameObjects.Remove(GO);
-            GameObjectCount--;
         }
 
         public void Start()
@@ -287,6 +296,22 @@ namespace MyEngine
             ShouldSort = true;
         }
 
+        public void SerializeV2(string Path = "")
+        {
+            using (StreamWriter SW = new StreamWriter(Name + ".txt", false))
+            {
+                Utility.OIG = new System.Runtime.Serialization.ObjectIDGenerator();
+
+                JsonTextWriter JW = new JsonTextWriter(SW);
+                JW.Formatting = Formatting.Indented;
+
+                Utility.SerializeV2(JW, this);
+
+                JW.Close();
+                SW.Close();
+            }
+        }
+
         public void Serialize(bool SerializerEditorStuff = false)
         {
             Utility.OIG = new System.Runtime.Serialization.ObjectIDGenerator();
@@ -301,7 +326,7 @@ namespace MyEngine
                 SW.Write("Active:\t" + Active.ToString() + "\n");
                 SW.Write("Name:\t" + Name + "\n");
                 SW.Write("Id:\t" + Id + "\n");
-                SW.Write("GameObjectCount:\t" + (SerializerEditorStuff? GameObjectCount : GameObjectCount - NumberOfEditorObjects).ToString() + "\n");
+                SW.Write("GameObjectCount:\t" + (SerializerEditorStuff? GameObjects.Count : GameObjects.Count - NumberOfEditorObjects).ToString() + "\n");
 
                 MediaSource.Serialize(SW);
                 Setup.Camera.Serialize(SW);

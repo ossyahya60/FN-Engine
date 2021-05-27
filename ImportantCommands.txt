@@ -1,4 +1,4 @@
-dotnet sln new    (Make a new solution).
+dotnet new sln (Make a new solution).
 dotnet sln "SolutionName" add "ProjectName.csproj" (add an existing project).
 dotnet build (Build a project)
 dotnet run (Run // //)

@@ -75,6 +75,7 @@
     <Compile Include="FN_Editor\GameObjects_Tab.cs" />
     <Compile Include="FN_Editor\GizmosVisualizer.cs" />
     <Compile Include="FN_Editor\InspectorWindow.cs" />
+    <Compile Include="FN_Project\VisualizeEngineStartup.cs" />
     <Compile Include="Scripts\BezierLine.cs" />
     <Compile Include="Scripts\Button.cs" />
     <Compile Include="Scripts\Canvas.cs" />
@@ -130,6 +131,7 @@
     <Reference Include="ImGui.NET, Version=1.78.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ImGui.NET.1.78.0\lib\netstandard2.0\ImGui.NET.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="MonoGame.Framework, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Users\ossya\Downloads\FN-Engine-master\FN-Engine-master\MyEngine\bin\Windows\x86\Debug\MonoGame.Framework.dll</HintPath>

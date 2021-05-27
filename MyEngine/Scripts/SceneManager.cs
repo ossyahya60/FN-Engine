@@ -4,23 +4,50 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using System.Linq;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace MyEngine
 {
     public static class SceneManager
     {
-        public static Scene ActiveScene;
-        public static Dictionary<int, Action> InitializerList;
+        public static Scene ActiveScene = null;
+        public static Dictionary<int, Action> InitializerList = new Dictionary<int, Action>();
         public static bool ShouldUpdate = true;
 
         private static Scene SceneToBeLoaded = null;
         private static bool FirstTimeLoading = true;
         private static Vector2 Resolution = Vector2.Zero;
+        private static string ScenesDirectory = "";
+        private static string DefaultScene = "Main Scene";
+        private static List<string> Scenes = new List<string>();
 
-        public static void Start()
+
+        private static void ReadSceneFile()
         {
-            InitializerList = new Dictionary<int, Action>();
-            ActiveScene = null;
+            using (StreamReader SR = new StreamReader(ScenesDirectory + "/Scenes/Scenes.FN", false))
+            {
+                DefaultScene = SR.ReadLine().Split('\t')[1];
+                
+                int NumberOfScenes = int.Parse(SR.ReadLine().Split('\t')[1]);
+                for (int i = 0; i < NumberOfScenes; i++)
+                    Scenes.Add(SR.ReadLine());
+            }
+        }
+
+        private static void SaveSceneFile()
+        {
+            using (StreamWriter SW = new StreamWriter(ScenesDirectory + "/Scenes/Scenes.FN", false))
+            {
+                SW.WriteLine("Default Scene:\t" + DefaultScene);
+
+                string[] SceneNames = Directory.GetFiles(ScenesDirectory + "/Scenes").Where(Item => Item.Contains(".FN")).ToArray();
+
+                SW.WriteLine("Number Of Scenes:\t" + SceneNames.Length.ToString());
+
+                foreach (string S in SceneNames)
+                    SW.WriteLine(S);
+            }
         }
 
         private static void UnloadScene()
@@ -68,6 +95,25 @@ namespace MyEngine
             SceneToBeLoaded = scene;
         }
 
+        private static Scene DeserlializeV2(string Path = "")
+        {
+            using (StreamReader SR = new StreamReader(Path + ".txt", false))
+            {
+                Utility.OIG = new System.Runtime.Serialization.ObjectIDGenerator();
+
+                JsonTextReader JR = new JsonTextReader(SR);
+                JR.Read(); // {
+
+                Dictionary<long, object> SerializedObjects = new Dictionary<long, object>();
+                Scene scene = Utility.DeserializeV2(JR, SerializedObjects) as Scene;
+
+                JR.Close();
+                SR.Close();
+
+                return scene;
+            }
+        }
+
         public static void LoadScene_Serialization(string Name) //Use this
         {
             if (FirstTimeLoading)
@@ -87,16 +133,48 @@ namespace MyEngine
                 return;
 
             UnloadScene();
-            ActiveScene = SceneToBeLoaded;
+            ActiveScene = DeserlializeV2(SceneToBeLoaded.Name);
 
-
-            SceneToBeLoaded.Start();
-            SceneToBeLoaded.Deserialize(SceneToBeLoaded.Name);
             Light.Reset();
-            SceneToBeLoaded.Start();
+            ActiveScene.Start();
 
             SceneToBeLoaded = null;
         }
+
+        public static void SerializeScene(string Path = "", bool ForEditor = false)
+        {
+            if (ActiveScene != null)
+            {
+                GameObject EditorGameObject = null;
+                if (ForEditor)
+                {
+                    EditorGameObject = ActiveScene.FindGameObjectWithName("EditorGameObject");
+                    ActiveScene.RemoveGameObject(EditorGameObject, false);
+                }
+
+                ActiveScene.SerializeV2(Path);
+
+                if (ForEditor)
+                    ActiveScene.AddGameObject_Recursive(EditorGameObject);
+            }
+        }
+
+        //public static void LoadSceneNow_Serialization() //Not For High level user
+        //{
+        //    if (SceneToBeLoaded == null)
+        //        return;
+
+        //    UnloadScene();
+        //    ActiveScene = SceneToBeLoaded;
+
+
+        //    //SceneToBeLoaded.Start();
+        //    SceneToBeLoaded.DeserializeV2(SceneToBeLoaded.Name);
+        //    Light.Reset();
+        //    SceneToBeLoaded.Start();
+
+        //    SceneToBeLoaded = null;
+        //}
 
         public static void Initialize()
         {
@@ -118,8 +196,11 @@ namespace MyEngine
 
             Resolution = new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
 
-            if (ActiveScene != null && ShouldUpdate)
+            if (ActiveScene != null && ShouldUpdate && !FN_Editor.EditorScene.IsThisTheEditor)
                 ActiveScene.Update(gameTime);
+
+            // I moved this here, because Update rate is not the same as draw rate, so Input is not synchronized well
+            ActiveScene.DrawUI(gameTime); //Draw UI
         }
 
         public static void Draw(GameTime gameTime)

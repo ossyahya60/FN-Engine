@@ -499,9 +499,14 @@ namespace MyEngine.FN_Editor
                                             {
                                                 if (ContentWindow.DraggedAsset != null)
                                                 {
+                                                    object OldVal = FI.GetValue(GOC);
+
                                                     try
                                                     {
                                                         FI.SetValue(GOC, ContentWindow.DraggedAsset);
+
+                                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldVal), Operation.ChangeValue));
+                                                        GameObjects_Tab.Redo_Buffer.Clear();
                                                     }
                                                     catch (TargetInvocationException) // Log Error?
                                                     { }

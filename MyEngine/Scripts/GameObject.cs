@@ -30,7 +30,9 @@ namespace MyEngine
                 if(value != layer)
                 {
                     layer = value;
-                    SceneManager.ActiveScene.SortGameObjectsWithLayer();
+
+                    if(SceneManager.ActiveScene != null)
+                        SceneManager.ActiveScene.SortGameObjectsWithLayer();
                 }
             }
             get
@@ -39,7 +41,6 @@ namespace MyEngine
             }
         }
         public string Tag = null;
-        public int GameComponentsCount { private set; get; }
         public bool Active { set; get; }
         public string Name = "Default";
         public bool ShouldBeDeleted = false;
@@ -212,9 +213,8 @@ namespace MyEngine
 
             if (GameObjectComponents.Find(Item => Item.GetType() == component.GetType()) == null || CanBeAdded)
             {
-                GameObjectComponents.Insert(GameComponentsCount, component);
-                GameObjectComponents[GameComponentsCount].gameObject = this;
-                GameComponentsCount++;
+                component.gameObject = this;
+                GameObjectComponents.Insert(GameObjectComponents.Count, component);
 
                 return true;
             }
@@ -231,9 +231,8 @@ namespace MyEngine
 
             if (GameObjectComponents.Find(Item => Item.GetType() == component.GetType()) == null || CanBeAdded)
             {
-                GameObjectComponents.Insert(GameComponentsCount, component);
-                GameObjectComponents[GameComponentsCount].gameObject = this;
-                GameComponentsCount++;
+                component.gameObject = this;
+                GameObjectComponents.Insert(GameObjectComponents.Count, component);
 
                 return true;
             }
@@ -251,7 +250,7 @@ namespace MyEngine
                 GameObjectComponents.Remove(component);
                 if(Destroy)
                     component.Destroy();
-                GameComponentsCount--;
+
                 return true;
             }
 

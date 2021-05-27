@@ -26,7 +26,7 @@ namespace MyEngine
         {
             return JsonConvert.SerializeObject(OBJ, Formatting.Indented, new JsonSerializerSettings
             {
-                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             });
         }
     }

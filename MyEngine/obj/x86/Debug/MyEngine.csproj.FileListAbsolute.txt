@@ -17,8 +17,6 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\SubmittingGame.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\Temp.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Content\TileSet1.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\cimgui.dll
-C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.exe.config
-C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.exe
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.pdb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\System.Runtime.InteropServices.RuntimeInformation.dll
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\Microsoft.Win32.Primitives.dll
@@ -158,8 +156,10 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpFont.xml
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\SharpDX.D3DCompiler.xml
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\AssimpNet.xml
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.csprojAssemblyReference.cache
-C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.exe.config
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.csproj.CoreCompileInputs.cache
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.csproj.CopyComplete
-C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.exe
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.pdb
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.exe.config
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Debug\MyEngine.exe
+C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.exe.config
+C:\MyEngine\MyEngine\MyEngine\obj\x86\Debug\MyEngine.exe

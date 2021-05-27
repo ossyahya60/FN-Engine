@@ -1,0 +1,20 @@
+{
+  "Scene NameLOL": "MainScene",
+  "ID": "5",
+  "Array": [
+    "This",
+    "Is",
+    "String",
+    "Array"
+  ],
+  "Nested Object": {
+    "Scene Name": "MainScene",
+    "ID": "5",
+    "Array": [
+      "This",
+      "Is",
+      "String",
+      "Array"
+    ]
+  }
+}

@@ -5,6 +5,13 @@ namespace MyEngine.FN_Editor
 {
     public class EditorScene: GameObjectComponent
     {
+        public static bool IsThisTheEditor = false;
+
+        public override void Start()
+        {
+            IsThisTheEditor = true;
+        }
+
         public override void DrawUI()
         {
             if (ImGui.IsMouseDragging(ImGuiMouseButton.Right))

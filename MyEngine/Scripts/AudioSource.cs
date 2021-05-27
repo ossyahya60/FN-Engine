@@ -75,7 +75,7 @@ namespace MyEngine
                     {
                         SoundEffect = Setup.Content.Load<SoundEffect>(value);
                     }
-                    catch (System.InvalidCastException)
+                    catch (System.InvalidCastException) //Logging instead of throwing exception!
                     {
                         throw new Exception("Usupported Sound Effect Type, must be wav, ogg or mp3");
                     }
