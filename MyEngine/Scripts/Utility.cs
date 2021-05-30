@@ -173,11 +173,9 @@ namespace MyEngine
 
             if (!FirstTime) //Serialized Before!
             {
-                if (ShouldWriteValue)
-                {
-                    JW.WriteValue(GID.ToString());
-                    return;
-                }
+                JW.WriteValue(GID.ToString());
+
+                return;
             }
 
             JW.WriteStartObject();

@@ -7,9 +7,10 @@ namespace MyEngine
     {
         public bool NoLifeTime = false;
         public Vector2 Position;
-        public int Size = 1;
+        public Vector2 Size = Vector2.One;
         public float LifeTime = 1f;
         public Color Color = Color.White;
+        public Color FadeColor = Color.Black;
         public float Layer = 0f;
         public bool Expired = false;
         public bool ShrinkMode = true;
@@ -22,7 +23,7 @@ namespace MyEngine
             set
             {
                 height = (value >= 0) ? value : 0;
-                OriginalSize = height;
+                OriginalSize.Y = height;
             }
             get
             {
@@ -38,18 +39,16 @@ namespace MyEngine
         public float AccelerationMagnitude = 2f;
 
         private float LifeTimeCounter = 0;
-        private int OriginalSize;
+        private Vector2 OriginalSize;
         private bool OneTime = false;
         private bool ForParticleEffect = false;
         private float AccelerationCounter = 0;
         private int height;
-        private Rectangle HandyRectangle; //To avoid stack allocating a lot if memory in a short time
 
         public Particle(bool ForParticleEffect)
         {
             OriginalSize = Size;
             this.ForParticleEffect = ForParticleEffect;
-            HandyRectangle = new Rectangle();
             Length = 2;
             Height = 10;
         }
@@ -61,7 +60,7 @@ namespace MyEngine
                 if (ForParticleEffect)
                     OriginalSize = Size;
                 else
-                    OriginalSize = height;
+                    OriginalSize.Y = height;
                 OneTime = true;
             }
 
@@ -81,13 +80,15 @@ namespace MyEngine
                 if (ShrinkMode)
                 {
                     if(ForParticleEffect)
-                        Size = (int)(((LifeTime - LifeTimeCounter * MinimumSize) / LifeTime) * OriginalSize);
+                        Size = ((LifeTime - LifeTimeCounter * MinimumSize) / LifeTime) * OriginalSize;
                     else
-                        height = (int)(((LifeTime - LifeTimeCounter * MinimumSize) / LifeTime) * OriginalSize);
+                        height = (int)(((LifeTime - LifeTimeCounter * MinimumSize) / LifeTime) * OriginalSize.Y);
                 }
 
                 if (!NoLifeTime)
                 {
+                    Color = Color.Lerp(Color, FadeColor, LifeTimeCounter / LifeTime);
+
                     if (LifeTimeCounter >= LifeTime)
                         Expired = true;
                     else
@@ -100,10 +101,11 @@ namespace MyEngine
         {
             if(!Expired)
             {
+                Rectangle HandyRectangle = Rectangle.Empty;
                 HandyRectangle.X = (int)Position.X;
                 HandyRectangle.Y = (int)Position.Y;
-                HandyRectangle.Width = Size;
-                HandyRectangle.Height = Size;
+                HandyRectangle.Width = (int)Size.X;
+                HandyRectangle.Height = (int)Size.Y;
 
                 HitBoxDebuger.DrawRectangle(HandyRectangle, Color, Rotation, Layer);
             }
@@ -113,10 +115,11 @@ namespace MyEngine
         {
             if (!Expired)
             {
+                Rectangle HandyRectangle = Rectangle.Empty;
                 HandyRectangle.X = (int)Position.X;
                 HandyRectangle.Y = (int)Position.Y;
-                HandyRectangle.Width = Size;
-                HandyRectangle.Height = Size;
+                HandyRectangle.Width = (int)Size.X;
+                HandyRectangle.Height = (int)Size.Y;
 
                 HitBoxDebuger.DrawRectangle(HandyRectangle, Color, Rotation, texture, Layer, Vector2.Zero);
             }
@@ -127,6 +130,7 @@ namespace MyEngine
         {
             if (!Expired)
             {
+                Rectangle HandyRectangle = Rectangle.Empty;
                 HandyRectangle.X = (int)Position.X;
                 HandyRectangle.Y = (int)Position.Y;
                 HandyRectangle.Width = Length;

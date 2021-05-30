@@ -11,6 +11,7 @@ namespace MyEngine
     public class ParticleEffect: GameObjectComponent
     {
         public Color Color = Color.White;
+        public Color FadeColor = Color.Black;
         public bool NoLifeTime = false;
         public bool Accelerate = false;
         public bool LineParticle = false;
@@ -24,7 +25,20 @@ namespace MyEngine
         public bool ConstantVelocity = false;
         public bool ShrinkWithTime = false;
         public int ParticlesAtaTime = 10;
-        public Texture2D CustomTexture = null;
+        public string CustomTexture
+        {
+            set
+            {
+                customTex = Setup.Content.Load<Texture2D>(value.ToString());
+            }
+            get
+            {
+                if (customTex != null)
+                    return customTex.Name;
+                else
+                    return "";
+            }
+        }
         public Vector2 FireDirection;
         public float MinimumSize = 0.5f;
         public float AccelerationMagnitude = 0.1f;
@@ -64,6 +78,7 @@ namespace MyEngine
         private Random random;
         private Color Color1, Color2, Color3, ColorDefault = Color.White;
         private float rotation = 0;
+        private Texture2D customTex = null;
 
         public ParticleEffect()
         {
@@ -131,7 +146,7 @@ namespace MyEngine
                             }
                             else
                                 particle.Color = Color * (RandomAlpha ? (float)random.NextDouble() : 1);
-                            particle.Size = ParticleSize;
+                            particle.Size = ParticleSize * gameObject.Transform.Scale;
                             particle.Position = gameObject.Transform.Position;
                             particle.LifeTime = VanishAfter;
                             particle.ShrinkMode = ShrinkWithTime;
@@ -143,6 +158,7 @@ namespace MyEngine
                             particle.MinimumSize = MinimumSize;
                             particle.Layer = gameObject.Layer;
                             particle.NoLifeTime = NoLifeTime;
+                            particle.FadeColor = FadeColor;
                             if (RandomRotation)
                             {
                                 Rotation = (float)random.NextDouble() * 360;
@@ -183,12 +199,12 @@ namespace MyEngine
             if (LineParticle)
                 foreach (Particle P in Particles)
                     P.DrawSegment();
-            else if (CustomTexture == null)
+            else if (customTex == null)
                 foreach (Particle P in Particles)
                     P.Draw();
             else
                 foreach (Particle P in Particles)
-                    P.Draw(CustomTexture);
+                    P.Draw(customTex);
         }
 
         public override GameObjectComponent DeepCopy(GameObject clone)
@@ -211,8 +227,8 @@ namespace MyEngine
             SW.Write("FaceDirection:\t" + FaceDirection.ToString() + "\n");
             SW.Write("BurstMode:\t" + BurstMode.ToString() + "\n");
             SW.Write("ParticlesAtaTime:\t" + ParticlesAtaTime.ToString() + "\n");
-            if(CustomTexture != null && CustomTexture.Name != null)
-                SW.Write("CustomTexture:\t" + CustomTexture.Name + "\n");
+            if(customTex != null && customTex.Name != null)
+                SW.Write("CustomTexture:\t" + customTex.Name + "\n");
             else
                 SW.Write("CustomTexture:\t" + "null\n"); //This doesn't necessarily mean that there is no custom texture, but there might be one that wasn't loaded but assigned
             SW.Write("FireDirection:\t" + FireDirection.X.ToString() + "\t" + FireDirection.Y.ToString() + "\n");

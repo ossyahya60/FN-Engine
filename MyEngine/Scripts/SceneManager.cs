@@ -196,7 +196,7 @@ namespace MyEngine
 
             Resolution = new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
 
-            if (ActiveScene != null && ShouldUpdate && !FN_Editor.EditorScene.IsThisTheEditor)
+            if (ActiveScene != null && ShouldUpdate /*&& !FN_Editor.EditorScene.IsThisTheEditor*/)
                 ActiveScene.Update(gameTime);
 
             // I moved this here, because Update rate is not the same as draw rate, so Input is not synchronized well

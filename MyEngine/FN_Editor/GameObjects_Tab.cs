@@ -183,7 +183,7 @@ namespace MyEngine.FN_Editor
                                         gameObjects[i].PrevParent.AddChild(gameObjects[i]);
 
                                     //gameObjects[i].Name = Utility.UniqueGameObjectName(gameObjects[i].Name);
-                                    SceneManager.ActiveScene.AddGameObject_Recursive(gameObjects[i]);
+                                    SceneManager.ActiveScene.AddGameObject_Recursive(gameObjects[i], true, true);
                                 }
                             }
                             else
@@ -193,7 +193,7 @@ namespace MyEngine.FN_Editor
                                     GO.PrevParent.AddChild(GO);
 
                                 //GO.Name = Utility.UniqueGameObjectName(GO.Name);
-                                SceneManager.ActiveScene.AddGameObject_Recursive(GO);
+                                SceneManager.ActiveScene.AddGameObject_Recursive(GO, true, true);
                             }
 
                             break;
@@ -272,7 +272,7 @@ namespace MyEngine.FN_Editor
                                     if (gameObjects[i].PrevParent != null)
                                         gameObjects[i].PrevParent.AddChild(gameObjects[i]);
 
-                                    SceneManager.ActiveScene.AddGameObject_Recursive(gameObjects[i]);
+                                    SceneManager.ActiveScene.AddGameObject_Recursive(gameObjects[i], true, true);
                                 }
                             }
                             else
@@ -281,7 +281,7 @@ namespace MyEngine.FN_Editor
                                 if (GO.PrevParent != null)
                                     GO.PrevParent.AddChild(GO);
 
-                                SceneManager.ActiveScene.AddGameObject_Recursive(GO);
+                                SceneManager.ActiveScene.AddGameObject_Recursive(GO, true, true);
                             }
 
                             break;

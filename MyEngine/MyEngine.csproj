@@ -128,17 +128,28 @@
     <Compile Include="Scripts\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="AssimpNet, Version=4.1.0.0, Culture=neutral, PublicKeyToken=0d51b391f59f42a6, processorArchitecture=MSIL">
+      <HintPath>..\packages\AssimpNet.4.1.0\lib\net40\AssimpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="ATI.TextureConverter, Version=1.0.5522.26319, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.Content.Pipeline.3.8.0.1641\lib\netstandard2.0\ATI.TextureConverter.dll</HintPath>
+    </Reference>
+    <Reference Include="CppNet, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.Content.Pipeline.3.8.0.1641\lib\netstandard2.0\CppNet.dll</HintPath>
+    </Reference>
     <Reference Include="ImGui.NET, Version=1.78.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ImGui.NET.1.78.0\lib\netstandard2.0\ImGui.NET.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Win32.Registry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Win32.Registry.5.0.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Users\ossya\Downloads\FN-Engine-master\FN-Engine-master\MyEngine\bin\Windows\x86\Debug\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework.Content.Pipeline, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\ossya\Downloads\MonoGame\MonoGame\v3.0\Tools\MonoGame.Framework.Content.Pipeline.dll</HintPath>
+    <Reference Include="MonoGame.Framework.Content.Pipeline, Version=3.8.0.1641, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.Content.Pipeline.3.8.0.1641\lib\netstandard2.0\MonoGame.Framework.Content.Pipeline.dll</HintPath>
     </Reference>
     <Reference Include="MonoGame.ImGui, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Monogame.ImGui.1.0.0\lib\net462\MonoGame.ImGui.dll</HintPath>
@@ -146,6 +157,21 @@
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\MonoGame Projects\Windows\Alchemist\packages\Newtonsoft.Json.12.0.3\lib\net20\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Nvidia.TextureTools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.Content.Pipeline.3.8.0.1641\lib\netstandard2.0\Nvidia.TextureTools.dll</HintPath>
+    </Reference>
+    <Reference Include="PVRTexLibNET, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.Content.Pipeline.3.8.0.1641\lib\netstandard2.0\PVRTexLibNET.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.Content.Pipeline.3.8.0.1641\lib\netstandard2.0\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.D3DCompiler, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.Content.Pipeline.3.8.0.1641\lib\netstandard2.0\SharpDX.D3DCompiler.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpFont, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.Content.Pipeline.3.8.0.1641\lib\netstandard2.0\SharpFont.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -159,11 +185,26 @@
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Security.AccessControl, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.AccessControl.5.0.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Principal.Windows.5.0.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CppNet.dll" />
     <Content Include="Icon.ico" />
+    <Content Include="libmojoshader_64.dll" />
+    <Content Include="mgfxc.dll" />
+    <Content Include="mgfxc.exe" />
+    <Content Include="mgfxc.pdb" />
+    <Content Include="SharpDX.D3DCompiler.dll" />
+    <Content Include="SharpDX.D3DCompiler.xml" />
+    <Content Include="SharpDX.dll" />
+    <Content Include="SharpDX.xml" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb">
@@ -171,6 +212,9 @@
     </MonoGameContentReference>
     <None Include="app.config" />
     <None Include="app.manifest" />
+    <None Include="mgfxc.deps.json" />
+    <None Include="mgfxc.runtimeconfig.dev.json" />
+    <None Include="mgfxc.runtimeconfig.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
@@ -183,8 +227,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\MonoGame.Framework.DesktopGL.3.7.1.189\build\MonoGame.Framework.DesktopGL.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MonoGame.Framework.DesktopGL.3.7.1.189\build\MonoGame.Framework.DesktopGL.targets'))" />
     <Error Condition="!Exists('..\packages\ImGui.NET.1.78.0\build\net40\ImGui.NET.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ImGui.NET.1.78.0\build\net40\ImGui.NET.targets'))" />
+    <Error Condition="!Exists('..\packages\AssimpNet.4.1.0\build\AssimpNet.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\AssimpNet.4.1.0\build\AssimpNet.targets'))" />
   </Target>
   <Import Project="..\packages\ImGui.NET.1.78.0\build\net40\ImGui.NET.targets" Condition="Exists('..\packages\ImGui.NET.1.78.0\build\net40\ImGui.NET.targets')" />
+  <Import Project="..\packages\AssimpNet.4.1.0\build\AssimpNet.targets" Condition="Exists('..\packages\AssimpNet.4.1.0\build\AssimpNet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

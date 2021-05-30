@@ -16,6 +16,16 @@ namespace MyEngine
 
         private Transform transform;
 
+        public Text()
+        {
+            text = "Text";
+            if (gameObject != null)
+                transform = gameObject.Transform;
+            Origin = Vector2.Zero;
+            spriteEffects = SpriteEffects.None;
+            Color = Color.White;
+        }
+
         public Text(string name)
         {
             text = "Text";

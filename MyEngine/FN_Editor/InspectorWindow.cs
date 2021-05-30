@@ -510,6 +510,8 @@ namespace MyEngine.FN_Editor
                                                     }
                                                     catch (TargetInvocationException) // Log Error?
                                                     { }
+                                                    catch (System.ArgumentException)
+                                                    { }
 
                                                     ContentWindow.DraggedAsset = null;
                                                 }
@@ -692,6 +694,8 @@ namespace MyEngine.FN_Editor
                                                         GameObjects_Tab.Redo_Buffer.Clear();
                                                     }
                                                     catch(TargetInvocationException) // Log Error?
+                                                    { }
+                                                    catch(System.ArgumentException)
                                                     { }
 
                                                     ContentWindow.DraggedAsset = null;

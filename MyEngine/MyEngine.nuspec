@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>FN-Engine</id>
+    <version>0.1.1</version>
+    <title>FNEngine</title>
+    <authors>Osama</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/ossyahya60/FN-Engine</projectUrl>
+    <description>This is a 2D game engine based on Monogame</description>
+    <releaseNotes>Initial test release of FN-Engine</releaseNotes>
+    <copyright>copyright</copyright>
+    <tags>GameEngine Monogame</tags>
+  </metadata>
+</package>

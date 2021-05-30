@@ -17,9 +17,6 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\Content\SubmittingGame.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\Content\Temp.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\Content\TileSet1.xnb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\cimgui.dll
-C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\MyEngine.exe.config
-C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\MyEngine.exe
-C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\MyEngine.pdb
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\System.Runtime.InteropServices.RuntimeInformation.dll
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\Microsoft.Win32.Primitives.dll
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\netstandard.dll
@@ -159,7 +156,9 @@ C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\SharpDX.D3DCompiler.xml
 C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\AssimpNet.xml
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.csproj.CoreCompileInputs.cache
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.csproj.CopyComplete
-C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.exe
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\MyEngine.dll.config
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\MyEngine.dll
+C:\MyEngine\MyEngine\MyEngine\bin\Windows\x86\Release\MyEngine.pdb
+C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.dll
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.pdb
 C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.csprojAssemblyReference.cache
-C:\MyEngine\MyEngine\MyEngine\obj\x86\Release\MyEngine.exe.config

@@ -83,14 +83,15 @@ namespace MyEngine
         //    }
         //}
 
-        public void AddGameObject_Recursive(GameObject GO, bool Root = true) // Adds the GO along with its children and so on
+        public void AddGameObject_Recursive(GameObject GO, bool Root = true, bool NoNameCheck = false) // Adds the GO along with its children and so on
         {
             if (GO == null)
                 return;
 
             if (!GameObjects.Contains(GO))
             {
-                GO.Name = Utility.UniqueGameObjectName(GO.Name);
+                if(!NoNameCheck)
+                    GO.Name = Utility.UniqueGameObjectName(GO.Name);
                 GameObjects.Insert(GameObjects.Count, GO);
 
                 bool RemovedOrDeleted = false;

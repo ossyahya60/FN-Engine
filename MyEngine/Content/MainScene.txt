@@ -6,12 +6,66 @@
   "Name": "MainScene",
   "GameObjects": [
     {
-      "Length": 1,
+      "Length": 4,
       "Item Type": "MyEngine.GameObject"
     },
     {
       "Type": "MyEngine.GameObject",
       "Generated ID": 2,
+      "Name": "EditorGameObject",
+      "ShouldBeDeleted": "False",
+      "ShouldBeRemoved": "False",
+      "UI_Layer": "1",
+      "Children": [
+        {
+          "Length": 0,
+          "Item Type": "MyEngine.GameObject"
+        }
+      ],
+      "GameObjectComponents": [
+        {
+          "Length": 5,
+          "Item Type": "MyEngine.GameObjectComponent"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.GameObjects_Tab",
+          "Generated ID": 3,
+          "gameObject": "2",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.InspectorWindow",
+          "Generated ID": 4,
+          "gameObject": "2",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.ContentWindow",
+          "Generated ID": 5,
+          "GameContentPath": "C:\\MyEngine\\MyEngine\\MyEngine\\Content",
+          "gameObject": "2",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.GizmosVisualizer",
+          "Generated ID": 6,
+          "gameObject": "2",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.EditorScene",
+          "Generated ID": 7,
+          "gameObject": "2",
+          "Enabled": "True"
+        }
+      ],
+      "IsEditor": "True",
+      "Layer": "2",
+      "Active": "True"
+    },
+    {
+      "Type": "MyEngine.GameObject",
+      "Generated ID": 8,
       "Tag": "Test2",
       "Name": "Test2",
       "ShouldBeDeleted": "False",
@@ -25,8 +79,8 @@
       ],
       "Transform": {
         "Type": "MyEngine.Transform",
-        "Generated ID": 3,
-        "gameObject": "2",
+        "Generated ID": 9,
+        "gameObject": "8",
         "Enabled": "True",
         "LastPosition": "{X:0 Y:0}",
         "Position": "{X:0 Y:0}",
@@ -41,40 +95,28 @@
           "Length": 3,
           "Item Type": "MyEngine.GameObjectComponent"
         },
-        {
-          "Type": "MyEngine.Transform",
-          "Generated ID": 3,
-          "gameObject": "2",
-          "Enabled": "True",
-          "LastPosition": "{X:0 Y:0}",
-          "Position": "{X:0 Y:0}",
-          "Rotation": "0",
-          "Scale": "{X:1 Y:1}",
-          "LocalPosition": "{X:0 Y:0}",
-          "LocalRotation": "0",
-          "LocalScale": "{X:1 Y:1}"
-        },
+        "9",
         {
           "Type": "MyEngine.SpriteRenderer",
-          "Generated ID": 4,
+          "Generated ID": 10,
           "SpriteEffects": "None",
           "Color": "{R:0 G:255 B:255 A:255}",
-          "gameObject": "2",
+          "gameObject": "8",
           "Enabled": "True",
           "TextureName": "Temp",
           "Sprite": {
             "Type": "MyEngine.Sprite",
-            "Generated ID": 5,
+            "Generated ID": 11,
             "SourceRectangle": "{X:0 Y:0 Width:1280 Height:720}",
             "Origin": "{X:640 Y:360}",
-            "Transform": "3",
+            "Transform": "9",
             "Texture": "Temp"
           }
         },
         {
           "Type": "MyEngine.AudioSource",
-          "Generated ID": 7,
-          "gameObject": "2",
+          "Generated ID": 13,
+          "gameObject": "8",
           "Enabled": "True",
           "Volume": "1",
           "Pitch": "0",
@@ -86,7 +128,117 @@
       "IsEditor": "False",
       "Layer": "1",
       "Active": "True"
-    }
+    },
+    {
+      "Type": "MyEngine.GameObject",
+      "Generated ID": 14,
+      "Name": "Default",
+      "ShouldBeDeleted": "False",
+      "ShouldBeRemoved": "False",
+      "UI_Layer": "1",
+      "Children": [
+        {
+          "Length": 1,
+          "Item Type": "MyEngine.GameObject"
+        },
+        {
+          "Type": "MyEngine.GameObject",
+          "Generated ID": 15,
+          "Name": "Default (1)",
+          "ShouldBeDeleted": "False",
+          "ShouldBeRemoved": "False",
+          "UI_Layer": "1",
+          "Children": [
+            {
+              "Length": 0,
+              "Item Type": "MyEngine.GameObject"
+            }
+          ],
+          "Transform": {
+            "Type": "MyEngine.Transform",
+            "Generated ID": 16,
+            "gameObject": "15",
+            "Enabled": "True",
+            "LastPosition": "{X:-255 Y:-13}",
+            "Position": "{X:-255 Y:-13}",
+            "Rotation": "0",
+            "Scale": "{X:1 Y:1}",
+            "LocalPosition": "{X:190 Y:114}",
+            "LocalRotation": "0",
+            "LocalScale": "{X:1 Y:1}"
+          },
+          "GameObjectComponents": [
+            {
+              "Length": 2,
+              "Item Type": "MyEngine.GameObjectComponent"
+            },
+            "16",
+            {
+              "Type": "MyEngine.SpriteRenderer",
+              "Generated ID": 17,
+              "SpriteEffects": "None",
+              "Color": "{R:0 G:255 B:255 A:255}",
+              "gameObject": "15",
+              "Enabled": "True",
+              "TextureName": "Default Textures\\DefaultTexture",
+              "Sprite": {
+                "Type": "MyEngine.Sprite",
+                "Generated ID": 18,
+                "SourceRectangle": "{X:0 Y:0 Width:100 Height:100}",
+                "Origin": "{X:50 Y:50}",
+                "Transform": "16",
+                "Texture": "Default Textures\\DefaultTexture"
+              }
+            }
+          ],
+          "IsEditor": "False",
+          "Parent": "14",
+          "Layer": "1",
+          "Active": "True"
+        }
+      ],
+      "Transform": {
+        "Type": "MyEngine.Transform",
+        "Generated ID": 20,
+        "gameObject": "14",
+        "Enabled": "True",
+        "LastPosition": "{X:-445 Y:-127}",
+        "Position": "{X:-445 Y:-127}",
+        "Rotation": "0",
+        "Scale": "{X:1 Y:1}",
+        "LocalPosition": "{X:-445 Y:-127}",
+        "LocalRotation": "0",
+        "LocalScale": "{X:1 Y:1}"
+      },
+      "GameObjectComponents": [
+        {
+          "Length": 2,
+          "Item Type": "MyEngine.GameObjectComponent"
+        },
+        "20",
+        {
+          "Type": "MyEngine.SpriteRenderer",
+          "Generated ID": 21,
+          "SpriteEffects": "None",
+          "Color": "{R:0 G:255 B:255 A:255}",
+          "gameObject": "14",
+          "Enabled": "True",
+          "TextureName": "Arrow",
+          "Sprite": {
+            "Type": "MyEngine.Sprite",
+            "Generated ID": 22,
+            "SourceRectangle": "{X:0 Y:0 Width:64 Height:64}",
+            "Origin": "{X:32 Y:32}",
+            "Transform": "20",
+            "Texture": "Arrow"
+          }
+        }
+      ],
+      "IsEditor": "False",
+      "Layer": "1",
+      "Active": "True"
+    },
+    "15"
   ],
   "ID": "0"
 }
