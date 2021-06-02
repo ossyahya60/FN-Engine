@@ -133,7 +133,8 @@ namespace MyEngine
                 return;
 
             UnloadScene();
-            ActiveScene = DeserlializeV2(SceneToBeLoaded.Name);
+            //Utility.BuildAllContent(Directory.GetCurrentDirectory());
+            ActiveScene = DeserlializeV2(SceneToBeLoaded.Name + "_Editor");
 
             Light.Reset();
             ActiveScene.Start();
@@ -141,21 +142,24 @@ namespace MyEngine
             SceneToBeLoaded = null;
         }
 
-        public static void SerializeScene(string Path = "", bool ForEditor = false)
+        public static void SerializeScene(string Path = "")
         {
             if (ActiveScene != null)
             {
                 GameObject EditorGameObject = null;
-                if (ForEditor)
+                if (FN_Editor.EditorScene.IsThisTheEditor)
                 {
                     EditorGameObject = ActiveScene.FindGameObjectWithName("EditorGameObject");
                     ActiveScene.RemoveGameObject(EditorGameObject, false);
-                }
 
-                ActiveScene.SerializeV2(Path);
+                    ActiveScene.SerializeV2(Path);
 
-                if (ForEditor)
                     ActiveScene.AddGameObject_Recursive(EditorGameObject);
+
+                    ActiveScene.SerializeV2(Path + "_Editor");
+                }
+                else
+                    ActiveScene.SerializeV2(Path);
             }
         }
 

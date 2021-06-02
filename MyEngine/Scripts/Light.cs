@@ -119,7 +119,8 @@ namespace MyEngine
 
         public static void ApplyLighting()
         {
-            Rectangle BiasScene = new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
+            //You probably need to add they XY coordinates of BiasScene in editor mode too (below two lines) //Ignore this for now
+            Rectangle BiasScene = new Rectangle((int)(Setup.Camera.Position.X -Setup.graphics.PreferredBackBufferWidth*0.5f), (int)(Setup.Camera.Position.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f), Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
             if (FN_Editor.EditorScene.IsThisTheEditor)
                 BiasScene = new Rectangle((int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.X + -Setup.graphics.PreferredBackBufferWidth * 0.5f + Setup.Camera.Position.X), (int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f + Setup.Camera.Position.Y), (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.X, (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.Y);
 

@@ -8,7 +8,7 @@ namespace MyEngine.FN_Editor
 {
     enum ActiveGizmo { Movement, Rotation, Scale}
 
-    public class GizmosVisualizer: GameObjectComponent
+    internal class GizmosVisualizer: GameObjectComponent
     {
         public static Vector2 BiasSceneWindow
         {

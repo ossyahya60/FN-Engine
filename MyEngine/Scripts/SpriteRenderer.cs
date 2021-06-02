@@ -75,7 +75,8 @@ namespace MyEngine
                 DestRect.Location = gameObject.Transform.Position.ToPoint();
                 DestRect.Width = (int)(Sprite.SourceRectangle.Width * gameObject.Transform.Scale.X);
                 DestRect.Height = (int)(Sprite.SourceRectangle.Height * gameObject.Transform.Scale.Y);
-                spriteBatch.Draw(Sprite.Texture, null, DestRect, Sprite.SourceRectangle, Sprite.Origin, gameObject.Transform.Rotation, Vector2.One, Color, SpriteEffects, gameObject.Layer);
+                spriteBatch.Draw(Sprite.Texture, DestRect, Sprite.SourceRectangle, Color, gameObject.Transform.Rotation, Sprite.Origin, SpriteEffects, gameObject.Layer);
+                //spriteBatch.Draw(Sprite.Texture, null, DestRect, Sprite.SourceRectangle, Sprite.Origin, gameObject.Transform.Rotation, Vector2.One, Color, SpriteEffects, gameObject.Layer);
             }
         }
 

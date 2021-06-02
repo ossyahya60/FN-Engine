@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace MyEngine.FN_Project
 {
-    public class VisualizeEngineStartup: GameObjectComponent
+    internal class VisualizeEngineStartup: GameObjectComponent
     {
         private static bool FirstTimeOnThisMachine = false;
         private string SelectedPath = "";
@@ -14,6 +14,9 @@ namespace MyEngine.FN_Project
 
         public override void Start()
         {
+            // Download the right template version of Monogame
+            // Download the necessary nuget packages
+            // Replace Game1.cs file with a one you create on runtime altering the name of namespace (Text here then dump it to a .cs file)
             if (FirstBootUp)
             {
                 if (FirstTimeOnThisMachine)

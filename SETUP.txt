@@ -1,0 +1,8 @@
+For First Time Installation:
+-Download Visual Studio 2019 (Mandatory)
+-Download Monogame Project Templates from Visual Studio Extensions tab.
+-Make a new project (Windows for now)
+
+For Every Project You Make:
+-Open the .csproj file and edit teh field TargetFramework from "net core app3.1" to "net462", then save and quit.
+-Download the nuget package called "FN-Engine" from Nuget Package Manager from Projects tab.

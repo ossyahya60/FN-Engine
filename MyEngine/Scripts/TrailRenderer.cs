@@ -9,6 +9,7 @@ namespace MyEngine
 {
     public class TrailRenderer: GameObjectComponent
     {
+        public Color FadeColor = Color.White;
         public float SpawnRate = 0f;  //Control this to make the trail Continous or discrete, 0 means Fully Continionus
         public Vector2 OffsetPosition;
         public int SegmentWidth = 10;
@@ -61,6 +62,7 @@ namespace MyEngine
                 if (gameObject.Transform.Position - gameObject.Transform.LastPosition != Vector2.Zero)
                 {
                     Particle particle = new Particle(false);
+                    particle.FadeColor = FadeColor;
                     particle.Position = gameObject.Transform.LastPosition + OffsetPosition;
                     particle.LifeTime = VanishAfter;
                     //if (RandomSize)

@@ -45,6 +45,7 @@ namespace MyEngine
         public float Speed = 5f;
         public float VanishAfter = 1f;
         public float TimeBetweenFiring = 0.25f;
+        public float RotationalVelocity = 0;
         public float Rotation //Angle
         {
             set
@@ -159,6 +160,7 @@ namespace MyEngine
                             particle.Layer = gameObject.Layer;
                             particle.NoLifeTime = NoLifeTime;
                             particle.FadeColor = FadeColor;
+                            particle.RotationalVelocity = RotationalVelocity;
                             if (RandomRotation)
                             {
                                 Rotation = (float)random.NextDouble() * 360;

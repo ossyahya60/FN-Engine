@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace MyEngine.FN_Editor
 {
-    public class EditorScene: GameObjectComponent
+    internal class EditorScene: GameObjectComponent
     {
         public static bool IsThisTheEditor = false;
 

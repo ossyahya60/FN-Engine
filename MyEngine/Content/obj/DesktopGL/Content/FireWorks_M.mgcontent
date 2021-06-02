@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/FireWorks_M.ogg</SourceFile>
-  <SourceTime>2020-04-23T16:15:51.664066+02:00</SourceTime>
-  <DestFile>C:/MyEngine/MyEngine/MyEngine/Content/bin/DesktopGL/Content/FireWorks_M.xnb</DestFile>
-  <DestTime>2021-04-18T21:06:42.0662122+02:00</DestTime>
+  <SourceFile>C:/MyEngine/FN-Engine/MyEngine/Content/FireWorks_M.ogg</SourceFile>
+  <SourceTime>2021-06-01T17:23:23.1011209+02:00</SourceTime>
+  <DestFile>C:/MyEngine/FN-Engine/MyEngine/Content/bin/DesktopGL/Content/FireWorks_M.xnb</DestFile>
+  <DestTime>2021-06-01T17:24:52.4035717+02:00</DestTime>
   <Importer>OggImporter</Importer>
   <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
   <Processor>SoundEffectProcessor</Processor>

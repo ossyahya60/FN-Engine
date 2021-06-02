@@ -299,7 +299,7 @@ namespace MyEngine
 
         public void SerializeV2(string Path = "")
         {
-            using (StreamWriter SW = new StreamWriter(Name + ".txt", false))
+            using (StreamWriter SW = new StreamWriter(Path + ".txt", false))
             {
                 Utility.OIG = new System.Runtime.Serialization.ObjectIDGenerator();
 

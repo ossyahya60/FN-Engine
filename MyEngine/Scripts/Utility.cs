@@ -20,11 +20,17 @@ namespace MyEngine
 
         private static Regex NameRegex = null;
         private static Regex NameFormatRegex = null;
+        private static Regex TexRegex = null;
+        private static Regex MusicRegex = null;
+        private static Regex ShaderRegex = null;
 
         static Utility()
         {
             NameRegex = new Regex(@"([][(][0-9]+[)])$");
             NameFormatRegex = new Regex(@"([.]*[][(][0-9]+[)])");
+            TexRegex = new Regex(@"([\.]\b(png|jpg|jpeg)\b)$", RegexOptions.IgnoreCase);
+            MusicRegex = new Regex(@"([\.]\b(wav|ogg|wma|mp3)\b)$", RegexOptions.IgnoreCase);
+            ShaderRegex = new Regex(@"([\.]\b(fx)\b)$", RegexOptions.IgnoreCase);
         }
 
         public static bool CircleContains(Vector2 Center, int Radius, Vector2 Point)
@@ -99,7 +105,7 @@ namespace MyEngine
 
         public static Color STR_To_Color(string Value)
         {
-            Color Output = Color.TransparentBlack;
+            Color Output = Color.Transparent;
 
             string[] ColorFormat = Value.Split(' ');
             Output.R = byte.Parse(ColorFormat[0].Remove(0, 3));
@@ -278,7 +284,7 @@ namespace MyEngine
             JR.Read(); //GID Value
             long GID = long.Parse(JR.Value.ToString());
 
-            SerializedObjects[GID] = OBJ; 
+            SerializedObjects[GID] = OBJ;
 
             while (JR.Read())
             {
@@ -292,12 +298,12 @@ namespace MyEngine
 
                 if (FI != null)
                 {
-                    if(FI.FieldType.IsValueType || FI.FieldType == typeof(string)) //Value type (Serialized Immediately)
+                    if (FI.FieldType.IsValueType || FI.FieldType == typeof(string)) //Value type (Serialized Immediately)
                     {
                         JR.Read(); //Value
                         FI.SetValue(OBJ, FromJsonToPrimvTypes(JR.Value.ToString(), FI.FieldType));
                     }
-                    else if(FI.FieldType.IsArray)
+                    else if (FI.FieldType.IsArray)
                     {
                         JR.Read(); //Start Array
 
@@ -318,7 +324,7 @@ namespace MyEngine
 
                         //Iterating Objects
                         var OBJ_Arr = (IList)GetInstance(FI.FieldType);
-                        for(int i=0; i<ArrLength; i++)
+                        for (int i = 0; i < ArrLength; i++)
                         {
                             JR.Read(); //Value
 
@@ -342,7 +348,7 @@ namespace MyEngine
 
                         FI.SetValue(OBJ, OBJ_Arr);
                     }
-                    else if(FI.FieldType.GetInterface("IEnumerable") != null) //Lists?
+                    else if (FI.FieldType.GetInterface("IEnumerable") != null) //Lists?
                     {
                         JR.Read(); //Start Array
 
@@ -808,7 +814,7 @@ namespace MyEngine
                     string[] LineArr = Line.Split('\t');
                     int LoopLength = int.Parse(LineArr[3]);
 
-                    if(LoopLength == 0)
+                    if (LoopLength == 0)
                     {
                         FI.SetValue(ActiveObject, GetInstance(LineArr[1]));
                         continue;
@@ -1058,7 +1064,7 @@ namespace MyEngine
         {
             object SerializedObject = null;
 
-            if(SOs.ContainsKey(long.Parse(Key)))
+            if (SOs.ContainsKey(long.Parse(Key)))
                 SerializedObject = SOs[long.Parse(Key)]; //Check if there is a failure?
 
             return SerializedObject;
@@ -1106,6 +1112,22 @@ namespace MyEngine
             Setup.PM.ProcessContent(T);
         }
 
+        public static void BuildAllContent(string CurrentDirectory)
+        {
+            foreach (string F in Directory.GetFiles(CurrentDirectory)) //Building Items that are buildable
+            {
+                string[] FileSplit = F.Split('\\');
+                string TexName = FileSplit[FileSplit.Length - 1];
+
+                if (TexRegex.IsMatch(TexName) || MusicRegex.IsMatch(TexName) || ShaderRegex.IsMatch(TexName))
+                    BuildContentItem(F);
+            }
+
+            foreach (string Dir in Directory.GetDirectories(CurrentDirectory))
+                if (Dir != CurrentDirectory + @"\bin" || Dir != CurrentDirectory + @"\obj")
+                    BuildContentItem(Dir);
+        }
+
         public static string UniqueGameObjectName(string BaseName) // If base name is not present in the scene, then base name is returned
         {
             string UniqueName = BaseName;
@@ -1117,7 +1139,7 @@ namespace MyEngine
             GameObject[] GOs = null;
             int SearchNumber = 0;
 
-            if(Duplicate)
+            if (Duplicate)
             {
                 string[] SearchingName = BaseName.Remove(BaseName.Length - 1, 1).Split('(');
                 SearchNumber = int.Parse(SearchingName[SearchingName.Length - 1]) + 1;
@@ -1136,16 +1158,16 @@ namespace MyEngine
 
                     if (SearchNumber == Number)
                         SearchNumber++;
-                    else if(!Duplicate)
+                    else if (!Duplicate)
                         break; //?
                 }
-                else if(!Duplicate)
+                else if (!Duplicate)
                     SearchNumber++;
             }
 
-            if(!Duplicate && SearchNumber != 0)
+            if (!Duplicate && SearchNumber != 0)
                 UniqueName = BaseName + " (" + SearchNumber.ToString() + ")";
-            else if(Duplicate)
+            else if (Duplicate)
             {
                 string[] ProcessingName = UniqueName.Remove(UniqueName.Length - 1, 1).Split('(');
                 UniqueName = "";

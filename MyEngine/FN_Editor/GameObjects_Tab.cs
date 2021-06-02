@@ -9,7 +9,7 @@ namespace MyEngine.FN_Editor
 {
     enum Operation { Delete, Create, Rename, GO_DragAndDrop, AddComponent, RemoveComponent, ChangeValue};
 
-    class GameObjects_Tab : GameObjectComponent
+    internal class GameObjects_Tab : GameObjectComponent
     {
         public static GameObject WhoIsSelected = null;
         public static Vector2[] MyRegion;

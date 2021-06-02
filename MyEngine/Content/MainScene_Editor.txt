@@ -1,12 +1,12 @@
 {
   "Type": "MyEngine.Scene",
   "Generated ID": 1,
-  "ShouldSort": "False",
+  "ShouldSort": "True",
   "Active": "True",
   "Name": "MainScene",
   "GameObjects": [
     {
-      "Length": 3,
+      "Length": 4,
       "Item Type": "MyEngine.GameObject"
     },
     {
@@ -218,7 +218,61 @@
       "Layer": "0.1",
       "Active": "True"
     },
-    "9"
+    "9",
+    {
+      "Type": "MyEngine.GameObject",
+      "Generated ID": 19,
+      "Name": "EditorGameObject",
+      "ShouldBeDeleted": "False",
+      "ShouldBeRemoved": "False",
+      "UI_Layer": "1",
+      "Children": [
+        {
+          "Length": 0,
+          "Item Type": "MyEngine.GameObject"
+        }
+      ],
+      "GameObjectComponents": [
+        {
+          "Length": 5,
+          "Item Type": "MyEngine.GameObjectComponent"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.GameObjects_Tab",
+          "Generated ID": 20,
+          "gameObject": "19",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.InspectorWindow",
+          "Generated ID": 21,
+          "gameObject": "19",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.ContentWindow",
+          "Generated ID": 22,
+          "GameContentPath": "C:\\MyEngine\\FN-Engine\\MyEngine\\Content",
+          "gameObject": "19",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.GizmosVisualizer",
+          "Generated ID": 23,
+          "gameObject": "19",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.EditorScene",
+          "Generated ID": 24,
+          "gameObject": "19",
+          "Enabled": "True"
+        }
+      ],
+      "IsEditor": "True",
+      "Layer": "2",
+      "Active": "True"
+    }
   ],
   "ID": "0"
 }

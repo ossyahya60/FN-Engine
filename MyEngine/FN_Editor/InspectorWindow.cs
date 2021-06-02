@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MyEngine.FN_Editor
 {
-    class InspectorWindow: GameObjectComponent
+    internal class InspectorWindow: GameObjectComponent
     {
         public static List<Type> ComponentsTypes = new List<Type>();
         public static Vector2[] MyRegion;

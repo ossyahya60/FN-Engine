@@ -176,7 +176,7 @@ namespace MyEngine
             //Type FI = typeof(GameObject).GetMember("IsActive")[0];
 
             //GameObjectsTab.Transform.Scale = Vector2.One * 200;
-            Test6.GetComponent<SpriteRenderer>().Sprite.Texture = HitBoxDebuger.RectTexture(Color.Yellow);
+            Test6.GetComponent<SpriteRenderer>().Sprite.Texture = Content.Load<Texture2D>(@"Default Textures/DefaultTexture");
             Test6.Transform.Scale = 100 * Vector2.One;
             Test6.Layer = 0.1f;
             //Test6.Transform.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, 1.2f * graphics.PreferredBackBufferHeight / 2);
@@ -227,7 +227,7 @@ namespace MyEngine
 
             //GameObject.Instantiate(Test2).Name = "Test2_1";
 
-            Test6.GetComponent<SpriteRenderer>().Effect = Content.Load<Effect>("ShadowCasting");
+            //Test6.GetComponent<SpriteRenderer>().Effect = Content.Load<Effect>("ShadowCasting");
 
             SceneManager.ActiveScene.SortGameObjectsWithLayer();
         }

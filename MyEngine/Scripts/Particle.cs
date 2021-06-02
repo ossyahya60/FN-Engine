@@ -15,6 +15,7 @@ namespace MyEngine
         public bool Expired = false;
         public bool ShrinkMode = true;
         public float Rotation = 0;
+        public float RotationalVelocity = 0;
 
         //Specific for trail renderer
         public int Length;
@@ -68,6 +69,9 @@ namespace MyEngine
             {
                 if(ForParticleEffect)
                 {
+                    if (RotationalVelocity != 0)
+                        Rotation += RotationalVelocity;
+
                     if (ConstantVelocity)
                         Position += Speed * (Vector2.Normalize(Direction));
                     else

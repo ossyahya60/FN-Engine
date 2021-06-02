@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace MyEngine.FN_Editor
 {
-    public class ContentWindow: GameObjectComponent
+    internal class ContentWindow: GameObjectComponent
     {
         public static object DraggedAsset = null;
         public static Vector2[] MyRegion;
