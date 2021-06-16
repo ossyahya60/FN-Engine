@@ -296,8 +296,7 @@ namespace MyEngine
         public virtual void Start()
         {
             foreach (GameObjectComponent GOC in GameObjectComponents)
-                if (GOC.Enabled)
-                    GOC.Start();
+                GOC.Start();
         }
 
         public virtual void Update(GameTime gameTime)

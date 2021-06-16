@@ -69,6 +69,26 @@
   <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="FN_Editor\ContentWindow.cs" />
     <Compile Include="FN_Editor\EditorScene.cs" />
@@ -89,6 +109,7 @@
     <Compile Include="Scripts\Camera2D.cs" />
     <Compile Include="Scripts\CircleCollider.cs" />
     <Compile Include="Scripts\Collider2D.cs" />
+    <Compile Include="Scripts\CollisionHandler.cs" />
     <Compile Include="Scripts\Debugger.cs" />
     <Compile Include="Scripts\GameObject.cs" />
     <Compile Include="Scripts\GameObjectComponent.cs" />

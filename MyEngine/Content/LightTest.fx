@@ -7,7 +7,7 @@
 #define PS_SHADERMODEL ps_5_0
 #endif
 
-static const int MAX_LIGHTS = 20;
+static const int MAX_LIGHTS = 50;
 static const int MAX_Shadows = 50;
 
 int LightCount;

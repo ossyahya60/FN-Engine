@@ -14,7 +14,7 @@ namespace MyEngine
         public static bool CastShadows_Global = true;
 
         private static bool ShaderLoaded = false;
-        private static int MAX_LIGHT_COUNT = 20;
+        private static int MAX_LIGHT_COUNT = 50;
         private static RenderTarget2D RenderTarget2D;
         private static Effect LightEffect;
         private static RenderTarget2D ShadowMap;
@@ -266,9 +266,9 @@ namespace MyEngine
                 ShadowIntensity[i] = MathHelper.Clamp(1 - LIGHTS[i].ShadowIntensity, 0, 1);
                 CastShadow[i] = LIGHTS[i].CastShadow? 1:0;
 
-                if (LIGHTS[i].Type == LightTypes.Directional)
+                if (LIGHTS[i].Type == LightTypes.Directional) //Bug here where directional intensity is set forever
                 {
-                    DirectionalIntensity_param.SetValue(LIGHTS[i].DirectionalIntensity);
+                    DirectionalIntensity_param.SetValue(MathHelper.Clamp(LIGHTS[i].DirectionalIntensity, 0, 1));
                     InnerRadius[i] = 0;
                     Radius[i] = 0;
                 }
@@ -276,6 +276,7 @@ namespace MyEngine
 
             LightCount_param.SetValue(MathHelper.Clamp(LightCount, 0, MAX_LIGHT_COUNT));
             //CameraPosNorm_param.SetValue(new Vector2(Setup.Camera.Position.X / Setup.resolutionIndependentRenderer.VirtualWidth, Setup.Camera.Position.Y / Setup.resolutionIndependentRenderer.VirtualHeight));
+            AngularRadius_param.SetValue(AngularRadius);
             AngularRadius_param.SetValue(AngularRadius);
             X_Bias_param.SetValue(X_Bias);
             Y_Bias_param.SetValue(Y_Bias);

@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Numerics;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 namespace MyEngine.FN_Editor
 {
@@ -12,6 +13,8 @@ namespace MyEngine.FN_Editor
     {
         public static List<Type> ComponentsTypes = new List<Type>();
         public static Vector2[] MyRegion;
+
+        private static IEnumerable<Type> Types;
 
         private IntPtr intPointer;
         private IntPtr intPointerL;
@@ -24,6 +27,8 @@ namespace MyEngine.FN_Editor
         private int ChosenComponent = -1;
         private List<bool> ComponentsNotRemoved = new List<bool>();
         private object ValueToChange = null;
+        private bool ComboChanged = false;
+        private DateTime LastExecWriteTime = DateTime.Now;
 
         static InspectorWindow() //This should be called again on 'Hot reloading'
         {
@@ -32,10 +37,32 @@ namespace MyEngine.FN_Editor
 
         private static void GetGOCs()
         {
-            var q = from t in Assembly.GetExecutingAssembly().GetTypes()
-                    where t.IsClass && t.Namespace == Assembly.GetExecutingAssembly().GetName().Name && t.BaseType == typeof(GameObjectComponent)
+            Types = from t in Assembly.GetExecutingAssembly().GetTypes()
+            where t.IsClass && t.Namespace == Assembly.GetExecutingAssembly().GetName().Name && t.BaseType == typeof(GameObjectComponent)
                     select t;
-            q.ToList().ForEach(item => ComponentsTypes.Add(item));
+
+            ReloadAssemblyOnChange();
+
+            Types.ToList().ForEach(item => ComponentsTypes.Add(item));
+        }
+
+        private static void ReloadAssemblyOnChange()
+        {
+            //This line should be called everytime the game executes!
+            try
+            {
+                //string AssemName = Assembly.GetExecutingAssembly().FullName;
+                //Types = Types.Where(Item => Item.Assembly.FullName == AssemName);
+                //Types.Concat(from t in Assembly.LoadFrom("GameExecutablePath").GetTypes() where t.IsClass && t.BaseType.Name == typeof(GameObjectComponent).Name select t);
+            }
+            catch(System.IO.FileNotFoundException) //Log Errors?
+            {
+                Console.Out.WriteLine("Executable is not found, please run the application first");
+            }
+            catch(System.BadImageFormatException)
+            {
+                Console.Out.WriteLine("This shouldn't happen, check Class InspectorWindow, ReloadAssembly Function");
+            }
         }
 
         public override void Start()
@@ -50,6 +77,22 @@ namespace MyEngine.FN_Editor
             intPointerL = Marshal.AllocHGlobal(sizeof(long));
             intPointerU32 = Marshal.AllocHGlobal(sizeof(uint));
             MyRegion = new Vector2[2];
+        }
+
+        public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
+        {
+            try
+            {
+                //if (File.GetLastWriteTime("GameExecutablePath").CompareTo(LastExecWriteTime) > 0)
+                //{
+                //    LastExecWriteTime = File.GetLastWriteTime("GameExecutablePath");
+                //    ReloadAssemblyOnChange(
+                //}
+            }
+            catch (System.IO.FileNotFoundException) //Log Errors?
+            {
+                Console.Out.WriteLine("Executable is not found, please run the application first");
+            }
         }
 
         public override void DrawUI()
@@ -190,6 +233,16 @@ namespace MyEngine.FN_Editor
                             break;
                         default:
                             EnteredHere = false;
+                            if (FI.FieldType.IsEnum)
+                            {
+                                EnteredHere = true;
+                                int CurrentItem = (int)FI.GetValue(Selected_GO);
+                                int TempCurrentItem = CurrentItem;
+                                ImGui.Combo(FI.Name, ref CurrentItem, Enum.GetNames(FI.FieldType), Enum.GetNames(FI.FieldType).Length);
+                                if (TempCurrentItem != CurrentItem)
+                                    ComboChanged = true;
+                                FI.SetValue(Selected_GO, CurrentItem);
+                            }
                             break;
                     }
 
@@ -197,8 +250,9 @@ namespace MyEngine.FN_Editor
                     {
                         if (ImGui.IsItemActivated()) //Item Is In Edit Mode
                             ValueToChange = FI.GetValue(Selected_GO);
-                        else if (ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
+                        else if (ComboChanged || ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
                         {
+                            ComboChanged = false;
                             if (ValueToChange != FI.GetValue(Selected_GO))
                             {
                                 GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(Selected_GO, FI), ValueToChange), Operation.ChangeValue));
@@ -315,6 +369,16 @@ namespace MyEngine.FN_Editor
                             break;
                         default:
                             EnteredHere = false;
+                            if (PI.PropertyType.IsEnum)
+                            {
+                                EnteredHere = true;
+                                int CurrentItem = (int)PI.GetValue(Selected_GO);
+                                int TempCurrentItem = CurrentItem;
+                                ImGui.Combo(PI.Name, ref CurrentItem, Enum.GetNames(PI.PropertyType), Enum.GetNames(PI.PropertyType).Length);
+                                if (TempCurrentItem != CurrentItem)
+                                    ComboChanged = true;
+                                PI.SetValue(Selected_GO, CurrentItem);
+                            }
                             break;
                     }
 
@@ -322,8 +386,9 @@ namespace MyEngine.FN_Editor
                     {
                         if (ImGui.IsItemActivated()) //Item Is In Edit Mode
                             ValueToChange = PI.GetValue(Selected_GO);
-                        else if (ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
+                        else if (ComboChanged || ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
                         {
+                            ComboChanged = false;
                             if (ValueToChange != PI.GetValue(Selected_GO))
                             {
                                 GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(Selected_GO, PI), ValueToChange), Operation.ChangeValue));
@@ -483,7 +548,19 @@ namespace MyEngine.FN_Editor
                                     break;
                                 default:
                                     EnteredHere = false;
-                                    if (FI.GetType().IsClass && !FI.GetType().IsArray)
+
+                                    if(FI.FieldType.IsEnum)
+                                    {
+                                        EnteredHere = true;
+                                        int CurrentItem = (int)FI.GetValue(GOC);
+                                        int TempCurrentItem = CurrentItem;
+                                        ImGui.Combo(FI.Name, ref CurrentItem, Enum.GetNames(FI.FieldType), Enum.GetNames(FI.FieldType).Length);
+
+                                        if (TempCurrentItem != CurrentItem)
+                                            ComboChanged = true;
+                                        FI.SetValue(GOC, CurrentItem);
+                                    }
+                                    else if (FI.GetType().IsClass && !FI.GetType().IsArray)
                                     {
                                         EnteredHere = true;
                                         var Name = FI.GetValue(GOC);
@@ -527,8 +604,9 @@ namespace MyEngine.FN_Editor
                             {
                                 if (ImGui.IsItemActivated()) //Item Is In Edit Mode
                                     ValueToChange = FI.GetValue(GOC);
-                                else if (ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
+                                else if (ComboChanged || ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
                                 {
+                                    ComboChanged = false;
                                     if (ValueToChange != FI.GetValue(GOC))
                                     {
                                         GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), ValueToChange), Operation.ChangeValue));
@@ -668,7 +746,18 @@ namespace MyEngine.FN_Editor
                                     break;
                                 default:
                                     EnteredHere = false;
-                                    if (PI.GetType().IsClass && !PI.GetType().IsArray)
+
+                                    if (PI.PropertyType.IsEnum)
+                                    {
+                                        EnteredHere = true;
+                                        int CurrentItem = (int)PI.GetValue(GOC);
+                                        int TempCurrentItem = CurrentItem;
+                                        ImGui.Combo(PI.Name, ref CurrentItem, Enum.GetNames(PI.PropertyType), Enum.GetNames(PI.PropertyType).Length);
+                                        if (TempCurrentItem != CurrentItem)
+                                            ComboChanged = true;
+                                        PI.SetValue(GOC, CurrentItem);
+                                    }
+                                    else if (PI.GetType().IsClass && !PI.GetType().IsArray)
                                     {
                                         EnteredHere = true;
                                         var Name = PI.GetValue(GOC);
@@ -713,8 +802,9 @@ namespace MyEngine.FN_Editor
                             {
                                 if (ImGui.IsItemActivated()) //Item Is In Edit Mode
                                     ValueToChange = PI.GetValue(GOC);
-                                else if (ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
+                                else if (ComboChanged || ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
                                 {
+                                    ComboChanged = false;
                                     if (ValueToChange != PI.GetValue(GOC))
                                     {
                                         GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), ValueToChange), Operation.ChangeValue));

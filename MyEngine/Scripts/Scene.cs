@@ -175,9 +175,9 @@ namespace MyEngine
 
             int Count = GameObjects.Count - 1;
 
-            if (Active)
-                for (int i = Count; i >= 0; i--)
-                    GameObjects[Count - i].Start();
+            //if (Active)
+            for (int i = Count; i >= 0; i--)
+                GameObjects[Count - i].Start();
         }
 
         public void Update(GameTime gameTime)
@@ -215,6 +215,20 @@ namespace MyEngine
 
             //FPS
             ImGui.Text(((int)(1.0f / (float)gameTime.ElapsedGameTime.TotalSeconds)).ToString());
+
+            if (ImGui.BeginMainMenuBar())
+            {
+                if (ImGui.BeginMenu("File"))
+                {
+                    if (ImGui.MenuItem("Serialize"))
+                        SceneManager.SerializeScene("MainScene");
+
+                    ImGui.EndMenu();
+                }
+                ImGui.EndMainMenuBar();
+            }
+
+            ImGui.ShowDemoWindow();
 
             int Count = GameObjects.Count - 1;
 
@@ -299,7 +313,7 @@ namespace MyEngine
 
         public void SerializeV2(string Path = "")
         {
-            using (StreamWriter SW = new StreamWriter(Path + ".txt", false))
+            using (StreamWriter SW = new StreamWriter(Path + ".scene", false))
             {
                 Utility.OIG = new System.Runtime.Serialization.ObjectIDGenerator();
 

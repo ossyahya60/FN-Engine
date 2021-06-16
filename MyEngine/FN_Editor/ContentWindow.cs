@@ -68,6 +68,7 @@ namespace MyEngine.FN_Editor
                     else
                         continue;
 
+                    DirectoryChanged = true;
                     Utility.BuildContentItem(GameContentPath + "\\" + AssetName);
                 }
             }
@@ -178,8 +179,13 @@ namespace MyEngine.FN_Editor
                 {
                     string[] AssetPath = Files[i].Split('\\');
                     string AssetName = AssetPath[AssetPath.Length - 1];
-                    string[] AssetLoadNameComposite = Files[i].Remove(0, ContentFolderDirectory.Length + 1).Split('.');
-                    string AssetLoadName = AssetLoadNameComposite[AssetLoadNameComposite.Length - 2];
+
+                    //string[] AssetLoadNameComposite = Files[i].Remove(0, ContentFolderDirectory.Length + 1).Split('.');
+                    //string AssetLoadName = AssetLoadNameComposite[AssetLoadNameComposite.Length - 2];
+
+                    string AssPath = Files[i].Remove(0, ContentFolderDirectory.Length + 1);
+                    int idx = AssPath.LastIndexOf('.');
+                    string AssetLoadName = AssPath.Substring(0, idx);
 
                     if (TexRegex.IsMatch(AssetName)) //Found a texture
                     {
@@ -190,7 +196,7 @@ namespace MyEngine.FN_Editor
                         if (ImGui.ImageButton(ID, new Vector2(64.0f, 64.0f)))
                         {
                             ImGui.OpenPopup("AssetName");
-                            AssName = AssetLoadName + "." + AssetLoadNameComposite[AssetLoadNameComposite.Length - 1];
+                            AssName = AssetLoadName + "." + AssetName.Substring(idx + 1);
                         }
 
                         //if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
@@ -218,7 +224,7 @@ namespace MyEngine.FN_Editor
                             ImGui.PopID();
 
                             ImGui.OpenPopup("AssetName");
-                            AssName = AssetLoadName + "." + AssetLoadNameComposite[AssetLoadNameComposite.Length - 1];
+                            AssName = AssetLoadName + "." + AssetName.Substring(idx + 1);
                         }
 
                         // Dragging an asset
@@ -246,7 +252,7 @@ namespace MyEngine.FN_Editor
                             ImGui.PopID();
 
                             ImGui.OpenPopup("AssetName");
-                            AssName = AssetLoadName + "." + AssetLoadNameComposite[AssetLoadNameComposite.Length - 1];
+                            AssName = AssetLoadName + "." + AssetName.Substring(idx + 1);
                         }
 
                         // Dragging an asset

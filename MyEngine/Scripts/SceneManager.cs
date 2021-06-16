@@ -97,7 +97,7 @@ namespace MyEngine
 
         private static Scene DeserlializeV2(string Path = "")
         {
-            using (StreamReader SR = new StreamReader(Path + ".txt", false))
+            using (StreamReader SR = new StreamReader(Path + ".scene", false))
             {
                 Utility.OIG = new System.Runtime.Serialization.ObjectIDGenerator();
 

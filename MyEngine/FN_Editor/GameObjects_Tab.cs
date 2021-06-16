@@ -58,7 +58,7 @@ namespace MyEngine.FN_Editor
             /////
 
             //Scene Tab
-            ImGui.Begin(SceneManager.ActiveScene.Name);
+            ImGui.Begin(SceneManager.ActiveScene.Name, ImGuiWindowFlags.NoMove);
 
             ///
             MyRegion[0] = ImGui.GetWindowPos();

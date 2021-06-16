@@ -1,0 +1,150 @@
+{
+  "Type": "MyEngine.Scene",
+  "Generated ID": 1,
+  "ShouldSort": "False",
+  "Active": "True",
+  "Name": "MainScene",
+  "GameObjects": [
+    {
+      "Length": 2,
+      "Item Type": "MyEngine.GameObject"
+    },
+    {
+      "Type": "MyEngine.GameObject",
+      "Generated ID": 2,
+      "Tag": "Test2",
+      "Name": "Test2",
+      "ShouldBeDeleted": "False",
+      "ShouldBeRemoved": "False",
+      "UI_Layer": "1",
+      "Children": [
+        {
+          "Length": 0,
+          "Item Type": "MyEngine.GameObject"
+        }
+      ],
+      "Transform": {
+        "Type": "MyEngine.Transform",
+        "Generated ID": 3,
+        "gameObject": "2",
+        "Enabled": "True",
+        "LastPosition": "{X:0 Y:0}",
+        "Position": "{X:0 Y:0}",
+        "Rotation": "0",
+        "Scale": "{X:1 Y:1}",
+        "LocalPosition": "{X:0 Y:0}",
+        "LocalRotation": "0",
+        "LocalScale": "{X:1 Y:1}"
+      },
+      "GameObjectComponents": [
+        {
+          "Length": 3,
+          "Item Type": "MyEngine.GameObjectComponent"
+        },
+        "3",
+        {
+          "Type": "MyEngine.SpriteRenderer",
+          "Generated ID": 4,
+          "SpriteEffects": "None",
+          "Color": "{R:0 G:255 B:255 A:255}",
+          "gameObject": "2",
+          "Enabled": "True",
+          "TextureName": "Temp",
+          "Sprite": {
+            "Type": "MyEngine.Sprite",
+            "Generated ID": 5,
+            "SourceRectangle": "{X:0 Y:0 Width:1280 Height:720}",
+            "Origin": "{X:640 Y:360}",
+            "Transform": "3",
+            "Texture": "Temp"
+          }
+        },
+        {
+          "Type": "MyEngine.AudioSource",
+          "Generated ID": 7,
+          "gameObject": "2",
+          "Enabled": "True",
+          "Volume": "1",
+          "Pitch": "0",
+          "Pan": "0",
+          "IsLooping": "False",
+          "AudioName": "FireWorks_M"
+        }
+      ],
+      "IsEditor": "False",
+      "Layer": "1",
+      "Active": "True"
+    },
+    {
+      "Type": "MyEngine.GameObject",
+      "Generated ID": 8,
+      "Name": "Default",
+      "ShouldBeDeleted": "False",
+      "ShouldBeRemoved": "False",
+      "UI_Layer": "1",
+      "Children": [
+        {
+          "Length": 0,
+          "Item Type": "MyEngine.GameObject"
+        }
+      ],
+      "Transform": {
+        "Type": "MyEngine.Transform",
+        "Generated ID": 9,
+        "gameObject": "8",
+        "Enabled": "True",
+        "LastPosition": "{X:-391 Y:-91}",
+        "Position": "{X:-391 Y:-91}",
+        "Rotation": "0",
+        "Scale": "{X:1 Y:1}",
+        "LocalPosition": "{X:-391 Y:-91}",
+        "LocalRotation": "0",
+        "LocalScale": "{X:1 Y:1}"
+      },
+      "GameObjectComponents": [
+        {
+          "Length": 3,
+          "Item Type": "MyEngine.GameObjectComponent"
+        },
+        "9",
+        {
+          "Type": "MyEngine.Light",
+          "Generated ID": 10,
+          "CastShadow": "False",
+          "Type": "Point",
+          "color": "{R:255 G:255 B:255 A:255}",
+          "AngularRadius": "360",
+          "OuterRadius": "0.25",
+          "InnerRadius": "0.025",
+          "InnerInensity": "1.5",
+          "Attenuation": "1",
+          "DirectionalIntensity": "0.2",
+          "ShadowIntensity": "0.5",
+          "gameObject": "8",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.SpriteRenderer",
+          "Generated ID": 11,
+          "SpriteEffects": "None",
+          "Color": "{R:0 G:255 B:255 A:255}",
+          "gameObject": "8",
+          "Enabled": "True",
+          "TextureName": "WhatsApp Image 2021-06-10 at 7.18.22 PM",
+          "Sprite": {
+            "Type": "MyEngine.Sprite",
+            "Generated ID": 12,
+            "SourceRectangle": "{X:0 Y:0 Width:642 Height:522}",
+            "Origin": "{X:321 Y:261}",
+            "Transform": "9",
+            "Texture": "WhatsApp Image 2021-06-10 at 7.18.22 PM"
+          }
+        }
+      ],
+      "IsEditor": "False",
+      "Layer": "1",
+      "Active": "True"
+    }
+  ],
+  "ID": "0"
+}
