@@ -89,7 +89,7 @@ namespace MyEngine
             {
                 if (S == "bin")
                 {
-                    WorkingDirectory = WorkingDirectory.Remove(WorkingDirectory.Length-1, 1);
+                    WorkingDirectory = WorkingDirectory.Remove(WorkingDirectory.Length - 1, 1);
                     break;
                 }
 
@@ -99,9 +99,9 @@ namespace MyEngine
             Setup.SourceFilePath = Environment.CurrentDirectory;
             Setup.IntermediateFilePath = Setup.SourceFilePath + @"\obj\Windows";
 #if DEBUG
-            Setup.OutputFilePath = WorkingDirectory + @"\bin\Windows\x86\Debug\Content";
+            Setup.OutputFilePath = WorkingDirectory + @"\bin\Debug\Content";
 #else
-            Setup.OutputFilePath = WorkingDirectory + @"\bin\Windows\x86\Release\Content";
+            Setup.OutputFilePath = WorkingDirectory + @"\bin\Release\Content";
 #endif           
             ///////////////////////////////////
 

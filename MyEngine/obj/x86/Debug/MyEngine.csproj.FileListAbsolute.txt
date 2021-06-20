@@ -297,7 +297,6 @@ C:\MyEngine\FN-Engine\MyEngine\bin\Windows\x86\Debug\Nvidia.TextureTools.dll
 C:\MyEngine\FN-Engine\MyEngine\bin\Windows\x86\Debug\PVRTexLibNET.dll
 C:\MyEngine\FN-Engine\MyEngine\bin\Windows\x86\Debug\SharpDX.D3DCompiler.dll
 C:\MyEngine\FN-Engine\MyEngine\bin\Windows\x86\Debug\SharpDX.dll
-C:\MyEngine\FN-Engine\MyEngine\bin\Windows\x86\Debug\SharpFont.dll
 C:\MyEngine\FN-Engine\MyEngine\bin\Windows\x86\Debug\System.Buffers.dll
 C:\MyEngine\FN-Engine\MyEngine\bin\Windows\x86\Debug\System.Numerics.Vectors.dll
 C:\MyEngine\FN-Engine\MyEngine\bin\Windows\x86\Debug\System.Runtime.CompilerServices.Unsafe.dll
@@ -334,3 +333,6 @@ C:\MyEngine\FN-Engine\MyEngine\obj\x86\Debug\MyEngine.csproj.CoreCompileInputs.c
 C:\MyEngine\FN-Engine\MyEngine\obj\x86\Debug\MyEngine.csproj.CopyComplete
 C:\MyEngine\FN-Engine\MyEngine\obj\x86\Debug\MyEngine.exe
 C:\MyEngine\FN-Engine\MyEngine\obj\x86\Debug\MyEngine.pdb
+C:\MyEngine\FN-Engine\MyEngine\bin\Windows\x86\Debug\Content\AmongUs.xnb
+C:\MyEngine\FN-Engine\MyEngine\bin\Windows\x86\Debug\FreeImageNET.dll
+C:\MyEngine\FN-Engine\MyEngine\bin\Windows\x86\Debug\MonoGame.Framework.Content.Pipeline.xml

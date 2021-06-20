@@ -1,17 +1,2 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"C:/MyEngine/MyEngine/MyEngine/Content/AMB_WR_BirdWind.ogg","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/AMB_WR_BirdWind.xnb","SongProcessor","SongContent",159762,133,1.218099
-"C:/MyEngine/MyEngine/MyEngine/Content/Arrow.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Arrow.xnb","TextureProcessor","Texture2DContent",454,16469,0.1138112
-"C:/MyEngine/MyEngine/MyEngine/Content/CharacterIdleAnimation.PNG","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/CharacterIdleAnimation.xnb","TextureProcessor","Texture2DContent",1856,299093,0.0151787
-"C:/MyEngine/MyEngine/MyEngine/Content/CharacterRunningAnimation.PNG","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/CharacterRunningAnimation.xnb","TextureProcessor","Texture2DContent",2132,364501,0.0136221
-"C:/MyEngine/MyEngine/MyEngine/Content/FireWorks_M.ogg","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/FireWorks_M.xnb","SoundEffectProcessor","SoundEffectContent",15865,91113,0.2303404
-"C:/MyEngine/MyEngine/MyEngine/Content/Font.spritefont","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Font.xnb","FontDescriptionProcessor","SpriteFontContent",2008,136209,0.2514277
-"C:/MyEngine/MyEngine/MyEngine/Content/Hornet.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Hornet.xnb","TextureProcessor","Texture2DContent",4015,977685,0.0314615
-"C:/MyEngine/MyEngine/MyEngine/Content/Icons/FolderIcon.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Icons/FolderIcon.xnb","TextureProcessor","Texture2DContent",1149,61525,0.0088036
-"C:/MyEngine/MyEngine/MyEngine/Content/Icons/MusicIcon.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Icons/MusicIcon.xnb","TextureProcessor","Texture2DContent",4657,65621,0.0048807
-"C:/MyEngine/MyEngine/MyEngine/Content/Jump.WAV","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Jump.xnb","SoundEffectProcessor","SoundEffectContent",11346,11407,0.1883674
-"C:/MyEngine/MyEngine/MyEngine/Content/LightTest.fx","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/LightTest.xnb","EffectProcessor","CompiledEffectContent",4277,60048,2.536544
-"C:/MyEngine/MyEngine/MyEngine/Content/ShadowCasting.fx","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/ShadowCasting.xnb","EffectProcessor","CompiledEffectContent",1656,1629,0.1215111
-"C:/MyEngine/MyEngine/MyEngine/Content/SkyAndClouds.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/SkyAndClouds.xnb","TextureProcessor","Texture2DContent",41967,33554517,1.174747
-"C:/MyEngine/MyEngine/MyEngine/Content/SubmittingGame.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/SubmittingGame.xnb","TextureProcessor","Texture2DContent",9175,1048661,0.0769991
-"C:/MyEngine/MyEngine/MyEngine/Content/Temp.jpg","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/Temp.xnb","TextureProcessor","Texture2DContent",76913,3686485,0.1810032
-"C:/MyEngine/MyEngine/MyEngine/Content/TileSet1.png","C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/TileSet1.xnb","TextureProcessor","Texture2DContent",13634,409685,0.0119981
+"C:/MyEngine/FN-Engine/MyEngine/Content/Arrow.png","C:/MyEngine/FN-Engine/MyEngine/Content/bin/Windows/Arrow.xnb","TextureProcessor","Texture2DContent",454,16469,0.1956538

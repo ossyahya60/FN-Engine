@@ -15,6 +15,7 @@ namespace MyEngine.FN_Editor
         public static Vector2[] MyRegion;
         public static LinkedList<KeyValuePair<object, Operation>> Undo_Buffer;
         public static LinkedList<KeyValuePair<object, Operation>> Redo_Buffer;
+
         public const int BufferLimit = 200; //200 Items
 
         private string NameBuffer = "";

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>C:/MyEngine/FN-Engine/MyEngine/Content/201743141_2917505425171918_1288613533689786583_n.jpg</SourceFile>
+  <SourceTime>2021-06-19T20:12:06.845697+02:00</SourceTime>
+  <DestFile>C:/MyEngine/FN-Engine/MyEngine/bin/Debug/Content/201743141_2917505425171918_1288613533689786583_n.xnb</DestFile>
+  <DestTime>2021-06-20T11:51:59.254751+02:00</DestTime>
+  <Importer>TextureImporter</Importer>
+  <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
+  <Processor>TextureProcessor</Processor>
+  <ProcessorTime>2018-12-08T18:35:54+02:00</ProcessorTime>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>

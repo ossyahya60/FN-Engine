@@ -137,6 +137,11 @@ namespace MyEngine
             ActiveScene = DeserlializeV2(SceneToBeLoaded.Name + "_Editor");
 
             Light.Reset();
+            if(FN_Editor.EditorScene.IsThisTheEditor) //Some clean up
+            {
+                FN_Editor.GameObjects_Tab.Undo_Buffer.Clear();
+                FN_Editor.GameObjects_Tab.Redo_Buffer.Clear();
+            }
             ActiveScene.Start();
 
             SceneToBeLoaded = null;

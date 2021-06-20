@@ -14,8 +14,7 @@ namespace MyEngine.FN_Editor
         public static object DraggedAsset = null;
         public static Vector2[] MyRegion;
 
-        public string GameContentPath = null;
-
+        private string GameContentPath = null;
         private Microsoft.Xna.Framework.Graphics.Texture2D T2D = null;
         private IntPtr TexID;
         private DateTime StartingDate = DateTime.Now;
@@ -38,7 +37,7 @@ namespace MyEngine.FN_Editor
 
             if (GameContentPath == null)
                 GameContentPath = Directory.GetCurrentDirectory();
-            
+
             T2D = Setup.Content.Load<Microsoft.Xna.Framework.Graphics.Texture2D>("Temp");
             TexID = Scene.GuiRenderer.BindTexture(T2D); //Don't forget to unbind texture upon deletion
             ContentFolderDirectory = Directory.GetCurrentDirectory();
@@ -47,6 +46,8 @@ namespace MyEngine.FN_Editor
             MusicRegex = new Regex(@"([\.]\b(wav|ogg|wma|mp3)\b)$", RegexOptions.IgnoreCase);
             ShaderRegex = new Regex(@"([\.]\b(fx)\b)$", RegexOptions.IgnoreCase);
             MyRegion = new Vector2[2];
+
+            Utility.BuildAllContent(GameContentPath);
         }
 
         private void DrageEnter(object sender, DragEventArgs e)

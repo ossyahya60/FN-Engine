@@ -6,13 +6,14 @@ using System.Windows.Forms;
 
 namespace MyEngine.FN_Project
 {
-    internal class VisualizeEngineStartup : GameObjectComponent
+    internal class VisualizeEngineStartup
     {
+        public static string GamePath = "";
+
         private static bool FirstTimeOnThisMachine = false;
-        private string SelectedPath = "";
         private static bool FirstBootUp = true;
 
-        public override void Start()
+        public void Start()
         {
             // Download the right template version of Monogame
             // Download the necessary nuget packages
@@ -34,7 +35,7 @@ namespace MyEngine.FN_Project
                         else
                             OpenExistingProject(fbd.SelectedPath);
 
-                        SelectedPath = fbd.SelectedPath;
+                        GamePath = fbd.SelectedPath;
                     }
                     else if (result == DialogResult.Cancel)
                         Setup.Game.Exit();
@@ -44,10 +45,10 @@ namespace MyEngine.FN_Project
             }
         }
 
-        public override void DrawUI()
+        public void DrawUI()
         {
             ImGui.Begin("Manage Projects");
-            ImGui.Text(SelectedPath);
+            ImGui.Text(GamePath);
             ImGui.End();
         }
 
@@ -71,8 +72,6 @@ namespace MyEngine.FN_Project
                 "dotnet new mgdesktopgl", //DesktopGL
                 "dotnet new sln", //Make a new visual studio solution
                 "dotnet sln add " + ProjName, //Add the project to the solution
-                "mgcb-editor --register", //Register the content in MGCB
-                "mgcb-editor", //Open MGCB Editor (Optional)
             };
 
             ExecuteCommand(MakeDesktopGLProj, Path);
@@ -80,6 +79,17 @@ namespace MyEngine.FN_Project
             string NameSpaceName = Path.Substring(Path.LastIndexOf('\\') + 1);
             File.WriteAllText(Path + @"\" + NameSpaceName + ".csproj", GetTemplateProjFile());
             File.WriteAllText(Path + @"\" + "Game1.cs", GetTemplateMainFile(NameSpaceName));
+
+            string[] AddEngine = new string[]
+            {
+                "cd " + Path, //Go to the new directory
+                "dotnet build",
+                "nuget install FN-Engine -OutputDirectory " + Path + @"\bin\Debug\net462",
+                "mgcb-editor --register", //Register the content in MGCB
+                "mgcb-editor", //Open MGCB Editor (Optional)
+            };
+
+            ExecuteCommand(AddEngine, Path);
         }
 
         private void OpenExistingProject(string Path)
@@ -122,9 +132,12 @@ namespace MyEngine.FN_Project
             File.Delete(batFileName);
         }
 
-        private string GetTemplateProjFile()
+        private string GetTemplateProjFile() //Edit this whenever you add a package to the engine, or change settings
         {
             return "<Project Sdk=\"Microsoft.NET.Sdk\">" + "\n" +
+                   "<PropertyGroup>" + "\n" +
+                   "<PlatformTarget>AnyCPU</PlatformTarget>" + "\n" +
+                   "</PropertyGroup>" + "\n" +
                    "<PropertyGroup>" + "\n" +
                    "<OutputType>WinExe</OutputType>" + "\n" +
                    "<TargetFramework>net462</TargetFramework>" + "\n" +
@@ -149,6 +162,8 @@ namespace MyEngine.FN_Project
                    "<ItemGroup>" + "\n" +
                    "<PackageReference Include=\"MonoGame.Framework.DesktopGL\" Version=\"3.7.1.189\" />" + "\n" +
                    "<PackageReference Include=\"MonoGame.Content.Builder\" Version=\"3.7.* \" />" + "\n" +
+                   "<PackageReference Include=\"FN-Engine\" Version=\"0.1.* \" />" + "\n" +
+                   "<PackageReference Include=\"Newtonsoft.Json\" Version=\"12.0.* \" />" + "\n" +
                    "</ItemGroup>" + "\n" +
                    "</Project>";
         }

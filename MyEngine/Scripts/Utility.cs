@@ -1124,8 +1124,8 @@ namespace MyEngine
             }
 
             foreach (string Dir in Directory.GetDirectories(CurrentDirectory))
-                if (Dir != CurrentDirectory + @"\bin" || Dir != CurrentDirectory + @"\obj")
-                    BuildContentItem(Dir);
+                if (!Dir.Equals(CurrentDirectory + @"\bin") || Dir.Equals(CurrentDirectory + @"\obj"))
+                    BuildAllContent(Dir);
         }
 
         public static string UniqueGameObjectName(string BaseName) // If base name is not present in the scene, then base name is returned

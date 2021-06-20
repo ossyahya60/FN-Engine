@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/MyEngine/MyEngine/MyEngine/Content/FireWorks_M.ogg</SourceFile>
-  <SourceTime>2020-04-23T16:15:51.664066+02:00</SourceTime>
-  <DestFile>C:/MyEngine/MyEngine/MyEngine/Content/bin/Windows/FireWorks_M.xnb</DestFile>
-  <DestTime>2021-04-22T13:49:51.3494867+02:00</DestTime>
+  <SourceFile>C:/MyEngine/FN-Engine/MyEngine/Content/FireWorks_M.ogg</SourceFile>
+  <SourceTime>2021-06-01T17:23:23.1011209+02:00</SourceTime>
+  <DestFile>C:/MyEngine/FN-Engine/MyEngine/bin/Debug/Content/FireWorks_M.xnb</DestFile>
+  <DestTime>2021-06-20T11:41:30.9177767+02:00</DestTime>
   <Importer>OggImporter</Importer>
   <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
-  <Processor>SoundEffectProcessor</Processor>
+  <Processor>SongProcessor</Processor>
   <ProcessorTime>2018-12-08T18:35:54+02:00</ProcessorTime>
-  <Parameters>
-    <Key>Quality</Key>
-    <Value>Best</Value>
-  </Parameters>
   <Dependencies />
   <BuildAsset />
-  <BuildOutput />
+  <BuildOutput>
+    <string>C:/MyEngine/FN-Engine/MyEngine/bin/Debug/Content/FireWorks_M.wma</string>
+  </BuildOutput>
 </PipelineBuildEvent>
