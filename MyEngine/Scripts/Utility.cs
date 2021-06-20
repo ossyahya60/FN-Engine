@@ -192,6 +192,8 @@ namespace MyEngine
             JW.WritePropertyName("Generated ID");
             JW.WriteValue(GID);
 
+
+
             foreach (FieldInfo Member in OBJ.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
                 if (Member.GetValue(OBJ) == null)
@@ -219,12 +221,42 @@ namespace MyEngine
 
                     JW.WriteEndObject();
 
-                    foreach (var Item in (IEnumerable)Member.GetValue(OBJ))
+                    if (Member.FieldType.GetInterface("IDictionary") != null)
                     {
-                        if (Item.GetType().IsValueType || Item.GetType() == typeof(string))
-                            JW.WriteValue(Item.ToString());
-                        else
-                            SerializeV2(JW, Item); //Supporting one level of lists (List<List<>> is not supported now)
+                        var DicVal = Member.GetValue(OBJ) as IDictionary;
+
+                        IEnumerator KEYS = DicVal.Keys.GetEnumerator(), VALUES = DicVal.Values.GetEnumerator();
+
+                        KEYS.MoveNext();
+                        VALUES.MoveNext();
+
+                        foreach (var Item in (IEnumerable)DicVal) //Serialize each dictionary entry
+                        {
+                            // Key
+                            if (KEYS.Current.GetType().IsValueType || KEYS.Current.GetType() == typeof(string))
+                                JW.WriteValue(KEYS.Current.ToString());
+                            else //Serializable class
+                                SerializeV2(JW, KEYS.Current);
+
+                            // Value
+                            if (VALUES.Current.GetType().IsValueType || VALUES.Current.GetType() == typeof(string))
+                                JW.WriteValue(VALUES.Current.ToString());
+                            else //Serializable class
+                                SerializeV2(JW, VALUES.Current);
+
+                            KEYS.MoveNext();
+                            VALUES.MoveNext();
+                        }
+                    }
+                    else
+                    {
+                        foreach (var Item in (IEnumerable)Member.GetValue(OBJ))
+                        {
+                            if (Item.GetType().IsValueType || Item.GetType() == typeof(string))
+                                JW.WriteValue(Item.ToString());
+                            else
+                                SerializeV2(JW, Item); //Supporting one level of lists (List<List<>> is not supported now)
+                        }
                     }
 
                     JW.WriteEndArray();
@@ -253,12 +285,52 @@ namespace MyEngine
                     JW.WritePropertyName(Member.Name);
                     JW.WriteStartArray();
 
-                    foreach (var Item in (IEnumerable)Member.GetValue(OBJ))
+                    JW.WriteStartObject();
+
+                    JW.WritePropertyName("Length");
+                    JW.WriteValue(((ICollection)Member.GetValue(OBJ)).Count);
+
+                    JW.WritePropertyName("Item Type");
+                    JW.WriteValue(((IEnumerable)Member.GetValue(OBJ)).GetType().GetGenericArguments()[0].ToString());
+
+                    JW.WriteEndObject();
+
+                    if (Member.PropertyType.GetInterface("IDictionary") != null)
                     {
-                        if (Item.GetType().IsValueType || Item.GetType() == typeof(string))
-                            JW.WriteValue(Item.ToString());
-                        else
-                            SerializeV2(JW, Item); //Supporting one level of lists (List<List<>> is not supported now)
+                        var DicVal = Member.GetValue(OBJ) as IDictionary;
+
+                        IEnumerator KEYS = DicVal.Keys.GetEnumerator(), VALUES = DicVal.Values.GetEnumerator();
+
+                        KEYS.MoveNext();
+                        VALUES.MoveNext();
+
+                        foreach (var Item in (IEnumerable)DicVal) //Serialize each dictionary entry
+                        {
+                            // Key
+                            if (KEYS.Current.GetType().IsValueType || KEYS.Current.GetType() == typeof(string))
+                                JW.WriteValue(KEYS.Current.ToString());
+                            else //Serializable class
+                                SerializeV2(JW, KEYS.Current);
+
+                            // Value
+                            if (VALUES.Current.GetType().IsValueType || VALUES.Current.GetType() == typeof(string))
+                                JW.WriteValue(VALUES.Current.ToString());
+                            else //Serializable class
+                                SerializeV2(JW, VALUES.Current);
+
+                            KEYS.MoveNext();
+                            VALUES.MoveNext();
+                        }
+                    }
+                    else
+                    {
+                        foreach (var Item in (IEnumerable)Member.GetValue(OBJ))
+                        {
+                            if (Item.GetType().IsValueType || Item.GetType() == typeof(string))
+                                JW.WriteValue(Item.ToString());
+                            else
+                                SerializeV2(JW, Item); //Supporting one level of lists (List<List<>> is not supported now)
+                        }
                     }
 
                     JW.WriteEndArray();
@@ -367,32 +439,83 @@ namespace MyEngine
                         JR.Read(); // End Object
                                    // End of Metadata
 
-                        //Iterating Objects
-                        var OBJ_List = (IList)GetInstance(FI.FieldType);
-
-                        for (int i = 0; i < ListLength; i++)
+                        // Handle Dictionaries Here Key then Value respectively
+                        if (FI.FieldType.GetInterface("IDictionary") != null)
                         {
-                            JR.Read(); //Value
+                            var OBJ_Dic = (IDictionary)GetInstance(FI.FieldType);
+                            Type[] KeyAndValTypes = OBJ_Dic.GetType().GetGenericArguments();
 
-                            if (IteratedObjectType.IsValueType || IteratedObjectType == typeof(string)) //Immediate assigining
+                            for (int i = 0; i < ListLength; i++)
                             {
-                                OBJ_List.Add(FromJsonToPrimvTypes(JR.Value.ToString(), IteratedObjectType));
-                            }
-                            else
-                            {
-                                if (JR.TokenType == JsonToken.StartObject)
-                                    OBJ_List.Add(DeserializeV2(JR, SerializedObjects));
-                                else if (long.TryParse(JR.Value.ToString(), out long ResultGID))
-                                    OBJ_List.Add(SerializedObjects[ResultGID]);
-                                else if (FI.FieldType == typeof(Texture2D))
-                                    OBJ_List.Add(Setup.Content.Load<Texture2D>(JR.Value.ToString()));
-                                else if (FI.FieldType == typeof(Effect))
-                                    OBJ_List.Add(Setup.Content.Load<Effect>(JR.Value.ToString()));
+                                object Key = null;
+                                object Value = null;
 
+                                JR.Read(); //Value
+                                //Deserialize Key
+                                if (KeyAndValTypes[0].IsValueType || KeyAndValTypes[0] == typeof(string)) //Immediate assigining
+                                    Key = FromJsonToPrimvTypes(JR.Value.ToString(), KeyAndValTypes[0]);
+                                else
+                                {
+                                    if (JR.TokenType == JsonToken.StartObject)
+                                        Key = DeserializeV2(JR, SerializedObjects);
+                                    else if (long.TryParse(JR.Value.ToString(), out long ResultGID))
+                                        Key = SerializedObjects[ResultGID];
+                                    else if (FI.FieldType == typeof(Texture2D))
+                                        Key = Setup.Content.Load<Texture2D>(JR.Value.ToString());
+                                    else if (FI.FieldType == typeof(Effect))
+                                        Key = Setup.Content.Load<Effect>(JR.Value.ToString());
+                                }
+
+                                JR.Read(); //Value
+                                //Deserialize Value
+                                if (KeyAndValTypes[1].IsValueType || KeyAndValTypes[1] == typeof(string)) //Immediate assigining
+                                    Value = FromJsonToPrimvTypes(JR.Value.ToString(), KeyAndValTypes[1]);
+                                else
+                                {
+                                    if (JR.TokenType == JsonToken.StartObject)
+                                        Value = DeserializeV2(JR, SerializedObjects);
+                                    else if (long.TryParse(JR.Value.ToString(), out long ResultGID))
+                                        Value = SerializedObjects[ResultGID];
+                                    else if (FI.FieldType == typeof(Texture2D))
+                                        Value = Setup.Content.Load<Texture2D>(JR.Value.ToString());
+                                    else if (FI.FieldType == typeof(Effect))
+                                        Value = Setup.Content.Load<Effect>(JR.Value.ToString());
+                                }
+
+                                OBJ_Dic.Add(Key, Value);
                             }
+
+                            FI.SetValue(OBJ, OBJ_Dic);
                         }
+                        else
+                        {
+                            //Iterating Objects
+                            var OBJ_List = (IList)GetInstance(FI.FieldType);
 
-                        FI.SetValue(OBJ, OBJ_List);
+                            for (int i = 0; i < ListLength; i++)
+                            {
+                                JR.Read(); //Value
+
+                                if (IteratedObjectType.IsValueType || IteratedObjectType == typeof(string)) //Immediate assigining
+                                {
+                                    OBJ_List.Add(FromJsonToPrimvTypes(JR.Value.ToString(), IteratedObjectType));
+                                }
+                                else
+                                {
+                                    if (JR.TokenType == JsonToken.StartObject)
+                                        OBJ_List.Add(DeserializeV2(JR, SerializedObjects));
+                                    else if (long.TryParse(JR.Value.ToString(), out long ResultGID))
+                                        OBJ_List.Add(SerializedObjects[ResultGID]);
+                                    else if (FI.FieldType == typeof(Texture2D))
+                                        OBJ_List.Add(Setup.Content.Load<Texture2D>(JR.Value.ToString()));
+                                    else if (FI.FieldType == typeof(Effect))
+                                        OBJ_List.Add(Setup.Content.Load<Effect>(JR.Value.ToString()));
+
+                                }
+                            }
+
+                            FI.SetValue(OBJ, OBJ_List);
+                        }
                     }
                     else //Serializable Objects?
                     {
@@ -480,31 +603,82 @@ namespace MyEngine
                         JR.Read(); // End Object
                                    // End of Metadata
 
-                        //Iterating Objects
-                        var OBJ_List = (IList)GetInstance(PI.PropertyType);
-
-                        for (int i = 0; i < ListLength; i++)
+                        // Handle Dictionaries Here Key then Value respectively
+                        if (PI.PropertyType.GetInterface("IDictionary") != null)
                         {
-                            JR.Read(); //Value
+                            var OBJ_Dic = (IDictionary)GetInstance(PI.PropertyType);
+                            Type[] KeyAndValTypes = OBJ_Dic.GetType().GetGenericArguments();
 
-                            if (IteratedObjectType.IsValueType || IteratedObjectType == typeof(string)) //Immediate assigining
+                            for (int i = 0; i < ListLength; i++)
                             {
-                                OBJ_List.Add(FromJsonToPrimvTypes(JR.Value.ToString(), IteratedObjectType));
+                                object Key = null;
+                                object Value = null;
+
+                                JR.Read(); //Value
+                                //Deserialize Key
+                                if (KeyAndValTypes[0].IsValueType || KeyAndValTypes[0] == typeof(string)) //Immediate assigining
+                                    Key = FromJsonToPrimvTypes(JR.Value.ToString(), KeyAndValTypes[0]);
+                                else
+                                {
+                                    if (JR.TokenType == JsonToken.StartObject)
+                                        Key = DeserializeV2(JR, SerializedObjects);
+                                    else if (long.TryParse(JR.Value.ToString(), out long ResultGID))
+                                        Key = SerializedObjects[ResultGID];
+                                    else if (PI.PropertyType == typeof(Texture2D))
+                                        Key = Setup.Content.Load<Texture2D>(JR.Value.ToString());
+                                    else if (PI.PropertyType == typeof(Effect))
+                                        Key = Setup.Content.Load<Effect>(JR.Value.ToString());
+                                }
+
+                                JR.Read(); //Value
+                                //Deserialize Value
+                                if (KeyAndValTypes[1].IsValueType || KeyAndValTypes[1] == typeof(string)) //Immediate assigining
+                                    Value = FromJsonToPrimvTypes(JR.Value.ToString(), KeyAndValTypes[1]);
+                                else
+                                {
+                                    if (JR.TokenType == JsonToken.StartObject)
+                                        Value = DeserializeV2(JR, SerializedObjects);
+                                    else if (long.TryParse(JR.Value.ToString(), out long ResultGID))
+                                        Value = SerializedObjects[ResultGID];
+                                    else if (PI.PropertyType == typeof(Texture2D))
+                                        Value = Setup.Content.Load<Texture2D>(JR.Value.ToString());
+                                    else if (PI.PropertyType == typeof(Effect))
+                                        Value = Setup.Content.Load<Effect>(JR.Value.ToString());
+                                }
+
+                                OBJ_Dic.Add(Key, Value);
                             }
-                            else
-                            {
-                                if (JR.TokenType == JsonToken.StartObject)
-                                    OBJ_List.Add(DeserializeV2(JR, SerializedObjects));
-                                else if (long.TryParse(JR.Value.ToString(), out long ResultGID))
-                                    OBJ_List.Add(SerializedObjects[ResultGID]);
-                                else if (PI.PropertyType == typeof(Texture2D))
-                                    OBJ_List.Add(Setup.Content.Load<Texture2D>(JR.Value.ToString()));
-                                else if (PI.PropertyType == typeof(Effect))
-                                    OBJ_List.Add(Setup.Content.Load<Effect>(JR.Value.ToString()));
-                            }
+
+                            PI.SetValue(OBJ, OBJ_Dic);
                         }
+                        else
+                        {
+                            //Iterating Objects
+                            var OBJ_List = (IList)GetInstance(PI.PropertyType);
 
-                        PI.SetValue(OBJ, OBJ_List);
+                            for (int i = 0; i < ListLength; i++)
+                            {
+                                JR.Read(); //Value
+
+                                if (IteratedObjectType.IsValueType || IteratedObjectType == typeof(string)) //Immediate assigining
+                                {
+                                    OBJ_List.Add(FromJsonToPrimvTypes(JR.Value.ToString(), IteratedObjectType));
+                                }
+                                else
+                                {
+                                    if (JR.TokenType == JsonToken.StartObject)
+                                        OBJ_List.Add(DeserializeV2(JR, SerializedObjects));
+                                    else if (long.TryParse(JR.Value.ToString(), out long ResultGID))
+                                        OBJ_List.Add(SerializedObjects[ResultGID]);
+                                    else if (PI.PropertyType == typeof(Texture2D))
+                                        OBJ_List.Add(Setup.Content.Load<Texture2D>(JR.Value.ToString()));
+                                    else if (PI.PropertyType == typeof(Effect))
+                                        OBJ_List.Add(Setup.Content.Load<Effect>(JR.Value.ToString()));
+                                }
+                            }
+
+                            PI.SetValue(OBJ, OBJ_List);
+                        }
                     }
                     else //Serializable Objects?
                     {

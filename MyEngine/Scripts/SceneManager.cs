@@ -28,7 +28,7 @@ namespace MyEngine
             using (StreamReader SR = new StreamReader(ScenesDirectory + "/Scenes/Scenes.FN", false))
             {
                 DefaultScene = SR.ReadLine().Split('\t')[1];
-                
+
                 int NumberOfScenes = int.Parse(SR.ReadLine().Split('\t')[1]);
                 for (int i = 0; i < NumberOfScenes; i++)
                     Scenes.Add(SR.ReadLine());
@@ -137,7 +137,7 @@ namespace MyEngine
             ActiveScene = DeserlializeV2(SceneToBeLoaded.Name + "_Editor");
 
             Light.Reset();
-            if(FN_Editor.EditorScene.IsThisTheEditor) //Some clean up
+            if (FN_Editor.EditorScene.IsThisTheEditor) //Some clean up
             {
                 FN_Editor.GameObjects_Tab.Undo_Buffer.Clear();
                 FN_Editor.GameObjects_Tab.Redo_Buffer.Clear();

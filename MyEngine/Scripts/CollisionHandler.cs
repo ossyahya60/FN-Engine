@@ -13,19 +13,19 @@ namespace MyEngine.Scripts
                     if (GOC is Collider2D)
                         Colliders.Add(GOC);
 
-            foreach(var collider in Colliders)
+            foreach (var collider in Colliders)
             {
                 foreach (var collider2 in Colliders)
                 {
-                    if(collider != collider2)
+                    if (collider != collider2)
                     {
-                        if(((Collider2D)collider).IsTouching((Collider2D)collider2))
+                        if (((Collider2D)collider).IsTouching((Collider2D)collider2))
                         {
                             //((Collider2D)collider).Resolve(collider2);
                         }
                     }
                 }
-            }    
+            }
         }
     }
 }

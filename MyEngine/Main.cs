@@ -31,7 +31,7 @@ namespace MyEngine
             //var profileProperty = shaderType.GetProperty("Profile");
             //var value = (int)profileProperty.GetValue(null);
             //var extension = value == 1 ? "dx11" : "ogl";
-            
+
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
         }

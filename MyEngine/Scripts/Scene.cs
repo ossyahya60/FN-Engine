@@ -90,7 +90,7 @@ namespace MyEngine
 
             if (!GameObjects.Contains(GO))
             {
-                if(!NoNameCheck)
+                if (!NoNameCheck)
                     GO.Name = Utility.UniqueGameObjectName(GO.Name);
                 GameObjects.Insert(GameObjects.Count, GO);
 
@@ -112,12 +112,12 @@ namespace MyEngine
                     AddGameObject_Recursive(Child, false);
                 }
 
-                if(Root)
+                if (Root)
                     SortGameObjectsWithLayer();
             }
         }
 
-         //Didn't work as Gameobjects have to be in the simulation in order to be find by "GetChildrenMethod" :(
+        //Didn't work as Gameobjects have to be in the simulation in order to be find by "GetChildrenMethod" :(
         //public void AddGameObject(GameObject GO) //=> Implement it using "Recursion"
         //{
         //    GameObjects.Insert(GameObjectCount, GO);
@@ -167,7 +167,7 @@ namespace MyEngine
 
         public void Start()
         {
-            if(GuiRenderer == null)
+            if (GuiRenderer == null)
                 GuiRenderer = new ImGUIRenderer(Setup.Game).Initialize().RebuildFontAtlas();
 
             if (ImGUI_RenderTarget == null)
@@ -341,13 +341,13 @@ namespace MyEngine
                 SW.Write("Active:\t" + Active.ToString() + "\n");
                 SW.Write("Name:\t" + Name + "\n");
                 SW.Write("Id:\t" + Id + "\n");
-                SW.Write("GameObjectCount:\t" + (SerializerEditorStuff? GameObjects.Count : GameObjects.Count - NumberOfEditorObjects).ToString() + "\n");
+                SW.Write("GameObjectCount:\t" + (SerializerEditorStuff ? GameObjects.Count : GameObjects.Count - NumberOfEditorObjects).ToString() + "\n");
 
                 MediaSource.Serialize(SW);
                 Setup.Camera.Serialize(SW);
 
                 foreach (GameObject GO in GameObjects)
-                    if(!GO.IsEditor || SerializerEditorStuff)
+                    if (!GO.IsEditor || SerializerEditorStuff)
                         Utility.Serialize(SW, GO);
 
                 SW.WriteLine("End Of " + ToString());

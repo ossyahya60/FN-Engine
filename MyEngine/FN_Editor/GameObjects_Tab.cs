@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace MyEngine.FN_Editor
 {
-    enum Operation { Delete, Create, Rename, GO_DragAndDrop, AddComponent, RemoveComponent, ChangeValue};
+    enum Operation { Delete, Create, Rename, GO_DragAndDrop, AddComponent, RemoveComponent, ChangeValue };
 
     internal class GameObjects_Tab : GameObjectComponent
     {
@@ -100,15 +100,15 @@ namespace MyEngine.FN_Editor
                     if (SelectedGOs.Count != 0)
                     {
                         GOs_Clipboard = SelectedGOs.ToArray();
-                        
-                        for(int i=0; i<GOs_Clipboard.Length; i++)
+
+                        for (int i = 0; i < GOs_Clipboard.Length; i++)
                         {
                             string OrignalName = GOs_Clipboard[i].Name;
 
                             string[] OrigNames = new string[GOs_Clipboard.Length];
                             GameObject[] AllChildren = GOs_Clipboard[i].GetALLChildren();
 
-                            if(AllChildren != null)
+                            if (AllChildren != null)
                                 for (int j = 0; j < AllChildren.Length; j++)
                                     OrigNames[j] = AllChildren[j].Name;
 
@@ -150,7 +150,7 @@ namespace MyEngine.FN_Editor
                         Redo_Buffer.Clear();
                     }
                 }
-                else if(ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Z), true) && Undo_Buffer.Count != 0) //Handling Undo and Redo actions
+                else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Z), true) && Undo_Buffer.Count != 0) //Handling Undo and Redo actions
                 {
                     KeyValuePair<object, Operation> KVP = RemoveFromACircularBuffer(Undo_Buffer);
 
@@ -180,7 +180,7 @@ namespace MyEngine.FN_Editor
 
                                 for (int i = 0; i < gameObjects.Length; i++)
                                 {
-                                    if(gameObjects[i].PrevParent != null)
+                                    if (gameObjects[i].PrevParent != null)
                                         gameObjects[i].PrevParent.AddChild(gameObjects[i]);
 
                                     //gameObjects[i].Name = Utility.UniqueGameObjectName(gameObjects[i].Name);
@@ -308,7 +308,7 @@ namespace MyEngine.FN_Editor
                             GameObject PrevParent = SceneManager.ActiveScene.FindGameObjectWithName(SourceAndPrevParent.Value);
                             if (KVP_GO.Value == null && SourceAndPrevParent.Key.Parent != null) //Destination is null
                                 SourceAndPrevParent.Key.Parent.RemoveChild(SourceAndPrevParent.Key);
-                            else if(PrevParent != null)
+                            else if (PrevParent != null)
                                 PrevParent.AddChild(SourceAndPrevParent.Key);
 
                             break;
@@ -384,10 +384,10 @@ namespace MyEngine.FN_Editor
                         Redo_Buffer.Clear();
                     }
                 }
-                else if(ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.A))) //Select All
+                else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.A))) //Select All
                 {
                     foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
-                        if(!GO.IsEditor)
+                        if (!GO.IsEditor)
                             SelectedGOs.Add(GO);
                 }
             }
@@ -504,7 +504,7 @@ namespace MyEngine.FN_Editor
 
             int ChildrenCount = GO.Children.Count;
 
-            if(ChildrenCount == 0)
+            if (ChildrenCount == 0)
             {
                 if (!Root)
                     ImGui.Indent();
@@ -670,7 +670,7 @@ namespace MyEngine.FN_Editor
             if (Open)
                 ImGui.TreePop();
 
-            if(Root)
+            if (Root)
                 ImGui.Indent();
         }
     }

@@ -1,0 +1,82 @@
+{
+  "Type": "MyEngine.Scene",
+  "Generated ID": 1,
+  "ShouldSort": "False",
+  "Active": "True",
+  "Name": "DummyScene",
+  "GameObjects": [
+    {
+      "Length": 1,
+      "Item Type": "System.String"
+    },
+    "EditorObject",
+    {
+      "Type": "MyEngine.GameObject",
+      "Generated ID": 2,
+      "Name": "EditorObject",
+      "ShouldBeDeleted": "False",
+      "ShouldBeRemoved": "False",
+      "UI_Layer": "1",
+      "Children": [
+        {
+          "Length": 0,
+          "Item Type": "MyEngine.GameObject"
+        }
+      ],
+      "Transform": {
+        "Type": "MyEngine.Transform",
+        "Generated ID": 3,
+        "gameObject": "2",
+        "Enabled": "True",
+        "LastPosition": "{X:0 Y:0}",
+        "Position": "{X:0 Y:0}",
+        "Rotation": "0",
+        "Scale": "{X:1 Y:1}",
+        "LocalPosition": "{X:0 Y:0}",
+        "LocalRotation": "0",
+        "LocalScale": "{X:1 Y:1}"
+      },
+      "GameObjectComponents": [
+        {
+          "Length": 6,
+          "Item Type": "MyEngine.GameObjectComponent"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.GameObjects_Tab",
+          "Generated ID": 4,
+          "gameObject": "2",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.InspectorWindow",
+          "Generated ID": 5,
+          "gameObject": "2",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.ContentWindow",
+          "Generated ID": 6,
+          "gameObject": "2",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.GizmosVisualizer",
+          "Generated ID": 7,
+          "gameObject": "2",
+          "Enabled": "True"
+        },
+        {
+          "Type": "MyEngine.FN_Editor.EditorScene",
+          "Generated ID": 8,
+          "gameObject": "2",
+          "Enabled": "True"
+        },
+        "3"
+      ],
+      "IsEditor": "True",
+      "Layer": "1",
+      "Active": "True"
+    }
+  ],
+  "ID": "1"
+}
