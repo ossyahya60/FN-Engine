@@ -1,0 +1,3 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/FN Engine CrossPlatform/FN_Engine/Content/Font.spritefont","C:/FN Engine CrossPlatform/FN_Engine/Content/bin/DesktopGL/Content/Font.xnb","FontDescriptionProcessor","SpriteFontContent",2008,21538,0.7771375
+"C:/FN Engine CrossPlatform/FN_Engine/Content/LightTest.fx","C:/FN Engine CrossPlatform/FN_Engine/Content/bin/DesktopGL/Content/LightTest.xnb","EffectProcessor","CompiledEffectContent",4277,67833,4.849802

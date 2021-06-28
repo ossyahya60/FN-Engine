@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>FromNewbies.FN-Engine</id>
+    <version>1.0.0</version>
+    <authors>Oss</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <description>This is an alpha version of a Monogame based 2D game engine</description>
+    <tags>Monogame, GameEngine</tags>
+    <repository url="https://github.com/ossyahya60/FN-Engine" />
+    <dependencies>
+      <group targetFramework=".NETCoreApp3.1">
+        <dependency id="ImGui.NET" version="1.78.0" exclude="Build,Analyzers" />
+        <dependency id="MonoGame.Content.Builder.Task" version="3.8.0.1641" exclude="Build,Analyzers" />
+        <dependency id="MonoGame.Framework.Content.Pipeline" version="3.8.0.1641" exclude="Build,Analyzers" />
+        <dependency id="MonoGame.Framework.DesktopGL" version="3.8.0.1641" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="13.0.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkReferences>
+      <group targetFramework=".NETCoreApp3.1">
+        <frameworkReference name="Microsoft.WindowsDesktop.App.WindowsForms" />
+      </group>
+    </frameworkReferences>
+    <contentFiles>
+      <files include="any/netcoreapp3.1/Content/bin/DesktopGL/Content/Font.xnb" buildAction="Content" />
+      <files include="any/netcoreapp3.1/Content/bin/DesktopGL/Content/LightTest.xnb" buildAction="Content" />
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="C:\FN Engine CrossPlatform\FN-Engine\bin\Debug\netcoreapp3.1\FN-Engine.runtimeconfig.json" target="lib\netcoreapp3.1\FN-Engine.runtimeconfig.json" />
+    <file src="C:\FN Engine CrossPlatform\FN-Engine\bin\Debug\netcoreapp3.1\FN-Engine.dll" target="lib\netcoreapp3.1\FN-Engine.dll" />
+    <file src="C:\FN Engine CrossPlatform\FN-Engine\Content\bin\DesktopGL\Content\Font.xnb" target="content\Content\bin\DesktopGL\Content\Font.xnb" />
+    <file src="C:\FN Engine CrossPlatform\FN-Engine\Content\bin\DesktopGL\Content\Font.xnb" target="contentFiles\any\netcoreapp3.1\Content\bin\DesktopGL\Content\Font.xnb" />
+    <file src="C:\FN Engine CrossPlatform\FN-Engine\Content\bin\DesktopGL\Content\LightTest.xnb" target="content\Content\bin\DesktopGL\Content\LightTest.xnb" />
+    <file src="C:\FN Engine CrossPlatform\FN-Engine\Content\bin\DesktopGL\Content\LightTest.xnb" target="contentFiles\any\netcoreapp3.1\Content\bin\DesktopGL\Content\LightTest.xnb" />
+  </files>
+</package>

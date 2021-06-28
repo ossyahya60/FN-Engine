@@ -1,0 +1,124 @@
+{
+  "Type": "FN_Engine.Scene",
+  "Generated ID": 1,
+  "ShouldSort": "False",
+  "Active": "True",
+  "Name": "MainScene",
+  "GameObjects": [
+    {
+      "Length": 2,
+      "Item Type": "FN_Engine.GameObject"
+    },
+    {
+      "Type": "FN_Engine.GameObject",
+      "Generated ID": 2,
+      "Name": "Default",
+      "ShouldBeDeleted": "False",
+      "ShouldBeRemoved": "False",
+      "UI_Layer": "1",
+      "Children": [
+        {
+          "Length": 1,
+          "Item Type": "FN_Engine.GameObject"
+        },
+        {
+          "Type": "FN_Engine.GameObject",
+          "Generated ID": 3,
+          "Name": "Default (1)",
+          "ShouldBeDeleted": "False",
+          "ShouldBeRemoved": "False",
+          "UI_Layer": "1",
+          "Children": [
+            {
+              "Length": 0,
+              "Item Type": "FN_Engine.GameObject"
+            }
+          ],
+          "Transform": {
+            "Type": "FN_Engine.Transform",
+            "Generated ID": 4,
+            "gameObject": "3",
+            "Enabled": "True",
+            "LastPosition": "{X:-497 Y:-114}",
+            "Position": "{X:-497 Y:-114}",
+            "Rotation": "0",
+            "Scale": "{X:0.5 Y:0.5}",
+            "LocalPosition": "{X:2 Y:15}",
+            "LocalRotation": "0",
+            "LocalScale": "{X:0.5 Y:0.5}"
+          },
+          "GameObjectComponents": [
+            {
+              "Length": 2,
+              "Item Type": "FN_Engine.GameObjectComponent"
+            },
+            "4",
+            {
+              "Type": "FN_Engine.SpriteRenderer",
+              "Generated ID": 5,
+              "SpriteEffects": "None",
+              "Color": "{R:5 G:76 B:76 A:255}",
+              "gameObject": "3",
+              "Enabled": "True",
+              "TextureName": "Default Textures\\DefaultTexture",
+              "Sprite": {
+                "Type": "FN_Engine.Sprite",
+                "Generated ID": 6,
+                "SourceRectangle": "{X:0 Y:0 Width:100 Height:100}",
+                "Origin": "{X:50 Y:50}",
+                "Transform": "4",
+                "Texture": "Default Textures\\DefaultTexture"
+              }
+            }
+          ],
+          "IsEditor": "False",
+          "Parent": "2",
+          "Layer": "1",
+          "Active": "True"
+        }
+      ],
+      "Transform": {
+        "Type": "FN_Engine.Transform",
+        "Generated ID": 8,
+        "gameObject": "2",
+        "Enabled": "True",
+        "LastPosition": "{X:-499 Y:-129}",
+        "Position": "{X:-499 Y:-129}",
+        "Rotation": "0",
+        "Scale": "{X:1 Y:1}",
+        "LocalPosition": "{X:-499 Y:-129}",
+        "LocalRotation": "0",
+        "LocalScale": "{X:1 Y:1}"
+      },
+      "GameObjectComponents": [
+        {
+          "Length": 2,
+          "Item Type": "FN_Engine.GameObjectComponent"
+        },
+        "8",
+        {
+          "Type": "FN_Engine.SpriteRenderer",
+          "Generated ID": 9,
+          "SpriteEffects": "None",
+          "Color": "{R:0 G:255 B:255 A:255}",
+          "gameObject": "2",
+          "Enabled": "True",
+          "TextureName": "Default Textures\\DefaultTexture",
+          "Sprite": {
+            "Type": "FN_Engine.Sprite",
+            "Generated ID": 10,
+            "SourceRectangle": "{X:0 Y:0 Width:100 Height:100}",
+            "Origin": "{X:50 Y:50}",
+            "Transform": "8",
+            "Texture": "Default Textures\\DefaultTexture"
+          }
+        }
+      ],
+      "IsEditor": "False",
+      "Layer": "1",
+      "Active": "True"
+    },
+    "3"
+  ],
+  "ID": "0"
+}

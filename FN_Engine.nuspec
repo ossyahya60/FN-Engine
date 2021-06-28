@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>FN_Engine</id>
+    <version>0.1.8</version>
+    <title>FN_Engine</title>
+    <authors>Osama</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/ossyahya60/FN-Engine</projectUrl>
+    <description>This is a 2D game engine based on Monogame</description>
+    <releaseNotes>Initial test release of FN-Engine</releaseNotes>
+    <copyright>copyright</copyright>
+    <tags>GameEngine Monogame</tags>
+	<dependencies>
+      <group targetFramework="netcoreapp3.1" />
+    </dependencies>
+  </metadata>
+  <files>
+   <file src="bin\Debug\netcoreapp3.1\MonoGame.Framework.Content.Pipeline.dll" target="lib\netcoreapp3.1"></file>
+   <file src="bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll" target="lib\netcoreapp3.1"></file>
+   <file src="bin\Debug\netcoreapp3.1\ImGui.NET.dll" target="lib\netcoreapp3.1"></file>
+  </files>
+</package>

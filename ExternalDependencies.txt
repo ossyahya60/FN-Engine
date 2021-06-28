@@ -1,0 +1,3 @@
+To Build sound and music: (They exist in debug folder)
+=> ffmpeg
+=> ffprobe
