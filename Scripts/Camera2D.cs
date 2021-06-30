@@ -30,8 +30,9 @@ namespace FN_Engine
             get { return _position; }
             set
             {
+                if (_position != value)
+                    _isViewTransformationDirty = true;
                 _position = value;
-                _isViewTransformationDirty = true;
             }
         }
 
@@ -50,12 +51,14 @@ namespace FN_Engine
             get { return _zoom; }
             set
             {
+                if(_zoom != value)
+                    _isViewTransformationDirty = true;
+
                 _zoom = value;
                 if (_zoom < 0.1f)
                 {
                     _zoom = 0.1f;
                 }
-                _isViewTransformationDirty = true;
             }
         }
 
@@ -67,8 +70,10 @@ namespace FN_Engine
             }
             set
             {
+                if(_rotation != value)
+                    _isViewTransformationDirty = true;
+
                 _rotation = value;
-                _isViewTransformationDirty = true;
             }
         }
 

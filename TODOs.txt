@@ -4,3 +4,6 @@
 4- Hot Reloading?
 5- Game Should focus on startup.
 6- Remove then add changed components (Map variable values before adding the component).
+7- Serializing Camera and RIR.
+8- Separate Cameras for scene and game.
+9- Fix Shadows

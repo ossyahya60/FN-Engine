@@ -96,6 +96,8 @@ namespace FN_Engine.FN_Project
 
             Directory.CreateDirectory(DestinationDir + "\\Icons");
             Directory.CreateDirectory(DestinationDir + "\\Default Textures");
+            Directory.CreateDirectory(DestinationDir + "\\bin\\DesktopGL");
+            File.Copy(SourceDir + "\\LightShaderCompiled\\LightTest.xnb", DestinationDir + "\\bin\\DesktopGL\\LightTest.xnb");
 
             CopyAndPasteFiles(SourceDir + "\\Icons", DestinationDir + "\\Icons");
             CopyAndPasteFiles(SourceDir + "\\Default Textures", DestinationDir + "\\Default Textures");

@@ -1,5 +1,4 @@
-﻿using ImGuiNET;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -7,9 +6,9 @@ using System.IO;
 
 namespace FN_Engine
 {
-    public enum LightTypes { Point, Spot, Directional}
+    public enum LightTypes { Point, Spot, Directional }
 
-    public class Light: GameObjectComponent
+    public class Light : GameObjectComponent
     {
         public static bool CastShadows_Global = true;
 
@@ -111,7 +110,7 @@ namespace FN_Engine
 
         public static void Init_Light()
         {
-            if(RenderTarget2D == null)
+            if (RenderTarget2D == null)
                 RenderTarget2D = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
 
             Setup.GraphicsDevice.SetRenderTarget(RenderTarget2D); //Render Target
@@ -120,7 +119,7 @@ namespace FN_Engine
         public static void ApplyLighting()
         {
             //You probably need to add they XY coordinates of BiasScene in editor mode too (below two lines) //Ignore this for now
-            Rectangle BiasScene = new Rectangle((int)(Setup.Camera.Position.X -Setup.graphics.PreferredBackBufferWidth*0.5f), (int)(Setup.Camera.Position.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f), Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
+            Rectangle BiasScene = new Rectangle((int)(Setup.Camera.Position.X - Setup.graphics.PreferredBackBufferWidth * 0.5f), (int)(Setup.Camera.Position.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f), Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
             if (FN_Editor.EditorScene.IsThisTheEditor)
                 BiasScene = new Rectangle((int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.X + -Setup.graphics.PreferredBackBufferWidth * 0.5f + Setup.Camera.Position.X), (int)(FN_Editor.GizmosVisualizer.BiasSceneWindow.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f + Setup.Camera.Position.Y), (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.X, (int)FN_Editor.GizmosVisualizer.BiasSceneWindowSize.Y);
 
@@ -165,17 +164,20 @@ namespace FN_Engine
                 ShadowCaster[] Occluders = SceneManager.ActiveScene.FindGameObjectComponents<ShadowCaster>();
                 Ray ray = new Ray();
 
+
+                Vector2 Bias = -new Vector2(Setup.graphics.PreferredBackBufferWidth * 0.5f - Setup.Camera.Position.X, Setup.graphics.PreferredBackBufferHeight * 0.5f - Setup.Camera.Position.Y);
+
                 if (Occluders != null)
                 {
-                    Points.Add(Vector2.Zero);
-                    Points.Add(Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth);
-                    Points.Add(Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth + Vector2.UnitY * Setup.graphics.PreferredBackBufferHeight);
-                    Points.Add(Vector2.UnitY * Setup.graphics.PreferredBackBufferHeight);
+                    Points.Add(Bias);
+                    Points.Add(Bias + Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth);
+                    Points.Add(Bias + Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth + Vector2.UnitY * Setup.graphics.PreferredBackBufferHeight);
+                    Points.Add(Bias + Vector2.UnitY * Setup.graphics.PreferredBackBufferHeight);
 
-                    BorderOccluders[0].SetOccluder(Vector2.Zero, Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth);
-                    BorderOccluders[1].SetOccluder(Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth, new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight));
-                    BorderOccluders[2].SetOccluder(Vector2.Zero, new Vector2(0, Setup.graphics.PreferredBackBufferHeight));
-                    BorderOccluders[3].SetOccluder(new Vector2(0, Setup.graphics.PreferredBackBufferHeight), new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight));
+                    BorderOccluders[0].SetOccluder(Bias, Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth + Bias);
+                    BorderOccluders[1].SetOccluder(Bias + Vector2.UnitX * Setup.graphics.PreferredBackBufferWidth, new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight) + Bias);
+                    BorderOccluders[2].SetOccluder(Bias + Vector2.Zero, new Vector2(0, Setup.graphics.PreferredBackBufferHeight) + Bias);
+                    BorderOccluders[3].SetOccluder(Bias + new Vector2(0, Setup.graphics.PreferredBackBufferHeight), new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight) + Bias);
 
                     HandyList.Add(BorderOccluders[0]);
                     HandyList.Add(BorderOccluders[1]);
@@ -239,15 +241,16 @@ namespace FN_Engine
 
                         PointsTriangle.Sort((x, y) => MathCompanion.GetAngle(x, LIGHTS[k].gameObject.Transform.Position).CompareTo(MathCompanion.GetAngle(y, LIGHTS[k].gameObject.Transform.Position)));
 
+                        Bias = -Bias;
                         //DrawTriangles
                         for (int i = 0; i < PointsTriangle.Count - 1; i++)
                         {
-                            HitBoxDebuger.DrawTriangle(PointsTriangle[i], PointsTriangle[i + 1], LIGHTS[k].gameObject.Transform.Position); //White Color
+                            HitBoxDebuger.DrawTriangle(Bias + PointsTriangle[i], Bias + PointsTriangle[i + 1], Bias + LIGHTS[k].gameObject.Transform.Position); //White Color
                         }
-                        HitBoxDebuger.DrawTriangle(PointsTriangle[PointsTriangle.Count - 1], PointsTriangle[0], LIGHTS[k].gameObject.Transform.Position);
+                        HitBoxDebuger.DrawTriangle(Bias + PointsTriangle[PointsTriangle.Count - 1], Bias + PointsTriangle[0], Bias + LIGHTS[k].gameObject.Transform.Position);
                     }
                 }
-
+                
                 ShadowMap_param.SetValue(ShadowMap);
             }
 
@@ -258,14 +261,14 @@ namespace FN_Engine
 
                 COLOR[i] = LIGHTS[i].color.ToVector3();
                 InnerRadius[i] = MathHelper.Clamp(LIGHTS[i].InnerRadius, 0, LIGHTS[i].OuterRadius) * Setup.Camera.Zoom;
-                Radius[i] = MathHelper.Clamp(LIGHTS[i].OuterRadius, 0, 1)  * Setup.Camera.Zoom;
+                Radius[i] = MathHelper.Clamp(LIGHTS[i].OuterRadius, 0, 1) * Setup.Camera.Zoom;
                 Attenuation[i] = MathHelper.Clamp(LIGHTS[i].Attenuation, 0, float.MaxValue);
                 X_Bias[i] = (LIGHTS[i].gameObject.Transform.Position.X - Setup.Camera.Position.X) / Setup.graphics.PreferredBackBufferWidth;
                 Y_Bias[i] = (LIGHTS[i].gameObject.Transform.Position.Y - Setup.Camera.Position.Y) / Setup.graphics.PreferredBackBufferHeight;
                 AngularRadius[i] = MathHelper.Clamp(LIGHTS[i].AngularRadius, 0, 360);
                 InnerIntensity[i] = MathHelper.Clamp(LIGHTS[i].InnerInensity, 1, float.MaxValue);
                 ShadowIntensity[i] = MathHelper.Clamp(1 - LIGHTS[i].ShadowIntensity, 0, 1);
-                CastShadow[i] = LIGHTS[i].CastShadow? 1:0;
+                CastShadow[i] = LIGHTS[i].CastShadow ? 1 : 0;
 
                 if (LIGHTS[i].Type == LightTypes.Directional) //Bug here where directional intensity is set forever
                 {

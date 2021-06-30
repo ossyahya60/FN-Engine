@@ -149,7 +149,7 @@ namespace FN_Engine.FN_Editor
             MyRegion = new Vector2[2];
         }
 
-        public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
+        public override void DrawUI()
         {
             try
             {
@@ -164,10 +164,7 @@ namespace FN_Engine.FN_Editor
             {
                 Console.Out.WriteLine("Executable is not found, please run the application first");
             }
-        }
 
-        public override void DrawUI()
-        {
             ImGui.Begin("Inspector");
 
             ///

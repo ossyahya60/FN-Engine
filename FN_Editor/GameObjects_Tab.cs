@@ -53,8 +53,6 @@ namespace FN_Engine.FN_Editor
             ImGui.Text("Game Running Slowly: ");
             //ImGui.SameLine();
 
-            ImGui.Text("Camera Pos: ");
-            ImGui.SameLine();
             ImGui.Text(Setup.Camera.Position.ToString());
             /////
 

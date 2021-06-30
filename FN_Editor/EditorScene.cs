@@ -17,6 +17,9 @@ namespace FN_Engine.FN_Editor
             if (ImGui.IsMouseDragging(ImGuiMouseButton.Right))
                 Setup.Camera.Move(Input.MouseDelta(), 1);
 
+            if (ImGui.GetIO().KeyCtrl && Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.S))
+                SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
+
             //GameObject ChosenGO = SceneManager.ActiveScene.GameObjects[0];
             //if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && GameObjects_Tab.WhoIsSelected == null)
             //{

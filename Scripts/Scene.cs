@@ -217,6 +217,7 @@ namespace FN_Engine
 
             //FPS
             ImGui.Text(((int)(1.0f / (float)gameTime.ElapsedGameTime.TotalSeconds)).ToString());
+            ImGui.Text(Input.GetMousePosition().ToString());
 
             if (ImGui.BeginMainMenuBar())
             {
