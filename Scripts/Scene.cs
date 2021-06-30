@@ -226,7 +226,10 @@ namespace FN_Engine
                         SceneManager.SerializeScene("DefaultScene");
 
                     if (ImGui.MenuItem("Play"))
-                        Threader.Invoke(FN_Project.VisualizeEngineStartup.RunGame, 0);
+                    {
+                        SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
+                        Threader.Invoke(FN_Project.VisualizeEngineStartup.RunExecutable, 0);
+                    }
 
                     ImGui.EndMenu();
                 }
@@ -302,7 +305,7 @@ namespace FN_Engine
 
         public void SerializeV2(string Path = "")
         {
-            using (StreamWriter SW = new StreamWriter(Path + ".scene", false))
+            using (StreamWriter SW = new StreamWriter(Path + ".scene", false)) //Remember to serialize and deserialize Camera and RIR
             {
                 Utility.OIG = new System.Runtime.Serialization.ObjectIDGenerator();
 

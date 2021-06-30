@@ -1,3 +1,0 @@
-Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"C:/FN Engine CrossPlatform/FN_Engine/MyEngine/Content/LightTest.fx","C:/FN Engine CrossPlatform/FN_Engine/MyEngine/Content/bin/DesktopGL/Content/LightTest.xnb","EffectProcessor","CompiledEffectContent",4056,35140,2.145869
-"C:/FN Engine CrossPlatform/FN_Engine/MyEngine/Content/ShadowCasting.fx","C:/FN Engine CrossPlatform/FN_Engine/MyEngine/Content/bin/DesktopGL/Content/ShadowCasting.xnb","EffectProcessor","CompiledEffectContent",1843,1632,0.3828419

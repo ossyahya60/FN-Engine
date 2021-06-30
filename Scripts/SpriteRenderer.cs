@@ -70,12 +70,14 @@ namespace FN_Engine
                     LastEffect = Effect;
                 }
 
+                Vector2 FakeOrigin = (gameObject.Parent != null) ? -gameObject.Transform.Position + gameObject.Parent.Transform.Position + Sprite.Origin : Sprite.Origin;
+
                 Rectangle DestRect = Rectangle.Empty;
                 //spriteBatch.Draw(Sprite.Texture, Transform.Position, Sprite.SourceRectangle, Color, Transform.Rotation, Sprite.Origin, Transform.Scale, SpriteEffects, gameObject.Layer);
-                DestRect.Location = gameObject.Transform.Position.ToPoint();
+                DestRect.Location = (gameObject.Parent != null) ? gameObject.Parent.Transform.Position.ToPoint() : gameObject.Transform.Position.ToPoint();
                 DestRect.Width = (int)(Sprite.SourceRectangle.Width * gameObject.Transform.Scale.X);
                 DestRect.Height = (int)(Sprite.SourceRectangle.Height * gameObject.Transform.Scale.Y);
-                spriteBatch.Draw(Sprite.Texture, DestRect, Sprite.SourceRectangle, Color, gameObject.Transform.Rotation, Sprite.Origin, SpriteEffects, gameObject.Layer);
+                spriteBatch.Draw(Sprite.Texture, DestRect, Sprite.SourceRectangle, Color, gameObject.Transform.Rotation, FakeOrigin, SpriteEffects, gameObject.Layer);
                 //spriteBatch.Draw(Sprite.Texture, null, DestRect, Sprite.SourceRectangle, Sprite.Origin, gameObject.Transform.Rotation, Vector2.One, Color, SpriteEffects, gameObject.Layer);
             }
         }

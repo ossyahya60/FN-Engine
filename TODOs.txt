@@ -1,0 +1,6 @@
+1- Reload Assembly on change. #Done
+2- Fix Transform.
+3- Look into the security issue when copying file to a game.
+4- Hot Reloading?
+5- Game Should focus on startup.
+6- Remove then add changed components (Map variable values before adding the component).

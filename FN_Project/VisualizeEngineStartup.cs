@@ -9,6 +9,7 @@ namespace FN_Engine.FN_Project
     {
         public static string GamePath = "";
         public static bool NewProject = false;
+        public static string GameName = "";
 
         private static bool FirstTimeOnThisMachine = false;
         private static bool FirstBootUp = true;
@@ -81,6 +82,7 @@ namespace FN_Engine.FN_Project
             string NameSpaceName = Path.Substring(Path.LastIndexOf('\\') + 1);
             File.WriteAllText(Path + @"\" + NameSpaceName + ".csproj", GetTemplateProjFile());
             File.WriteAllText(Path + @"\" + "Game1.cs", GetTemplateMainFile(NameSpaceName));
+            GameName = NameSpaceName;
 
             string SourceDir = Environment.CurrentDirectory;
 
@@ -124,6 +126,8 @@ namespace FN_Engine.FN_Project
                 //"mgcb-editor " + "Content\\Content.mgcb" //Open MGCB Editor (Optional)
             };
 
+            GameName = Path.Split('\\')[(Path.Split('\\').Length - 1)];
+
             ExecuteCommand(OpenProj, Path);
         }
 
@@ -135,6 +139,18 @@ namespace FN_Engine.FN_Project
                 "cd " + GamePath, //Go to the existing directory
                 "dotnet build",
                 "dotnet run"
+            };
+
+            ExecuteCommand(RunGM, GamePath);
+        }
+
+        public static void RunExecutable()
+        {
+            string[] RunGM = new string[]
+            {
+                //"dotnet new -i MonoGame.Templates.CSharp::3.8.0.1641", //Download Template
+                "cd " + GamePath + "\\bin\\Debug\\netcoreapp3.1", //Go to the existing directory
+                "start " + GameName + ".exe"
             };
 
             ExecuteCommand(RunGM, GamePath);

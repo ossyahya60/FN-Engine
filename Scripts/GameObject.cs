@@ -204,7 +204,7 @@ namespace FN_Engine
             return null;
         }
 
-        public bool AddComponent<T>(T component) where T : GameObjectComponent  //Add a component to a gameobject
+        public bool AddComponent<T>(T component, int Index = -1) where T : GameObjectComponent  //Add a component to a gameobject
         {
             bool CanBeAdded = false;
             foreach (string s in CanBeAddedMultipleTimes)
@@ -214,7 +214,11 @@ namespace FN_Engine
             if (GameObjectComponents.Find(Item => Item.GetType() == component.GetType()) == null || CanBeAdded)
             {
                 component.gameObject = this;
-                GameObjectComponents.Insert(GameObjectComponents.Count, component);
+
+                if(Index < 0)
+                    GameObjectComponents.Insert(GameObjectComponents.Count, component);
+                else if(Index <= GameObjectComponents.Count)
+                    GameObjectComponents.Insert(Index, component);
 
                 return true;
             }

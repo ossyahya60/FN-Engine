@@ -39,7 +39,7 @@ namespace FN_Engine
                 GameObject[] GOs = gameObject.GetChildren();
 
                 foreach (GameObject GO in GOs)
-                    if(GO.Transform != null)
+                    if (GO.Transform != null)
                         GO.Transform.Position += (position - LastPosition);
             }
             get
@@ -191,42 +191,42 @@ namespace FN_Engine
 
         public void MoveX(float x) //Move a gameobject a certain distance in x
         {
-            Position += Vector2.UnitX * x;
+            LocalPosition += Vector2.UnitX * x;
         }
 
         public void MoveY(float y) //Move a gameobject a certain distance in y
         {
-            Position += Vector2.UnitY * y;
+            LocalPosition += Vector2.UnitY * y;
         }
 
         public void Move(float x, float y) //Move a gameobject a certain distance in x and y axis
         {
-            Position += Vector2.UnitX * x + Vector2.UnitY * y;
+            LocalPosition += Vector2.UnitX * x + Vector2.UnitY * y;
         }
 
         public void Move(Vector2 Movement) //Move a gameobject a certain distance in x and y axis
         {
-            Position += Movement;
+            LocalPosition += Movement;
         }
 
         public void ScaleX(float x) //Move a gameobject a certain distance in x
         {
-            Scale += Vector2.UnitX * x;
+            LocalScale += Vector2.UnitX * x;
         }
 
         public void ScaleY(float y) //Move a gameobject a certain distance in y
         {
-            Scale += Vector2.UnitY * y;
+            LocalScale += Vector2.UnitY * y;
         }
 
         public void ScaleBoth(float x, float y) //Move a gameobject a certain distance in x and y axis
         {
-            Scale += Vector2.UnitX * x + Vector2.UnitY * y;
+            LocalScale += Vector2.UnitX * x + Vector2.UnitY * y;
         }
 
         public void ScaleBoth(Vector2 scale) //Move a gameobject a certain distance in x and y axis
         {
-            Scale += scale;
+            LocalScale += scale;
         }
 
         public override void Destroy()

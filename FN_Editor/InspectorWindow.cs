@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Threading;
 
 namespace FN_Engine.FN_Editor
 {
@@ -28,7 +29,7 @@ namespace FN_Engine.FN_Editor
         private List<bool> ComponentsNotRemoved = new List<bool>();
         private object ValueToChange = null;
         private bool ComboChanged = false;
-        private DateTime LastExecWriteTime = DateTime.Now;
+        private static DateTime LastExecWriteTime = DateTime.MinValue;
 
         static InspectorWindow() //This should be called again on 'Hot reloading'
         {
@@ -44,12 +45,12 @@ namespace FN_Engine.FN_Editor
             where t.IsClass && t.Namespace == AssemblyName && t.BaseType == typeof(GameObjectComponent)
                     select t;
 
-            //ReloadAssemblyOnChange();
+            ReloadAssemblyOnChange();
 
-            Types.ToList().ForEach(item => ComponentsTypes.Add(item));
+            //Types.ToList().ForEach(item => ComponentsTypes.Add(item));
         }
 
-        public static void ReloadAssemblyOnChange()
+        public static void ReloadAssemblyOnChange() //I assume that the name of a .cs file is the same as the name of the class defined in it
         {
             //This line should be called everytime the game executes!
             try
@@ -57,7 +58,72 @@ namespace FN_Engine.FN_Editor
                 string AssemName = Assembly.GetExecutingAssembly().FullName;
                 string GamePath = FN_Project.VisualizeEngineStartup.GamePath;
                 Types = Types.Where(Item => Item.Assembly.FullName == AssemName);
-                Types = Types.Concat(from t in Assembly.LoadFrom(GamePath + "\\bin\\Debug\\netcoreapp3.1\\" + GamePath.Substring(GamePath.LastIndexOf('\\') + 1) + ".dll").GetTypes() where t.IsClass && t.BaseType.Name == typeof(GameObjectComponent).Name select t);
+
+                Thread.Sleep(500);
+                var GameAssem = Assembly.Load(File.ReadAllBytes(GamePath + "\\bin\\Debug\\netcoreapp3.1\\" + GamePath.Substring(GamePath.LastIndexOf('\\') + 1) + ".dll"));
+                Types = Types.Concat(from t in GameAssem.GetTypes() where t.IsClass && t.BaseType.Name == typeof(GameObjectComponent).Name select t);
+
+                //Get Dirty Classes
+                var DirtyTypes = Directory.GetFiles(FN_Project.VisualizeEngineStartup.GamePath, "*.cs", SearchOption.AllDirectories).Where(Item => File.GetLastWriteTime(Item) > LastExecWriteTime).ToList();
+                if (DirtyTypes != null && DirtyTypes.Count != 0)
+                {
+                    for (int i = 0; i < DirtyTypes.Count; i++)
+                    {
+                        DirtyTypes[i] = DirtyTypes[i].Substring(DirtyTypes[i].LastIndexOf('\\') + 1);
+                        DirtyTypes[i] = DirtyTypes[i].Remove(DirtyTypes[i].Length - 3, 3);
+                    }
+
+                    string GameAssemName = GameAssem.GetName().Name;
+                    DirtyTypes.RemoveAll(Item => GameAssem.GetType(GameAssemName + "." + Item, false) == null || GameAssem.GetType(GameAssemName + "." + Item, false).BaseType != typeof(GameObjectComponent));
+                }
+                else
+                    DirtyTypes = null;
+
+                if (DirtyTypes != null && SceneManager.ActiveScene != null)
+                {
+                    string GameAssemName = GameAssem.GetName().Name;
+                    foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
+                    {
+                        if (!GO.IsEditor)
+                        {
+                            GameObjectComponent[] GOCs = new GameObjectComponent[GO.GameObjectComponents.Count];
+                            GO.GameObjectComponents.CopyTo(GOCs);
+
+                            foreach (GameObjectComponent GOC in GOCs)
+                            {
+                                if (DirtyTypes.Contains(GOC.GetType().Name))
+                                {
+                                    var NewCompInst = Utility.GetInstance(GameAssem.GetType(GameAssemName + "." + GOC.GetType().Name)) as GameObjectComponent;
+                                    
+                                    foreach (FieldInfo FI in NewCompInst.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic |BindingFlags.Instance))
+                                    {
+                                        var Member = NewCompInst.GetType().GetField(FI.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+                                        var Val = GOC.GetType().GetField(FI.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                                        if (Member != null && Val != null)
+                                            Member.SetValue(NewCompInst, Val.GetValue(GOC));
+                                    }
+
+                                    foreach (PropertyInfo PI in NewCompInst.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                                    {
+                                        var Member = NewCompInst.GetType().GetProperty(PI.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+                                        var Val = GOC.GetType().GetProperty(PI.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                                        if (Member != null && Val != null && Member.SetMethod != null && Member.GetMethod != null)
+                                            Member.SetValue(NewCompInst, Val.GetValue(GOC));
+                                    }
+
+                                    int IndexOfGOC = GO.GameObjectComponents.IndexOf(GOC);
+                                    GO.RemoveComponent(GOC, false);
+                                    GO.AddComponent(NewCompInst, IndexOfGOC);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ComponentsTypes.Clear();
+                Types.ToList().ForEach(item => ComponentsTypes.Add(item));
             }
             catch(System.IO.FileNotFoundException) //Log Errors?
             {
@@ -87,11 +153,12 @@ namespace FN_Engine.FN_Editor
         {
             try
             {
-                //if (File.GetLastWriteTime("GameExecutablePath").CompareTo(LastExecWriteTime) > 0)
-                //{
-                //    LastExecWriteTime = File.GetLastWriteTime("GameExecutablePath");
-                //    ReloadAssemblyOnChange(
-                //}
+                var WriteTime = File.GetLastWriteTime(FN_Project.VisualizeEngineStartup.GamePath + "\\bin\\Debug\\netcoreapp3.1\\" + FN_Project.VisualizeEngineStartup.GameName + ".dll");
+                if (WriteTime.CompareTo(LastExecWriteTime) > 0)
+                {
+                    ReloadAssemblyOnChange();
+                    LastExecWriteTime = WriteTime;
+                }
             }
             catch (System.IO.FileNotFoundException) //Log Errors?
             {
