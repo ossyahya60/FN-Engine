@@ -1,9 +1,10 @@
 1- Reload Assembly on change. #Done
 2- Fix Transform.
 3- Look into the security issue when copying file to a game.
-4- Hot Reloading?
+4- Hot Reloading? #Done?
 5- Game Should focus on startup.
 6- Remove then add changed components (Map variable values before adding the component).
 7- Serializing Camera and RIR.
 8- Separate Cameras for scene and game.
-9- Fix Shadows
+9- Fix Shadows. #Done
+10- Optimize Transform memory?

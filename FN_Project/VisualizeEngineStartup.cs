@@ -124,7 +124,7 @@ namespace FN_Engine.FN_Project
             {
                 //"dotnet new -i MonoGame.Templates.CSharp::3.8.0.1641", //Download Template
                 "cd " + Path, //Go to the existing directory
-                "start " + SlnName
+                //"start " + SlnName
                 //"mgcb-editor " + "Content\\Content.mgcb" //Open MGCB Editor (Optional)
             };
 

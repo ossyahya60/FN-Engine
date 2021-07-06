@@ -197,8 +197,8 @@ namespace FN_Engine
 
         public static void Update(GameTime gameTime)
         {
-            if (!Setup.Game.IsActive) //Pause Game when minimized
-                return;
+            //if (!Setup.Game.IsActive) //Pause Game when minimized
+                //return;
 
             if (Input.GetKey(Keys.RightAlt) && Input.GetKeyUp(Keys.Enter))
                 Setup.graphics.ToggleFullScreen();
@@ -220,8 +220,8 @@ namespace FN_Engine
         {
             if (ActiveScene != null)
             {
-                if (!Setup.Game.IsActive) //Pause Game when minimized
-                    return;
+                //if (!Setup.Game.IsActive) //Pause Game when minimized
+                    //return;
 
                 if (ActiveScene.ShouldSort)
                 {

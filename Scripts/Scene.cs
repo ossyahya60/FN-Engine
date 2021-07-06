@@ -212,12 +212,16 @@ namespace FN_Engine
 
             GuiRenderer.BeforeLayout(gameTime); // Must be called prior to calling any ImGui controls
 
+            ImGui.GetIO().ConfigWindowsResizeFromEdges = true;
+
             //Move windows using title bar only
             ImGui.GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
             //FPS
             ImGui.Text(((int)(1.0f / (float)gameTime.ElapsedGameTime.TotalSeconds)).ToString());
             ImGui.Text(Input.GetMousePosition().ToString());
+
+            ImGui.ShowDemoWindow();
 
             if (ImGui.BeginMainMenuBar())
             {

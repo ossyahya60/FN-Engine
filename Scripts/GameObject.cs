@@ -1,8 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 
 namespace FN_Engine
 {
@@ -15,6 +14,14 @@ namespace FN_Engine
         {
             set
             {
+                if (parent != value)
+                {
+                    if (parent == null && value != null)
+                        Transform.JustParented = true;
+
+                    Transform.FakeTransform = null;
+                }
+
                 PrevParent = parent;
                 parent = value;
             }

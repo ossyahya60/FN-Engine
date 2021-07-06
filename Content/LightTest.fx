@@ -84,6 +84,10 @@ float4 MainPS(VertexShaderOutput input) : COLOR
                                         
                     float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
 
+					//New Shader
+					//SumColors[i].rgb += (color.rgb + Color[i]) * (Attenuation[i] * Dist * Dist * ShadowAttenuation);
+					
+					//Old Shader
                     SumColors[i].rgb += color.rgb * Color[i];
                     SumColors[i].rgb *= Attenuation[i] * Dist * Dist * ShadowAttenuation;
                     Dirty = true;
@@ -98,6 +102,10 @@ float4 MainPS(VertexShaderOutput input) : COLOR
                     
                     float Dist = ((Radius[i] - sqrt(Dist_SQ)) / Radius[i]);
 
+					//New Shader
+					//SumColors[i].rgb += (color.rgb + Color[i]) * ((InnerIntensity[i] * Attenuation[i] - (InnerIntensity[i] - 1) * Attenuation[i] * (sqrt(Dist_SQ) / InnerRadius[i])) * Dist * Dist * ShadowAttenuation);
+					
+					//Old Shader
                     SumColors[i].rgb += color.rgb * Color[i];
                     SumColors[i].rgb *= (InnerIntensity[i] * Attenuation[i] - (InnerIntensity[i] - 1) * Attenuation[i] * (sqrt(Dist_SQ) / InnerRadius[i])) * Dist * Dist * ShadowAttenuation;
                     Dirty = true;

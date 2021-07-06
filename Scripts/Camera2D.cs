@@ -107,7 +107,7 @@ namespace FN_Engine
 
                 _isViewTransformationDirty = false;
             }
-
+            
             return _transform;
         }
 

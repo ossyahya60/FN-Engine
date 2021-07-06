@@ -180,7 +180,7 @@ namespace FN_Engine
         protected override void Draw(GameTime gameTime)
         {
             SceneManager.Draw(gameTime);
-
+            
             base.Draw(gameTime);
         }
     }

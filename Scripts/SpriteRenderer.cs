@@ -1,8 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ImGuiNET;
 using System.IO;
-using System;
 
 namespace FN_Engine
 {
@@ -41,6 +40,8 @@ namespace FN_Engine
         public Color Color = Color.Aqua;
         public Effect Effect;
 
+        private Vector2 Pos = Vector2.Zero;
+
         static SpriteRenderer()
         {
             LastEffect = null;
@@ -70,16 +71,42 @@ namespace FN_Engine
                     LastEffect = Effect;
                 }
 
-                Vector2 FakeOrigin = (gameObject.Parent != null) ? -gameObject.Transform.Position + gameObject.Parent.Transform.Position + Sprite.Origin : Sprite.Origin;
+                Transform T = gameObject.Transform.FakeTransform;
+                if (gameObject.Parent != null)
+                {
+                    if (gameObject.Transform.JustParented)
+                    {
+                        gameObject.Transform.Position -= gameObject.Parent.Transform.Position;
+                        gameObject.Transform.Rotation -= gameObject.Parent.Transform.Rotation;
+                        gameObject.Transform.Scale /= gameObject.Parent.Transform.Scale;
+                        gameObject.Transform.JustParented = false;
+                    }
+
+                    T.Position += gameObject.Transform.Position - gameObject.Transform.LastPosition;
+                    T.Rotation += gameObject.Transform.Rotation - gameObject.Transform.LastRotation;
+                    T.Scale += gameObject.Transform.Scale - gameObject.Transform.LastScale;
+
+                    T = Transform.Compose(gameObject.Parent.Transform, T);
+
+                    T.CloneRelevantData(ref gameObject.Transform);
+                }
+
+                Pos = T.Position;
+                //Vector2 FakeOrigin = (gameObject.Parent != null) ? -gameObject.Transform.Position + gameObject.Parent.Transform.Position + Sprite.Origin : Sprite.Origin;
 
                 Rectangle DestRect = Rectangle.Empty;
                 //spriteBatch.Draw(Sprite.Texture, Transform.Position, Sprite.SourceRectangle, Color, Transform.Rotation, Sprite.Origin, Transform.Scale, SpriteEffects, gameObject.Layer);
-                DestRect.Location = (gameObject.Parent != null) ? gameObject.Parent.Transform.Position.ToPoint() : gameObject.Transform.Position.ToPoint();
-                DestRect.Width = (int)(Sprite.SourceRectangle.Width * gameObject.Transform.Scale.X);
-                DestRect.Height = (int)(Sprite.SourceRectangle.Height * gameObject.Transform.Scale.Y);
-                spriteBatch.Draw(Sprite.Texture, DestRect, Sprite.SourceRectangle, Color, gameObject.Transform.Rotation, FakeOrigin, SpriteEffects, gameObject.Layer);
+                DestRect.Location = T.Position.ToPoint();
+                DestRect.Width = (int)(Sprite.SourceRectangle.Width * T.Scale.X);
+                DestRect.Height = (int)(Sprite.SourceRectangle.Height * T.Scale.Y);
+                spriteBatch.Draw(Sprite.Texture, DestRect, Sprite.SourceRectangle, Color, T.Rotation, Sprite.Origin, SpriteEffects, gameObject.Layer);
                 //spriteBatch.Draw(Sprite.Texture, null, DestRect, Sprite.SourceRectangle, Sprite.Origin, gameObject.Transform.Rotation, Vector2.One, Color, SpriteEffects, gameObject.Layer);
             }
+        }
+
+        public override void DrawUI()
+        {
+            ImGui.Text(gameObject.Name + ": " + Pos.ToString());
         }
 
         public override GameObjectComponent DeepCopy(GameObject clone)
