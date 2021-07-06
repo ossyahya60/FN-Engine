@@ -453,7 +453,7 @@ namespace FN_Engine.FN_Editor
             {
                 if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                 {
-                    WhoIsSelected = null;
+                    //WhoIsSelected = null;
                     SelectedGOs.Clear();
                 }
 
