@@ -44,7 +44,7 @@ namespace FN_Engine.FN_Project
                 "dotnet new --install MonoGame.Templates.CSharp::3.8.0.1641"
             };
 
-            ExecuteCommand(Commands, "");
+            Utility.ExecuteCommand(Commands, "");
         }
 
         public static void MakeNewProject(string Path)
@@ -59,7 +59,7 @@ namespace FN_Engine.FN_Project
                 "dotnet sln add " + ProjName, //Add the project to the solution
             };
 
-            ExecuteCommand(MakeDesktopGLProj, Path);
+            Utility.ExecuteCommand(MakeDesktopGLProj, Path);
 
             string[] RunGame = new string[]
             {
@@ -68,7 +68,7 @@ namespace FN_Engine.FN_Project
                 "dotnet run"
             };
 
-            ExecuteCommand(RunGame, Path);
+            Utility.ExecuteCommand(RunGame, Path);
 
             //Copying DLLs
             string GameDebugDir = Path + "\\bin\\Debug\\netcoreapp3.1";
@@ -130,7 +130,7 @@ namespace FN_Engine.FN_Project
 
             GameName = Path.Split('\\')[(Path.Split('\\').Length - 1)];
 
-            ExecuteCommand(OpenProj, Path);
+            Utility.ExecuteCommand(OpenProj, Path);
         }
 
         public static void RunGame()
@@ -143,7 +143,7 @@ namespace FN_Engine.FN_Project
                 "dotnet run"
             };
 
-            ExecuteCommand(RunGM, GamePath);
+            Utility.ExecuteCommand(RunGM, GamePath);
         }
 
         public static void RunExecutable()
@@ -155,32 +155,7 @@ namespace FN_Engine.FN_Project
                 "start " + GameName + ".exe"
             };
 
-            ExecuteCommand(RunGM, GamePath);
-        }
-
-        // This function is from a stackoverflow question:
-        // URL: https://stackoverflow.com/questions/437419/execute-multiple-command-lines-with-the-same-process-using-net
-        public static void ExecuteCommand(string[] Commands, string Path)
-        {
-            string batFileName = Path + @"\" + Guid.NewGuid() + ".bat";
-
-            using (StreamWriter batFile = new StreamWriter(batFileName))
-            {
-                foreach (string Comm in Commands)
-                    batFile.WriteLine(Comm);
-            }
-
-            ProcessStartInfo processStartInfo = new ProcessStartInfo("cmd.exe", "/c " + batFileName);
-            processStartInfo.UseShellExecute = false;
-            processStartInfo.CreateNoWindow = true;
-            processStartInfo.WindowStyle = ProcessWindowStyle.Normal;
-
-            Process p = new Process();
-            p.StartInfo = processStartInfo;
-            p.Start();
-            p.WaitForExit();
-
-            File.Delete(batFileName);
+            Utility.ExecuteCommand(RunGM, GamePath);
         }
 
         private static string GetTemplateProjFile() //Edit this whenever you add a package to the engine, or change settings

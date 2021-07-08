@@ -60,6 +60,17 @@ namespace FN_Engine.FN_Editor
             ImGui.Begin(SceneManager.ActiveScene.Name);
 
             ///
+            if (MyRegion[1].Y != 0)
+            {
+                float DeltaSize = MyRegion[1].Y - ImGui.GetWindowSize().Y;
+
+                if (DeltaSize != 0)
+                {
+                    ImGui.SetWindowSize("Content Manager", ContentWindow.MyRegion[1] + new Vector2(0, DeltaSize));
+                    ImGui.SetWindowPos("Content Manager", ContentWindow.MyRegion[0] - new Vector2(0, DeltaSize));
+                }
+            }
+
             MyRegion[0] = ImGui.GetWindowPos();
             MyRegion[1] = ImGui.GetWindowSize();
             ///
@@ -402,6 +413,47 @@ namespace FN_Engine.FN_Editor
                     GameObject GO = new GameObject();
                     //GO.Name = Utility.UniqueGameObjectName("Unique Name");
                     GO.AddComponent(new Transform());
+                    GO.Transform = GO.GetComponent<Transform>();
+                    if (WhoIsSelected != null)
+                        WhoIsSelected.AddChild(GO);
+
+                    GO.Start();
+
+                    SceneManager.ActiveScene.AddGameObject_Recursive(GO);
+
+                    AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(GO, Operation.Create));
+                    Redo_Buffer.Clear();
+
+                    //Should sort game objects?
+                }
+
+                if (ImGui.Selectable("New Sprite"))
+                {
+                    GameObject GO = new GameObject();
+                    //GO.Name = Utility.UniqueGameObjectName("Unique Name");
+                    GO.AddComponent(new Transform());
+                    GO.AddComponent(new SpriteRenderer());
+                    GO.Transform = GO.GetComponent<Transform>();
+                    if (WhoIsSelected != null)
+                        WhoIsSelected.AddChild(GO);
+
+                    GO.Start();
+
+                    SceneManager.ActiveScene.AddGameObject_Recursive(GO);
+
+                    AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(GO, Operation.Create));
+                    Redo_Buffer.Clear();
+
+                    //Should sort game objects?
+                }
+
+                if (ImGui.Selectable("New Light"))
+                {
+                    GameObject GO = new GameObject();
+                    //GO.Name = Utility.UniqueGameObjectName("Unique Name");
+                    GO.AddComponent(new Transform());
+                    GO.AddComponent(new Light());
+                    GO.Transform = GO.GetComponent<Transform>();
                     if (WhoIsSelected != null)
                         WhoIsSelected.AddChild(GO);
 
@@ -451,9 +503,9 @@ namespace FN_Engine.FN_Editor
 
             if (ImGui.IsWindowHovered(ImGuiHoveredFlags.RootWindow) && !ImGui.IsAnyItemHovered())
             {
-                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && ImGui.IsWindowFocused())
                 {
-                    //WhoIsSelected = null;
+                    WhoIsSelected = null;
                     SelectedGOs.Clear();
                 }
 

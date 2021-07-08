@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.IO;
 
 namespace FN_Engine
@@ -71,25 +72,7 @@ namespace FN_Engine
                     LastEffect = Effect;
                 }
 
-                Transform T = gameObject.Transform.FakeTransform;
-                if (gameObject.Parent != null)
-                {
-                    if (gameObject.Transform.JustParented)
-                    {
-                        gameObject.Transform.Position -= gameObject.Parent.Transform.Position;
-                        gameObject.Transform.Rotation -= gameObject.Parent.Transform.Rotation;
-                        gameObject.Transform.Scale /= gameObject.Parent.Transform.Scale;
-                        gameObject.Transform.JustParented = false;
-                    }
-
-                    T.Position += gameObject.Transform.Position - gameObject.Transform.LastPosition;
-                    T.Rotation += gameObject.Transform.Rotation - gameObject.Transform.LastRotation;
-                    T.Scale += gameObject.Transform.Scale - gameObject.Transform.LastScale;
-
-                    T = Transform.Compose(gameObject.Parent.Transform, T);
-
-                    T.CloneRelevantData(ref gameObject.Transform);
-                }
+                Transform T = gameObject.Transform.AdjustTransformation();
 
                 Pos = T.Position;
                 //Vector2 FakeOrigin = (gameObject.Parent != null) ? -gameObject.Transform.Position + gameObject.Parent.Transform.Position + Sprite.Origin : Sprite.Origin;

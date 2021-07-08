@@ -23,6 +23,7 @@ namespace FN_Engine.FN_Editor
         private string ContentFolderDirectory = null;
         private List<IntPtr> TexIDs;
         private string AssName = "";
+        private HashSet<string> NotLoadedAssets = new HashSet<string>();
 
         public override void Start()
         {
@@ -86,6 +87,7 @@ namespace FN_Engine.FN_Editor
                         return;
 
                     string AssetName = AssetPath[AssetPath.Length - 1];
+
                     if (TexRegex.IsMatch(AssetName) || MusicRegex.IsMatch(AssetName) || ShaderRegex.IsMatch(AssetName))
                         File.Copy(Item, GameContentPath + "\\" + AssetName, true);
                     else
@@ -93,6 +95,8 @@ namespace FN_Engine.FN_Editor
 
                     DirectoryChanged = true;
                     Utility.BuildContentItem(GameContentPath + "\\" + AssetName);
+
+                    NotLoadedAssets.Remove(Item);
                 }
             }
         }
@@ -102,6 +106,25 @@ namespace FN_Engine.FN_Editor
             ImGui.Begin("Content Manager");
 
             ///
+            if (MyRegion[1].X != 0)
+            {
+                float DeltaSize = MyRegion[1].X - ImGui.GetWindowSize().X;
+
+                if (DeltaSize != 0)
+                {
+                    ImGui.SetWindowSize("Inspector", InspectorWindow.MyRegion[1] + new Vector2(DeltaSize, 0));
+                    ImGui.SetWindowPos("Inspector", InspectorWindow.MyRegion[0] - new Vector2(DeltaSize, 0));
+                }
+            }
+
+            if (MyRegion[1].Y != 0)
+            {
+                float DeltaSize = MyRegion[1].Y - ImGui.GetWindowSize().Y;
+
+                if (DeltaSize != 0)
+                    ImGui.SetWindowSize(SceneManager.ActiveScene.Name, GameObjects_Tab.MyRegion[1] + new Vector2(0, DeltaSize));
+            }
+
             MyRegion[0] = ImGui.GetWindowPos();
             MyRegion[1] = ImGui.GetWindowSize();
             ///
@@ -166,6 +189,8 @@ namespace FN_Engine.FN_Editor
 
             int Enumerator = 3;
 
+            ImGui.BeginChild("Assets");
+
             //Folders
             bool Entered = false;
             int ID_F = 0;
@@ -187,7 +212,8 @@ namespace FN_Engine.FN_Editor
                 ImGui.PopTextWrapPos();
                 ImGui.EndGroup();
 
-                ImGui.SameLine();
+                if(ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X)
+                    ImGui.SameLine();
             }
 
             if (Entered)
@@ -209,6 +235,9 @@ namespace FN_Engine.FN_Editor
             {
                 for (int i = 0; i < Files.Length; i++)
                 {
+                    if (NotLoadedAssets.Contains(Files[i]))
+                        continue;
+
                     string[] AssetPath = Files[i].Split('\\');
                     string AssetName = AssetPath[AssetPath.Length - 1];
 
@@ -221,8 +250,16 @@ namespace FN_Engine.FN_Editor
 
                     if (TexRegex.IsMatch(AssetName)) //Found a texture
                     {
-                        if (DirectoryChanged) //Rebuild content
-                            TexIDs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>(AssetLoadName)));
+                        try
+                        {
+                            if (DirectoryChanged) //Rebuild content
+                                TexIDs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>(AssetLoadName)));
+                        }
+                        catch(Microsoft.Xna.Framework.Content.ContentLoadException)
+                        {
+                            NotLoadedAssets.Add(Files[i]);
+                            continue;
+                        }
 
                         IntPtr ID = TexIDs[Enumerator++];
                         if (ImGui.ImageButton(ID, new Vector2(64.0f, 64.0f)))
@@ -300,7 +337,8 @@ namespace FN_Engine.FN_Editor
                         if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
                             ImGui.PopID();
 
-                        ImGui.SameLine();
+                        if (ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X)
+                            ImGui.SameLine();
                     }
                 }
             }
@@ -334,6 +372,8 @@ namespace FN_Engine.FN_Editor
             //}
 
             ImGui.EndChild();
+
+            ImGui.BeginChild("Assets");
 
             ImGui.End();
         }

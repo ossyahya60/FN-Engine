@@ -66,7 +66,7 @@ namespace FN_Engine
 
         // This Appoach is based on this example code from here:
         //URL: http://www.catalinzima.com/2011/06/2d-skeletal-animations/
-        public static Transform Compose(Transform a, Transform b)
+        public static Transform Compose(Transform a, Transform b) //Eats memory?
         {
             Transform Result = new Transform();
             Vector2 transformedPosition = a.TransformVector(b.Position);
@@ -81,6 +81,32 @@ namespace FN_Engine
             result.Position = Vector2.Lerp(key1.Position, key2.Position, amount);
             result.Scale = Vector2.Lerp(key1.Scale, key2.Scale, amount);
             result.Rotation = MathHelper.Lerp(key1.Rotation, key2.Rotation, amount);
+        }
+
+        //Call this function if you found that transform doesn't respond to change by parent transformations
+        public Transform AdjustTransformation()
+        {
+            Transform T = gameObject.Transform.FakeTransform;
+            if (gameObject.Parent != null)
+            {
+                if (gameObject.Transform.JustParented)
+                {
+                    Position -= gameObject.Parent.Transform.Position;
+                    Rotation -= gameObject.Parent.Transform.Rotation;
+                    Scale /= gameObject.Parent.Transform.Scale;
+                    JustParented = false;
+                }
+
+                T.Position += Position - LastPosition;
+                T.Rotation += Rotation - LastRotation;
+                T.Scale += gameObject.Transform.Scale - LastScale;
+
+                T = Compose(gameObject.Parent.Transform, T);
+
+                T.CloneRelevantData(ref gameObject.Transform);
+            }
+
+            return T;
         }
 
         public Vector2 TransformVector(Vector2 point)

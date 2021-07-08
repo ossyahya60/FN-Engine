@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace FN_Engine
 {
@@ -149,6 +150,31 @@ namespace FN_Engine
         public static object GetInstance(Type ObjectType)
         {
             return Activator.CreateInstance(ObjectType);
+        }
+
+        // This function is from a stackoverflow question:
+        // URL: https://stackoverflow.com/questions/437419/execute-multiple-command-lines-with-the-same-process-using-net
+        public static void ExecuteCommand(string[] Commands, string Path)
+        {
+            string batFileName = Path + @"\" + Guid.NewGuid() + ".bat";
+
+            using (StreamWriter batFile = new StreamWriter(batFileName))
+            {
+                foreach (string Comm in Commands)
+                    batFile.WriteLine(Comm);
+            }
+
+            ProcessStartInfo processStartInfo = new ProcessStartInfo("cmd.exe", "/c " + batFileName);
+            processStartInfo.UseShellExecute = false;
+            processStartInfo.CreateNoWindow = true;
+            processStartInfo.WindowStyle = ProcessWindowStyle.Normal;
+
+            Process p = new Process();
+            p.StartInfo = processStartInfo;
+            p.Start();
+            p.WaitForExit();
+
+            File.Delete(batFileName);
         }
 
         public static void SerializeV2(JsonTextWriter JW, object OBJ, bool ShouldWriteValue = false)

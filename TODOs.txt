@@ -1,6 +1,6 @@
 1- Reload Assembly on change. #Done
-2- Fix Transform. #Done
-3- Look into the security issue when copying file to a game.
+2- Fix Transform. # NOT Done
+3- Look into the security issue when copying file to a game. (Make antivirus give access to the engine)
 4- Hot Reloading? #Done?
 5- Game Should focus on startup.
 6- Remove then add changed components (Map variable values before adding the component).#Done

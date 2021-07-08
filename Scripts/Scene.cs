@@ -221,8 +221,6 @@ namespace FN_Engine
             ImGui.Text(((int)(1.0f / (float)gameTime.ElapsedGameTime.TotalSeconds)).ToString());
             ImGui.Text(Input.GetMousePosition().ToString());
 
-            ImGui.ShowDemoWindow();
-
             if (ImGui.BeginMainMenuBar())
             {
                 if (ImGui.BeginMenu("File"))

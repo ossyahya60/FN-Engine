@@ -259,6 +259,7 @@ namespace FN_Engine
                 if (LIGHTS[i].Enabled == false || LIGHTS[i].gameObject.IsActive() == false)
                     continue;
 
+                LIGHTS[i].gameObject.Transform.AdjustTransformation();
                 COLOR[i] = LIGHTS[i].color.ToVector3();
                 InnerRadius[i] = MathHelper.Clamp(LIGHTS[i].InnerRadius, 0, LIGHTS[i].OuterRadius) * Setup.Camera.Zoom;
                 Radius[i] = MathHelper.Clamp(LIGHTS[i].OuterRadius, 0, 1) * Setup.Camera.Zoom;

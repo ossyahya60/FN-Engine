@@ -112,6 +112,7 @@ namespace FN_Engine
             Setup.SourceFilePath = Environment.CurrentDirectory;
             Setup.IntermediateFilePath = Setup.SourceFilePath + @"\obj\DesktopGL";
             Setup.OutputFilePath = WorkingDirectory + @"\bin\Debug\netcoreapp3.1\Content";
+            Content.RootDirectory = Setup.OutputFilePath;
 
             Setup.ConfigurePipelineMG();
 
@@ -122,6 +123,7 @@ namespace FN_Engine
 
                 GameObject GO = new GameObject(true);
                 GO.Name = "EditorGameObject";
+                GO.Layer = -1;
                 GO.AddComponent(new FN_Editor.GameObjects_Tab());
                 GO.AddComponent(new FN_Editor.InspectorWindow());
                 GO.AddComponent(new FN_Editor.ContentWindow());

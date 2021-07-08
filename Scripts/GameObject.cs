@@ -347,13 +347,14 @@ namespace FN_Engine
             Clone.Active = GO.Active;
             Clone.Layer = GO.Layer;
             Clone.Name = GO.Name;
+
+            for (int i = 0; i < GO.GameObjectComponents.Count; i++)
+                Clone.AddComponent(GO.GameObjectComponents[i].DeepCopy(Clone));
+
             if (GO.Parent != null)
                 GO.Parent.AddChild(Clone);
             else
                 Clone.Parent = null;
-
-            for (int i = 0; i < GO.GameObjectComponents.Count; i++)
-                Clone.AddComponent<GameObjectComponent>(GO.GameObjectComponents[i].DeepCopy(Clone));
 
             SceneManager.ActiveScene.AddGameObject_Recursive(Clone);
 
@@ -369,13 +370,14 @@ namespace FN_Engine
             Clone.Tag = GO.Tag;
             Clone.Active = GO.Active;
             Clone.Layer = GO.Layer;
+
+            for (int i = 0; i < GO.GameObjectComponents.Count; i++)
+                Clone.AddComponent<GameObjectComponent>(GO.GameObjectComponents[i].DeepCopy(Clone));
+
             if (parent != null)
                 parent.AddChild(Clone);
             else
                 Clone.Parent = null;
-
-            for (int i = 0; i < GO.GameObjectComponents.Count; i++)
-                Clone.AddComponent<GameObjectComponent>(GO.GameObjectComponents[i].DeepCopy(Clone));
 
             SceneManager.ActiveScene.AddGameObject_Recursive(Clone);
 
@@ -397,13 +399,14 @@ namespace FN_Engine
                     ChildClone.Tag = Child.Tag;
                     ChildClone.Active = Child.Active;
                     ChildClone.Layer = Child.Layer;
+
+                    for (int i = 0; i < Child.GameObjectComponents.Count; i++)
+                        ChildClone.AddComponent<GameObjectComponent>(Child.GameObjectComponents[i].DeepCopy(ChildClone));
+
                     if (Parent != null)
                         Parent.AddChild(ChildClone);
                     else
                         ChildClone.Parent = null;
-
-                    for (int i = 0; i < Child.GameObjectComponents.Count; i++)
-                        ChildClone.AddComponent<GameObjectComponent>(Child.GameObjectComponents[i].DeepCopy(ChildClone));
 
                     SceneManager.ActiveScene.AddGameObject_Recursive(ChildClone);
 

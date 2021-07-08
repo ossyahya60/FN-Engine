@@ -168,6 +168,17 @@ namespace FN_Engine.FN_Editor
             ImGui.Begin("Inspector");
 
             ///
+            if (MyRegion[1].X != 0)
+            {
+                float DeltaSize = MyRegion[1].X - ImGui.GetWindowSize().X;
+
+                if (DeltaSize != 0 && ImGui.IsWindowFocused())
+                {
+                    ImGui.SetWindowSize("Content Manager", ContentWindow.MyRegion[1] + new Vector2(DeltaSize, 0));
+                    //ImGui.SetWindowPos("Content Manager", ContentWindow.MyRegion[0] + new Vector2(DeltaSize, 0));
+                }
+            }
+
             MyRegion[0] = ImGui.GetWindowPos();
             MyRegion[1] = ImGui.GetWindowSize();
             ///
