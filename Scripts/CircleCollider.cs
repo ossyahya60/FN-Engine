@@ -5,19 +5,31 @@ namespace FN_Engine
 {
     public class CircleCollider : GameObjectComponent, Collider2D
     {
+        public bool CenteredOrigin = true;
         public bool isTrigger = true;
         public int Radius = 50;
         public Vector2 Center
         {
+            set
+            {
+                center = value;
+            }
             get
             {
-                var SR = gameObject.GetComponent<SpriteRenderer>();
-                if (SR == null)
-                    return gameObject.Transform.Position + Radius * Vector2.One;
-                else
-                    return gameObject.Transform.Position + SR.Sprite.Origin;
+                if (CenteredOrigin)
+                {
+                    var SR = gameObject.GetComponent<SpriteRenderer>();
+                    if (SR == null)
+                        return gameObject.Transform.Position;
+                    else
+                        return gameObject.Transform.Position;
+                }
+
+                return center;
             }
         }
+
+        private Vector2 center = Vector2.Zero;
 
         public CircleCollider(int Radius)
         {
@@ -50,14 +62,28 @@ namespace FN_Engine
             {
                 Rectangle TempCollider = (collider as BoxCollider2D).GetDynamicCollider();
 
-                if (MathCompanion.Abs(gameObject.Transform.Position.X - TempCollider.Center.X) > Radius + TempCollider.Width/2)
+                if (MathCompanion.Abs(Center.X - TempCollider.Center.X) > Radius + TempCollider.Width/2)
                     return false;
 
-                if (MathCompanion.Abs(gameObject.Transform.Position.Y - TempCollider.Center.Y) > Radius + TempCollider.Height/2)
+                if (MathCompanion.Abs(Center.Y - TempCollider.Center.Y) > Radius + TempCollider.Height/2)
                     return false;
             }
 
             return true;
+        }
+
+        public bool CollisionDetection(Collider2D collider, bool Continous)
+        {
+            return IsTouching(collider);
+        }
+
+        public void CollisionResponse(Rigidbody2D RB, Collider2D collider, bool Continous, float DeltaTime, Vector2 CollisionPos) //change this
+        {
+            if (!Continous && !isTrigger)
+            {
+                gameObject.Transform.Move(-RB.Velocity.X * DeltaTime, -RB.Velocity.Y * DeltaTime);
+                RB.Velocity = Vector2.Zero;
+            }
         }
 
         public bool IsTrigger()
@@ -85,6 +111,12 @@ namespace FN_Engine
             throw new System.NotImplementedException();
         }
 
+        void Collider2D.Visualize(float X_Bias, float Y_Bias)
+        {
+            if (Enabled)
+                HitBoxDebuger.DrawCircle(Center + new Vector2(X_Bias, Y_Bias), Radius);
+        }
+
         public override GameObjectComponent DeepCopy(GameObject Clone)
         {
             CircleCollider clone = this.MemberwiseClone() as CircleCollider;
@@ -101,16 +133,6 @@ namespace FN_Engine
             SW.Write("Radius:\t" + Radius.ToString() + "\n");
 
             SW.WriteLine("End Of " + ToString());
-        }
-
-        public GameObjectComponent ReturnGOC()
-        {
-            return this;
-        }
-
-        public void Visualize(float X_Bias = 0, float Y_Bias = 0)
-        {
-            HitBoxDebuger.DrawCircle(Center + new Vector2(X_Bias, Y_Bias), Radius);
         }
     }
 }

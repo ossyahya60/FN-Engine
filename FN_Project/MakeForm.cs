@@ -20,6 +20,7 @@ namespace FN_Engine.FN_Project
 
                     if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
+                        VisualizeEngineStartup.GamePath = fbd.SelectedPath;
                         if (Directory.GetFiles(fbd.SelectedPath).Length == 0 && Directory.GetDirectories(fbd.SelectedPath).Length == 0) // Make New Project
                             VisualizeEngineStartup.MakeNewProject(fbd.SelectedPath);
                         else

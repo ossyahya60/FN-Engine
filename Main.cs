@@ -14,7 +14,6 @@ namespace FN_Engine
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        ResolutionIndependentRenderer RIR;
         Camera2D Camera;
         ////////<Variables>/////
         public static SpriteFont spriteFont;
@@ -24,7 +23,6 @@ namespace FN_Engine
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            RIR = new ResolutionIndependentRenderer(this);
 
             // use reflection to figure out if Shader.Profile is OpenGL (0) or DirectX (1)
             //var mgAssembly = Assembly.GetAssembly(typeof(Game));
@@ -32,9 +30,8 @@ namespace FN_Engine
             //var profileProperty = shaderType.GetProperty("Profile");
             //var value = (int)profileProperty.GetValue(null);
             //var extension = value == 1 ? "dx11" : "ogl";
-
             IsMouseVisible = true;
-            Window.AllowUserResizing = true;
+            Window.AllowUserResizing = false;
         }
 
         /// <summary>
@@ -59,23 +56,23 @@ namespace FN_Engine
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            graphics.PreferredBackBufferWidth = 1366;
-            graphics.PreferredBackBufferHeight = 768;
-            //graphics.IsFullScreen = true;
-            graphics.ApplyChanges();
 
-            RIR.VirtualWidth = graphics.PreferredBackBufferWidth;
-            RIR.VirtualHeight = graphics.PreferredBackBufferHeight;
             /////////Camera And Resolution Independent Renderer/////// -> Mandatory
             Camera = new Camera2D();
             Camera.Zoom = 1f;
 
-            //You should look at this when deserializing scene for a game! (Note for the Engine Programmer)
-            //Camera.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
+            Setup.Initialize(graphics, Content, spriteBatch, Window, Camera, this);
 
-            Setup.Initialize(graphics, Content, spriteBatch, RIR, Window, Camera, this);
+            ResolutionIndependentRenderer.Init(ref graphics);
+            ResolutionIndependentRenderer.SetResolution(1366, 768, false);
+            ResolutionIndependentRenderer.SetVirtualResolution(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
 
-            RIR.InitializeResolutionIndependence(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, Camera);
+            Exiting += SerializeBeforeExit;
+        }
+
+        private void SerializeBeforeExit(object sender, EventArgs args)
+        {
+            SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
         }
 
         /// <summary>
@@ -84,8 +81,8 @@ namespace FN_Engine
         /// </summary>
         protected override void LoadContent()
         {
+            SceneManager.ShouldUpdate = true;
             ImportantIntialization();
-            RIR.BackgroundColor = Color.Transparent;
 
             Setup.Content.Load<SpriteFont>("Font");
 
@@ -130,7 +127,13 @@ namespace FN_Engine
                 GO.AddComponent(new FN_Editor.GizmosVisualizer());
                 GO.AddComponent(new FN_Editor.EditorScene());
 
+                GameObject CamerContr = new GameObject();
+                CamerContr.Name = "Camera Controller";
+                CamerContr.AddComponent(new Transform());
+                CamerContr.AddComponent(new CameraController());
+
                 SceneManager.ActiveScene.AddGameObject_Recursive(GO);
+                SceneManager.ActiveScene.AddGameObject_Recursive(CamerContr);
 
                 SceneManager.Initialize();
 

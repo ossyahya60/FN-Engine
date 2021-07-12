@@ -19,7 +19,7 @@ namespace FN_Engine
     public class Rigidbody2D: GameObjectComponent
     {
         public bool KinematicToKinematicCollisionDetection = false;
-        public bool AffectedByGravity;
+        public bool AffectedByGravity = true;
         public bool Interpolate = false; //Might be supported in the future (Interpolation between frames for smoothness during high speeds
         public bool ConstraintHorizontalMovement = false;
         public bool ConstraintVerticalMovement = false;
@@ -32,12 +32,7 @@ namespace FN_Engine
 
         private float GravityConstant = 10; //Universal gravitational constant (Approximated to 10 for easiness)
         private bool Sleeping = false;
-        private double DeltaTime = 1.0f / 60;
-
-        public Rigidbody2D()
-        {
-            AffectedByGravity = true;
-        }
+        private float DeltaTime = 1.0f / 60;
 
         public override void Start()
         {
@@ -45,7 +40,7 @@ namespace FN_Engine
 
         public override void Update(GameTime gameTime)
         {
-            DeltaTime = gameTime.ElapsedGameTime.TotalSeconds;
+            DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             switch (BodyType)
             {
@@ -56,13 +51,10 @@ namespace FN_Engine
                     break;
                 case BodyType.Dynamic: //affected by everything :D =>This one checks collision only
                     {
-                        float DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
                         //Check collision here
 
                         if (AffectedByGravity)
-                            Velocity.Y += GravityConstant * GravityScale * DeltaTime;
-
-                        Velocity -= LinearDragScale * DeltaTime * Velocity;
+                            Velocity.Y += GravityConstant * GravityScale;
 
                         gameObject.Transform.Position += Velocity * DeltaTime;
                     }
@@ -81,9 +73,14 @@ namespace FN_Engine
                 default:
                     break;
             }
+
+            if (ConstraintHorizontalMovement)
+                Velocity.X = 0;
+            if (ConstraintVerticalMovement)
+                Velocity.Y = 0;
         }
 
-        public void AddForce(Vector2 Value, ForceMode2D Mode)
+        public void AddForce(Vector2 Value, ForceMode2D Mode = ForceMode2D.Force)
         {
             if (BodyType == BodyType.Dynamic) //Forces affect dynamic rigidbodies only
             {
@@ -91,7 +88,7 @@ namespace FN_Engine
                 {
                     case ForceMode2D.Force:
                         // Force = Mass * Acceleration, => F = Mass * dV/dt, then dV = F * dt / Mass
-                        Velocity += Value * (float)DeltaTime / Mass;
+                        Velocity += Value * DeltaTime / Mass;
                         break;
                     case ForceMode2D.Impulse:
                         // Adds to the velocity of the rigidbody directly!
@@ -100,15 +97,6 @@ namespace FN_Engine
                     default:
                         break;
                 }
-            }
-        }
-
-        public void AddForce(Vector2 Value)
-        {
-            if (BodyType == BodyType.Dynamic) //Forces affect dynamic rigidbodies only
-            {
-                // Force = Mass * Acceleration, => F = Mass * dV/dt, then dV = F * dt / Mass
-                Velocity += Value * (float)DeltaTime / Mass;
             }
         }
 

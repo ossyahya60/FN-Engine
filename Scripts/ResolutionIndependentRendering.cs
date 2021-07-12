@@ -1,135 +1,205 @@
-﻿using Microsoft.Xna.Framework;
+﻿//////////////////////////////////////////////////////////////////////////
+////License:  The MIT License (MIT)
+////Copyright (c) 2010 David Amador (http://www.david-amador.com)
+////
+////Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+////
+////The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+////
+////THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//////////////////////////////////////////////////////////////////////////
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace FN_Engine
-{/// <summary>
-/// //////This code is not mine
-/// The URL: http://blog.roboblob.com/2013/07/27/solving-resolution-independent-rendering-and-2d-camera-using-monogame/comment-page-1/
-/// </summary>
-    public class ResolutionIndependentRenderer
+{
+    static public class ResolutionIndependentRenderer
     {
-        private readonly Game _game;
-        private Viewport _viewport;
-        private float _ratioX;
-        private float _ratioY;
-        private Vector2 _virtualMousePosition = new Vector2();
+        static private GraphicsDeviceManager _Device = null;
 
-        public Color BackgroundColor = Color.Black;
+        static private int _Width = 800;
+        static private int _Height = 600;
+        static private int _VWidth = 1024;
+        static private int _VHeight = 768;
+        static private Matrix _ScaleMatrix;
+        static private bool _FullScreen = false;
+        static private bool _dirtyMatrix = true;
 
-        public void InitializeResolutionIndependence(int realScreenWidth, int realScreenHeight, Camera2D _camera) //This function is called whenever resolution or screen changes
+        static public void Init(ref GraphicsDeviceManager device)
         {
-            //VirtualWidth = 1366;
-            //VirtualHeight = 768;
-            ScreenWidth = realScreenWidth;
-            ScreenHeight = realScreenHeight;
-            Initialize();
+            _Width = device.PreferredBackBufferWidth;
+            _Height = device.PreferredBackBufferHeight;
+            _Device = device;
+            _dirtyMatrix = true;
+            ApplyResolutionSettings();
 
-            _camera.RecalculateTransformationMatrices();
+            Setup.Camera.RecalculateTransformationMatrices();
         }
 
-        public ResolutionIndependentRenderer(Game game)
+        static public Vector2 GetVirtualRes()
         {
-            _game = game;
-            VirtualWidth = 1366;
-            VirtualHeight = 768;
-
-            ScreenWidth = 1024;
-            ScreenHeight = 768;
+            return new Vector2(_VWidth, _VHeight);
         }
 
-        public int VirtualHeight;
 
-        public int VirtualWidth;
-
-        public int ScreenWidth;
-        public int ScreenHeight;
-
-        public void Initialize()
+        static public Matrix getTransformationMatrix()
         {
-            SetupVirtualScreenViewport();
+            if (_dirtyMatrix) RecreateScaleMatrix();
 
-            _ratioX = (float)_viewport.Width / VirtualWidth;
-            _ratioY = (float)_viewport.Height / VirtualHeight;
+            return _ScaleMatrix;
+        }
+
+        static public void SetResolution(int Width, int Height, bool FullScreen)
+        {
+            _Width = Width;
+            _Height = Height;
+
+            _FullScreen = FullScreen;
+
+            ApplyResolutionSettings();
+        }
+
+        static public void SetVirtualResolution(int Width, int Height)
+        {
+            _VWidth = Width;
+            _VHeight = Height;
 
             _dirtyMatrix = true;
         }
 
-        public void SetupFullViewport()
+        static private void ApplyResolutionSettings()
         {
-            var vp = new Viewport();
-            vp.X = vp.Y = 0;
-            vp.Width = ScreenWidth;
-            vp.Height = ScreenHeight;
-            _game.GraphicsDevice.Viewport = vp;
+
+#if XBOX360
+           _FullScreen = true;
+#endif
+
+            // If we aren't using a full screen mode, the height and width of the window can
+            // be set to anything equal to or smaller than the actual screen size.
+            if (_FullScreen == false)
+            {
+                if ((_Width <= GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width)
+                    && (_Height <= GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height))
+                {
+                    _Device.PreferredBackBufferWidth = _Width;
+                    _Device.PreferredBackBufferHeight = _Height;
+                    _Device.IsFullScreen = _FullScreen;
+                    _Device.ApplyChanges();
+                }
+            }
+            else
+            {
+                // If we are using full screen mode, we should check to make sure that the display
+                // adapter can handle the video mode we are trying to set.  To do this, we will
+                // iterate through the display modes supported by the adapter and check them against
+                // the mode we want to set.
+                foreach (DisplayMode dm in GraphicsAdapter.DefaultAdapter.SupportedDisplayModes)
+                {
+                    // Check the width and height of each mode against the passed values
+                    if ((dm.Width == _Width) && (dm.Height == _Height))
+                    {
+                        // The mode is supported, so set the buffer formats, apply changes and return
+                        _Device.PreferredBackBufferWidth = _Width;
+                        _Device.PreferredBackBufferHeight = _Height;
+                        _Device.IsFullScreen = _FullScreen;
+                        _Device.ApplyChanges();
+                    }
+                }
+            }
+
             _dirtyMatrix = true;
+
+            _Width = _Device.PreferredBackBufferWidth;
+            _Height = _Device.PreferredBackBufferHeight;
         }
 
-        public void BeginDraw()
+        /// <summary>
+        /// Sets the device to use the draw pump
+        /// Sets correct aspect ratio
+        /// </summary>
+        static public void BeginDraw()
         {
             // Start by reseting viewport to (0,0,1,1)
-            SetupFullViewport();
+            FullViewport();
             // Clear to Black
-            //_game.GraphicsDevice.Clear(BackgroundColor);
+            //_Device.GraphicsDevice.Clear(Color.Black);
             // Calculate Proper Viewport according to Aspect Ratio
-            SetupVirtualScreenViewport();
+            ResetViewport();
             // and clear that
             // This way we are gonna have black bars if aspect ratio requires it and
             // the clear color on the rest
+            _Device.GraphicsDevice.Clear(Color.CornflowerBlue);
         }
 
-        public bool RenderingToScreenIsFinished;
-        private static Matrix _scaleMatrix;
-        private bool _dirtyMatrix = true;
-
-        public Matrix GetTransformationMatrix()
+        static private void RecreateScaleMatrix()
         {
-            if (_dirtyMatrix)
-                RecreateScaleMatrix();
-
-            return _scaleMatrix;
-        }
-
-        private void RecreateScaleMatrix()
-        {
-            Matrix.CreateScale((float)ScreenWidth / VirtualWidth, (float)ScreenWidth / VirtualWidth, 1f, out _scaleMatrix);
             _dirtyMatrix = false;
+            _ScaleMatrix = Matrix.CreateScale(
+                           (float)_Device.GraphicsDevice.Viewport.Width / _VWidth,
+                           (float)_Device.GraphicsDevice.Viewport.Width / _VWidth,
+                           1f);
         }
 
-        public Vector2 ScaleMouseToScreenCoordinates(Vector2 screenPosition)
+
+        static public void FullViewport()
         {
-            var realX = screenPosition.X - _viewport.X;
-            var realY = screenPosition.Y - _viewport.Y;
-
-            _virtualMousePosition.X = realX / _ratioX;
-            _virtualMousePosition.Y = realY / _ratioY;
-
-            return _virtualMousePosition;
+            Viewport vp = new Viewport();
+            vp.X = vp.Y = 0;
+            vp.Width = _Width;
+            vp.Height = _Height;
+            _Device.GraphicsDevice.Viewport = vp;
         }
 
-        public void SetupVirtualScreenViewport()
+        /// <summary>
+        /// Get virtual Mode Aspect Ratio
+        /// </summary>
+        /// <returns>aspect ratio</returns>
+        static public float getVirtualAspectRatio()
         {
-            var targetAspectRatio = VirtualWidth / (float)VirtualHeight;
+            return (float)_VWidth / (float)_VHeight;
+        }
+
+        static public void ResetViewport()
+        {
+            float targetAspectRatio = getVirtualAspectRatio();
             // figure out the largest area that fits in this resolution at the desired aspect ratio
-            var width = ScreenWidth;
-            var height = (int)(width / targetAspectRatio + .5f);
+            int width = _Device.PreferredBackBufferWidth;
+            int height = (int)(width / targetAspectRatio + .5f);
+            bool changed = false;
 
-            if (height > ScreenHeight)
+            if (height > _Device.PreferredBackBufferHeight)
             {
-                height = ScreenHeight;
+                height = _Device.PreferredBackBufferHeight;
                 // PillarBox
                 width = (int)(height * targetAspectRatio + .5f);
+                changed = true;
             }
 
             // set up the new viewport centered in the backbuffer
-            _viewport = new Viewport
-            {
-                X = (ScreenWidth / 2) - (width / 2),
-                Y = (ScreenHeight / 2) - (height / 2),
-                Width = width,
-                Height = height
-            };
+            Viewport viewport = new Viewport();
 
-            _game.GraphicsDevice.Viewport = _viewport;
+            viewport.X = (_Device.PreferredBackBufferWidth / 2) - (width / 2);
+            viewport.Y = (_Device.PreferredBackBufferHeight / 2) - (height / 2);
+            viewport.Width = width;
+            viewport.Height = height;
+            viewport.MinDepth = 0;
+            viewport.MaxDepth = 1;
+
+            if (changed)
+            {
+                _dirtyMatrix = true;
+            }
+
+            _Device.GraphicsDevice.Viewport = viewport;
+        }
+
+        static public Vector2 ScaleMouseToScreenCoordinates(Vector2 screenPosition)
+        {
+            var realX = screenPosition.X - _Device.GraphicsDevice.Viewport.X;
+            var realY = screenPosition.Y - _Device.GraphicsDevice.Viewport.Y;
+
+            return new Vector2(realX / ((float)_Device.GraphicsDevice.Viewport.Width / _VWidth), realY / ((float)_Device.GraphicsDevice.Viewport.Height / _VHeight));
         }
     }
 }

@@ -151,10 +151,7 @@ namespace FN_Engine
 
         public static Vector2 GetMousePosition()
         {
-            Vector2 Temp = Vector2.One;
-            Temp.X = Setup.resolutionIndependentRenderer.VirtualWidth;
-            Temp.Y = Setup.resolutionIndependentRenderer.VirtualHeight;
-            return MathCompanion.Clamp(Setup.resolutionIndependentRenderer.ScaleMouseToScreenCoordinates(Mouse.GetState().Position.ToVector2()), Vector2.Zero, Temp);
+            return ResolutionIndependentRenderer.ScaleMouseToScreenCoordinates(Mouse.GetState().Position.ToVector2());
         }
 
         public static bool TouchDown()

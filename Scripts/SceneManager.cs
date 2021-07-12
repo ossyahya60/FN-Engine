@@ -155,6 +155,10 @@ namespace FN_Engine
         {
             if (ActiveScene != null)
             {
+                var CamCont = ActiveScene.FindGameObjectWithName("Camera Controller").GetComponent<CameraController>();
+                bool StoredVal = CamCont.Visualize;
+                CamCont.Visualize = false;
+
                 GameObject EditorGameObject = null;
                 if (FN_Editor.EditorScene.IsThisTheEditor)
                 {
@@ -169,6 +173,8 @@ namespace FN_Engine
                 }
                 else
                     ActiveScene.SerializeV2(Path);
+
+                CamCont.Visualize = StoredVal;
             }
         }
 
@@ -205,7 +211,7 @@ namespace FN_Engine
 
             /////////Resolution related//////////// -> Mandatory
             if (Resolution != new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight))
-                Setup.resolutionIndependentRenderer.InitializeResolutionIndependence(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, Setup.Camera);
+                ResolutionIndependentRenderer.Init(ref Setup.graphics);
 
             Resolution = new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
 
@@ -231,7 +237,7 @@ namespace FN_Engine
 
                 ///
                 Light.Init_Light();
-                Setup.resolutionIndependentRenderer.BeginDraw(); //Resolution related -> Mandatory
+                ResolutionIndependentRenderer.BeginDraw(); //Resolution related -> Mandatory
 
                 Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix()); // -> Mandatory
                 SpriteRenderer.LastEffect = null; // This should be the same effect as in the begin method above

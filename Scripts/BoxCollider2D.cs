@@ -1,98 +1,117 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.IO;
 
 namespace FN_Engine
 {
     public class BoxCollider2D : GameObjectComponent, Collider2D
     {
-        public BoxCollider2D()
-        {
-            bounds = new Rectangle(0, 0, 0, 0);
-        }
-
-        public Rectangle Bounds
-        {
-            set
-            {
-                bounds = value;
-            }
-            get
-            {
-                return new Rectangle(bounds.X, bounds.Y, (int)(bounds.Width), (int)(bounds.Height));
-            }
-        }
         public bool isTrigger = false;
-
-        private double GameTime = 1.0f / 60;
-        private Rectangle bounds;
-        private Vector2 PrevScale;
-        //private float DisplaceMagnitude = 0.01f; //1 pixel
+        public bool SlideCollision = true;
+        public Rectangle Bounds;
 
         public Rectangle GetDynamicCollider()
         {
             Rectangle HandyRectangle = Rectangle.Empty;
-            HandyRectangle.X = (int)(gameObject.Transform.Position.X + Bounds.X);
-            HandyRectangle.Y = (int)(gameObject.Transform.Position.Y + Bounds.Y);
-            HandyRectangle.Width = Bounds.Width;
-            HandyRectangle.Height = Bounds.Height;
+            HandyRectangle.X = (int)(gameObject.Transform.Position.X + Bounds.X - Bounds.Width * 0.5f * gameObject.Transform.Scale.X);
+            HandyRectangle.Y = (int)(gameObject.Transform.Position.Y + Bounds.Y - Bounds.Height * 0.5f * gameObject.Transform.Scale.Y);
+            HandyRectangle.Width = (int)(Bounds.Width * gameObject.Transform.Scale.X);
+            HandyRectangle.Height = (int)(Bounds.Height * gameObject.Transform.Scale.Y);
 
             return HandyRectangle;
         }
         
         public override void Start()
         {
-            if (gameObject.GetComponent<SpriteRenderer>() != null && bounds.Width == 0)  //Initializing Collider bounds with the sprite bounds if exists
+            var SR = gameObject.GetComponent<SpriteRenderer>();
+            if (SR != null && Bounds.Width == 0)  //Initializing Collider bounds with the sprite bounds if exists
             {
-                if (gameObject.GetComponent<SpriteRenderer>().Sprite != null)
-                    Bounds = new Rectangle(0, 0, (int)(gameObject.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Size.X * gameObject.Transform.Scale.X), (int)(gameObject.GetComponent<SpriteRenderer>().Sprite.SourceRectangle.Size.Y * gameObject.Transform.Scale.Y));
+                if (SR.Sprite != null)
+                    Bounds = new Rectangle(0, 0, SR.Sprite.SourceRectangle.Size.X, SR.Sprite.SourceRectangle.Size.Y);
                 else
                     Bounds = new Rectangle(0, 0, 100, 100);
             }
-            else if(bounds.Width == 0)
+            else if(Bounds.Width == 0)
                 Bounds = new Rectangle(0, 0, 100, 100);
-
-            PrevScale = gameObject.Transform.Scale;
         }
 
         public bool IsTouching(Collider2D collider)  //Are the two colliders currently touching?
         {
-            BoxCollider2D boxCollider = collider as BoxCollider2D;
-
-            return GetDynamicCollider().Intersects(boxCollider.GetDynamicCollider());
-        }
-
-        bool CollisionDetection(Collider2D collider) //AABB collision detection =>We should check if the two "Bounding Boxes are touching, then make SAT Collision detection
-        {
-            BoxCollider2D boxCollider = collider as BoxCollider2D;
-
-            return GetDynamicCollider().Intersects(boxCollider.GetDynamicCollider());
-        }
-
-        //SAT Collision response is good, you will possess the vector to push the two objects from each other
-        void CollisionResponse(Collider2D collider, bool Continous)
-        {
-            if (!Continous && !isTrigger)
+            if (collider is BoxCollider2D) //Assuming Center as Origin
             {
-                BoxCollider2D boxCollider = collider as BoxCollider2D;
-                Rigidbody2D RB = gameObject.GetComponent<Rigidbody2D>();
-
-                gameObject.Transform.Move(-RB.Velocity.X * (float)GameTime, -RB.Velocity.Y * (float)GameTime);
+                return GetDynamicCollider().Intersects((collider as BoxCollider2D).GetDynamicCollider());
             }
+            else if (collider is CircleCollider) //Assuming Center as Origin
+            {
+                CircleCollider TempCollider = collider as CircleCollider;
+                var ThisCollider = GetDynamicCollider();
+
+                if (MathCompanion.Abs(ThisCollider.Center.X - TempCollider.Center.X) > TempCollider.Radius + ThisCollider.Width / 2)
+                    return false;
+
+                if (MathCompanion.Abs(ThisCollider.Center.Y - TempCollider.Center.Y) > TempCollider.Radius + ThisCollider.Height / 2)
+                    return false;
+            }
+
+            return true;
         }
 
-        public override void Update(GameTime gameTime)
+        bool Collider2D.CollisionDetection(Collider2D collider, bool Continous) //AABB collision detection =>We should check if the two "Bounding Boxes are touching, then make SAT Collision detection
         {
-            Point Delta = (gameObject.Transform.Scale - PrevScale).ToPoint();
-            bounds.Size += new Point(Delta.X, Delta.Y);
+            return collider.IsTouching(this);
+        }
 
-            GameTime = gameTime.ElapsedGameTime.TotalSeconds;
-            PrevScale = gameObject.Transform.Scale;
+        //Note: This code is inspired by:
+        //URL: https://www.deengames.com/blog/2020/a-primer-on-aabb-collision-resolution.html
+        //SAT Collision response is good, you will possess the vector to push the two objects from each other
+        void Collider2D.CollisionResponse(Rigidbody2D YourRigidBody, Collider2D collider, bool Continous, float DeltaTime, Vector2 CollisionPos)
+        {
+            Rectangle DC1 = GetDynamicCollider();
+            Rectangle DC2 = (collider as BoxCollider2D).GetDynamicCollider();
+
+            float DistanceBetweenCollidersX = YourRigidBody.Velocity.X > 0 ? Math.Abs(DC1.Right - DC2.Left) : Math.Abs(DC1.Left - DC2.Right); 
+            float DistanceBetweenCollidersY = YourRigidBody.Velocity.Y > 0 ? Math.Abs(DC1.Bottom - DC2.Top) : Math.Abs(DC1.Top - DC2.Bottom);
+
+            float TimeBetweenCollidersX = YourRigidBody.Velocity.X != 0 ? Math.Abs(DistanceBetweenCollidersX / YourRigidBody.Velocity.X) : 0;
+            float TimeBetweenCollidersY = YourRigidBody.Velocity.Y != 0 ? Math.Abs(DistanceBetweenCollidersY / YourRigidBody.Velocity.Y) : 0;
+
+            float ShortestTime;
+
+            if (YourRigidBody.Velocity.X != 0 && YourRigidBody.Velocity.Y == 0)
+            {
+                // Colliison on X-axis only
+                ShortestTime = TimeBetweenCollidersX;
+                YourRigidBody.gameObject.Transform.MoveX(ShortestTime * YourRigidBody.Velocity.X * DeltaTime);
+                //YourRigidBody.Velocity.X = 0;
+            }
+            else if (YourRigidBody.Velocity.X == 0 && YourRigidBody.Velocity.Y != 0)
+            {
+                // Colliison on Y-axis only
+                ShortestTime = TimeBetweenCollidersY;
+                YourRigidBody.gameObject.Transform.MoveY(ShortestTime * YourRigidBody.Velocity.Y * DeltaTime);
+                //YourRigidBody.Velocity.Y = 0;
+            }
+            else
+            {
+                // Colliison on both axis
+                ShortestTime = Math.Min(TimeBetweenCollidersX, TimeBetweenCollidersY);
+                YourRigidBody.gameObject.Transform.Move(ShortestTime * YourRigidBody.Velocity.X * DeltaTime, ShortestTime * YourRigidBody.Velocity.Y * DeltaTime);
+                //YourRigidBody.Velocity = Vector2.Zero;
+
+                if (SlideCollision)
+                {
+                    if (TimeBetweenCollidersX < TimeBetweenCollidersY)
+                        YourRigidBody.gameObject.Transform.Position.Y = CollisionPos.Y;
+                    else if (TimeBetweenCollidersX > TimeBetweenCollidersY)
+                        YourRigidBody.gameObject.Transform.Position.X = CollisionPos.X;
+                }
+            }
         }
 
         public override GameObjectComponent DeepCopy(GameObject clone)
         {
             BoxCollider2D Clone = this.MemberwiseClone() as BoxCollider2D;
-            Clone.bounds = new Rectangle(bounds.Location, bounds.Size);
+            Clone.Bounds = new Rectangle(Bounds.Location, Bounds.Size);
 
             return Clone;
         }
@@ -102,7 +121,7 @@ namespace FN_Engine
             return GetDynamicCollider().Contains(Point);
         }
 
-        public bool IsTrigger()  //Is this collider marked as trigger? (trigger means no collision or physics is applied on this collider
+        public bool IsTrigger()  //Is this collider marked as trigger? (trigger means no collision or physics is applied on this collider)
         {
             return isTrigger;
         }
@@ -127,28 +146,28 @@ namespace FN_Engine
             throw new System.NotImplementedException();
         }
 
+        void Collider2D.Visualize(float X_Bias, float Y_Bias)
+        {
+            if (Enabled)
+            {
+                //var SR = gameObject.GetComponent<SpriteRenderer>();
+                //Point Bias = (SR != null && SR.Sprite.Texture != null) ? (-SR.Sprite.Origin).ToPoint() : Point.Zero;
+                var DynCollid = GetDynamicCollider();
+                DynCollid.Offset(new Point((int)X_Bias, (int)Y_Bias));
+
+                HitBoxDebuger.DrawNonFilledRectangle_Effect(DynCollid);
+            }
+        }
+
         public override void Serialize(StreamWriter SW)
         {
             SW.WriteLine(ToString());
 
             base.Serialize(SW);
-            SW.Write("SourceRectangle:\t" + bounds.X.ToString() + "\t" + bounds.Y.ToString() + "\t" + bounds.Width.ToString() + "\t" + bounds.Height.ToString() + "\n");
+            SW.Write("SourceRectangle:\t" + Bounds.X.ToString() + "\t" + Bounds.Y.ToString() + "\t" + Bounds.Width.ToString() + "\t" + Bounds.Height.ToString() + "\n");
             SW.Write("IsTrigger:\t" + isTrigger.ToString() + "\n");
 
             SW.WriteLine("End Of " + ToString());
-        }
-
-        public GameObjectComponent ReturnGOC()
-        {
-            return this;
-        }
-
-        public void Visualize(float X_Bias = 0, float Y_Bias = 0)
-        {
-            Rectangle DynamicCollider = GetDynamicCollider();
-            DynamicCollider.X = (int)X_Bias + DynamicCollider.X;
-            DynamicCollider.Y = (int)Y_Bias + DynamicCollider.Y;
-            HitBoxDebuger.DrawNonFilledRectangle_Effect(DynamicCollider);
         }
     }
 }

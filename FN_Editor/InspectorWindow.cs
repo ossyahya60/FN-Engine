@@ -15,6 +15,8 @@ namespace FN_Engine.FN_Editor
         public static List<Type> ComponentsTypes = new List<Type>();
         public static Vector2[] MyRegion;
 
+        internal static Assembly GameAssem = null;
+
         private static IEnumerable<Type> Types;
 
         private IntPtr intPointer;
@@ -42,10 +44,10 @@ namespace FN_Engine.FN_Editor
             AssemblyName = AssemblyName.Replace('-', '_');
 
             Types = from t in Assembly.GetExecutingAssembly().GetTypes()
-            where t.IsClass && t.Namespace == AssemblyName && t.BaseType == typeof(GameObjectComponent)
+            where t.IsClass && t.Namespace == AssemblyName && t.BaseType == typeof(GameObjectComponent) && t.IsVisible
                     select t;
 
-            ReloadAssemblyOnChange();
+            //ReloadAssemblyOnChange();
 
             //Types.ToList().ForEach(item => ComponentsTypes.Add(item));
         }
@@ -60,7 +62,7 @@ namespace FN_Engine.FN_Editor
                 Types = Types.Where(Item => Item.Assembly.FullName == AssemName);
 
                 Thread.Sleep(500);
-                var GameAssem = Assembly.Load(File.ReadAllBytes(GamePath + "\\bin\\Debug\\netcoreapp3.1\\" + GamePath.Substring(GamePath.LastIndexOf('\\') + 1) + ".dll"));
+                GameAssem = Assembly.Load(File.ReadAllBytes(GamePath + "\\bin\\Debug\\netcoreapp3.1\\" + GamePath.Substring(GamePath.LastIndexOf('\\') + 1) + ".dll"));
                 Types = Types.Concat(from t in GameAssem.GetTypes() where t.IsClass && t.BaseType.Name == typeof(GameObjectComponent).Name select t);
 
                 //Get Dirty Classes
@@ -147,6 +149,8 @@ namespace FN_Engine.FN_Editor
             intPointerL = Marshal.AllocHGlobal(sizeof(long));
             intPointerU32 = Marshal.AllocHGlobal(sizeof(uint));
             MyRegion = new Vector2[2];
+
+            GetGOCs();
         }
 
         public override void DrawUI()
@@ -173,10 +177,7 @@ namespace FN_Engine.FN_Editor
                 float DeltaSize = MyRegion[1].X - ImGui.GetWindowSize().X;
 
                 if (DeltaSize != 0 && ImGui.IsWindowFocused())
-                {
                     ImGui.SetWindowSize("Content Manager", ContentWindow.MyRegion[1] + new Vector2(DeltaSize, 0));
-                    //ImGui.SetWindowPos("Content Manager", ContentWindow.MyRegion[0] + new Vector2(DeltaSize, 0));
-                }
             }
 
             MyRegion[0] = ImGui.GetWindowPos();
@@ -189,7 +190,7 @@ namespace FN_Engine.FN_Editor
             {
                 if (Selected_GO.ShouldBeDeleted)
                 {
-                    FN_Editor.GameObjects_Tab.WhoIsSelected = null;
+                    GameObjects_Tab.WhoIsSelected = null;
                     return;
                 }
 
@@ -248,6 +249,13 @@ namespace FN_Engine.FN_Editor
                             int I = (int)FI.GetValue(Selected_GO);
                             ImGui.InputInt(FI.Name, ref I);
                             FI.SetValue(Selected_GO, I);
+                            break;
+                        case "System.String": //string
+                            string ST = (string)FI.GetValue(Selected_GO);
+                            if (ST == null)
+                                ST = "null";
+                            ImGui.InputText(FI.Name, ref ST, 50);
+                            FI.SetValue(Selected_GO, ST);
                             break;
                         case "System.Int16": //int 16
                             short S = (short)FI.GetValue(Selected_GO);
@@ -384,6 +392,13 @@ namespace FN_Engine.FN_Editor
                             int I = (int)PI.GetValue(Selected_GO);
                             ImGui.InputInt(PI.Name, ref I);
                             PI.SetValue(Selected_GO, I);
+                            break;
+                        case "System.String": //string
+                            string ST = (string)PI.GetValue(Selected_GO);
+                            if (ST == null)
+                                ST = "null";
+                            ImGui.InputText(PI.Name, ref ST, 50);
+                            PI.SetValue(Selected_GO, ST);
                             break;
                         case "System.Int16": //int 16
                             short S = (short)PI.GetValue(Selected_GO);
@@ -540,6 +555,13 @@ namespace FN_Engine.FN_Editor
                                     int I = (int)FI.GetValue(GOC);
                                     ImGui.InputInt(FI.Name, ref I);
                                     FI.SetValue(GOC, I);
+                                    break;
+                                case "System.String": //string
+                                    string ST = (string)FI.GetValue(GOC);
+                                    if (ST == null)
+                                        ST = "null";
+                                    ImGui.InputText(FI.Name, ref ST, 50);
+                                    FI.SetValue(GOC, ST);
                                     break;
                                 case "System.Int16": //int 16
                                     short S = (short)FI.GetValue(GOC);
@@ -739,6 +761,13 @@ namespace FN_Engine.FN_Editor
                                     ImGui.InputInt(PI.Name, ref I);
                                     PI.SetValue(GOC, I);
                                     break;
+                                case "System.String": //string
+                                    string ST = (string)PI.GetValue(GOC);
+                                    if (ST == null)
+                                        ST = "null";
+                                    ImGui.InputText(PI.Name, ref ST, 50);
+                                    PI.SetValue(GOC, ST);
+                                    break;
                                 case "System.Int16": //int 16
                                     short S = (short)PI.GetValue(GOC);
                                     Marshal.WriteInt16(intPointer, S);
@@ -901,8 +930,11 @@ namespace FN_Engine.FN_Editor
 
                     if (!ComponentsNotRemoved_Arr[T_Counter])
                     {
-                        GOC_Removed = GOC;
-                        ComponentsNotRemoved.RemoveAt(T_Counter++);
+                        if (GOC.gameObject.Name != "Camera Controller")
+                        {
+                            GOC_Removed = GOC;
+                            ComponentsNotRemoved.RemoveAt(T_Counter++);
+                        }
                     }
 
                     ImGui.NewLine();

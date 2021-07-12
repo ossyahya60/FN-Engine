@@ -93,8 +93,8 @@ namespace FN_Engine
 
                 Matrix.CreateScale(ref _camScaleVector, out _camScaleMatrix);
 
-                _resTranslationVector.X = Setup.resolutionIndependentRenderer.VirtualWidth * 0.5f;
-                _resTranslationVector.Y = Setup.resolutionIndependentRenderer.VirtualHeight * 0.5f;
+                _resTranslationVector.X = ResolutionIndependentRenderer.GetVirtualRes().X * 0.5f;
+                _resTranslationVector.Y = ResolutionIndependentRenderer.GetVirtualRes().Y * 0.5f;
                 _resTranslationVector.Z = 0;
 
                 Matrix.CreateTranslation(ref _resTranslationVector, out _resTranslationMatrix);
@@ -103,7 +103,7 @@ namespace FN_Engine
                              _camRotationMatrix *
                              _camScaleMatrix *
                              _resTranslationMatrix *
-                             Setup.resolutionIndependentRenderer.GetTransformationMatrix();
+                             ResolutionIndependentRenderer.getTransformationMatrix();
 
                 _isViewTransformationDirty = false;
             }

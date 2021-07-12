@@ -376,7 +376,11 @@ namespace FN_Engine
         {
             JR.Read(); //Object Type
             JR.Read(); //Object Type Value
+
             Type ObjType = Type.GetType(JR.Value.ToString());
+            if (ObjType == null && FN_Editor.EditorScene.IsThisTheEditor)
+                ObjType = FN_Editor.InspectorWindow.GameAssem.GetType(JR.Value.ToString());
+
             var OBJ = GetInstance(ObjType);
 
             JR.Read(); //GID
@@ -722,8 +726,8 @@ namespace FN_Engine
 
                     }
                 }
-                else
-                    throw new Exception("Serialized member is not present in the class!");
+                //else
+                    //throw new Exception("Serialized member is not present in the class!");
             }
 
             return null; //This line shouldn't be logically reachable

@@ -8,11 +8,10 @@ namespace FN_Engine
 {
     public class Setup
     {
-        public static GraphicsDeviceManager graphics { get; private set; }
+        public static GraphicsDeviceManager graphics;
         public static ContentManager Content { get; private set; }
         public static GraphicsDevice GraphicsDevice { get; private set; }
         public static SpriteBatch spriteBatch { get; private set; }
-        public static ResolutionIndependentRenderer resolutionIndependentRenderer { get; private set; }
         public static GameWindow GameWindow { get; private set; }
         public static Camera2D Camera { get; private set; }
         public static Game Game { get; private set; }
@@ -22,14 +21,13 @@ namespace FN_Engine
         public static string IntermediateFilePath = @"C:\FN_Engine\FN_Engine\FN_Engine\Content\obj\Windows";
         //public static Form DragAndDropForm = new Form();
 
-        public static void Initialize(GraphicsDeviceManager GDM, ContentManager CM, SpriteBatch SB, ResolutionIndependentRenderer RIR, GameWindow GW, Camera2D camera, Game game)
+        public static void Initialize(GraphicsDeviceManager GDM, ContentManager CM, SpriteBatch SB, GameWindow GW, Camera2D camera, Game game)
         {
             ConfigurePipelineMG();
             graphics = GDM;
             Content = CM;
             GraphicsDevice = GDM.GraphicsDevice;
             spriteBatch = SB;
-            resolutionIndependentRenderer = RIR;
             GameWindow = GW;
             Camera = camera;
             Game = game;

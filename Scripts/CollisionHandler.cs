@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
 
-namespace FN_Engine.Scripts
+namespace FN_Engine
 {
-    internal class CollisionHandler
+    internal static class CollisionHandler
     {
-        public void Update()
+        static public void Update(GameTime gameTime)
         {
             List<GameObjectComponent> Colliders = new List<GameObjectComponent>();
 
@@ -19,9 +21,17 @@ namespace FN_Engine.Scripts
                 {
                     if (collider != collider2)
                     {
-                        if (((Collider2D)collider).IsTouching((Collider2D)collider2))
+                        var CD1 = collider as Collider2D;
+                        var CD2 = collider2 as Collider2D;
+                        var CallerRigidBody = collider.gameObject.GetComponent<Rigidbody2D>();
+
+                        if (CallerRigidBody != null && CD1.CollisionDetection(CD2, false)) //We call the resolution two times for more stable resolutions
                         {
-                            //((Collider2D)collider).Resolve(collider2);
+                            Vector2 CollisionPos = CallerRigidBody.gameObject.Transform.Position;
+                            CallerRigidBody.gameObject.Transform.Position = CallerRigidBody.gameObject.Transform.LastPosition;
+
+                            CD1.CollisionResponse(CallerRigidBody, CD2, false, (float)gameTime.ElapsedGameTime.TotalSeconds * 1, CollisionPos);
+                            //CD1.CollisionResponse(CallerRigidBody, CD2, false, (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f, CollisionPos); //UnComment this if there is a problem
                         }
                     }
                 }

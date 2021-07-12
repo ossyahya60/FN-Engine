@@ -30,12 +30,12 @@ namespace FN_Engine.FN_Project
             }
         }
 
-        public override void DrawUI()
-        {
-            ImGui.Begin("Manage Projects");
-            ImGui.Text(GamePath);
-            ImGui.End();
-        }
+        //public override void DrawUI()
+        //{
+        //    ImGui.Begin("Manage Projects");
+        //    ImGui.Text(GamePath);
+        //    ImGui.End();
+        //}
 
         private void DownloadPrerequisites()
         {
@@ -64,8 +64,8 @@ namespace FN_Engine.FN_Project
             string[] RunGame = new string[]
             {
                 "cd " + Path, //Go to the new directory
-                "dotnet build",
-                "dotnet run"
+                "dotnet build"//,
+                //"dotnet run"
             };
 
             Utility.ExecuteCommand(RunGame, Path);
@@ -105,10 +105,12 @@ namespace FN_Engine.FN_Project
             File.Copy(SourceDir + "\\Font.spritefont", DestinationDir + "\\Font.spritefont");
             File.Copy(SourceDir + "\\imgui.ini", DestinationDir + "\\imgui.ini");
 
+            NewProject = true;
+
+            Utility.ExecuteCommand(RunGame, Path);
+
             //Reload Assembly
             FN_Editor.InspectorWindow.ReloadAssemblyOnChange();
-
-            NewProject = true;
         }
 
         private static void CopyAndPasteFiles(string Source, string Destination)
@@ -131,6 +133,9 @@ namespace FN_Engine.FN_Project
             GameName = Path.Split('\\')[(Path.Split('\\').Length - 1)];
 
             Utility.ExecuteCommand(OpenProj, Path);
+
+            //Reload Assembly
+            FN_Editor.InspectorWindow.ReloadAssemblyOnChange();
         }
 
         public static void RunGame()
@@ -220,7 +225,6 @@ namespace FN_Engine.FN_Project
             "    {" + "\n" +
             "        GraphicsDeviceManager graphics;" + "\n" +
             "        SpriteBatch spriteBatch;" + "\n" +
-            "        ResolutionIndependentRenderer RIR;" + "\n" +
             "        Camera2D Camera;" + "\n" +
             "        ////////<Variables>/////" + "\n" +
             "        public static SpriteFont spriteFont;" + "\n" +
@@ -230,7 +234,6 @@ namespace FN_Engine.FN_Project
             "        {" + "\n" +
             "            graphics = new GraphicsDeviceManager(this);" + "\n" +
             "            Content.RootDirectory = \"Content\";" + "\n" +
-            "            RIR = new ResolutionIndependentRenderer(this);" + "\n" +
             "            IsMouseVisible = true;" + "\n" +
             "            Window.AllowUserResizing = false;" + "\n" +
             "        }" + "\n" +
@@ -257,23 +260,15 @@ namespace FN_Engine.FN_Project
             "        {" + "\n" +
             "            // Create a new SpriteBatch, which can be used to draw textures." + "\n" +
             "            spriteBatch = new SpriteBatch(GraphicsDevice);" + "\n" +
-            "            graphics.PreferredBackBufferWidth = 1366;" + "\n" +
-            "            graphics.PreferredBackBufferHeight = 768;" + "\n" +
-            "            //graphics.IsFullScreen = true;" + "\n" +
-            "            graphics.ApplyChanges();" + "\n" +
             "    \n" +
-            "            RIR.VirtualWidth = graphics.PreferredBackBufferWidth;" + "\n" +
-            "            RIR.VirtualHeight = graphics.PreferredBackBufferHeight;" + "\n" +
             "            /////////Camera And Resolution Independent Renderer/////// -> Mandatory" + "\n" +
             "            Camera = new Camera2D();" + "\n" +
             "            Camera.Zoom = 1f;" + "\n" +
+            "            Setup.Initialize(graphics, Content, spriteBatch, Window, Camera, this);" + "\n" +
             "    \n" +
-            "            //You should look at this when deserializing scene for a game! (Note for the Engine Programmer)" + "\n" +
-            "            Camera.Position = new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);" + "\n" +
-            "    \n" +
-            "            Setup.Initialize(graphics, Content, spriteBatch, RIR, Window, Camera, this);" + "\n" +
-            "    \n" +
-            "            RIR.InitializeResolutionIndependence(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, Camera);" + "\n" +
+            "            ResolutionIndependentRenderer.Init(ref graphics);" + "\n" +
+            "            ResolutionIndependentRenderer.SetResolution(1366, 768, false);" + "\n" +
+            "            ResolutionIndependentRenderer.SetVirtualResolution(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);" + "\n" +
             "        }" + "\n" +
             "    \n" +
             "        /// <summary>" + "\n" +
@@ -283,7 +278,6 @@ namespace FN_Engine.FN_Project
             "        protected override void LoadContent()" + "\n" +
             "        {" + "\n" +
             "            ImportantIntialization();" + "\n" +
-            "            RIR.BackgroundColor = Color.Transparent;" + "\n" +
             "            spriteFont = Content.Load<SpriteFont>(\"Font\");" + "\n" +
             "            // This bit of code handles the directories from a PC to another" + "\n" +
             "            string WorkingDirectory = \"\";" + "\n" +

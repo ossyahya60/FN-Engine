@@ -211,7 +211,7 @@ namespace FN_Engine.FN_Editor
 
                         break;
                 }
-                
+
                 //Collider Visualization
                 var Colliders = SelectedGO.GameObjectComponents.FindAll(Item => Item is Collider2D);
 
@@ -221,6 +221,11 @@ namespace FN_Engine.FN_Editor
             }
 
             ImGui.End();
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            
         }
     }
 }

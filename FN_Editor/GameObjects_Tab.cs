@@ -94,7 +94,8 @@ namespace FN_Engine.FN_Editor
                 }
 
                 foreach (GameObject GO in SelectedGOs)
-                    GO.ShouldBeRemoved = true;
+                    if(GO.Name != "Camera Controller")
+                        GO.ShouldBeRemoved = true;
             }
 
             //Some Scene window functionalities
@@ -573,6 +574,10 @@ namespace FN_Engine.FN_Editor
 
                 ImGui.Selectable(GO.Name, SelectedGOs.Contains(GO));
 
+                if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                    if (ImGui.IsItemClicked())
+                        Setup.Camera.Position = GO.Transform.Position + (MyRegion[1].X + MyRegion[0].X) * Microsoft.Xna.Framework.Vector2.UnitX;
+
                 //Accept Drag and Drop
                 if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.SourceNoDisableHover))
                 {
@@ -651,6 +656,10 @@ namespace FN_Engine.FN_Editor
             }
 
             bool Open = ImGui.TreeNodeEx(GO.Name, SelectedGOs.Contains(GO) ? ImGuiTreeNodeFlags.Selected : ImGuiTreeNodeFlags.None);
+
+            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                if (ImGui.IsItemClicked())
+                    Setup.Camera.Position = GO.Transform.Position + (MyRegion[1].X + MyRegion[0].X) * Microsoft.Xna.Framework.Vector2.UnitX;
 
             //Accept Drag and Drop
             if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.SourceNoDisableHover))

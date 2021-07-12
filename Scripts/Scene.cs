@@ -189,6 +189,8 @@ namespace FN_Engine
             if (Active)
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].Update(gameTime);
+
+            CollisionHandler.Update(gameTime);
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -211,33 +213,6 @@ namespace FN_Engine
             Setup.GraphicsDevice.Clear(Color.Transparent);
 
             GuiRenderer.BeforeLayout(gameTime); // Must be called prior to calling any ImGui controls
-
-            ImGui.GetIO().ConfigWindowsResizeFromEdges = true;
-
-            //Move windows using title bar only
-            ImGui.GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
-
-            //FPS
-            ImGui.Text(((int)(1.0f / (float)gameTime.ElapsedGameTime.TotalSeconds)).ToString());
-            ImGui.Text(Input.GetMousePosition().ToString());
-
-            if (ImGui.BeginMainMenuBar())
-            {
-                if (ImGui.BeginMenu("File"))
-                {
-                    if (ImGui.MenuItem("Serialize"))
-                        SceneManager.SerializeScene("DefaultScene");
-
-                    if (ImGui.MenuItem("Play"))
-                    {
-                        SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
-                        Threader.Invoke(FN_Project.VisualizeEngineStartup.RunExecutable, 0);
-                    }
-
-                    ImGui.EndMenu();
-                }
-                ImGui.EndMainMenuBar();
-            }
 
             int Count = GameObjects.Count - 1;
 
