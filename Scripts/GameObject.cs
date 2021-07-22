@@ -318,6 +318,14 @@ namespace FN_Engine
                         GOC.Update(gameTime);
         }
 
+        internal virtual void UpdateUI(GameTime gameTime)
+        {
+            if (IsActive())
+                foreach (GameObjectComponent GOC in GameObjectComponents)
+                    if (GOC.Enabled)
+                        GOC.UpdateUI(gameTime);
+        }
+
         public virtual void Draw(SpriteBatch spriteBatch)
         {
             if (IsActive())

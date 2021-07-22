@@ -41,6 +41,11 @@ namespace FN_Engine
 
         }
 
+        internal virtual void UpdateUI(GameTime gameTime)
+        {
+
+        }
+
         //Not used now...
         public virtual void Serialize(StreamWriter SW)
         {

@@ -193,6 +193,15 @@ namespace FN_Engine
             CollisionHandler.Update(gameTime);
         }
 
+        internal void UpdateUI(GameTime gameTime)
+        {
+            int Count = GameObjects.Count - 1;
+
+            if (Active)
+                for (int i = Count; i >= 0; i--)
+                    GameObjects[Count - i].UpdateUI(gameTime);
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             int Count = GameObjects.Count - 1;
@@ -213,14 +222,13 @@ namespace FN_Engine
             Setup.GraphicsDevice.Clear(Color.Transparent);
 
             GuiRenderer.BeforeLayout(gameTime); // Must be called prior to calling any ImGui controls
+            ImGui.GetIO().ConfigWindowsResizeFromEdges = true;
 
             int Count = GameObjects.Count - 1;
 
             if (Active)
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].DrawUI();
-
-            ImGui.Text(gameTime.IsRunningSlowly.ToString());
 
             GuiRenderer.AfterLayout(); // Must be called after ImGui control calls
             Setup.GraphicsDevice.SetRenderTarget(null);

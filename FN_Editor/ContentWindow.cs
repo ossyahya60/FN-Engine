@@ -6,24 +6,41 @@ using System.IO;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace FN_Engine.FN_Editor
 {
     internal class ContentWindow: GameObjectComponent
     {
+        internal class SpriteEditorInfo
+        {
+            public bool IsSpriteSheet;
+            public bool BySize;
+            public int[] SizeOrCount;
+            public int[] Offset;
+            public int[] Spacing;
+            internal ImGuiDir IsOpen = ImGuiDir.Right;
+        }
+
         public static object DraggedAsset = null;
         public static Vector2[] MyRegion;
+        public static List<IntPtr> TexPtrs;
+        public static string SelectedTexture = null;
+
+        public Dictionary<string, SpriteEditorInfo> SPIs = new Dictionary<string, SpriteEditorInfo>();
 
         private string GameContentPath = null;
-        private DateTime StartingDate = DateTime.Now;
         private bool DirectoryChanged = true;
         private Regex TexRegex = null;
         private Regex MusicRegex = null;
         private Regex ShaderRegex = null;
         private string ContentFolderDirectory = null;
-        private List<IntPtr> TexIDs;
         private string AssName = "";
-        private HashSet<string> NotLoadedAssets = new HashSet<string>();
+        private readonly HashSet<string> NotLoadedAssets = new HashSet<string>();
+        private int SelTexIndex = 0;
+        private bool IsSpriteEditorOpen = false;
+        private List<Microsoft.Xna.Framework.Rectangle> SlicedTexs = null;
+        private Texture2D SelTex = null;
 
         public override void Start()
         {
@@ -35,11 +52,13 @@ namespace FN_Engine.FN_Editor
             /////////////////////////////
             ///
 
+            TexPtrs = new List<IntPtr>();
+            SlicedTexs = new List<Microsoft.Xna.Framework.Rectangle>();
+
             if (GameContentPath == null)
                 GameContentPath = Directory.GetCurrentDirectory();
 
             ContentFolderDirectory = Directory.GetCurrentDirectory();
-            TexIDs = new List<IntPtr>();
             TexRegex = new Regex(@"([\.]\b(png|jpg|jpeg)\b)$", RegexOptions.IgnoreCase);
             MusicRegex = new Regex(@"([\.]\b(wav|ogg|wma|mp3)\b)$", RegexOptions.IgnoreCase);
             ShaderRegex = new Regex(@"([\.]\b(fx)\b)$", RegexOptions.IgnoreCase);
@@ -181,10 +200,10 @@ namespace FN_Engine.FN_Editor
 
             if (DirectoryChanged)
             {
-                TexIDs.Clear(); //?
-                TexIDs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\FolderIcon")));
-                TexIDs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\MusicIcon")));
-                TexIDs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\ShaderIcon")));
+                TexPtrs.Clear(); //?
+                TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\FolderIcon")));
+                TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\MusicIcon")));
+                TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\ShaderIcon")));
             }
 
             int Enumerator = 3;
@@ -200,7 +219,7 @@ namespace FN_Engine.FN_Editor
 
                 ImGui.BeginGroup();
                 ImGui.PushID(ID_F++);
-                if (ImGui.ImageButton(TexIDs[0], new Vector2(64.0f, 64.0f), Vector2.Zero, Vector2.One, 0, Vector4.Zero))
+                if (ImGui.ImageButton(TexPtrs[0], new Vector2(64.0f, 64.0f), Vector2.Zero, Vector2.One, 0, Vector4.Zero))
                 {
                     GameContentPath = Dir;
                     DirectoryChanged = true;
@@ -253,7 +272,7 @@ namespace FN_Engine.FN_Editor
                         try
                         {
                             if (DirectoryChanged) //Rebuild content
-                                TexIDs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>(AssetLoadName)));
+                                TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>(AssetLoadName)));
                         }
                         catch(Microsoft.Xna.Framework.Content.ContentLoadException)
                         {
@@ -261,11 +280,11 @@ namespace FN_Engine.FN_Editor
                             continue;
                         }
 
-                        IntPtr ID = TexIDs[Enumerator++];
+                        IntPtr ID = TexPtrs[Enumerator++];
                         if (ImGui.ImageButton(ID, new Vector2(64.0f, 64.0f)))
                         {
                             ImGui.OpenPopup("AssetName");
-                            AssName = AssetLoadName + "." + AssetName.Substring(idx + 1);
+                            AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
                         }
 
                         //if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
@@ -281,19 +300,143 @@ namespace FN_Engine.FN_Editor
                             ImGui.EndDragDropSource();
                         }
 
+                        if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                        {
+                            ImGui.OpenPopup("Sprite Editor Props");
+                            SelectedTexture = AssetLoadName;
+                            SelTexIndex = Enumerator - 1;
+                            IsSpriteEditorOpen = true;
+                        }
+
+                        ImGui.SameLine();
+
+                        if (SPIs.ContainsKey(AssetLoadName))
+                        {
+                            if (ImGui.ArrowButton("ThisTex" + i.ToString(), SPIs[AssetLoadName].IsOpen))
+                            {
+                                SelectedTexture = AssetLoadName;
+                                SelTexIndex = Enumerator - 1;
+                                if (SPIs[AssetLoadName].IsOpen == ImGuiDir.Left)
+                                    SPIs[AssetLoadName].IsOpen = ImGuiDir.Right;
+                                else
+                                {
+                                    SPIs[AssetLoadName].IsOpen = ImGuiDir.Left;
+
+                                    if (SPIs[AssetLoadName].IsSpriteSheet)
+                                    {
+                                        SlicedTexs.Clear();
+                                        Texture2D Tex = Setup.Content.Load<Texture2D>(SelectedTexture);
+                                        SpriteEditorInfo SPI = SPIs[SelectedTexture];
+                                        SelTex = Tex;
+
+                                        if (SPI.BySize)
+                                        {
+                                            SPI.SizeOrCount[0] = (int)Math.Clamp(SPI.SizeOrCount[0], Tex.Width / 30.0f, Tex.Width);
+                                            SPI.SizeOrCount[1] = (int)Math.Clamp(SPI.SizeOrCount[1], Tex.Height / 30.0f, Tex.Height);
+
+                                            for (int i2 = 0; i2 < Tex.Height; i2 += SPI.SizeOrCount[1])
+                                            {
+                                                for (int j = 0; j < Tex.Width; j += SPI.SizeOrCount[0])
+                                                {
+                                                    Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i2 != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
+                                                    Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
+                                                    Vector2 UV0 = new Vector2(j, i2) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+                                                    Vector2 UV1 = new Vector2(j + SPI.SizeOrCount[0], i2 + SPI.SizeOrCount[1]) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+
+                                                    Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * Tex.Width), (int)(UV0.Y * Tex.Height), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
+                                                    Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1);
+                                                    Rect.Height = Math.Clamp(Rect.Height, 0, Tex.Height - Rect.Y - 1);
+                                                    Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[Rect.Width * Rect.Height];
+
+                                                    Tex.GetData(0, Rect, buffer, 0, Rect.Width * Rect.Height);
+
+                                                    if (!buffer.All(Item => Item.A == 0))
+                                                        SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * 10000), (int)(UV0.Y * 10000), (int)(Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs(UV1.Y - UV0.Y) * 10000)));
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            SPI.SizeOrCount[0] = Math.Clamp(SPI.SizeOrCount[0], 1, 32);
+                                            SPI.SizeOrCount[1] = Math.Clamp(SPI.SizeOrCount[1], 1, 32);
+                                            Vector2 ImageSize = new Vector2(1.0f / SPI.SizeOrCount[1], 1.0f / SPI.SizeOrCount[0]);
+
+                                            for (int i2 = 0; i2 < SPI.SizeOrCount[0]; i2++)
+                                            {
+                                                for (int j = 0; j < SPI.SizeOrCount[1]; j++)
+                                                {
+                                                    Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i2 != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
+                                                    Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
+                                                    Vector2 UV0 = new Vector2(j * ImageSize.X, i2 * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+                                                    Vector2 UV1 = new Vector2((j + 1) * ImageSize.X, (i2 + 1) * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+
+                                                    //Eliminating empty textures
+                                                    Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * Tex.Width), (int)(UV0.Y * Tex.Height), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
+                                                    Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1);
+                                                    Rect.Height = Math.Clamp(Rect.Height, 0, Tex.Height - Rect.Y - 1);
+                                                    Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[Rect.Width * Rect.Height];
+
+                                                    Tex.GetData(0, Rect, buffer, 0, Rect.Width * Rect.Height);
+
+                                                    if (!buffer.All(Item => Item.A == 0))
+                                                        SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * 10000), (int)(UV0.Y * 10000), (int)(Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs(UV1.Y - UV0.Y) * 10000)));
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (SPIs[AssetLoadName].IsOpen == ImGuiDir.Left) //Texture pack is open
+                            {
+                                ImGui.SameLine();
+                                ImGui.BeginChild(AssetLoadName, Vector2.Zero, true, ImGuiWindowFlags.NoMove | ImGuiWindowFlags.AlwaysHorizontalScrollbar);
+
+                                Microsoft.Xna.Framework.Rectangle Rect = SlicedTexs[0];
+
+                                for (int i3=0; i3<SlicedTexs.Count; i3++)
+                                {
+                                    bool EnteredButton2 = false;
+                                    ImGui.PushID(i3.ToString() + "Noice");
+                                    if (ImGui.ImageButton(TexPtrs[SelTexIndex], new Vector2(64, 64), new Vector2(SlicedTexs[i3].X / 10000.0f, SlicedTexs[i3].Y / 10000.0f), new Vector2(SlicedTexs[i3].Right / 10000.0f, SlicedTexs[i3].Bottom / 10000.0f)))
+                                    {
+                                        ImGui.PopID();
+                                        EnteredButton2 = true;
+                                    }
+
+                                    // Dragging an asset
+                                    if (ImGui.BeginDragDropSource())
+                                    {
+                                        ImGui.SetDragDropPayload("Asset2", IntPtr.Zero, 0);
+                                        DraggedAsset = new KeyValuePair<string, Vector4>(AssetLoadName, new Vector4(SlicedTexs[i3].X, SlicedTexs[i3].Y, SlicedTexs[i3].Width, SlicedTexs[i3].Height));
+
+                                        ImGui.EndDragDropSource();
+                                    }
+
+                                    if (!EnteredButton2)
+                                        ImGui.PopID();
+
+                                    if (i3 != SlicedTexs.Count - 1)
+                                        ImGui.SameLine();
+                                }
+
+                                ImGui.EndChild();
+                            }
+                        }
+
                         ImGui.SameLine();
                     }
                     else if (MusicRegex.IsMatch(AssetName)) //Found a song or a soundeffect
                     {
                         ImGui.PushID(ID_F++);
                         bool EnteredButton = false;
-                        if (ImGui.ImageButton(TexIDs[1], new Vector2(64.0f, 64.0f)))
+                        if (ImGui.ImageButton(TexPtrs[1], new Vector2(64.0f, 64.0f)))
                         {
                             EnteredButton = true;
                             ImGui.PopID();
 
                             ImGui.OpenPopup("AssetName");
-                            AssName = AssetLoadName + "." + AssetName.Substring(idx + 1);
+                            AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
                         }
 
                         // Dragging an asset
@@ -315,13 +458,12 @@ namespace FN_Engine.FN_Editor
                     {
                         ImGui.PushID(ID_F++);
                         bool EnteredButton = false;
-                        if (ImGui.ImageButton(TexIDs[2], new Vector2(64.0f, 64.0f)))
+                        if (ImGui.ImageButton(TexPtrs[2], new Vector2(64.0f, 64.0f)))
                         {
                             EnteredButton = true;
                             ImGui.PopID();
 
-                            ImGui.OpenPopup("AssetName");
-                            AssName = AssetLoadName + "." + AssetName.Substring(idx + 1);
+                            AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
                         }
 
                         // Dragging an asset
@@ -343,6 +485,83 @@ namespace FN_Engine.FN_Editor
                 }
             }
             DirectoryChanged = false;
+
+            //Sprite editor
+            if (ImGui.BeginPopupModal("Sprite Editor Props", ref IsSpriteEditorOpen, ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                string SelectedTex = SelectedTexture;
+
+                if (SelectedTex == null)
+                    return;
+
+                if (!SPIs.ContainsKey(SelectedTex)) //First time edit
+                    SPIs.Add(SelectedTex, new SpriteEditorInfo() { SizeOrCount = new int[2], Offset = new int[2], Spacing = new int[2] });
+
+                SpriteEditorInfo SPI = SPIs[SelectedTex];
+
+                ImGui.Checkbox("Spritesheet?", ref SPI.IsSpriteSheet);
+
+                if (SPI.IsSpriteSheet)
+                {
+                    Texture2D Tex = Setup.Content.Load<Texture2D>(SelectedTexture);
+
+                    ImGui.Checkbox("Slice By Size", ref SPI.BySize);
+                    ImGui.Text("Texture Dimensions: " + new Vector2(Tex.Width, Tex.Height).ToString());
+                    ImGui.InputInt2("Size/Count", ref SPI.SizeOrCount[0]);
+                    ImGui.InputInt2("Offset", ref SPI.Offset[0]);
+                    ImGui.InputInt2("Spacing", ref SPI.Spacing[0]);
+
+                    if(SPI.BySize)
+                    {
+                        SPI.SizeOrCount[0] = (int)Math.Clamp(SPI.SizeOrCount[0], Tex.Width / 30.0f, Tex.Width);
+                        SPI.SizeOrCount[1] = (int)Math.Clamp(SPI.SizeOrCount[1], Tex.Height / 30.0f, Tex.Height);
+                        Vector2 ImageSize = new Vector2((float)SPI.SizeOrCount[0] / Tex.Width, (float)SPI.SizeOrCount[1] / Tex.Height);
+
+                        for (int i = 0; i < Tex.Height; i += SPI.SizeOrCount[1])
+                        {
+                            for (int j = 0; j < Tex.Width; j += SPI.SizeOrCount[0])
+                            {
+                                Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
+                                Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
+                                ImGui.Image(TexPtrs[SelTexIndex], ImageSize * 512, new Vector2(j, i) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), new Vector2(j + SPI.SizeOrCount[0], i + SPI.SizeOrCount[1]) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), Vector4.One, Vector4.One);
+
+                                if (j < Tex.Width - SPI.SizeOrCount[0])
+                                    ImGui.SameLine();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        SPI.SizeOrCount[0] = Math.Clamp(SPI.SizeOrCount[0], 1, 32);
+                        SPI.SizeOrCount[1] = Math.Clamp(SPI.SizeOrCount[1], 1, 32);
+                        Vector2 ImageSize = new Vector2(1.0f / SPI.SizeOrCount[1], 1.0f / SPI.SizeOrCount[0]);
+
+                        for (int i=0; i<SPI.SizeOrCount[0]; i++)
+                        {
+                            for (int j=0; j<SPI.SizeOrCount[1]; j++)
+                            {
+                                Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
+                                Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
+                                ImGui.Image(TexPtrs[SelTexIndex], ImageSize * 512, new Vector2(j * ImageSize.X, i * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), new Vector2((j + 1) * ImageSize.X, (i + 1) * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), Vector4.One, Vector4.One);
+
+                                if(j != SPI.SizeOrCount[1] - 1)
+                                    ImGui.SameLine();
+                            }
+                        }
+                    }
+                }
+
+                if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Escape)))
+                {
+                    ImGui.CloseCurrentPopup();
+                    IsSpriteEditorOpen = false;
+                }
+
+                ImGui.EndPopup();
+            }
+
+            
+            ////////////////////////
 
             if (ImGui.BeginPopup("AssetName"))
             {
@@ -372,8 +591,6 @@ namespace FN_Engine.FN_Editor
             //}
 
             ImGui.EndChild();
-
-            ImGui.BeginChild("Assets");
 
             ImGui.End();
         }

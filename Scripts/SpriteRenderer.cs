@@ -1,5 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FN_Engine
@@ -8,7 +11,7 @@ namespace FN_Engine
     {
         public static Effect LastEffect;
 
-        public string TextureName
+        public string TextureName //Don't change this name! (It's used in content window in drag and drop)
         {
             set
             {
@@ -20,6 +23,19 @@ namespace FN_Engine
                     Sprite = new Sprite(gameObject.Transform);
                     Sprite.LoadTexture("Default Textures\\DefaultTexture");
                 }
+
+                //if (FN_Editor.EditorScene.IsThisTheEditor)
+                //{
+                //    if (FN_Editor.ContentWindow.DraggedAsset != null && FN_Editor.ContentWindow.DraggedAsset is KeyValuePair<string, Rectangle>)
+                //    {
+                //        KeyValuePair<string, Rectangle> DraggedSubTex = (KeyValuePair<string, Rectangle>)FN_Editor.ContentWindow.DraggedAsset;
+
+                //        Sprite.LoadTexture(DraggedSubTex.Key);
+                //        Sprite.SourceRectangle = new Rectangle((int)(Sprite.Texture.Width * DraggedSubTex.Value.X / 10000.0f), (int)(Sprite.Texture.Height * DraggedSubTex.Value.Y / 10000.0f), (int)(Sprite.Texture.Width * DraggedSubTex.Value.Width / 10000.0f), (int)(Sprite.Texture.Height * DraggedSubTex.Value.Height / 10000.0f));
+
+                //        return;
+                //    }
+                //}
 
                 if (value == Sprite.Texture.Name)
                     return;
@@ -34,10 +50,29 @@ namespace FN_Engine
                     return null;
             }
         }
-        public Sprite Sprite { private set; get; }
+
+        public Sprite Sprite { private set; get; } 
         public SpriteEffects SpriteEffects;
         public Color Color = Color.Aqua;
         public Effect Effect;
+        public Rectangle SourceRectangle //Don't change this name! (It's used in content window in drag and drop)
+        {
+            set
+            {
+                if (Sprite != null)
+                {
+                    Sprite.SourceRectangle = value;
+                    Sprite.Origin = new Vector2(value.Width * 0.5f, value.Height * 0.5f);
+                }
+            }
+            get
+            {
+                if (Sprite == null)
+                    return Rectangle.Empty;
+
+                return Sprite.SourceRectangle;
+            }
+        }
 
         static SpriteRenderer()
         {

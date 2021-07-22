@@ -141,15 +141,15 @@ namespace FN_Engine
             return new Vector2((int)vector.X, (int)vector.Y);
         }
 
-        public static object GetInstance(string ObjectType)
+        public static object GetInstance(string ObjectType, object[] Args = null)
         {
             Type T = Type.GetType(ObjectType);
-            return Activator.CreateInstance(T);
+            return Activator.CreateInstance(T, Args);
         }
 
-        public static object GetInstance(Type ObjectType)
+        public static object GetInstance(Type ObjectType, object[] Args = null)
         {
-            return Activator.CreateInstance(ObjectType);
+            return Activator.CreateInstance(ObjectType, Args);
         }
 
         // This function is from a stackoverflow question:
@@ -244,7 +244,11 @@ namespace FN_Engine
                     JW.WriteValue(((ICollection)Member.GetValue(OBJ)).Count);
 
                     JW.WritePropertyName("Item Type");
-                    JW.WriteValue(((IEnumerable)Member.GetValue(OBJ)).GetType().GetGenericArguments()[0].ToString());
+
+                    if (!MemType.IsArray)
+                        JW.WriteValue(((IEnumerable)Member.GetValue(OBJ)).GetType().GetGenericArguments()[0].ToString());
+                    else
+                        JW.WriteValue(MemType.FullName.Remove(MemType.FullName.Length - 2, 2));
 
                     JW.WriteEndObject();
 
@@ -317,8 +321,13 @@ namespace FN_Engine
                     JW.WritePropertyName("Length");
                     JW.WriteValue(((ICollection)Member.GetValue(OBJ)).Count);
 
+                    
                     JW.WritePropertyName("Item Type");
-                    JW.WriteValue(((IEnumerable)Member.GetValue(OBJ)).GetType().GetGenericArguments()[0].ToString());
+
+                    if (!MemType.IsArray)
+                        JW.WriteValue(((IEnumerable)Member.GetValue(OBJ)).GetType().GetGenericArguments()[0].ToString());
+                    else
+                        JW.WriteValue(MemType.FullName.Remove(MemType.FullName.Length - 2, 2));
 
                     JW.WriteEndObject();
 
@@ -426,7 +435,7 @@ namespace FN_Engine
                                    // End of Metadata
 
                         //Iterating Objects
-                        var OBJ_Arr = (IList)GetInstance(FI.FieldType);
+                        var OBJ_Arr = (IList)GetInstance(FI.FieldType, new object[] { ArrLength });
                         for (int i = 0; i < ArrLength; i++)
                         {
                             JR.Read(); //Value
@@ -590,7 +599,7 @@ namespace FN_Engine
                                    // End of Metadata
 
                         //Iterating Objects
-                        var OBJ_Arr = (IList)GetInstance(PI.PropertyType);
+                        var OBJ_Arr = (IList)GetInstance(PI.PropertyType, new object[] { ArrLength });
                         for (int i = 0; i < ArrLength; i++)
                         {
                             JR.Read(); //Value

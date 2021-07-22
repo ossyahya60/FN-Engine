@@ -14,14 +14,12 @@ namespace FN_Engine.FN_Editor
 
         public override void DrawUI()
         {
-            ImGui.GetIO().ConfigWindowsResizeFromEdges = true;
-
             //Move windows using title bar only
             ImGui.GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
             //FPS
             //ImGui.Text(((int)(1.0f / (float)gameTime.ElapsedGameTime.TotalSeconds)).ToString());
-            ImGui.Text("Mouse Pos: " + Input.GetMousePosition().ToString());
+            //ImGui.Text("Mouse Pos: " + Input.GetMousePosition().ToString());
 
             if (ImGui.IsMouseDragging(ImGuiMouseButton.Right))
                 Setup.Camera.Move(Input.MouseDelta(), 1);
@@ -29,18 +27,26 @@ namespace FN_Engine.FN_Editor
             if (ImGui.GetIO().KeyCtrl && Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.S))
                 SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
 
+            if (ImGui.GetIO().KeyCtrl && Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.P))
+            {
+                SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
+                Threader.Invoke(FN_Project.VisualizeEngineStartup.RunExecutable, 0);
+            }
+
             if (ImGui.BeginMainMenuBar())
             {
                 if (ImGui.BeginMenu("File"))
                 {
-                    if (ImGui.MenuItem("Serialize"))
+                    if (ImGui.MenuItem("Save", "CTRL + S"))
                         SceneManager.SerializeScene("DefaultScene");
 
-                    if (ImGui.MenuItem("Play"))
+                    if (ImGui.MenuItem("Launch Game", "CTRL + P"))
                     {
                         SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
                         Threader.Invoke(FN_Project.VisualizeEngineStartup.RunExecutable, 0);
                     }
+
+                    ImGui.Checkbox("Enable Update", ref SceneManager.ShouldUpdate);
 
                     ImGui.EndMenu();
                 }

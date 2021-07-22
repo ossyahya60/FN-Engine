@@ -215,8 +215,11 @@ namespace FN_Engine
 
             Resolution = new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
 
-            if (ActiveScene != null && ShouldUpdate /*&& !FN_Editor.EditorScene.IsThisTheEditor*/)
+            if (ActiveScene != null && ShouldUpdate)
                 ActiveScene.Update(gameTime);
+
+            if (ActiveScene != null && FN_Editor.EditorScene.IsThisTheEditor)
+                ActiveScene.UpdateUI(gameTime);
 
             // I moved this here, because Update rate is not the same as draw rate, so Input is not synchronized well
             ActiveScene.DrawUI(gameTime); //Draw UI

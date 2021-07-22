@@ -81,7 +81,7 @@ namespace FN_Engine
         /// </summary>
         protected override void LoadContent()
         {
-            SceneManager.ShouldUpdate = true;
+            SceneManager.ShouldUpdate = false;
             ImportantIntialization();
 
             Setup.Content.Load<SpriteFont>("Font");
@@ -155,8 +155,8 @@ namespace FN_Engine
         {
             Input.GetState(); //This has to be called at the start of update method!!
 
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                //Exit();
 
             ///////////////////////////////////////
             if (Input.GetKey(Keys.Z, KeyboardFlags.SHIFT))

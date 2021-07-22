@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.Xna.Framework;
 
 namespace FN_Engine
@@ -11,11 +12,8 @@ namespace FN_Engine
         public Vector2 Position;
         public float Rotation = 0;
         public Vector2 Scale = Vector2.One;
-        public string NiceString = "lol";
 
         internal bool JustParented = false;
-
-        private Vector2 position = Vector2.Zero;
 
         internal Transform FakeTransform
         {
@@ -58,7 +56,14 @@ namespace FN_Engine
             ToBeSet.Scale = Scale;
         }
 
-        public override void DrawUI()
+        internal override void UpdateUI(GameTime gameTime)
+        {
+            LastPosition = Position;
+            LastRotation = Rotation;
+            LastScale = Scale;
+        }
+
+        public override void Update(GameTime gameTime)
         {
             LastPosition = Position;
             LastRotation = Rotation;
@@ -97,6 +102,9 @@ namespace FN_Engine
                     Scale /= gameObject.Parent.Transform.Scale;
                     JustParented = false;
                 }
+
+                if (Position - LastPosition != Vector2.Zero)
+                    Console.WriteLine("WOOW");
 
                 T.Position += Position - LastPosition;
                 T.Rotation += Rotation - LastRotation;
