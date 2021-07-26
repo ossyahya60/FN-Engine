@@ -60,7 +60,7 @@ namespace FN_Engine.FN_Editor
             ImGui.Begin(SceneManager.ActiveScene.Name);
 
             ///
-            if (MyRegion[1].Y != 0)
+            if (EditorScene.AutoConfigureWindows && MyRegion[1].Y != 0)
             {
                 float DeltaSize = MyRegion[1].Y - ImGui.GetWindowSize().Y;
 

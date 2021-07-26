@@ -176,7 +176,7 @@ namespace FN_Engine.FN_Editor
                 if (ImGui.BeginTabItem("Inspector"))
                 {
                     ///
-                    if (MyRegion[1].X != 0)
+                    if (EditorScene.AutoConfigureWindows && MyRegion[1].X != 0)
                     {
                         float DeltaSize = MyRegion[1].X - ImGui.GetWindowSize().X;
 

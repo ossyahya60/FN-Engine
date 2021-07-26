@@ -25,7 +25,7 @@ namespace FN_Engine
                         var CD2 = collider2 as Collider2D;
                         var CallerRigidBody = collider.gameObject.GetComponent<Rigidbody2D>();
 
-                        if (CallerRigidBody != null && CD1.CollisionDetection(CD2, false)) //We call the resolution two times for more stable resolutions
+                        if (CallerRigidBody != null && !CD1.IsTrigger() && CD1.CollisionDetection(CD2, false)) //We call the resolution two times for more stable resolutions
                         {
                             Vector2 CollisionPos = CallerRigidBody.gameObject.Transform.Position;
                             CallerRigidBody.gameObject.Transform.Position = CallerRigidBody.gameObject.Transform.LastPosition;

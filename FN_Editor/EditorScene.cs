@@ -1,11 +1,17 @@
 ﻿using ImGuiNET;
-using Microsoft.Xna.Framework;
+using System.Numerics;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace FN_Engine.FN_Editor
 {
     internal class EditorScene: GameObjectComponent
     {
         public static bool IsThisTheEditor = false;
+        public static bool AutoConfigureWindows = true;
+
+        private string sceneName = "Default";
 
         public override void Start()
         {
@@ -35,10 +41,65 @@ namespace FN_Engine.FN_Editor
 
             if (ImGui.BeginMainMenuBar())
             {
+                ImGui.SetNextItemOpen(true);
+
                 if (ImGui.BeginMenu("File"))
                 {
+                    if (ImGui.BeginMenu("New Scene"))
+                    {
+                        ImGui.InputText("Name", ref sceneName, 50);
+
+                        ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+
+                        if (ImGui.SmallButton("Create"))
+                        {
+                            //Validate Name Here with the files in the directory
+                            if (!Directory.GetFiles(Environment.CurrentDirectory).Contains(Environment.CurrentDirectory + "\\" + sceneName + ".scene"))
+                            {
+                                SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
+
+                                var ActiveScene = SceneManager.ActiveScene;
+
+                                GameObject GO = new GameObject(true);
+                                GO.Name = "EditorGameObject";
+                                GO.Layer = -1;
+                                GO.AddComponent(new FN_Editor.GameObjects_Tab());
+                                GO.AddComponent(new FN_Editor.InspectorWindow());
+                                GO.AddComponent(new FN_Editor.ContentWindow());
+                                GO.AddComponent(new FN_Editor.GizmosVisualizer());
+                                GO.AddComponent(new FN_Editor.EditorScene());
+
+                                GameObject CamerContr = new GameObject();
+                                CamerContr.Name = "Camera Controller";
+                                CamerContr.AddComponent(new Transform());
+                                CamerContr.AddComponent(new CameraController());
+
+                                Scene NewScene = new Scene(sceneName);
+                                SceneManager.ActiveScene = NewScene;
+
+                                SceneManager.ActiveScene.AddGameObject_Recursive(GO);
+                                SceneManager.ActiveScene.AddGameObject_Recursive(CamerContr);
+
+                                SceneManager.Initialize();
+
+                                SceneManager.SerializeScene(NewScene.Name);
+                                SceneManager.LoadScene_Serialization(NewScene.Name);
+                                SceneManager.ActiveScene = ActiveScene;
+
+                                //settings of ImGui must be loaded or edited
+                            }
+                        }
+
+                        //var GEO = SceneManager.ActiveScene.FindGameObjectWithName("EditorGameObject");
+                        //Scene NewScene = new Scene("NOice Scene");
+                        //NewScene.AddGameObject_Recursive(GEO);
+                        //SceneManager.SerializeScene(NewScene.Name);
+                        //SceneManager.LoadScene_Serialization(NewScene.Name);
+                        ImGui.EndMenu();
+                    }
+
                     if (ImGui.MenuItem("Save", "CTRL + S"))
-                        SceneManager.SerializeScene("DefaultScene");
+                        SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
 
                     if (ImGui.MenuItem("Launch Game", "CTRL + P"))
                     {
@@ -48,8 +109,11 @@ namespace FN_Engine.FN_Editor
 
                     ImGui.Checkbox("Enable Update", ref SceneManager.ShouldUpdate);
 
+                    ImGui.Checkbox("Auto Config Windows", ref AutoConfigureWindows);
+
                     ImGui.EndMenu();
                 }
+
                 ImGui.EndMainMenuBar();
             }
 

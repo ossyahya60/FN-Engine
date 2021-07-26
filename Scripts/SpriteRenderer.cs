@@ -53,7 +53,7 @@ namespace FN_Engine
 
         public Sprite Sprite { private set; get; } 
         public SpriteEffects SpriteEffects;
-        public Color Color = Color.Aqua;
+        public Color Color = Color.White;
         public Effect Effect;
         public Rectangle SourceRectangle //Don't change this name! (It's used in content window in drag and drop)
         {
