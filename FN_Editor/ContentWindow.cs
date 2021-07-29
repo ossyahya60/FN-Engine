@@ -481,7 +481,7 @@ namespace FN_Engine.FN_Editor
                                     bool EnteredButton2 = false;
                                     ImGui.PushID(i3.ToString() + "Noice");
                                     ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
-                                    if (ImGui.ImageButton(TexPtrs[SelTexIndex], new Vector2(64, 64), new Vector2(SlicedTexs[i3].X / 10000.0f, SlicedTexs[i3].Y / 10000.0f), new Vector2(SlicedTexs[i3].Right / 10000.0f, SlicedTexs[i3].Bottom / 10000.0f)))
+                                    if (ImGui.ImageButton(TexPtrs[SelTexIndex], new Vector2(64 * ((float)SlicedTexs[i3].Width / SlicedTexs[i3].Height), 64), new Vector2(SlicedTexs[i3].X / 10000.0f, SlicedTexs[i3].Y / 10000.0f), new Vector2(SlicedTexs[i3].Right / 10000.0f, SlicedTexs[i3].Bottom / 10000.0f)))
                                     {
                                         ImGui.PopID();
                                         EnteredButton2 = true;

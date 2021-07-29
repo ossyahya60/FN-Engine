@@ -54,40 +54,41 @@ namespace FN_Engine.FN_Editor
                         if (ImGui.SmallButton("Create"))
                         {
                             //Validate Name Here with the files in the directory
-                            if (!Directory.GetFiles(Environment.CurrentDirectory).Contains(Environment.CurrentDirectory + "\\" + sceneName + ".scene"))
-                            {
-                                SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
+                            string[] Scenes = Directory.GetFiles(Environment.CurrentDirectory).Where(Item => Item.EndsWith(".scene")).ToArray();
+                            sceneName = Utility.UniqueName(sceneName, Scenes);
 
-                                var ActiveScene = SceneManager.ActiveScene;
+                            //Create Scene
+                            SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
 
-                                GameObject GO = new GameObject(true);
-                                GO.Name = "EditorGameObject";
-                                GO.Layer = -1;
-                                GO.AddComponent(new FN_Editor.GameObjects_Tab());
-                                GO.AddComponent(new FN_Editor.InspectorWindow());
-                                GO.AddComponent(new FN_Editor.ContentWindow());
-                                GO.AddComponent(new FN_Editor.GizmosVisualizer());
-                                GO.AddComponent(new FN_Editor.EditorScene());
+                            var ActiveScene = SceneManager.ActiveScene;
 
-                                GameObject CamerContr = new GameObject();
-                                CamerContr.Name = "Camera Controller";
-                                CamerContr.AddComponent(new Transform());
-                                CamerContr.AddComponent(new CameraController());
+                            GameObject GO = new GameObject(true);
+                            GO.Name = "EditorGameObject";
+                            GO.Layer = -1;
+                            GO.AddComponent(new FN_Editor.GameObjects_Tab());
+                            GO.AddComponent(new FN_Editor.InspectorWindow());
+                            GO.AddComponent(new FN_Editor.ContentWindow());
+                            GO.AddComponent(new FN_Editor.GizmosVisualizer());
+                            GO.AddComponent(new FN_Editor.EditorScene());
 
-                                Scene NewScene = new Scene(sceneName);
-                                SceneManager.ActiveScene = NewScene;
+                            GameObject CamerContr = new GameObject();
+                            CamerContr.Name = "Camera Controller";
+                            CamerContr.AddComponent(new Transform());
+                            CamerContr.AddComponent(new CameraController());
 
-                                SceneManager.ActiveScene.AddGameObject_Recursive(GO);
-                                SceneManager.ActiveScene.AddGameObject_Recursive(CamerContr);
+                            Scene NewScene = new Scene(sceneName);
+                            SceneManager.ActiveScene = NewScene;
 
-                                SceneManager.Initialize();
+                            SceneManager.ActiveScene.AddGameObject_Recursive(GO);
+                            SceneManager.ActiveScene.AddGameObject_Recursive(CamerContr);
 
-                                SceneManager.SerializeScene(NewScene.Name);
-                                SceneManager.LoadScene_Serialization(NewScene.Name);
-                                SceneManager.ActiveScene = ActiveScene;
+                            SceneManager.Initialize();
 
-                                //settings of ImGui must be loaded or edited
-                            }
+                            SceneManager.SerializeScene(NewScene.Name);
+                            SceneManager.LoadScene_Serialization(NewScene.Name);
+                            SceneManager.ActiveScene = ActiveScene;
+
+                            //settings of ImGui must be loaded or edited
                         }
 
                         //var GEO = SceneManager.ActiveScene.FindGameObjectWithName("EditorGameObject");
@@ -110,6 +111,14 @@ namespace FN_Engine.FN_Editor
                     ImGui.Checkbox("Enable Update", ref SceneManager.ShouldUpdate);
 
                     ImGui.Checkbox("Auto Config Windows", ref AutoConfigureWindows);
+
+                    ImGui.EndMenu();
+                }
+
+                if(ImGui.BeginMenu("Tools"))
+                {
+                    if (ImGui.MenuItem("Animation Editor"))
+                        AnimationEditor.IsWindowOpen = true;
 
                     ImGui.EndMenu();
                 }

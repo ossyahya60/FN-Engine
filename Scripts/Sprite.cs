@@ -44,7 +44,8 @@ namespace FN_Engine
 
         public void LoadTexture(string path)
         {
-            Texture = Setup.Content.Load<Texture2D>(path);
+            try { Texture = Setup.Content.Load<Texture2D>(path); }
+            catch (Microsoft.Xna.Framework.Content.ContentLoadException) { } //Log Error maybe?
         }
 
         public Rectangle DynamicScaledRect()

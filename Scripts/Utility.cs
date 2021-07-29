@@ -1396,6 +1396,57 @@ namespace FN_Engine
             return UniqueName;
         }
 
+        public static string UniqueName(string BaseName, string[] NamePool) // If base name is not present in the scene, then base name is returned
+        {
+            string UniqueName = BaseName;
+
+            bool Duplicate = false;
+            if (NameFormatRegex.IsMatch(BaseName))
+                Duplicate = true;
+
+            string[] Names = null;
+            int SearchNumber = 0;
+
+            if (Duplicate)
+            {
+                string[] SearchingName = BaseName.Remove(BaseName.Length - 1, 1).Split('(');
+                SearchNumber = int.Parse(SearchingName[SearchingName.Length - 1]) + 1;
+
+                Names = NamePool.Where(Item => GetBaseName(Item) == GetBaseName(UniqueName)).OrderBy(Item => GetSearchNumber(Item)).ToArray();
+            }
+            else
+                Names = NamePool.Where(Item => (Item.StartsWith(BaseName) && NameRegex.IsMatch(Item.Remove(0, BaseName.Length))) || Item == BaseName).OrderBy(Item => GetSearchNumber(Item)).ToArray();
+
+            for (int i = 0; i < Names.Length; i++)
+            {
+                if (Names[i] != BaseName)
+                {
+                    string[] ProcessingName = Names[i].Remove(Names[i].Length - 1, 1).Split('(');
+                    int Number = int.Parse(ProcessingName[ProcessingName.Length - 1]);
+
+                    if (SearchNumber == Number)
+                        SearchNumber++;
+                    else if (!Duplicate)
+                        break; //?
+                }
+                else if (!Duplicate)
+                    SearchNumber++;
+            }
+
+            if (!Duplicate && SearchNumber != 0)
+                UniqueName = BaseName + " (" + SearchNumber.ToString() + ")";
+            else if (Duplicate)
+            {
+                string[] ProcessingName = UniqueName.Remove(UniqueName.Length - 1, 1).Split('(');
+                UniqueName = "";
+                for (int i = 0; i < ProcessingName.Length - 1; i++)
+                    UniqueName = ProcessingName[i] + "(";
+                UniqueName += SearchNumber.ToString() + ")";
+            }
+
+            return UniqueName;
+        }
+
         private static string GetBaseName(string Name)
         {
             string BaseName = "";
