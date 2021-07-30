@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System.IO;
 
 namespace FN_Engine
 {
@@ -27,10 +26,10 @@ namespace FN_Engine
                 ActiveClip = AM;
         }
 
-        public void PlayWithTag(string Tag)
+        public void Play(string Name)
         {
             foreach (Animation Anim in AnimationClips)
-                if (Anim.Tag == Tag)
+                if (Anim.Name == Name)
                 {
                     Anim.Play();
                     ActiveClip = Anim;
@@ -46,25 +45,25 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject Clone)
         {
             Animator clone = this.MemberwiseClone() as Animator;
-            clone.ActiveClip = ActiveClip.DeepCopy(Clone);
+            clone.ActiveClip = ActiveClip.DeepCopy();
             clone.AnimationClips = new List<Animation>();
 
             foreach (Animation animation in AnimationClips)
-                clone.AddClip(animation.DeepCopy(Clone));
+                clone.AddClip(animation.DeepCopy());
 
             return clone; 
         }
 
-        public override void Serialize(StreamWriter SW)
-        {
-            SW.WriteLine(ToString());
+        //public override void Serialize(StreamWriter SW)
+        //{
+        //    SW.WriteLine(ToString());
 
-            base.Serialize(SW);
-            foreach (Animation AM in AnimationClips)
-                AM.Serialize(SW);
-            //SW.Write("ActiveClip:\t" + ActiveClip.Tag.ToString() + "\n");
+        //    base.Serialize(SW);
+        //    foreach (Animation AM in AnimationClips)
+        //        AM.Serialize(SW);
+        //    //SW.Write("ActiveClip:\t" + ActiveClip.Tag.ToString() + "\n");
 
-            SW.WriteLine("End Of " + ToString());
-        }
+        //    SW.WriteLine("End Of " + ToString());
+        //}
     }
 }

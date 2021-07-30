@@ -665,7 +665,7 @@ namespace FN_Engine.FN_Editor
                                                     ComboChanged = true;
                                                 FI.SetValue(GOC, CurrentItem);
                                             }
-                                            else if (FI.GetType().IsClass && !FI.GetType().IsArray)
+                                            else if (FI.GetType().IsClass && FI.GetType().GetInterface("IEnumerable") == null)
                                             {
                                                 EnteredHere = true;
                                                 var Name = FI.GetValue(GOC);
@@ -909,7 +909,7 @@ namespace FN_Engine.FN_Editor
                                                     ComboChanged = true;
                                                 PI.SetValue(GOC, CurrentItem);
                                             }
-                                            else if (PI.GetType().IsClass && !PI.GetType().IsArray)
+                                            else if (PI.GetType().IsClass && PI.GetType().GetInterface("IEnumerable") == null)
                                             {
                                                 EnteredHere = true;
                                                 var Name = PI.GetValue(GOC);

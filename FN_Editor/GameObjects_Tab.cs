@@ -15,6 +15,7 @@ namespace FN_Engine.FN_Editor
         public static Vector2[] MyRegion;
         public static LinkedList<KeyValuePair<object, Operation>> Undo_Buffer;
         public static LinkedList<KeyValuePair<object, Operation>> Redo_Buffer;
+        public static GameObject DraggedGO;
 
         public const int BufferLimit = 200; //200 Items
 
@@ -22,7 +23,6 @@ namespace FN_Engine.FN_Editor
         private HashSet<GameObject> SelectedGOs;
         private GameObject[] GOs_Clipboard = null;
         private bool IsCopy = true;
-        private GameObject DraggedGO;
 
         public override void Start()
         {
