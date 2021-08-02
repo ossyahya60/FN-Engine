@@ -386,9 +386,12 @@ namespace FN_Engine
             JR.Read(); //Object Type
             JR.Read(); //Object Type Value
 
+            var T4 = Assembly.GetEntryAssembly().GetName().Name;
             Type ObjType = Type.GetType(JR.Value.ToString());
             if (ObjType == null && FN_Editor.EditorScene.IsThisTheEditor)
                 ObjType = FN_Editor.InspectorWindow.GameAssem.GetType(JR.Value.ToString());
+            else if(ObjType == null)
+                ObjType = Assembly.GetEntryAssembly().GetType(JR.Value.ToString());
 
             var OBJ = GetInstance(ObjType);
 

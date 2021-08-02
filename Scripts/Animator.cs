@@ -8,6 +8,13 @@ namespace FN_Engine
         public List<Animation> AnimationClips;
         public Animation ActiveClip = null;
 
+        private SpriteRenderer SR = null;
+
+        public override void Start()
+        {
+            SR = gameObject.GetComponent<SpriteRenderer>();
+        }
+
         public Animator()
         {
             AnimationClips = new List<Animation>();
@@ -15,11 +22,13 @@ namespace FN_Engine
 
         public void AddClip(Animation AM)
         {
+            AM.SR = SR;
             AnimationClips.Add(AM);
         }
 
         public void AddClip(Animation AM, bool SetAsActive)
         {
+            AM.SR = SR;
             AnimationClips.Add(AM);
 
             if (SetAsActive)
@@ -31,6 +40,7 @@ namespace FN_Engine
             foreach (Animation Anim in AnimationClips)
                 if (Anim.Name == Name)
                 {
+                    Anim.SR = SR;
                     Anim.Play();
                     ActiveClip = Anim;
                 }

@@ -5,16 +5,17 @@ using System.Collections.Generic;
 
 namespace FN_Engine
 {
+    public class Frame
+    {
+        public Texture2D Tex = null;
+        public float Time = 0.25f;
+        public Microsoft.Xna.Framework.Rectangle SourceRectangle = Microsoft.Xna.Framework.Rectangle.Empty;
+        internal IntPtr TexPtr;
+    }
+
     public class Animation 
     {
-        public class Frame
-        {
-            public Texture2D Tex = null;
-            public Rectangle SourceRect = Rectangle.Empty;
-            public float Time = 0.5f;
-            internal IntPtr TexPtr = IntPtr.Zero;
-        }
-
+        public SpriteRenderer SR = null;
         public string Name = "Default Animation";
         public List<Frame> Frames;
         public float Speed = 1.0f;
@@ -51,6 +52,9 @@ namespace FN_Engine
                 }
                 else
                     TimeCounter += (float)gameTime.ElapsedGameTime.TotalSeconds * Speed;
+
+                SR.Sprite.Texture = Frames[ActiveFrame].Tex;
+                SR.Sprite.SourceRectangle = Frames[ActiveFrame].SourceRectangle;
             }
         }
 
@@ -60,7 +64,7 @@ namespace FN_Engine
             Clone.Frames = new List<Frame>(Frames.Count);
 
             for (int i = 0; i < Frames.Count; i++)
-                Clone.Frames[i] = new Frame() { SourceRect = Frames[i].SourceRect, Time = Frames[i].Time, Tex = Frames[i].Tex };
+                Clone.Frames[i] = new Frame() { SourceRectangle = Frames[i].SourceRectangle, Time = Frames[i].Time, Tex = Frames[i].Tex };
 
             return Clone;    
         }
