@@ -10,6 +10,7 @@ namespace FN_Engine
     public class Scene
     {
         public static ImGUI.ImGuiRenderer GuiRenderer { private set; get; } = null; //This is the ImGuiRenderer
+        public static bool IsSceneBeingLoaded = false;
 
         public bool ShouldSort = false;
         public bool Active = true;

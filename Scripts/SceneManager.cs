@@ -135,6 +135,7 @@ namespace FN_Engine
             UnloadScene();
             //Utility.BuildAllContent(Directory.GetCurrentDirectory());
 
+            Scene.IsSceneBeingLoaded = true;
             if(FN_Editor.EditorScene.IsThisTheEditor)
                 ActiveScene = DeserlializeV2(SceneToBeLoaded.Name + "_Editor");
             else
@@ -148,6 +149,7 @@ namespace FN_Engine
                 FN_Editor.GameObjects_Tab.Redo_Buffer.Clear();
             }
 
+            Scene.IsSceneBeingLoaded = false;
             SceneToBeLoaded = null;
         }
 

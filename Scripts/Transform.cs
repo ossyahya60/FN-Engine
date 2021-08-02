@@ -103,12 +103,9 @@ namespace FN_Engine
                     JustParented = false;
                 }
 
-                if (Position - LastPosition != Vector2.Zero)
-                    Console.WriteLine("WOOW");
-
                 T.Position += Position - LastPosition;
                 T.Rotation += Rotation - LastRotation;
-                T.Scale += gameObject.Transform.Scale - LastScale;
+                T.Scale += Scale - LastScale;
 
                 T = Compose(gameObject.Parent.Transform, T);
 
@@ -121,7 +118,7 @@ namespace FN_Engine
         public Vector2 TransformVector(Vector2 point)
         {
             Vector2 result = Vector2.Transform(point, Matrix.CreateRotationZ(Rotation));
-            result *= Scale;
+            //result *= Scale;
             result += Position;
             return result;
         }
