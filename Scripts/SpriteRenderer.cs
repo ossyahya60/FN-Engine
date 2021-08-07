@@ -103,7 +103,7 @@ namespace FN_Engine
                     LastEffect = Effect;
                 }
 
-                Transform T = gameObject.Transform.AdjustTransformation();
+                Transform T = gameObject.Transform.AdjustedTransform;
 
                 Rectangle DestRect = Rectangle.Empty;
                 DestRect.Location = T.Position.ToPoint();

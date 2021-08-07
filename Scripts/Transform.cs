@@ -6,6 +6,7 @@ namespace FN_Engine
 {
     public class Transform : GameObjectComponent
     {
+        public bool MoveLocally = false;
         public Vector2 LastPosition { private set; get; }
         public float LastRotation { private set; get; }
         public Vector2 LastScale { private set; get; }
@@ -13,7 +14,9 @@ namespace FN_Engine
         public float Rotation = 0;
         public Vector2 Scale = Vector2.One;
 
+
         internal bool JustParented = false;
+        internal Transform AdjustedTransform = null;
 
         internal Transform FakeTransform
         {
@@ -104,17 +107,18 @@ namespace FN_Engine
                     Position -= (gameObject.Parent.Transform.Position - Position) / gameObject.Parent.Transform.Scale + Displacement;
                     Rotation -= ParentRotation;
                     Scale /= gameObject.Parent.Transform.Scale;
-                    JustParented = false;
                 }
 
                 Displacement = Position - LastPosition;
-                T.Position += new Vector2((float)(Displacement.X * Math.Cos(ParentRotation) + Displacement.Y * Math.Sin(ParentRotation)), -(float)(Displacement.X * Math.Sin(ParentRotation) - Displacement.Y * Math.Cos(ParentRotation)));
+                T.Position += MoveLocally && !JustParented ? Displacement : new Vector2((float)(Displacement.X * Math.Cos(ParentRotation) + Displacement.Y * Math.Sin(ParentRotation)), -(float)(Displacement.X * Math.Sin(ParentRotation) - Displacement.Y * Math.Cos(ParentRotation)));
                 T.Rotation += Rotation - LastRotation;
                 T.Scale += Scale - LastScale;
 
                 T = Compose(gameObject.Parent.Transform, T);
 
                 T.CloneRelevantData(ref gameObject.Transform);
+
+                JustParented = false;
             }
 
             return T;

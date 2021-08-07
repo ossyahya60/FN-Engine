@@ -189,9 +189,25 @@ namespace FN_Engine
 
             if (Active)
                 for (int i = Count; i >= 0; i--)
-                    GameObjects[Count - i].Update(gameTime);
+                    if (GameObjects[Count - i].Active)
+                        GameObjects[Count - i].Update(gameTime);
 
             CollisionHandler.Update(gameTime);
+        }
+
+        private void QueueInOrder(Queue<Transform> queue)
+        {
+            if (queue.Count == 0)
+                return;
+
+            Transform GO = queue.Dequeue();
+            GO.AdjustedTransform = GO.AdjustTransformation();
+
+            foreach (GameObject Child in GO.gameObject.Children)
+                if (Child.Active)
+                    queue.Enqueue(Child.Transform);
+
+            QueueInOrder(queue);
         }
 
         internal void UpdateUI(GameTime gameTime)
@@ -199,8 +215,21 @@ namespace FN_Engine
             int Count = GameObjects.Count - 1;
 
             if (Active)
+            {
+                Queue<Transform> Transforms = new Queue<Transform>();
+
                 for (int i = Count; i >= 0; i--)
+                {
                     GameObjects[Count - i].UpdateUI(gameTime);
+
+                    //Adjusting Transforms
+                    if (GameObjects[Count - i].Parent == null && GameObjects[Count - i].Active && GameObjects[Count - i].Transform != null)
+                    {
+                        Transforms.Enqueue(GameObjects[Count - i].Transform);
+                        QueueInOrder(Transforms);
+                    }
+                }
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -212,9 +241,7 @@ namespace FN_Engine
                     GameObjects[Count - i].Draw(spriteBatch);
 
             foreach (GameObject GO in GameObjects.FindAll(item => item.ShouldBeDeleted | item.ShouldBeRemoved))
-            {
                 RemoveGameObject(GO, GO.ShouldBeDeleted);
-            }
         }
 
         public void DrawUI(GameTime gameTime)

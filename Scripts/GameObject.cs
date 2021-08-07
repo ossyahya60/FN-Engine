@@ -10,6 +10,7 @@ namespace FN_Engine
         public bool IsEditor { private set; get; }
 
         public GameObject PrevParent { private set; get; }
+
         public GameObject Parent
         {
             set
@@ -312,10 +313,9 @@ namespace FN_Engine
 
         public virtual void Update(GameTime gameTime)
         {
-            if (IsActive())
-                foreach (GameObjectComponent GOC in GameObjectComponents)
-                    if (GOC.Enabled)
-                        GOC.Update(gameTime);
+            foreach (GameObjectComponent GOC in GameObjectComponents)
+                if (GOC.Enabled)
+                    GOC.Update(gameTime);
         }
 
         internal virtual void UpdateUI(GameTime gameTime)
