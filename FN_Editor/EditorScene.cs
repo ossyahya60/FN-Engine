@@ -120,6 +120,9 @@ namespace FN_Engine.FN_Editor
                     if (ImGui.MenuItem("Animation Editor"))
                         AnimationEditor.IsWindowOpen = true;
 
+                    if (ImGui.MenuItem("TileMap Editor"))
+                        TilemapEditor.IsWindowOpen = true;
+
                     ImGui.EndMenu();
                 }
 

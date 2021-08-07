@@ -30,8 +30,8 @@ namespace FN_Engine
                             Vector2 CollisionPos = CallerRigidBody.gameObject.Transform.Position;
                             CallerRigidBody.gameObject.Transform.Position = CallerRigidBody.gameObject.Transform.LastPosition;
 
-                            CD1.CollisionResponse(CallerRigidBody, CD2, false, (float)gameTime.ElapsedGameTime.TotalSeconds * 1, CollisionPos);
-                            //CD1.CollisionResponse(CallerRigidBody, CD2, false, (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f, CollisionPos); //UnComment this if there is a problem
+                            CD1.CollisionResponse(CallerRigidBody, CD2, false, (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f, CollisionPos);
+                            CD1.CollisionResponse(CallerRigidBody, CD2, false, (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f, CollisionPos); //UnComment this if there is a problem
                         }
                     }
                 }

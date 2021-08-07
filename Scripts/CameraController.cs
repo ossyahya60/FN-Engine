@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace FN_Engine
 {
-    internal class CameraController: GameObjectComponent
+    public class CameraController: GameObjectComponent
     {
         public bool Visualize = true;
         public bool IsFullScreen = false;

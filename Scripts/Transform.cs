@@ -95,15 +95,20 @@ namespace FN_Engine
             Transform T = gameObject.Transform.FakeTransform;
             if (gameObject.Parent != null)
             {
+                float ParentRotation = gameObject.Parent.Transform.Rotation;
+                Vector2 Displacement;
+
                 if (gameObject.Transform.JustParented)
                 {
-                    Position -= gameObject.Parent.Transform.Position;
-                    Rotation -= gameObject.Parent.Transform.Rotation;
+                    Displacement = Vector2.Transform(Position, Matrix.CreateRotationZ(ParentRotation));
+                    Position -= (gameObject.Parent.Transform.Position - Position) / gameObject.Parent.Transform.Scale + Displacement;
+                    Rotation -= ParentRotation;
                     Scale /= gameObject.Parent.Transform.Scale;
                     JustParented = false;
                 }
 
-                T.Position += Position - LastPosition;
+                Displacement = Position - LastPosition;
+                T.Position += new Vector2((float)(Displacement.X * Math.Cos(ParentRotation) + Displacement.Y * Math.Sin(ParentRotation)), -(float)(Displacement.X * Math.Sin(ParentRotation) - Displacement.Y * Math.Cos(ParentRotation)));
                 T.Rotation += Rotation - LastRotation;
                 T.Scale += Scale - LastScale;
 
@@ -118,7 +123,7 @@ namespace FN_Engine
         public Vector2 TransformVector(Vector2 point)
         {
             Vector2 result = Vector2.Transform(point, Matrix.CreateRotationZ(Rotation));
-            //result *= Scale;
+            result *= Scale;
             result += Position;
             return result;
         }

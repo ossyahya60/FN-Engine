@@ -8,43 +8,34 @@ namespace FN_Engine
     //Not entirely sure if it should be a gameobject component or not
     public class Sprite
     {
-        public Texture2D Texture
-        {
-            set
-            {
-                texture = value;
-                SourceRectangle = new Rectangle(0, 0, texture.Width, texture.Height);
-                Origin = new Vector2(texture.Width * 0.5f, texture.Height * 0.5f);
-            }
-            get
-            {
-                return texture;
-            }
-        }
+        public Texture2D Texture;
         public Rectangle SourceRectangle;  //P.S: scale??
         public Vector2 Origin;
         public Transform Transform;
-
-        private Texture2D texture;
 
         public Sprite(Transform transform)
         {
             Transform = transform;
             Origin = Vector2.Zero;
             SourceRectangle = new Rectangle();
-            texture = null;
+            Texture = null;
         }
 
         public Sprite()
         {
             Origin = Vector2.Zero;
             SourceRectangle = new Rectangle();
-            texture = null;
+            Texture = null;
         }
 
         public void LoadTexture(string path)
         {
-            try { Texture = Setup.Content.Load<Texture2D>(path); }
+            try
+            { 
+                Texture = Setup.Content.Load<Texture2D>(path);
+                SourceRectangle = new Rectangle(0, 0, Texture.Width, Texture.Height);
+                Origin = new Vector2(Texture.Width * 0.5f, Texture.Height * 0.5f);
+            }
             catch (Microsoft.Xna.Framework.Content.ContentLoadException) { } //Log Error maybe?
         }
 
@@ -66,7 +57,7 @@ namespace FN_Engine
             Clone.SourceRectangle = new Rectangle(SourceRectangle.Location, SourceRectangle.Size);
             Clone.Origin = new Vector2(Origin.X, Origin.Y);
             Clone.Transform = clone.Transform;
-            Clone.texture = texture;
+            Clone.Texture = Texture;
 
             return Clone;
         }
@@ -82,18 +73,18 @@ namespace FN_Engine
             
             SW.Write("SourceRectangle:\t" + SourceRectangle.X.ToString() + "\t" + SourceRectangle.Y.ToString() + "\t" + SourceRectangle.Width.ToString() + "\t" + SourceRectangle.Height.ToString() + "\n");
             SW.Write("Origin:\t" + Origin.X.ToString() + "\t" + Origin.Y.ToString() + "\n");
-            if (texture != null)
+            if (Texture != null)
             {
-                if (texture.Name == null)
+                if (Texture.Name == null)
                 {
-                    texture.SaveAsPng(File.Create("Content/" + GameObjectName + ".png"), texture.Width, texture.Height);
-                    SW.Write("texture:\t" + "Content/" + GameObjectName + ".png" + "\n");
+                    Texture.SaveAsPng(File.Create("Content/" + GameObjectName + ".png"), Texture.Width, Texture.Height);
+                    SW.Write("Texture:\t" + "Content/" + GameObjectName + ".png" + "\n");
                 }
                 else
-                    SW.Write("texture:\t" + texture.Name + "\n");
+                    SW.Write("Texture:\t" + Texture.Name + "\n");
             }
             else
-                SW.Write("texture:\t" + "null\n");
+                SW.Write("Texture:\t" + "null\n");
 
             SW.WriteLine("End Of " + ToString());
         }
@@ -107,17 +98,17 @@ namespace FN_Engine
             string[] origin = SR.ReadLine().Split('\t');
             Origin = new Vector2(float.Parse(origin[1]), float.Parse(origin[2]));
             string TexString = SR.ReadLine().Split('\t')[1];
-            if (TexString == "null") //Should I create a default texture instead?
-                texture = HitBoxDebuger.RectTexture(Color.White);
-            else if (TexString.Contains(".png")) //Custom texture that is serialized
+            if (TexString == "null") //Should I create a default Texture instead?
+                Texture = HitBoxDebuger.RectTexture(Color.White);
+            else if (TexString.Contains(".png")) //Custom Texture that is serialized
             {
                 using (var fileStream = new FileStream(TexString, FileMode.Open))
                 {
-                    texture = Texture2D.FromStream(Setup.GraphicsDevice, fileStream);
+                    Texture = Texture2D.FromStream(Setup.GraphicsDevice, fileStream);
                 }
             }
             else
-                texture = Setup.Content.Load<Texture2D>(TexString);
+                Texture = Setup.Content.Load<Texture2D>(TexString);
 
             SR.ReadLine();
         }

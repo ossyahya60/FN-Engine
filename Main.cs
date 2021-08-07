@@ -127,6 +127,7 @@ namespace FN_Engine
                 GO.AddComponent(new FN_Editor.GizmosVisualizer());
                 GO.AddComponent(new FN_Editor.EditorScene());
                 GO.AddComponent(new FN_Editor.AnimationEditor());
+                GO.AddComponent(new FN_Editor.TilemapEditor());
 
                 GameObject CamerContr = new GameObject();
                 CamerContr.Name = "Camera Controller";

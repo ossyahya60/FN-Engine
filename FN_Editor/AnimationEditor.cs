@@ -146,6 +146,12 @@ namespace FN_Engine.FN_Editor
                                 if (AnimationClips[j].Name == DraggedGO_AnimClips[i].Name)
                                 {
                                     SelectedClip = j;
+                                    AnimationClips[j].Loop = DraggedGO_AnimClips[i].Loop;
+                                    AnimationClips[j].FixedTimeAmount = DraggedGO_AnimClips[i].FixedTime;
+                                    AnimationClips[j].FixedTimeBewteenFrames = DraggedGO_AnimClips[i].FixedTimeBetweenFrames;
+                                    AnimationClips[j].PlayReverse = DraggedGO_AnimClips[i].Reverse;
+                                    AnimationClips[j].Speed = DraggedGO_AnimClips[i].Speed;
+
                                     ActiveFrame = 0;
                                     SearchText = DraggedGO_AnimClips[i].Name;
                                     break;

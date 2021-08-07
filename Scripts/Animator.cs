@@ -6,8 +6,8 @@ namespace FN_Engine
     public class Animator: GameObjectComponent
     {
         public List<Animation> AnimationClips;
-        public Animation ActiveClip = null;
 
+        private Animation ActiveClip = null;
         private SpriteRenderer SR = null;
 
         public override void Start()
@@ -55,7 +55,7 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject Clone)
         {
             Animator clone = this.MemberwiseClone() as Animator;
-            clone.ActiveClip = ActiveClip.DeepCopy();
+            clone.ActiveClip = ActiveClip != null? ActiveClip.DeepCopy() : null;
             clone.AnimationClips = new List<Animation>();
 
             foreach (Animation animation in AnimationClips)

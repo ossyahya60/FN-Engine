@@ -64,7 +64,7 @@ namespace FN_Engine
             Clone.Frames = new List<Frame>(Frames.Count);
 
             for (int i = 0; i < Frames.Count; i++)
-                Clone.Frames[i] = new Frame() { SourceRectangle = Frames[i].SourceRectangle, Time = Frames[i].Time, Tex = Frames[i].Tex };
+                Clone.Frames.Add(new Frame() { SourceRectangle = Frames[i].SourceRectangle, Time = Frames[i].Time, Tex = Frames[i].Tex });
 
             return Clone;    
         }
