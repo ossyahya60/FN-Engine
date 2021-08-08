@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using System;
 
 namespace FN_Engine
 {
@@ -319,6 +320,7 @@ namespace FN_Engine
 
         public void SerializeV2(string Path = "")
         {
+            Directory.CreateDirectory(Environment.CurrentDirectory + "\\" + Path.Substring(0, Path.LastIndexOf("\\")));
             using (StreamWriter SW = new StreamWriter(Path + ".scene", false)) //Remember to serialize and deserialize Camera and RIR
             {
                 Utility.OIG = new System.Runtime.Serialization.ObjectIDGenerator();

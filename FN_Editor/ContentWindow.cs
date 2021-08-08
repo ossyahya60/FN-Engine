@@ -42,7 +42,6 @@ namespace FN_Engine.FN_Editor
         private int SelTexIndex = 0;
         private bool IsSpriteEditorOpen = false;
         private List<Microsoft.Xna.Framework.Rectangle> SlicedTexs = null;
-        private Texture2D SelTex = null;
 
         public override void Start()
         {
@@ -53,7 +52,6 @@ namespace FN_Engine.FN_Editor
             //form.DragDrop += DragDrop;
             /////////////////////////////
             ///
-
             TexPtrs = new List<IntPtr>();
             SlicedTexs = new List<Microsoft.Xna.Framework.Rectangle>();
 
@@ -344,7 +342,6 @@ namespace FN_Engine.FN_Editor
                                         SlicedTexs.Clear();
                                         Texture2D Tex = Setup.Content.Load<Texture2D>(SelectedTexture);
                                         SpriteEditorInfo SPI = SPIs[SelectedTexture];
-                                        SelTex = Tex;
 
                                         if (SPI.BySize)
                                         {

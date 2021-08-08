@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Numerics;
 
 namespace FN_Engine
 {
@@ -145,7 +146,7 @@ namespace FN_Engine
 
             //Setup.Content.RootDirectory = Environment.CurrentDirectory;
 
-            SceneManager.LoadScene_Serialization("DefaultScene");
+            SceneManager.LoadScene_Serialization("Scenes\\" + "DefaultScene");
         }
 
         /// <summary>

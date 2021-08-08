@@ -105,6 +105,42 @@ namespace FN_Engine
             return Output;
         }
 
+        public static System.Numerics.Vector2 STR_To_Vector2_Numeric(string Value)
+        {
+            System.Numerics.Vector2 Output = System.Numerics.Vector2.Zero;
+
+            string[] Vector2Format = Value.Split(',');
+            Output.X = float.Parse(Vector2Format[0].Remove(0, 1).Replace('f', ' '));
+            Output.Y = float.Parse(Vector2Format[3].Remove(Vector2Format[3].Length - 1, 1).Replace('f', ' '));
+
+            return Output;
+        }
+
+        public static System.Numerics.Vector3 STR_To_Vector3_Numeric(string Value)
+        {
+            System.Numerics.Vector3 Output = System.Numerics.Vector3.Zero;
+
+            string[] Vector3Format = Value.Split(',');
+            Output.X = float.Parse(Vector3Format[0].Remove(0, 1).Replace('f', ' '));
+            Output.Z = float.Parse(Vector3Format[3].Remove(Vector3Format[3].Length - 1, 1).Replace('f', ' '));
+            Output.Y = float.Parse(Vector3Format[1].Replace('f', ' '));
+
+            return Output;
+        }
+
+        public static System.Numerics.Vector4 STR_To_Vector4_Numeric(string Value)
+        {
+            System.Numerics.Vector4 Output = System.Numerics.Vector4.Zero;
+
+            string[] Vector4Format = Value.Split(',');
+            Output.X = float.Parse(Vector4Format[0].Remove(0, 1).Replace('f', ' '));
+            Output.W = float.Parse(Vector4Format[3].Remove(Vector4Format[3].Length - 1, 1).Replace('f', ' '));
+            Output.Y = float.Parse(Vector4Format[1].Replace('f', ' '));
+            Output.Z = float.Parse(Vector4Format[2].Replace('f', ' '));
+
+            return Output;
+        }
+
         public static Color STR_To_Color(string Value)
         {
             Color Output = Color.Transparent;
@@ -214,7 +250,7 @@ namespace FN_Engine
             JW.WriteStartObject();
 
             JW.WritePropertyName("Type");
-            JW.WriteValue(OBJ.GetType().ToString());
+            JW.WriteValue(OBJ.GetType().AssemblyQualifiedName);
 
             JW.WritePropertyName("Generated ID");
             JW.WriteValue(GID);
@@ -246,9 +282,9 @@ namespace FN_Engine
                     JW.WritePropertyName("Item Type");
 
                     if (!MemType.IsArray)
-                        JW.WriteValue(((IEnumerable)Member.GetValue(OBJ)).GetType().GetGenericArguments()[0].ToString());
+                        JW.WriteValue(((IEnumerable)Member.GetValue(OBJ)).GetType().GetGenericArguments()[0].AssemblyQualifiedName);
                     else
-                        JW.WriteValue(MemType.FullName.Remove(MemType.FullName.Length - 2, 2));
+                        JW.WriteValue(MemType.GetElementType().AssemblyQualifiedName);
 
                     JW.WriteEndObject();
 
@@ -325,9 +361,9 @@ namespace FN_Engine
                     JW.WritePropertyName("Item Type");
 
                     if (!MemType.IsArray)
-                        JW.WriteValue(((IEnumerable)Member.GetValue(OBJ)).GetType().GetGenericArguments()[0].ToString());
+                        JW.WriteValue(((IEnumerable)Member.GetValue(OBJ)).GetType().GetGenericArguments()[0].AssemblyQualifiedName);
                     else
-                        JW.WriteValue(MemType.FullName.Remove(MemType.FullName.Length - 2, 2));
+                        JW.WriteValue(MemType.GetElementType().AssemblyQualifiedName);
 
                     JW.WriteEndObject();
 
@@ -771,6 +807,14 @@ namespace FN_Engine
                 return STR_To_Rect(Value);
             else if (MemType == typeof(Color))
                 return STR_To_Color(Value);
+            else if (MemType == typeof(System.Numerics.Vector2))
+                return STR_To_Vector2_Numeric(Value);
+            else if (MemType == typeof(System.Numerics.Vector3))
+                return STR_To_Vector3_Numeric(Value);
+            else if (MemType == typeof(System.Numerics.Vector4))
+                return STR_To_Vector4_Numeric(Value);
+            //else if(MemType == typeof(IntPtr))
+            //    return hex
 
             throw new Exception("Type Not Handled!");
         }

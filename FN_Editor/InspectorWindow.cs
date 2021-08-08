@@ -310,6 +310,24 @@ namespace FN_Engine.FN_Editor
                                     ImGui.DragFloat4(FI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
                                     break;
+                                case "System.Numerics.Vector2": //Vector2
+                                    System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)FI.GetValue(Selected_GO);
+                                    Vector2 V2_IMGUI_Numeric = new System.Numerics.Vector2(V2_Numeric.X, V2_Numeric.Y);
+                                    ImGui.DragFloat2(FI.Name, ref V2_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                    FI.SetValue(Selected_GO, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
+                                    break;
+                                case "System.Numerics.Vector3": //Vector3
+                                    System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)FI.GetValue(Selected_GO);
+                                    Vector3 V3_IMGUI_Numeric = new System.Numerics.Vector3(V3_Numeric.X, V3_Numeric.Y, V3_Numeric.Z);
+                                    ImGui.DragFloat3(FI.Name, ref V3_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                    FI.SetValue(Selected_GO, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
+                                    break;
+                                case "System.Numerics.Vector4": //Vector4
+                                    System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)FI.GetValue(Selected_GO);
+                                    Vector4 V4_IMGUI_Numeric = new System.Numerics.Vector4(V4_Numeric.X, V4_Numeric.Y, V4_Numeric.Z, V4_Numeric.W);
+                                    ImGui.DragFloat4(FI.Name, ref V4_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                    FI.SetValue(Selected_GO, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
+                                    break;
                                 case "Microsoft.Xna.Framework.Rectangle": //Rectangle
                                     Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)FI.GetValue(Selected_GO);
                                     int[] Rec_ARR = new int[4] { Rec.X, Rec.Y, Rec.Width, Rec.Height };
@@ -452,6 +470,24 @@ namespace FN_Engine.FN_Editor
                                     Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
                                     ImGui.DragFloat4(PI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                     PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
+                                    break;
+                                case "System.Numerics.Vector2": //Vector2
+                                    System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)PI.GetValue(Selected_GO);
+                                    Vector2 V2_IMGUI_Numeric = new System.Numerics.Vector2(V2_Numeric.X, V2_Numeric.Y);
+                                    ImGui.DragFloat2(PI.Name, ref V2_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                    PI.SetValue(Selected_GO, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
+                                    break;
+                                case "System.Numerics.Vector3": //Vector3
+                                    System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)PI.GetValue(Selected_GO);
+                                    Vector3 V3_IMGUI_Numeric = new System.Numerics.Vector3(V3_Numeric.X, V3_Numeric.Y, V3_Numeric.Z);
+                                    ImGui.DragFloat3(PI.Name, ref V3_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                    PI.SetValue(Selected_GO, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
+                                    break;
+                                case "System.Numerics.Vector4": //Vector4
+                                    System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)PI.GetValue(Selected_GO);
+                                    Vector4 V4_IMGUI_Numeric = new System.Numerics.Vector4(V4_Numeric.X, V4_Numeric.Y, V4_Numeric.Z, V4_Numeric.W);
+                                    ImGui.DragFloat4(PI.Name, ref V4_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                    PI.SetValue(Selected_GO, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
                                     break;
                                 case "Microsoft.Xna.Framework.Rectangle": //Rectangle
                                     Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)PI.GetValue(Selected_GO);
@@ -615,6 +651,24 @@ namespace FN_Engine.FN_Editor
                                             Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
                                             ImGui.DragFloat4(FI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                             FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
+                                            break;
+                                        case "System.Numerics.Vector2": //Vector2
+                                            System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)FI.GetValue(GOC);
+                                            Vector2 V2_IMGUI_Numeric = new System.Numerics.Vector2(V2_Numeric.X, V2_Numeric.Y);
+                                            ImGui.DragFloat2(FI.Name, ref V2_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                            FI.SetValue(GOC, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
+                                            break;
+                                        case "System.Numerics.Vector3": //Vector3
+                                            System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)FI.GetValue(GOC);
+                                            Vector3 V3_IMGUI_Numeric = new System.Numerics.Vector3(V3_Numeric.X, V3_Numeric.Y, V3_Numeric.Z);
+                                            ImGui.DragFloat3(FI.Name, ref V3_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                            FI.SetValue(GOC, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
+                                            break;
+                                        case "System.Numerics.Vector4": //Vector4
+                                            System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)FI.GetValue(GOC);
+                                            Vector4 V4_IMGUI_Numeric = new System.Numerics.Vector4(V4_Numeric.X, V4_Numeric.Y, V4_Numeric.Z, V4_Numeric.W);
+                                            ImGui.DragFloat4(FI.Name, ref V4_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                            FI.SetValue(GOC, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
                                             break;
                                         case "Microsoft.Xna.Framework.Rectangle": //Rectangle
                                             Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)FI.GetValue(GOC);
@@ -860,6 +914,24 @@ namespace FN_Engine.FN_Editor
                                             Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
                                             ImGui.DragFloat4(PI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
                                             PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
+                                            break;
+                                        case "System.Numerics.Vector2": //Vector2
+                                            System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)PI.GetValue(GOC);
+                                            Vector2 V2_IMGUI_Numeric = new System.Numerics.Vector2(V2_Numeric.X, V2_Numeric.Y);
+                                            ImGui.DragFloat2(PI.Name, ref V2_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                            PI.SetValue(GOC, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
+                                            break;
+                                        case "System.Numerics.Vector3": //Vector3
+                                            System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)PI.GetValue(GOC);
+                                            Vector3 V3_IMGUI_Numeric = new System.Numerics.Vector3(V3_Numeric.X, V3_Numeric.Y, V3_Numeric.Z);
+                                            ImGui.DragFloat3(PI.Name, ref V3_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                            PI.SetValue(GOC, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
+                                            break;
+                                        case "System.Numerics.Vector4": //Vector4
+                                            System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)PI.GetValue(GOC);
+                                            Vector4 V4_IMGUI_Numeric = new System.Numerics.Vector4(V4_Numeric.X, V4_Numeric.Y, V4_Numeric.Z, V4_Numeric.W);
+                                            ImGui.DragFloat4(PI.Name, ref V4_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                                            PI.SetValue(GOC, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
                                             break;
                                         case "Microsoft.Xna.Framework.Rectangle": //Rectangle
                                             Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)PI.GetValue(GOC);

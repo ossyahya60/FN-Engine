@@ -101,12 +101,13 @@ namespace FN_Engine.FN_Editor
 
                 ImGui.SameLine();
 
-                ImGui.InputText("", ref DraggedGO, 50);
+                ImGui.InputText("", ref DraggedGO, 50, ImGuiInputTextFlags.ReadOnly);
 
                 if (ImGui.BeginDragDropTarget() && GameObjects_Tab.DraggedGO != null && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && GameObjects_Tab.DraggedGO.GetComponent<Animator>() != null)
                 {
                     DraggedGO = GameObjects_Tab.DraggedGO.Name;
                     DraggedGO_AnimClips = GameObjects_Tab.DraggedGO.GetComponent<Animator>().AnimationClips;
+                    GameObjects_Tab.DraggedGO = null;
                 }
 
                 bool AnimatorTree = ImGui.TreeNode("Animator");

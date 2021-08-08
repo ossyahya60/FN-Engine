@@ -12,6 +12,7 @@ namespace FN_Engine.FN_Editor
         public static bool AutoConfigureWindows = true;
 
         private string sceneName = "Default";
+        private bool PopUpOpen = false;
 
         public override void Start()
         {
@@ -22,10 +23,6 @@ namespace FN_Engine.FN_Editor
         {
             //Move windows using title bar only
             ImGui.GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
-
-            //FPS
-            //ImGui.Text(((int)(1.0f / (float)gameTime.ElapsedGameTime.TotalSeconds)).ToString());
-            //ImGui.Text("Mouse Pos: " + Input.GetMousePosition().ToString());
 
             if (ImGui.IsMouseDragging(ImGuiMouseButton.Right))
                 Setup.Camera.Move(Input.MouseDelta(), 1);
@@ -59,38 +56,10 @@ namespace FN_Engine.FN_Editor
 
                             //Create Scene
                             SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
-
-                            var ActiveScene = SceneManager.ActiveScene;
-
-                            GameObject GO = new GameObject(true);
-                            GO.Name = "EditorGameObject";
-                            GO.Layer = -1;
-                            GO.AddComponent(new FN_Editor.GameObjects_Tab());
-                            GO.AddComponent(new FN_Editor.InspectorWindow());
-                            GO.AddComponent(new FN_Editor.ContentWindow());
-                            GO.AddComponent(new FN_Editor.GizmosVisualizer());
-                            GO.AddComponent(new FN_Editor.EditorScene());
-
-                            GameObject CamerContr = new GameObject();
-                            CamerContr.Name = "Camera Controller";
-                            CamerContr.AddComponent(new Transform());
-                            CamerContr.AddComponent(new CameraController());
-
-                            Scene NewScene = new Scene(sceneName);
-                            SceneManager.ActiveScene = NewScene;
-
-                            SceneManager.ActiveScene.AddGameObject_Recursive(GO);
-                            SceneManager.ActiveScene.AddGameObject_Recursive(CamerContr);
-
-                            SceneManager.Initialize();
-
-                            SceneManager.SerializeScene(NewScene.Name);
-                            SceneManager.LoadScene_Serialization(NewScene.Name);
-                            SceneManager.ActiveScene = ActiveScene;
-
-                            //settings of ImGui must be loaded or edited
+                            CreateScene(sceneName);
                         }
 
+                        ImGui.PopStyleColor();
                         //var GEO = SceneManager.ActiveScene.FindGameObjectWithName("EditorGameObject");
                         //Scene NewScene = new Scene("NOice Scene");
                         //NewScene.AddGameObject_Recursive(GEO);
@@ -101,6 +70,55 @@ namespace FN_Engine.FN_Editor
 
                     if (ImGui.MenuItem("Save", "CTRL + S"))
                         SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
+
+                    if (ImGui.BeginMenu("Save As.."))
+                    {
+                        ImGui.InputText("Name", ref sceneName, 50);
+
+                        ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+
+                        if (ImGui.SmallButton("Save"))
+                        {
+                            //Validate Name Here with the files in the directory
+                            string[] Scenes = Directory.GetFiles(Environment.CurrentDirectory).Where(Item => Item.EndsWith(".scene")).ToArray();
+                            bool SceneExists = Scenes.Any(Item => Item.Equals(Environment.CurrentDirectory + "\\" + sceneName + ".scene"));
+
+                            if (SceneExists)
+                            {
+                                ImGui.OpenPopup("Overwrite File?");
+                                PopUpOpen = true;
+                            }
+                            else
+                            {
+                                string OldSceneName = SceneManager.ActiveScene.Name;
+                                SceneManager.ActiveScene.Name = sceneName;
+                                SceneManager.SerializeScene(sceneName);
+                                SceneManager.ActiveScene.Name = OldSceneName;
+                            }
+                        }
+
+                        if (ImGui.BeginPopupModal("Overwrite File?", ref PopUpOpen, ImGuiWindowFlags.AlwaysAutoResize))
+                        {
+                            if (ImGui.Button("Yes, overwrite file"))
+                            {
+                                string OldSceneName = SceneManager.ActiveScene.Name;
+                                SceneManager.ActiveScene.Name = sceneName;
+                                SceneManager.SerializeScene(sceneName);
+                                SceneManager.ActiveScene.Name = OldSceneName;
+
+                                ImGui.CloseCurrentPopup();
+                            }
+
+                            if (ImGui.Button("No") || ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Escape)))
+                                ImGui.CloseCurrentPopup();
+
+                            ImGui.EndPopup();
+                        }
+
+                        ImGui.PopStyleColor();
+
+                        ImGui.EndMenu();
+                    }
 
                     if (ImGui.MenuItem("Launch Game", "CTRL + P"))
                     {
@@ -147,6 +165,25 @@ namespace FN_Engine.FN_Editor
 
             //    GameObjects_Tab.WhoIsSelected = ChosenGO;
             //}
+        }
+
+        private void CreateScene(string sceneName)
+        {
+            var ActiveScene = SceneManager.ActiveScene;
+
+            Scene NewScene = new Scene(sceneName);
+            SceneManager.ActiveScene = NewScene;
+
+            SceneManager.ActiveScene.AddGameObject_Recursive(ActiveScene.FindGameObjectWithName("EditorGameObject"));
+            SceneManager.ActiveScene.AddGameObject_Recursive(ActiveScene.FindGameObjectWithName("Camera Controller"));
+
+            SceneManager.Initialize();
+
+            SceneManager.SerializeScene(NewScene.Name);
+            SceneManager.LoadScene_Serialization(NewScene.Name);
+            SceneManager.ActiveScene = ActiveScene;
+
+            //settings of ImGui must be loaded or edited
         }
     }
 }

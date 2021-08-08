@@ -167,14 +167,14 @@ namespace FN_Engine
                     EditorGameObject = ActiveScene.FindGameObjectWithName("EditorGameObject");
                     ActiveScene.RemoveGameObject(EditorGameObject, false);
 
-                    ActiveScene.SerializeV2(Path);
+                    ActiveScene.SerializeV2("Scenes\\" + Path);
 
                     ActiveScene.AddGameObject_Recursive(EditorGameObject);
 
-                    ActiveScene.SerializeV2(Path + "_Editor");
+                    ActiveScene.SerializeV2("Scenes\\" + Path + "_Editor");
                 }
                 else
-                    ActiveScene.SerializeV2(Path);
+                    ActiveScene.SerializeV2("Scenes\\" + Path);
 
                 CamCont.Visualize = StoredVal;
             }

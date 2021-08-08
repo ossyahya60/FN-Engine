@@ -38,6 +38,9 @@ namespace FN_Engine.FN_Editor
         public override void DrawUI()
         {
             //Debug
+            //FPS
+            ImGui.Text("FPS: " + Math.Ceiling(ImGui.GetIO().Framerate).ToString());
+
             ImGui.Text("Undo Buffer Count: ");
             ImGui.SameLine();
             ImGui.Text(Undo_Buffer.Count.ToString());
@@ -50,14 +53,14 @@ namespace FN_Engine.FN_Editor
             ImGui.SameLine();
             ImGui.Text(Input.GetMousePosition().ToString());
 
-            ImGui.Text("Game Running Slowly: ");
-            //ImGui.SameLine();
-
-            ImGui.Text(Setup.Camera.Position.ToString());
+            ImGui.Text("Camera Position: " + Setup.Camera.Position.ToString());
             /////
 
             //Scene Tab
-            ImGui.Begin(SceneManager.ActiveScene.Name);
+            ImGui.Begin("Scene Window");
+
+            ImGui.TextColored(new Vector4(0, 1, 0, 1), SceneManager.ActiveScene.Name);
+            ImGui.Separator();
 
             ///
             if (EditorScene.AutoConfigureWindows && MyRegion[1].Y != 0)
