@@ -40,25 +40,17 @@ namespace FN_Engine.FN_Editor
             //Debug
             //FPS
             ImGui.Text("FPS: " + Math.Ceiling(ImGui.GetIO().Framerate).ToString());
-
-            ImGui.Text("Undo Buffer Count: ");
-            ImGui.SameLine();
-            ImGui.Text(Undo_Buffer.Count.ToString());
-
-            ImGui.Text("Redo Buffer Count: ");
-            ImGui.SameLine();
-            ImGui.Text(Redo_Buffer.Count.ToString());
-
-            ImGui.Text("Mouse Pos: ");
-            ImGui.SameLine();
-            ImGui.Text(Input.GetMousePosition().ToString());
-
+            ImGui.Text("Undo Buffer Count: " + Undo_Buffer.Count.ToString());
+            ImGui.Text("Redo Buffer Count: " + Redo_Buffer.Count.ToString());
+            ImGui.Text("Mouse Pos: " + ImGui.GetMousePos().ToString());
             ImGui.Text("Camera Position: " + Setup.Camera.Position.ToString());
+
+            ImGui.Text("Screen Resolution: " + Setup.graphics.PreferredBackBufferWidth.ToString() + ", " + Setup.graphics.PreferredBackBufferHeight.ToString());
+            ImGui.Text("Screen Size: " + Setup.GraphicsDevice.Viewport.Width.ToString() + ", " + Setup.GraphicsDevice.Viewport.Height.ToString());
             /////
 
             //Scene Tab
             ImGui.Begin("Scene Window");
-
             ImGui.TextColored(new Vector4(0, 1, 0, 1), SceneManager.ActiveScene.Name);
             ImGui.Separator();
 
@@ -78,7 +70,7 @@ namespace FN_Engine.FN_Editor
             MyRegion[1] = ImGui.GetWindowSize();
             ///
 
-            ImGui.Indent();
+            //ImGui.Indent();
 
             for (int i = SceneManager.ActiveScene.GameObjects.Count - 1; i >= 0; i--)
             {
@@ -471,6 +463,28 @@ namespace FN_Engine.FN_Editor
                     //Should sort game objects?
                 }
 
+                if (ImGui.Selectable("Tilemap"))
+                {
+                    GameObject GO = new GameObject();
+                    GO.Name = "Tilemap";
+                    GO.Tag = "Tilemap";
+                    GO.AddComponent(new Transform());
+                    GO.AddComponent(new Tilemap());
+                    GO.Transform = GO.GetComponent<Transform>();
+                    GO.GetComponent<Tilemap>().ShowGrid = true;
+                    if (WhoIsSelected != null)
+                        WhoIsSelected.AddChild(GO);
+
+                    GO.Start();
+
+                    SceneManager.ActiveScene.AddGameObject_Recursive(GO);
+
+                    AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(GO, Operation.Create));
+                    Redo_Buffer.Clear();
+
+                    //Should sort game objects?
+                }
+
                 ImGui.EndPopup();
             }
 
@@ -652,13 +666,13 @@ namespace FN_Engine.FN_Editor
             if (Root)
                 ImGui.Unindent();
 
+            bool Open = ImGui.TreeNodeEx(GO.Name, SelectedGOs.Contains(GO) ? ImGuiTreeNodeFlags.Selected : ImGuiTreeNodeFlags.None);
+
             if (!GO.IsActive())
             {
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1));
                 ImGui.PushStyleColor(ImGuiCol.HeaderHovered, new Vector4(0.8f, 0.8f, 0.8f, 1));
             }
-
-            bool Open = ImGui.TreeNodeEx(GO.Name, SelectedGOs.Contains(GO) ? ImGuiTreeNodeFlags.Selected : ImGuiTreeNodeFlags.None);
 
             if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                 if (ImGui.IsItemClicked())

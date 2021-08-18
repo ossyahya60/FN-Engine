@@ -206,10 +206,12 @@ namespace FN_Engine
         public static void Update(GameTime gameTime)
         {
             //if (!Setup.Game.IsActive) //Pause Game when minimized
-                //return;
+            //return;
 
             if (Input.GetKey(Keys.RightAlt) && Input.GetKeyUp(Keys.Enter))
+            {
                 Setup.graphics.ToggleFullScreen();
+            }
 
             /////////Resolution related//////////// -> Mandatory
             if (Resolution != new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight))

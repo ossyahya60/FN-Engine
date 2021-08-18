@@ -18,6 +18,8 @@ namespace FN_Engine
         public string Name;
         public List<GameObject> GameObjects;
 
+        private ImFontPtr LoadedFont;
+
         public int ID
         {
             set
@@ -171,6 +173,7 @@ namespace FN_Engine
             if (GuiRenderer == null)
             {
                 GuiRenderer = new ImGUI.ImGuiRenderer(Setup.Game);
+                LoadedFont = ImGui.GetIO().Fonts.AddFontFromFileTTF("Roboto-Regular.ttf", 15);
                 GuiRenderer.RebuildFontAtlas();
             }
 
@@ -189,9 +192,24 @@ namespace FN_Engine
             int Count = GameObjects.Count - 1;
 
             if (Active)
+            {
                 for (int i = Count; i >= 0; i--)
+                {
                     if (GameObjects[Count - i].Active)
+                    {
                         GameObjects[Count - i].Update(gameTime);
+
+                        //Adjusting Transforms
+                        if (!FN_Editor.EditorScene.IsThisTheEditor && GameObjects[Count - i].Parent == null && GameObjects[Count - i].Transform != null)
+                        {
+                            Queue<Transform> Transforms = new Queue<Transform>();
+
+                            Transforms.Enqueue(GameObjects[Count - i].Transform);
+                            QueueInOrder(Transforms);
+                        }
+                    }
+                }
+            }
 
             CollisionHandler.Update(gameTime);
         }
@@ -217,15 +235,15 @@ namespace FN_Engine
 
             if (Active)
             {
-                Queue<Transform> Transforms = new Queue<Transform>();
-
                 for (int i = Count; i >= 0; i--)
                 {
                     GameObjects[Count - i].UpdateUI(gameTime);
 
                     //Adjusting Transforms
-                    if (GameObjects[Count - i].Parent == null && GameObjects[Count - i].Active && GameObjects[Count - i].Transform != null)
+                    if (GameObjects[Count - i].Parent == null && GameObjects[Count - i].Transform != null && GameObjects[Count - i].Active)
                     {
+                        Queue<Transform> Transforms = new Queue<Transform>();
+
                         Transforms.Enqueue(GameObjects[Count - i].Transform);
                         QueueInOrder(Transforms);
                     }
@@ -251,13 +269,20 @@ namespace FN_Engine
             Setup.GraphicsDevice.Clear(Color.Transparent);
 
             GuiRenderer.BeforeLayout(gameTime); // Must be called prior to calling any ImGui controls
+
+            ImGui.PushFont(LoadedFont);
             ImGui.GetIO().ConfigWindowsResizeFromEdges = true;
+            ImGui.GetStyle().FrameRounding = 12;
+            //ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 2);
 
             int Count = GameObjects.Count - 1;
 
             if (Active)
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].DrawUI();
+
+            //ImGui.PopStyleVar();
+            ImGui.PopFont();
 
             GuiRenderer.AfterLayout(); // Must be called after ImGui control calls
             Setup.GraphicsDevice.SetRenderTarget(null);
@@ -268,7 +293,7 @@ namespace FN_Engine
             // Drawing ImGUI Stuff
             Setup.GraphicsDevice.SetRenderTarget(null);
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, null);
-            spriteBatch.Draw(ImGUI_RenderTarget, Vector2.Zero, new Rectangle(0, 0, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight), Color.White);
+            spriteBatch.Draw(ImGUI_RenderTarget, Vector2.Zero, new Rectangle(0, 0, (int)ResolutionIndependentRenderer.GetVirtualRes().X, (int)ResolutionIndependentRenderer.GetVirtualRes().Y), Color.White);
             spriteBatch.End();
         }
 

@@ -476,14 +476,13 @@ namespace FN_Engine.FN_Editor
                                 for (int i3=0; i3<SlicedTexs.Count; i3++)
                                 {
                                     bool EnteredButton2 = false;
-                                    ImGui.PushID(i3.ToString() + "Noice");
                                     ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                                    ImGui.PushID(i3.ToString() + "Noice");
                                     if (ImGui.ImageButton(TexPtrs[SelTexIndex], new Vector2(64 * ((float)SlicedTexs[i3].Width / SlicedTexs[i3].Height), 64), new Vector2(SlicedTexs[i3].X / 10000.0f, SlicedTexs[i3].Y / 10000.0f), new Vector2(SlicedTexs[i3].Right / 10000.0f, SlicedTexs[i3].Bottom / 10000.0f)))
                                     {
                                         ImGui.PopID();
                                         EnteredButton2 = true;
                                     }
-                                    ImGui.PopStyleColor();
 
                                     // Dragging an asset
                                     if (ImGui.BeginDragDropSource())
@@ -496,6 +495,8 @@ namespace FN_Engine.FN_Editor
 
                                     if (!EnteredButton2)
                                         ImGui.PopID();
+                                    
+                                    ImGui.PopStyleColor();
 
                                     if (i3 != SlicedTexs.Count - 1)
                                         ImGui.SameLine();
@@ -509,10 +510,10 @@ namespace FN_Engine.FN_Editor
                     }
                     else if (MusicRegex.IsMatch(AssetName)) //Found a song or a soundeffect
                     {
-                        ImGui.PushID(ID_F++);
                         bool EnteredButton = false;
-
                         ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                        ImGui.PushID(ID_F++);
+
                         if (ImGui.ImageButton(TexPtrs[1], new Vector2(64.0f, 64.0f)))
                         {
                             EnteredButton = true;
@@ -520,7 +521,6 @@ namespace FN_Engine.FN_Editor
 
                             AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
                         }
-                        ImGui.PopStyleColor();
 
                         HelpMarker(AssetPath[AssetPath.Length - 1], false);
 
@@ -537,14 +537,16 @@ namespace FN_Engine.FN_Editor
                         if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
                             ImGui.PopID();
 
+                        ImGui.PopStyleColor();
+
                         ImGui.SameLine();
                     }
                     else if(ShaderRegex.IsMatch(AssetName)) // Found a shader
                     {
-                        ImGui.PushID(ID_F++);
                         bool EnteredButton = false;
-
                         ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                        ImGui.PushID(ID_F++);
+
                         if (ImGui.ImageButton(TexPtrs[2], new Vector2(64.0f, 64.0f)))
                         {
                             EnteredButton = true;
@@ -552,7 +554,6 @@ namespace FN_Engine.FN_Editor
 
                             AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
                         }
-                        ImGui.PopStyleColor();
 
                         HelpMarker(AssetPath[AssetPath.Length - 1], false);
 
@@ -568,6 +569,8 @@ namespace FN_Engine.FN_Editor
 
                         if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
                             ImGui.PopID();
+
+                        ImGui.PopStyleColor();
 
                         if (ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X)
                             ImGui.SameLine();
@@ -577,10 +580,10 @@ namespace FN_Engine.FN_Editor
                         if (AssetLoadName.Contains("_Editor"))
                             continue;
 
-                        ImGui.PushID(ID_F++);
                         bool EnteredButton = false;
-
                         ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                        ImGui.PushID(ID_F++);
+
                         if (ImGui.ImageButton(TexPtrs[3], new Vector2(64.0f, 64.0f)))
                         {
                             EnteredButton = true;
@@ -588,8 +591,6 @@ namespace FN_Engine.FN_Editor
                             
                             AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
                         }
-
-                        ImGui.PopStyleColor();
 
                         if (ImGui.IsItemHovered())
                         {
@@ -614,6 +615,8 @@ namespace FN_Engine.FN_Editor
 
                         if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
                             ImGui.PopID();
+
+                        ImGui.PopStyleColor();
 
                         if (ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X)
                             ImGui.SameLine();
@@ -728,6 +731,7 @@ namespace FN_Engine.FN_Editor
             //    ImGui.EndPopup();
             //}
 
+            ImGui.EndChild();
             ImGui.EndChild();
 
             ImGui.End();

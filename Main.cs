@@ -32,7 +32,7 @@ namespace FN_Engine
             //var value = (int)profileProperty.GetValue(null);
             //var extension = value == 1 ? "dx11" : "ogl";
             IsMouseVisible = true;
-            Window.AllowUserResizing = false;
+            Window.AllowUserResizing = true;
         }
 
         /// <summary>
@@ -65,11 +65,17 @@ namespace FN_Engine
             Setup.Initialize(graphics, Content, spriteBatch, Window, Camera, this);
 
             ResolutionIndependentRenderer.Init(ref graphics);
+            ResolutionIndependentRenderer.SetVirtualResolution(1366, 768);
             ResolutionIndependentRenderer.SetResolution(1366, 768, false);
-            ResolutionIndependentRenderer.SetVirtualResolution(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
 
             Exiting += SerializeBeforeExit;
+            //Window.ClientSizeChanged += ScreenSizeChanged;
         }
+
+        //private void ScreenSizeChanged(object sender, EventArgs args)
+        //{
+        //    //ResolutionIndependentRenderer.Init(ref graphics);
+        //}
 
         private void SerializeBeforeExit(object sender, EventArgs args)
         {
@@ -159,7 +165,7 @@ namespace FN_Engine
             Input.GetState(); //This has to be called at the start of update method!!
 
             //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                //Exit();
+            //Exit();
 
             ///////////////////////////////////////
             if (Input.GetKey(Keys.Z, KeyboardFlags.SHIFT))

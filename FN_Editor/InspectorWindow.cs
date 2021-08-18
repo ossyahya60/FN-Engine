@@ -212,7 +212,6 @@ namespace FN_Engine.FN_Editor
                         //    if(ImGui.CollapsingHeader(GOC.ToString().Remove(0, 9), ImGuiTreeNodeFlags.DefaultOpen)) //8 is "MyEngine.", change it if you change the name of the namespace
                         //    {
                         //        ImGui.Checkbox("Enabled", ref GOC.Enabled);
-                        //        ImGui.PopID();
                         //    }
                         //}
 
@@ -1080,8 +1079,6 @@ namespace FN_Engine.FN_Editor
 
                                     ImGui.PopID();
                                 }
-
-
                             }
 
                             if (!ComponentsNotRemoved_Arr[T_Counter])

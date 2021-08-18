@@ -299,7 +299,7 @@ namespace FN_Engine.FN_Project
             "            Setup.OutputFilePath = WorkingDirectory + \"\\\\bin\\\\Debug\\\\netcoreapp3.1\\\\Content\";" + "\n" +
             "            Setup.ConfigurePipelineMG();" + "\n" +
             "    \n" +
-            "            SceneManager.LoadScene_Serialization(\"DefaultScene\");" + "\n" +
+            "            SceneManager.LoadScene_Serialization(\"Scenes\\DefaultScene\");" + "\n" +
             "        }" + "\n" +
             "    \n" +
             "        /// <summary>" + "\n" +

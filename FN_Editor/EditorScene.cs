@@ -35,10 +35,10 @@ namespace FN_Engine.FN_Editor
                 SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
                 Threader.Invoke(FN_Project.VisualizeEngineStartup.RunExecutable, 0);
             }
-
+            
             if (ImGui.BeginMainMenuBar())
             {
-                ImGui.SetNextItemOpen(true);
+                //ImGui.SetNextItemOpen(true);
 
                 if (ImGui.BeginMenu("File"))
                 {
@@ -146,6 +146,9 @@ namespace FN_Engine.FN_Editor
 
                 ImGui.EndMainMenuBar();
             }
+
+            //Docking Part (Experimental
+            //ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
 
             //GameObject ChosenGO = SceneManager.ActiveScene.GameObjects[0];
             //if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && GameObjects_Tab.WhoIsSelected == null)

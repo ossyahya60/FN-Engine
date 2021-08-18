@@ -116,6 +116,11 @@ namespace FN_Engine
             return Output;
         }
 
+        public static Vector2 Vec2NumericToVec2MG(System.Numerics.Vector2 vector2)
+        {
+            return new Vector2(vector2.X, vector2.Y);
+        }
+
         public static System.Numerics.Vector3 STR_To_Vector3_Numeric(string Value)
         {
             System.Numerics.Vector3 Output = System.Numerics.Vector3.Zero;

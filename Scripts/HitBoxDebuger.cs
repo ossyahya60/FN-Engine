@@ -46,6 +46,38 @@ namespace FN_Engine
             return textureFilled;
         }
 
+        public static void DrawGrid_Effect(int RowsCount, int ColumnsCount, Vector2 Position, Point Spacing, int Thickness = 2)
+        {
+            RowsCount = Math.Clamp(RowsCount, 1, 100);
+            ColumnsCount = Math.Clamp(ColumnsCount, 1, 100);
+            Thickness = Math.Clamp(Thickness, 2, 50);
+            Spacing.X = Math.Clamp(Spacing.X, 1, 100);
+            Spacing.Y = Math.Clamp(Spacing.Y, 1, 100);
+            Position += ResolutionIndependentRenderer.GetVirtualRes() * 0.5f;
+
+            for (int i = 0; i <= RowsCount; i++)
+                DrawLine_Effect(new Vector2(Position.X, Position.Y + i * Spacing.Y), new Vector2(Position.X + Spacing.X * ColumnsCount, Position.Y + i * Spacing.Y));
+
+            for (int i = 0; i <= ColumnsCount; i++)
+                DrawLine_Effect(new Vector2(Position.X + i * Spacing.X, Position.Y), new Vector2(Position.X + i * Spacing.X, Position.Y + Spacing.Y * RowsCount));
+        }
+
+        public static void DrawGrid(int RowsCount, int ColumnsCount, Vector2 Position, Point Spacing, Color color, int Thickness = 2)
+        {
+            RowsCount = Math.Clamp(RowsCount, 1, int.MaxValue);
+            ColumnsCount = Math.Clamp(ColumnsCount, 1, int.MaxValue);
+            Thickness = Math.Clamp(Thickness, 2, 50);
+            Spacing.X = Math.Clamp(Spacing.X, 1, int.MaxValue);
+            Spacing.Y = Math.Clamp(Spacing.Y, 1, int.MaxValue);
+            Position -= new Vector2(Spacing.X * RowsCount, Spacing.Y * ColumnsCount) * 0.5f;
+
+            for (int i = 0; i <= RowsCount; i++)
+                DrawLine(new Vector2(Position.X, Position.Y + i * Spacing.Y), new Vector2(Position.X + Spacing.X * ColumnsCount, Position.Y + i * Spacing.Y), color, Thickness);
+
+            for (int i = 0; i <= ColumnsCount; i++)
+                DrawLine(new Vector2(Position.X + i * Spacing.X, Position.Y), new Vector2(Position.X + i * Spacing.X, Position.Y + Spacing.Y * RowsCount), color, Thickness);
+        }
+
         public static Texture2D RectTexture(float Alpha) //Allow setting Alpha value and RGB
         {
             Texture2D textureFilled = new Texture2D(Setup.GraphicsDevice, 1, 1);
@@ -170,7 +202,7 @@ namespace FN_Engine
             {
                 pass.Apply();
 
-                Setup.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionTexture>
+                Setup.GraphicsDevice.DrawUserIndexedPrimitives
                 (
                     PrimitiveType.TriangleStrip, // same result with TriangleList
                     _vertices,
@@ -227,12 +259,12 @@ namespace FN_Engine
             Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(Angle), Origin, SpriteEffects.None, Layer);
         }
 
-        public static void DrawLine(Vector2 Start, Vector2 End, Color color)  //Draw line
+        public static void DrawLine(Vector2 Start, Vector2 End, Color color, int Thickness = 2)  //Draw line
         {
             Rectangle Rect = Rectangle.Empty;
             Rect.Location = Start.ToPoint();
             Rect.Width = (int)(End - Start).Length();
-            Rect.Height = 2;
+            Rect.Height = Math.Clamp(Thickness, 1, 50);
             Setup.spriteBatch.Draw(_textureFilled, Rect, null, color, MathHelper.ToRadians(MathCompanion.GetAngle(Start, End)), Vector2.Zero, SpriteEffects.None, 0);
         }
 

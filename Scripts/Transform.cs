@@ -7,9 +7,9 @@ namespace FN_Engine
     public class Transform : GameObjectComponent
     {
         public bool MoveLocally = false;
-        public Vector2 LastPosition { private set; get; }
-        public float LastRotation { private set; get; }
-        public Vector2 LastScale { private set; get; }
+        public Vector2 LastPosition { internal set; get; }
+        public float LastRotation { internal set; get; }
+        public Vector2 LastScale { internal set; get; }
         public Vector2 Position;
         public float Rotation = 0;
         public Vector2 Scale = Vector2.One;
@@ -46,6 +46,10 @@ namespace FN_Engine
         public override void Start()
         {
             gameObject.Transform = this;
+
+            LastScale = Scale;
+            LastRotation = Rotation;
+            LastPosition = Position;
         }
 
         public static Transform Identity { get { return _Identity; } }
@@ -103,6 +107,9 @@ namespace FN_Engine
 
                 if (gameObject.Transform.JustParented)
                 {
+                    gameObject.Transform.LastPosition = Position;
+                    gameObject.Transform.LastRotation = Rotation;
+                    gameObject.Transform.LastScale = Scale;
                     Displacement = Vector2.Transform(Position, Matrix.CreateRotationZ(ParentRotation));
                     Position -= (gameObject.Parent.Transform.Position - Position) / gameObject.Parent.Transform.Scale + Displacement;
                     Rotation -= ParentRotation;

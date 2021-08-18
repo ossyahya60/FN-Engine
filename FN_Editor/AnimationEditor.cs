@@ -36,7 +36,7 @@ namespace FN_Engine.FN_Editor
             public List<Frame> Frames = null;
             public float Speed = 1;
             public bool PlayReverse = false;
-            public bool FixedTimeBewteenFrames = false;
+            public bool FixedTimeBewteenFrames = true;
             public bool Loop = false;
             public float FixedTimeAmount = 0.5f;
         }
@@ -53,7 +53,6 @@ namespace FN_Engine.FN_Editor
                 if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Escape)))
                     IsWindowOpen = false;
 
-                //ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(0, 0, 0, 1));
                 ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 2);
                 ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 1));
                 ImGui.Begin("Animation Editor", ImGuiWindowFlags.AlwaysAutoResize);
@@ -131,31 +130,34 @@ namespace FN_Engine.FN_Editor
                     ImGui.EndDragDropTarget();
                 }
 
-                if (AnimatorTree && DraggedGO_AnimClips != null)
+                if (AnimatorTree)
                 {
-                    for (int i = 0; i < DraggedGO_AnimClips.Count; i++)
+                    if (DraggedGO_AnimClips != null)
                     {
-                        ImGui.Selectable(DraggedGO_AnimClips[i].Name);
-
-                        if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                            DraggedGO_AnimClips.RemoveAt(i--);
-
-                        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && ImGui.IsItemHovered())
+                        for (int i = 0; i < DraggedGO_AnimClips.Count; i++)
                         {
-                            for (int j = 0; j < AnimationClips.Count; j++)
-                            {
-                                if (AnimationClips[j].Name == DraggedGO_AnimClips[i].Name)
-                                {
-                                    SelectedClip = j;
-                                    AnimationClips[j].Loop = DraggedGO_AnimClips[i].Loop;
-                                    AnimationClips[j].FixedTimeAmount = DraggedGO_AnimClips[i].FixedTime;
-                                    AnimationClips[j].FixedTimeBewteenFrames = DraggedGO_AnimClips[i].FixedTimeBetweenFrames;
-                                    AnimationClips[j].PlayReverse = DraggedGO_AnimClips[i].Reverse;
-                                    AnimationClips[j].Speed = DraggedGO_AnimClips[i].Speed;
+                            ImGui.Selectable(DraggedGO_AnimClips[i].Name);
 
-                                    ActiveFrame = 0;
-                                    SearchText = DraggedGO_AnimClips[i].Name;
-                                    break;
+                            if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                                DraggedGO_AnimClips.RemoveAt(i--);
+
+                            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && ImGui.IsItemHovered())
+                            {
+                                for (int j = 0; j < AnimationClips.Count; j++)
+                                {
+                                    if (AnimationClips[j].Name == DraggedGO_AnimClips[i].Name)
+                                    {
+                                        SelectedClip = j;
+                                        AnimationClips[j].Loop = DraggedGO_AnimClips[i].Loop;
+                                        AnimationClips[j].FixedTimeAmount = DraggedGO_AnimClips[i].FixedTime;
+                                        AnimationClips[j].FixedTimeBewteenFrames = DraggedGO_AnimClips[i].FixedTimeBetweenFrames;
+                                        AnimationClips[j].PlayReverse = DraggedGO_AnimClips[i].Reverse;
+                                        AnimationClips[j].Speed = DraggedGO_AnimClips[i].Speed;
+
+                                        ActiveFrame = 0;
+                                        SearchText = DraggedGO_AnimClips[i].Name;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -195,7 +197,7 @@ namespace FN_Engine.FN_Editor
                     ImGui.SameLine();
                     ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 90);
 
-                    ImGui.BeginChild("Animation Player", new Vector2(128, 128), true, ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("Animation Player", new Vector2(128, 128), false, ImGuiWindowFlags.NoScrollbar);
 
                     if (ImGui.BeginDragDropSource())
                     {
@@ -260,6 +262,7 @@ namespace FN_Engine.FN_Editor
                         if (i % 5 == 0 && i != 0)
                             ImGui.NewLine();
 
+                        ImGui.BeginGroup();
                         ImGui.ImageButton(F.TexPtr, new Vector2(64, 64), new Vector2((float)F.SourceRectangle.X / F.Tex.Width, (float)F.SourceRectangle.Y / F.Tex.Height), new Vector2((float)F.SourceRectangle.Right / F.Tex.Width, (float)F.SourceRectangle.Bottom / F.Tex.Height));
 
                         if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
@@ -288,6 +291,17 @@ namespace FN_Engine.FN_Editor
                             DraggedFrame = -1;
                             ImGui.EndDragDropTarget();
                         }
+
+                        if (!AnimationClips[SelectedClip].FixedTimeBewteenFrames)
+                        {
+                            ImGui.PushItemWidth(64);
+                            ImGui.PushID(i);
+                            ImGui.SliderFloat("", ref F.Time, 0, 10);
+                            ImGui.PopID();
+                            ImGui.PopItemWidth();
+                        }
+
+                        ImGui.EndGroup();
 
                         ImGui.SameLine();
                     }

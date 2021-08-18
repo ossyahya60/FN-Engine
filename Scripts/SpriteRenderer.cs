@@ -105,6 +105,9 @@ namespace FN_Engine
 
                 Transform T = gameObject.Transform.AdjustedTransform;
 
+                if (T == null)
+                    return;
+
                 Rectangle DestRect = Rectangle.Empty;
                 DestRect.Location = T.Position.ToPoint();
                 DestRect.Width = (int)(Sprite.SourceRectangle.Width * T.Scale.X);

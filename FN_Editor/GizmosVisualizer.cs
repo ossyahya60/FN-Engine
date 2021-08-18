@@ -26,6 +26,8 @@ namespace FN_Engine.FN_Editor
             }
         }
 
+        public static bool IsThisWindowHovered = true;
+
         private IntPtr Arrow;
         private IntPtr ScaleGizmo;
         private IntPtr RotationGizmo;
@@ -47,6 +49,8 @@ namespace FN_Engine.FN_Editor
             ImGui.SetNextWindowPos(BiasSceneWindow);
             ImGui.SetNextWindowSize(BiasSceneWindowSize);
             ImGui.Begin("Gizoms", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoBringToFrontOnFocus);
+
+            IsThisWindowHovered = ImGui.IsWindowHovered();
 
             GameObject SelectedGO = GameObjects_Tab.WhoIsSelected;
             if (SelectedGO != null && SelectedGO.Transform != null)
@@ -221,11 +225,6 @@ namespace FN_Engine.FN_Editor
             }
 
             ImGui.End();
-        }
-
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            
         }
     }
 }

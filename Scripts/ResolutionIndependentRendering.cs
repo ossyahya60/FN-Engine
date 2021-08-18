@@ -157,7 +157,7 @@ namespace FN_Engine
         /// <returns>aspect ratio</returns>
         static public float getVirtualAspectRatio()
         {
-            return (float)_VWidth / (float)_VHeight;
+            return (float)_VWidth / _VHeight;
         }
 
         static public void ResetViewport()
