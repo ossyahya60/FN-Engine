@@ -36,6 +36,7 @@ namespace FN_Engine.FN_Editor
         private GameObject ActiveTilemap = null;
         private Tools ActiveTool = Tools.None;
         private List<GameObject> HandyList, HandyList2;
+        private Microsoft.Xna.Framework.Rectangle TileMapSelectionArea;
 
         public TilemapEditor()
         {
@@ -49,6 +50,7 @@ namespace FN_Engine.FN_Editor
             TexPtrs[0] = Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\Brush"));
             HandyList = new List<GameObject>();
             HandyList2 = new List<GameObject>();
+            TileMapSelectionArea = Microsoft.Xna.Framework.Rectangle.Empty;
         }
 
         public override void DrawUI()
@@ -63,10 +65,12 @@ namespace FN_Engine.FN_Editor
                     ActiveTool = Tools.Brush;
                 else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.G))
                     ActiveTool = Tools.Bucket;
-                else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.S))
-                    ActiveTool = Tools.Select;
                 else if (ImGui.IsMouseClicked(ImGuiMouseButton.Middle))
                     ActiveTool = Tools.None;
+                //else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.S))
+                //    ActiveTool = Tools.Select;
+                //else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.C))
+                //    ActiveTool = Tools.CustomBrush;
 
                 Vector2 ThisWindowPos = ImGui.GetWindowPos();
                 Vector2 ThisWindowSize = ImGui.GetWindowSize();
@@ -129,6 +133,10 @@ namespace FN_Engine.FN_Editor
 
                     ImGui.EndDragDropTarget();
                 }
+
+                ImGui.SameLine();
+
+                ContentWindow.HelpMarker("Drag a gameobject having a Tilemap component here!", true);
 
                 if (ActiveTilemap != null && (ActiveTilemap.ShouldBeDeleted || ActiveTilemap.ShouldBeRemoved))
                     ActiveTilemap = null;
@@ -295,7 +303,7 @@ namespace FN_Engine.FN_Editor
                             {
                                 Tilemap tilemap = ActiveTilemap.GetComponent<Tilemap>();
                                 
-                                if (tilemap != null && Min.X != int.MaxValue)
+                                if (tilemap != null)
                                 {
                                     var Bias = Setup.Camera.Position - ResolutionIndependentRenderer.GetVirtualRes() * 0.5f - new Microsoft.Xna.Framework.Vector2(GameObjects_Tab.MyRegion[1].X + GameObjects_Tab.MyRegion[0].X, 0);
                                     var GridSize = tilemap.TileSize.ToVector2() * tilemap.GridSize.ToVector2() * tilemap.gameObject.Transform.Scale;
@@ -308,6 +316,9 @@ namespace FN_Engine.FN_Editor
                                         switch (ActiveTool)
                                         {
                                             case Tools.Brush:
+                                                if (Min.X == int.MaxValue)
+                                                    break;
+
                                                 if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                                                 {
                                                     HandyList.Clear();
@@ -316,7 +327,7 @@ namespace FN_Engine.FN_Editor
                                                 else if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                                                 {
                                                     //Undo action
-                                                    if(HandyList2.Count != 0)
+                                                    if (HandyList2.Count != 0)
                                                         GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(HandyList2.ToArray(), Operation.Delete));
                                                     if (HandyList.Count != 0)
                                                         GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(HandyList.ToArray(), Operation.Create));
@@ -407,7 +418,10 @@ namespace FN_Engine.FN_Editor
                                                 break;
                                             case Tools.Bucket: //remember to take another look at the logic (Solved!)
 
-                                                if(ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                                if (Min.X == int.MaxValue)
+                                                    break;
+
+                                                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                                                 {
                                                     HandyList.Clear();
                                                     HandyList2.Clear();
@@ -459,8 +473,29 @@ namespace FN_Engine.FN_Editor
                                                 }
 
                                                 break;
+                                            //case Tools.Select:
+
+                                            //    tileSize = (tilemap.TileSize.ToVector2() * tilemap.gameObject.Transform.Scale).ToPoint();
+                                            //    NewPos = (Input.GetMousePosition() + Bias - MapRect.Location.ToVector2()) / MapRect.Size.ToVector2() / (tileSize.ToVector2() / MapRect.Size.ToVector2());
+                                            //    NewPos.X = (int)NewPos.X;
+                                            //    NewPos.Y = (int)NewPos.Y;
+
+                                            //    var TPos = MapRect.Location.ToVector2() + tileSize.ToVector2() * NewPos;
+
+                                            //    if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                            //        TileMapSelectionArea = new Microsoft.Xna.Framework.Rectangle(TPos.ToPoint(), Microsoft.Xna.Framework.Point.Zero);
+                                            //    else if (ImGui.IsMouseDown(ImGuiMouseButton.Left))
+                                            //    {
+                                            //        TileMapSelectionArea.Size = (TPos + tileSize.ToVector2() - TileMapSelectionArea.Location.ToVector2()).ToPoint();
+                                            //        TileMapSelectionArea.Size = MathCompanion.Abs(TileMapSelectionArea.Size);
+                                            //        TileMapSelectionArea.Location = new Microsoft.Xna.Framework.Point(Math.Min(TileMapSelectionArea.X, TileMapSelectionArea.X + TileMapSelectionArea.Width), Math.Min(TileMapSelectionArea.Y, TileMapSelectionArea.Y + TileMapSelectionArea.Height));
+                                            //    }
+
+                                            //    break;
                                         }
                                     }
+                                    //else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                    //    TileMapSelectionArea = Microsoft.Xna.Framework.Rectangle.Empty;
                                 }
                                 else if(tilemap == null)
                                     ActiveTilemap = null;
@@ -477,6 +512,8 @@ namespace FN_Engine.FN_Editor
                 {
                     ImGui.Begin("Utils", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove);
 
+                    ContentWindow.HelpMarker("Handy Shortcuts: \nBrush(B)\nBucket(G)\nDelete(D)", true);
+
                     ImGui.SetWindowPos(new Vector2(ThisWindowPos.X + ThisWindowSize.X, ThisWindowPos.Y));
 
                     ImGui.PushStyleColor(ImGuiCol.Button, 0);
@@ -490,5 +527,11 @@ namespace FN_Engine.FN_Editor
                 }
             }
         }
+
+        //public override void Draw(SpriteBatch spriteBatch)
+        //{
+        //    if (IsWindowOpen && TileMapSelectionArea.Size != Microsoft.Xna.Framework.Point.Zero)
+        //        HitBoxDebuger.DrawNonFilledRectangle(TileMapSelectionArea, 2);
+        //}
     }
 }

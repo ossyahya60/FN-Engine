@@ -114,7 +114,7 @@ namespace FN_Engine
         public static void DrawNonFilledRectangle(Rectangle Rect, int Thickness = 1) //Draw Non filledRectangle (Does it consume much memory?) use for debugging purposes only!!
         {
             Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Left, Rect.Top, Rect.Width, Thickness), Color.LightGreen);
-            Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Right, Rect.Top, Thickness, Rect.Height), Color.LightGreen);
+            Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Right, Rect.Top, Thickness, Rect.Height + Thickness), Color.LightGreen);
             Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Left, Rect.Bottom, Rect.Width, Thickness), Color.LightGreen);
             Setup.spriteBatch.Draw(_textureNonFilled, new Rectangle(Rect.Left, Rect.Top, Thickness, Rect.Height), Color.LightGreen);
         }

@@ -54,7 +54,7 @@ namespace FN_Engine.FN_Editor
                     IsWindowOpen = false;
 
                 ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 2);
-                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 1));
+                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 1));                
                 ImGui.Begin("Animation Editor", ImGuiWindowFlags.AlwaysAutoResize);
 
                 if (ImGui.Button("New Animation"))
@@ -253,55 +253,61 @@ namespace FN_Engine.FN_Editor
                     //Frames
                     ImGui.Separator();
 
-                    for (int i = 0; i < AnimationClips[SelectedClip].Frames.Count; i++)
+                    if (AnimationClips[SelectedClip].Frames.Count != 0)
                     {
-                        Frame F = AnimationClips[SelectedClip].Frames[i];
-                        if (F.TexPtr == default(IntPtr))
-                            F.TexPtr = Scene.GuiRenderer.BindTexture(F.Tex);
+                        ImGui.BeginChild("Frames", new Vector2(Math.Clamp(AnimationClips[SelectedClip].Frames.Count * 80, 0, 5 * 80), 84), false, AnimationClips[SelectedClip].Frames.Count > 5 ? ImGuiWindowFlags.AlwaysHorizontalScrollbar : ImGuiWindowFlags.None);
 
-                        if (i % 5 == 0 && i != 0)
-                            ImGui.NewLine();
-
-                        ImGui.BeginGroup();
-                        ImGui.ImageButton(F.TexPtr, new Vector2(64, 64), new Vector2((float)F.SourceRectangle.X / F.Tex.Width, (float)F.SourceRectangle.Y / F.Tex.Height), new Vector2((float)F.SourceRectangle.Right / F.Tex.Width, (float)F.SourceRectangle.Bottom / F.Tex.Height));
-
-                        if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                        for (int i = 0; i < AnimationClips[SelectedClip].Frames.Count; i++)
                         {
-                            AnimationClips[SelectedClip].Frames.RemoveAt(i--);
-                            ActiveFrame = 0;
+                            Frame F = AnimationClips[SelectedClip].Frames[i];
+                            if (F.TexPtr == default(IntPtr))
+                                F.TexPtr = Scene.GuiRenderer.BindTexture(F.Tex);
+
+                            ImGui.BeginGroup();
+                            ImGui.ImageButton(F.TexPtr, new Vector2(64, 64), new Vector2((float)F.SourceRectangle.X / F.Tex.Width, (float)F.SourceRectangle.Y / F.Tex.Height), new Vector2((float)F.SourceRectangle.Right / F.Tex.Width, (float)F.SourceRectangle.Bottom / F.Tex.Height));
+
+                            if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                            {
+                                AnimationClips[SelectedClip].Frames.RemoveAt(i--);
+                                ActiveFrame = 0;
+                            }
+
+                            if (ImGui.BeginDragDropSource())
+                            {
+                                DraggedFrame = i;
+                                ImGui.SetDragDropPayload("Dragged Frame", IntPtr.Zero, 0);
+
+                                ImGui.EndDragDropSource();
+                            }
+
+                            if (ImGui.BeginDragDropTarget() && DraggedFrame != -1 && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                            {
+                                Frame Source = AnimationClips[SelectedClip].Frames[DraggedFrame];
+                                Frame Target = AnimationClips[SelectedClip].Frames[i];
+                                AnimationClips[SelectedClip].Frames.RemoveAt(DraggedFrame);
+                                AnimationClips[SelectedClip].Frames.Insert(DraggedFrame, Target);
+                                AnimationClips[SelectedClip].Frames.RemoveAt(i);
+                                AnimationClips[SelectedClip].Frames.Insert(i, Source);
+
+                                DraggedFrame = -1;
+                                ImGui.EndDragDropTarget();
+                            }
+
+                            if (!AnimationClips[SelectedClip].FixedTimeBewteenFrames)
+                            {
+                                ImGui.PushItemWidth(64);
+                                ImGui.PushID(i);
+                                ImGui.SliderFloat("", ref F.Time, 0, 10);
+                                ImGui.PopID();
+                                ImGui.PopItemWidth();
+                            }
+
+                            ImGui.EndGroup();
+
+                            ImGui.SameLine();
                         }
 
-                        if (ImGui.BeginDragDropSource())
-                        {
-                            DraggedFrame = i;
-                            ImGui.SetDragDropPayload("Dragged Frame", IntPtr.Zero, 0);
-
-                            ImGui.EndDragDropSource();
-                        }
-
-                        if (ImGui.BeginDragDropTarget() && DraggedFrame != -1 && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
-                        {
-                            Frame Source = AnimationClips[SelectedClip].Frames[DraggedFrame];
-                            Frame Target = AnimationClips[SelectedClip].Frames[i];
-                            AnimationClips[SelectedClip].Frames.RemoveAt(DraggedFrame);
-                            AnimationClips[SelectedClip].Frames.Insert(DraggedFrame, Target);
-                            AnimationClips[SelectedClip].Frames.RemoveAt(i);
-                            AnimationClips[SelectedClip].Frames.Insert(i, Source);
-
-                            DraggedFrame = -1;
-                            ImGui.EndDragDropTarget();
-                        }
-
-                        if (!AnimationClips[SelectedClip].FixedTimeBewteenFrames)
-                        {
-                            ImGui.PushItemWidth(64);
-                            ImGui.PushID(i);
-                            ImGui.SliderFloat("", ref F.Time, 0, 10);
-                            ImGui.PopID();
-                            ImGui.PopItemWidth();
-                        }
-
-                        ImGui.EndGroup();
+                        ImGui.EndChild();
 
                         ImGui.SameLine();
                     }

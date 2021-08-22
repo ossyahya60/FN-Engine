@@ -183,7 +183,7 @@ namespace FN_Engine.FN_Editor
                         if (DeltaSize != 0 && ImGui.IsWindowFocused())
                             ImGui.SetWindowSize("Content Manager", ContentWindow.MyRegion[1] + new Vector2(DeltaSize, 0));
                     }
-
+                    
                     MyRegion[0] = ImGui.GetWindowPos();
                     MyRegion[1] = ImGui.GetWindowSize();
                     ///

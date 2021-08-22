@@ -13,6 +13,21 @@ namespace FN_Engine
                 return -number;
         }
 
+        public static Vector2 Abs(Vector2 number)
+        {
+            return new Vector2(Math.Abs(number.X), Math.Abs(number.Y));
+        }
+
+        public static System.Numerics.Vector2 Abs(System.Numerics.Vector2 number)
+        {
+            return new System.Numerics.Vector2(Math.Abs(number.X), Math.Abs(number.Y));
+        }
+
+        public static Point Abs(Point number)
+        {
+            return new Point(Math.Abs(number.X), Math.Abs(number.Y));
+        }
+
         public static bool IsPositive(float number)
         {
             if (number >= 0)

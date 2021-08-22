@@ -658,6 +658,8 @@ namespace FN_Engine.FN_Editor
                         SPI.SizeOrCount[1] = (int)Math.Clamp(SPI.SizeOrCount[1], Tex.Height / 30.0f, Tex.Height);
                         Vector2 ImageSize = new Vector2((float)SPI.SizeOrCount[0] / Tex.Width, (float)SPI.SizeOrCount[1] / Tex.Height);
 
+                        ImGui.SetNextWindowSizeConstraints(Vector2.Zero, new Vector2(Setup.graphics.PreferredBackBufferWidth * 0.75f, Setup.graphics.PreferredBackBufferHeight * 0.65f));
+                        ImGui.BeginChild("Slices", new Vector2(600, 500), false, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.AlwaysHorizontalScrollbar);
                         for (int i = 0; i < Tex.Height; i += SPI.SizeOrCount[1])
                         {
                             for (int j = 0; j < Tex.Width; j += SPI.SizeOrCount[0])
@@ -670,6 +672,7 @@ namespace FN_Engine.FN_Editor
                                     ImGui.SameLine();
                             }
                         }
+                        ImGui.EndChild();
                     }
                     else
                     {
@@ -737,7 +740,7 @@ namespace FN_Engine.FN_Editor
             ImGui.End();
         }
 
-        private static void HelpMarker(string desc, bool DisplayMarker = true)
+        public static void HelpMarker(string desc, bool DisplayMarker = true)
         {   
             if(DisplayMarker)
                 ImGui.TextDisabled("(?)");

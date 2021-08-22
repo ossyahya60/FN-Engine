@@ -69,13 +69,16 @@ namespace FN_Engine
             ResolutionIndependentRenderer.SetResolution(1366, 768, false);
 
             Exiting += SerializeBeforeExit;
-            //Window.ClientSizeChanged += ScreenSizeChanged;
+            Window.ClientSizeChanged += ScreenSizeChanged;
         }
 
-        //private void ScreenSizeChanged(object sender, EventArgs args)
-        //{
-        //    //ResolutionIndependentRenderer.Init(ref graphics);
-        //}
+        private void ScreenSizeChanged(object sender, EventArgs args)
+        {
+            Setup.graphics.PreferredBackBufferWidth = Setup.GameWindow.ClientBounds.Width;
+            Setup.graphics.PreferredBackBufferHeight = Setup.GameWindow.ClientBounds.Height;
+            Setup.graphics.ApplyChanges();
+            ResolutionIndependentRenderer.Init(ref graphics);
+        }
 
         private void SerializeBeforeExit(object sender, EventArgs args)
         {

@@ -214,10 +214,10 @@ namespace FN_Engine
             }
 
             /////////Resolution related//////////// -> Mandatory
-            if (Resolution != new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight))
-                ResolutionIndependentRenderer.Init(ref Setup.graphics);
+            //if (Resolution != new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight))
+                //ResolutionIndependentRenderer.Init(ref Setup.graphics);
 
-            Resolution = new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
+            //Resolution = new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
 
             // I moved this here, because Update rate is not the same as draw rate, so Input is not synchronized well
             ActiveScene.DrawUI(gameTime); //Draw UI
