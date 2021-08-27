@@ -18,25 +18,18 @@ namespace FN_Engine
 
     public class Rigidbody2D: GameObjectComponent
     {
-        public bool KinematicToKinematicCollisionDetection = false;
         public bool AffectedByGravity = true;
-        public bool Interpolate = false; //Might be supported in the future (Interpolation between frames for smoothness during high speeds
         public bool ConstraintHorizontalMovement = false;
         public bool ConstraintVerticalMovement = false;
         public BodyType BodyType = BodyType.Dynamic;
+        public float Restitution = 1;
         public float LinearDragScale = 1; //This ranges from 0 to 1 to indicate how much the rigidbody should be affected by linear drag
-        public float AngularDragScale = 1; //This ranges from 0 to 1 to indicate how much the rigidbody should be affected by angular drag
         public float GravityScale = 1; //This ranges from 0 to 1 to indicate how much the rigidbody should be affected by gravity
         public float Mass = 1; //Might be used for collision response and other physics-related stuff
-        public Vector2 Velocity = Vector2.Zero; // 1 pixel per sec => This shouldn't be set every frame as it negates all other forces acting
+        public Vector2 Velocity; // 1 pixel per sec => This shouldn't be set every frame as it negates all other forces acting
 
         private float GravityConstant = 10; //Universal gravitational constant (Approximated to 10 for easiness)
-        private bool Sleeping = false;
         private float DeltaTime = 1.0f / 60;
-
-        public override void Start()
-        {
-        }
 
         public override void Update(GameTime gameTime)
         {
@@ -51,23 +44,13 @@ namespace FN_Engine
                     break;
                 case BodyType.Dynamic: //affected by everything :D =>This one checks collision only
                     {
-                        //Check collision here
-
                         if (AffectedByGravity)
                             Velocity.Y += GravityConstant * GravityScale;
-
-                        gameObject.Transform.Position += Velocity * DeltaTime;
                     }
                     break;
                 case BodyType.Kinematic: //not affected by forces
                     {
-                        float DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-                        if(KinematicToKinematicCollisionDetection)
-                        {
-                            //Check collision here =>Detection only, no response => Learn Signals please :D
-                        }
 
-                        gameObject.Transform.Position += Velocity * DeltaTime;
                     }
                     break;
                 default:
@@ -75,9 +58,12 @@ namespace FN_Engine
             }
 
             if (ConstraintHorizontalMovement)
-                Velocity.X = 0;
+                Velocity = new Vector2(0, Velocity.Y);
             if (ConstraintVerticalMovement)
-                Velocity.Y = 0;
+                Velocity = new Vector2(Velocity.X, 0);
+
+            if(BodyType != BodyType.Static)
+                gameObject.Transform.Position += Velocity * DeltaTime;
         }
 
         public void AddForce(Vector2 Value, ForceMode2D Mode = ForceMode2D.Force)
@@ -105,27 +91,6 @@ namespace FN_Engine
             Rigidbody2D clone = this.MemberwiseClone() as Rigidbody2D;
 
             return clone;
-        }
-
-        public override void Serialize(StreamWriter SW) //get the transform in deserialization
-        {
-            SW.WriteLine(ToString());
-
-            base.Serialize(SW);
-            SW.Write("KinematicToKinematicCollisionDetection:\t" + KinematicToKinematicCollisionDetection.ToString() + "\n");
-            SW.Write("AffectedByGravity:\t" + AffectedByGravity.ToString() + "\n");
-            SW.Write("Interpolate:\t" + Interpolate.ToString() + "\n");
-            SW.Write("ConstraintHorizontalMovement:\t" + ConstraintHorizontalMovement.ToString() + "\n");
-            SW.Write("ConstraintVerticalMovement:\t" + ConstraintVerticalMovement.ToString() + "\n");
-            SW.Write("BodyType:\t" + BodyType.ToString() + "\n");
-            SW.Write("LinearDragScale:\t" + LinearDragScale.ToString() + "\n");
-            SW.Write("AngularDragScale:\t" + AngularDragScale.ToString() + "\n");
-            SW.Write("GravityScale:\t" + GravityScale.ToString() + "\n");
-            SW.Write("Mass:\t" + Mass.ToString() + "\n");
-            SW.Write("Velocity:\t" + Velocity.X.ToString() + "\t" + Velocity.Y.ToString() + "\n");
-            SW.Write("Sleeping:\t" + Sleeping.ToString() + "\n");
-
-            SW.WriteLine("End Of " + ToString());
         }
     }
 }

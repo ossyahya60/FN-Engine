@@ -19,6 +19,7 @@ namespace FN_Engine
         public List<GameObject> GameObjects;
 
         private ImFontPtr LoadedFont;
+        internal List<Rigidbody2D> Rigidbody2Ds;
 
         public int ID
         {
@@ -48,6 +49,7 @@ namespace FN_Engine
             IDs = new List<int>();
             Name = name;
             HandyList = new List<GameObject>();
+            Rigidbody2Ds = new List<Rigidbody2D>();
         }
 
         public Scene()
@@ -55,6 +57,7 @@ namespace FN_Engine
             GameObjects = new List<GameObject>();
             IDs = new List<int>();
             HandyList = new List<GameObject>();
+            Rigidbody2Ds = new List<Rigidbody2D>();
         }
 
         public Scene(string name, int _ID)
@@ -64,6 +67,7 @@ namespace FN_Engine
             Name = name;
             ID = _ID;
             HandyList = new List<GameObject>();
+            Rigidbody2Ds = new List<Rigidbody2D>();
         }
 
         //public void AddGameObject(GameObject GO) //=> Implement it using "Recursion"
@@ -193,6 +197,8 @@ namespace FN_Engine
 
             if (Active)
             {
+                Rigidbody2Ds.Clear();
+
                 for (int i = Count; i >= 0; i--)
                 {
                     if (GameObjects[Count - i].Active)
@@ -210,6 +216,10 @@ namespace FN_Engine
                     }
                 }
             }
+
+            //Update Physics
+            foreach (Rigidbody2D RB in Rigidbody2Ds)
+                RB.Update(gameTime);
 
             CollisionHandler.Update(gameTime);
         }

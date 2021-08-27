@@ -314,16 +314,22 @@ namespace FN_Engine
         public virtual void Update(GameTime gameTime)
         {
             foreach (GameObjectComponent GOC in GameObjectComponents)
+            {
                 if (GOC.Enabled)
-                    GOC.Update(gameTime);
+                {
+                    if (GOC is Rigidbody2D == false)
+                        GOC.Update(gameTime);
+                    else
+                        SceneManager.ActiveScene.Rigidbody2Ds.Add(GOC as Rigidbody2D);
+                }
+            }
         }
 
         internal virtual void UpdateUI(GameTime gameTime)
         {
-            if (IsActive())
-                foreach (GameObjectComponent GOC in GameObjectComponents)
-                    if (GOC.Enabled)
-                        GOC.UpdateUI(gameTime);
+            foreach (GameObjectComponent GOC in GameObjectComponents)
+                if (GOC.Enabled)
+                    GOC.UpdateUI(gameTime);
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)

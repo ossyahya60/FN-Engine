@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FN_Engine
@@ -77,9 +78,9 @@ namespace FN_Engine
             return IsTouching(collider);
         }
 
-        public void CollisionResponse(Rigidbody2D RB, Collider2D collider, bool Continous, float DeltaTime, Vector2 CollisionPos) //change this
+        public void CollisionResponse(Rigidbody2D RB, Collider2D collider, float DeltaTime, ref List<GameObjectComponent> CDs) //change this
         {
-            if (!Continous && !isTrigger)
+            if (!isTrigger)
             {
                 gameObject.Transform.Move(-RB.Velocity.X * DeltaTime, -RB.Velocity.Y * DeltaTime);
                 RB.Velocity = Vector2.Zero;

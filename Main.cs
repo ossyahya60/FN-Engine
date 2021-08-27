@@ -2,9 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.IO;
-using System.Reflection;
-using System.Numerics;
 
 namespace FN_Engine
 {
@@ -69,16 +66,16 @@ namespace FN_Engine
             ResolutionIndependentRenderer.SetResolution(1366, 768, false);
 
             Exiting += SerializeBeforeExit;
-            Window.ClientSizeChanged += ScreenSizeChanged;
+            //Window.ClientSizeChanged += ScreenSizeChanged;
         }
 
-        private void ScreenSizeChanged(object sender, EventArgs args)
-        {
-            Setup.graphics.PreferredBackBufferWidth = Setup.GameWindow.ClientBounds.Width;
-            Setup.graphics.PreferredBackBufferHeight = Setup.GameWindow.ClientBounds.Height;
-            Setup.graphics.ApplyChanges();
-            ResolutionIndependentRenderer.Init(ref graphics);
-        }
+        //private void ScreenSizeChanged(object sender, EventArgs args)
+        //{
+        //    Setup.graphics.PreferredBackBufferWidth = Setup.GameWindow.ClientBounds.Width;
+        //    Setup.graphics.PreferredBackBufferHeight = Setup.GameWindow.ClientBounds.Height;
+        //    Setup.graphics.ApplyChanges();
+        //    ResolutionIndependentRenderer.Init(ref graphics);
+        //}
 
         private void SerializeBeforeExit(object sender, EventArgs args)
         {
@@ -180,10 +177,10 @@ namespace FN_Engine
             //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(value => Arrow.Transform.Rotation = value);
 
             if (Input.GetKeyUp(Keys.O, KeyboardFlags.CTRL))
-                SceneManager.SerializeScene("DefaultScene");
+                SceneManager.SerializeScene("Scenes\\DefaultScene");
 
             if (Input.GetKeyUp(Keys.R, KeyboardFlags.CTRL))
-                SceneManager.LoadScene_Serialization("DefaultScene");
+                SceneManager.LoadScene_Serialization("Scenes\\DefaultScene");
 
             SceneManager.Update(gameTime);
 

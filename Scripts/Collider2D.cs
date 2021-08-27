@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 namespace FN_Engine
 {
@@ -8,7 +9,7 @@ namespace FN_Engine
 
         bool CollisionDetection(Collider2D collider, bool Continous);
 
-        void CollisionResponse(Rigidbody2D YourRigidBody, Collider2D collider, bool Continous, float DeltaTime, Vector2 CollisionPos);
+        void CollisionResponse(Rigidbody2D YourRigidBody, Collider2D collider, float DeltaTime, ref List<GameObjectComponent> CDs);
 
         bool Contains(Vector2 Point);
 

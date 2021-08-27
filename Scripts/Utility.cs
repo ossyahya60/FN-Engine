@@ -366,9 +366,9 @@ namespace FN_Engine
                     JW.WritePropertyName("Item Type");
 
                     if (!MemType.IsArray)
-                        JW.WriteValue(((IEnumerable)Member.GetValue(OBJ)).GetType().GetGenericArguments()[0].AssemblyQualifiedName);
+                        JW.WriteValue(((IEnumerable)Member.GetValue(OBJ)).GetType().GetGenericArguments()[0].FullName);
                     else
-                        JW.WriteValue(MemType.GetElementType().AssemblyQualifiedName);
+                        JW.WriteValue(MemType.GetElementType().FullName);
 
                     JW.WriteEndObject();
 
@@ -427,12 +427,11 @@ namespace FN_Engine
             JR.Read(); //Object Type
             JR.Read(); //Object Type Value
 
-            var T4 = Assembly.GetEntryAssembly().GetName().Name;
             Type ObjType = Type.GetType(JR.Value.ToString());
             if (ObjType == null && FN_Editor.EditorScene.IsThisTheEditor)
-                ObjType = FN_Editor.InspectorWindow.GameAssem.GetType(JR.Value.ToString());
+                ObjType = FN_Editor.InspectorWindow.GameAssem.GetType(JR.Value.ToString().Substring(0, JR.Value.ToString().IndexOf(",")), true, false);
             else if(ObjType == null)
-                ObjType = Assembly.GetEntryAssembly().GetType(JR.Value.ToString());
+                ObjType = Assembly.GetEntryAssembly().GetType(JR.Value.ToString().Substring(0, JR.Value.ToString().IndexOf(",")), true, false);
 
             var OBJ = GetInstance(ObjType);
 
@@ -1388,7 +1387,7 @@ namespace FN_Engine
                 string[] FileSplit = F.Split('\\');
                 string TexName = FileSplit[FileSplit.Length - 1];
 
-                if (TexRegex.IsMatch(TexName) || MusicRegex.IsMatch(TexName) || ShaderRegex.IsMatch(TexName) || FontRegex.IsMatch(TexName))
+                if (TexRegex.IsMatch(TexName) || MusicRegex.IsMatch(TexName) /*|| ShaderRegex.IsMatch(TexName)*/ || FontRegex.IsMatch(TexName))
                     BuildContentItem(F);
             }
 

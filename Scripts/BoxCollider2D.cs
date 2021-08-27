@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FN_Engine
@@ -62,14 +63,17 @@ namespace FN_Engine
         }
 
         //Note: This code is inspired by:
-        //URL: https://www.deengames.com/blog/2020/a-primer-on-aabb-collision-resolution.html
+        //URL: https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331
         //SAT Collision response is good, you will possess the vector to push the two objects from each other
-        void Collider2D.CollisionResponse(Rigidbody2D YourRigidBody, Collider2D collider, bool Continous, float DeltaTime, Vector2 CollisionPos)
+        void Collider2D.CollisionResponse(Rigidbody2D YourRigidBody, Collider2D collider, float DeltaTime, ref List<GameObjectComponent> CDs)
         {
+            Vector2 CollisionPos = gameObject.Transform.Position;
+            gameObject.Transform.Position -= YourRigidBody.Velocity * DeltaTime;
+
             Rectangle DC1 = GetDynamicCollider();
             Rectangle DC2 = (collider as BoxCollider2D).GetDynamicCollider();
 
-            float DistanceBetweenCollidersX = YourRigidBody.Velocity.X > 0 ? Math.Abs(DC1.Right - DC2.Left) : Math.Abs(DC1.Left - DC2.Right); 
+            float DistanceBetweenCollidersX = YourRigidBody.Velocity.X > 0 ? Math.Abs(DC1.Right - DC2.Left) : Math.Abs(DC1.Left - DC2.Right);
             float DistanceBetweenCollidersY = YourRigidBody.Velocity.Y > 0 ? Math.Abs(DC1.Bottom - DC2.Top) : Math.Abs(DC1.Top - DC2.Bottom);
 
             float TimeBetweenCollidersX = YourRigidBody.Velocity.X != 0 ? Math.Abs(DistanceBetweenCollidersX / YourRigidBody.Velocity.X) : 0;
@@ -81,29 +85,40 @@ namespace FN_Engine
             {
                 // Colliison on X-axis only
                 ShortestTime = TimeBetweenCollidersX;
-                YourRigidBody.gameObject.Transform.MoveX(ShortestTime * YourRigidBody.Velocity.X * DeltaTime);
-                //YourRigidBody.Velocity.X = 0;
+                YourRigidBody.gameObject.Transform.MoveX(ShortestTime * YourRigidBody.Velocity.X);
+                YourRigidBody.Velocity.X = 0;
             }
             else if (YourRigidBody.Velocity.X == 0 && YourRigidBody.Velocity.Y != 0)
             {
                 // Colliison on Y-axis only
                 ShortestTime = TimeBetweenCollidersY;
-                YourRigidBody.gameObject.Transform.MoveY(ShortestTime * YourRigidBody.Velocity.Y * DeltaTime);
-                //YourRigidBody.Velocity.Y = 0;
+                YourRigidBody.gameObject.Transform.MoveY(ShortestTime * YourRigidBody.Velocity.Y);
+                YourRigidBody.Velocity.Y = 0;
             }
             else
             {
                 // Colliison on both axis
                 ShortestTime = Math.Min(TimeBetweenCollidersX, TimeBetweenCollidersY);
-                YourRigidBody.gameObject.Transform.Move(ShortestTime * YourRigidBody.Velocity.X * DeltaTime, ShortestTime * YourRigidBody.Velocity.Y * DeltaTime);
-                //YourRigidBody.Velocity = Vector2.Zero;
+                YourRigidBody.gameObject.Transform.Move(ShortestTime * YourRigidBody.Velocity.X, ShortestTime * YourRigidBody.Velocity.Y);
+                YourRigidBody.Velocity = Vector2.Zero;
 
                 if (SlideCollision)
                 {
+                    var OldPos = YourRigidBody.gameObject.Transform.Position;
                     if (TimeBetweenCollidersX < TimeBetweenCollidersY)
                         YourRigidBody.gameObject.Transform.Position.Y = CollisionPos.Y;
                     else if (TimeBetweenCollidersX > TimeBetweenCollidersY)
                         YourRigidBody.gameObject.Transform.Position.X = CollisionPos.X;
+
+                    var ThisDC = this as Collider2D;
+                    foreach (Collider2D GO in CDs)
+                    {
+                        if(GO != ThisDC && !GO.IsTrigger() && GO.CollisionDetection(ThisDC, false))
+                        {
+                            YourRigidBody.gameObject.Transform.Position = OldPos;
+                            break;
+                        }
+                    }
                 }
             }
         }

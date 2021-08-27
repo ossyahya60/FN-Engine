@@ -104,11 +104,17 @@ namespace FN_Engine.FN_Project
             CopyAndPasteFiles(SourceDir + "\\Default Textures", DestinationDir + "\\Default Textures");
             File.Copy(SourceDir + "\\LightTest.fx", DestinationDir + "\\LightTest.fx");
             File.Copy(SourceDir + "\\Font.spritefont", DestinationDir + "\\Font.spritefont");
+            File.Copy(SourceDir + "\\Sea Horses.ttf", DestinationDir + "\\Sea Horses.ttf");
             File.Copy(SourceDir + "\\imgui.ini", DestinationDir + "\\imgui.ini");
 
             NewProject = true;
 
+            //Utility.ExecuteCommand(new string[] { "cd " + Path + "\\Content", })
+
             Utility.ExecuteCommand(RunGame, Path);
+
+            Directory.CreateDirectory(GameDebugDir + "\\Content");
+            File.Copy(SourceDir + "\\LightShaderCompiled\\LightTest.xnb", GameDebugDir + "\\Content\\LightTest.xnb");
 
             //Reload Assembly
             FN_Editor.InspectorWindow.ReloadAssemblyOnChange();
@@ -299,7 +305,7 @@ namespace FN_Engine.FN_Project
             "            Setup.OutputFilePath = WorkingDirectory + \"\\\\bin\\\\Debug\\\\netcoreapp3.1\\\\Content\";" + "\n" +
             "            Setup.ConfigurePipelineMG();" + "\n" +
             "    \n" +
-            "            SceneManager.LoadScene_Serialization(\"Scenes\\DefaultScene\");" + "\n" +
+            "            SceneManager.LoadScene_Serialization(\"Scenes\\\\DefaultScene\");" + "\n" +
             "        }" + "\n" +
             "    \n" +
             "        /// <summary>" + "\n" +

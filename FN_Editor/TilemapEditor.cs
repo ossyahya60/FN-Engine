@@ -222,6 +222,7 @@ namespace FN_Engine.FN_Editor
                         Vector2 Min = new Vector2(int.MaxValue, int.MaxValue);
                         Vector2 Max = new Vector2(int.MinValue, int.MinValue);
                         Vector2 Size = new Vector2(TileSets[ActiveTileSet].Rects[0].Z * TileSets[ActiveTileSet].Tex.Width, TileSets[ActiveTileSet].Rects[0].W * TileSets[ActiveTileSet].Tex.Height);
+                        Size = new Vector2((float)Math.Round(Size.X), (float)Math.Round(Size.Y));
 
                         Vector2 InnserSpacingOld = ImGui.GetStyle().ItemSpacing;
 
@@ -502,6 +503,8 @@ namespace FN_Engine.FN_Editor
                             }
                         }
                     }
+
+                    ImGui.EndChild();
                 }
 
                 ImGui.PopStyleColor();

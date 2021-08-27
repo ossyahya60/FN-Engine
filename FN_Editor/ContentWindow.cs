@@ -357,8 +357,8 @@ namespace FN_Engine.FN_Editor
                                                     Vector2 UV0 = new Vector2(j, i2) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
                                                     Vector2 UV1 = new Vector2(j + SPI.SizeOrCount[0], i2 + SPI.SizeOrCount[1]) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
 
-                                                    Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)Math.Clamp((UV0.X * Tex.Width), 0, Tex.Width), (int)Math.Clamp((UV0.Y * Tex.Height), 0, Tex.Height), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
-                                                    Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1);
+                                                    Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)Math.Clamp((UV0.X * Tex.Width), 0, Tex.Width - 1), (int)Math.Clamp((UV0.Y * Tex.Height), 0, Tex.Height - 1), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
+                                                    Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1); //Bug here!
                                                     Rect.Height = Math.Clamp(Rect.Height, 0, Tex.Height - Rect.Y - 1);
                                                     Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[Rect.Width * Rect.Height];
 
