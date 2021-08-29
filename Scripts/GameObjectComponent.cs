@@ -152,5 +152,35 @@ namespace FN_Engine
         {
             return this.MemberwiseClone() as GameObjectComponent;
         }
+
+        public virtual void OnTriggerEnter2D(Collider2D collider)
+        {
+
+        }
+
+        public virtual void OnTriggerExit2D(Collider2D collider)
+        {
+
+        }
+
+        public virtual void OnTriggerStay2D(Collider2D collider)
+        {
+
+        }
+
+        public virtual void OnCollisionEnter2D(Collider2D collider)
+        {
+
+        }
+
+        public virtual void OnCollisionExit2D(Collider2D collider)
+        {
+
+        }
+
+        public virtual void OnCollisionStay2D(Collider2D collider)
+        {
+
+        }
     }
 }

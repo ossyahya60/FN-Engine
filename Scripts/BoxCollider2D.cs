@@ -7,6 +7,8 @@ namespace FN_Engine
 {
     public class BoxCollider2D : GameObjectComponent, Collider2D
     {
+        public int Entered = 0;
+        public int Exited = 0;
         public bool isTrigger = false;
         public bool SlideCollision = true;
         public Rectangle Bounds;
@@ -65,11 +67,8 @@ namespace FN_Engine
         //Note: This code is inspired by:
         //URL: https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331
         //SAT Collision response is good, you will possess the vector to push the two objects from each other
-        void Collider2D.CollisionResponse(Rigidbody2D YourRigidBody, Collider2D collider, float DeltaTime, ref List<GameObjectComponent> CDs)
+        void Collider2D.CollisionResponse(Rigidbody2D YourRigidBody, Collider2D collider, float DeltaTime, ref List<GameObjectComponent> CDs, Vector2 CollisionPos, bool ResetVelocity)
         {
-            Vector2 CollisionPos = gameObject.Transform.Position;
-            gameObject.Transform.Position -= YourRigidBody.Velocity * DeltaTime;
-
             Rectangle DC1 = GetDynamicCollider();
             Rectangle DC2 = (collider as BoxCollider2D).GetDynamicCollider();
 
@@ -86,29 +85,35 @@ namespace FN_Engine
                 // Colliison on X-axis only
                 ShortestTime = TimeBetweenCollidersX;
                 YourRigidBody.gameObject.Transform.MoveX(ShortestTime * YourRigidBody.Velocity.X);
-                YourRigidBody.Velocity.X = 0;
+                YourRigidBody.Velocity.X = ResetVelocity? 0 : YourRigidBody.Velocity.X;
             }
             else if (YourRigidBody.Velocity.X == 0 && YourRigidBody.Velocity.Y != 0)
             {
                 // Colliison on Y-axis only
                 ShortestTime = TimeBetweenCollidersY;
                 YourRigidBody.gameObject.Transform.MoveY(ShortestTime * YourRigidBody.Velocity.Y);
-                YourRigidBody.Velocity.Y = 0;
+                YourRigidBody.Velocity.Y = ResetVelocity? 0 : YourRigidBody.Velocity.Y;
             }
             else
             {
                 // Colliison on both axis
                 ShortestTime = Math.Min(TimeBetweenCollidersX, TimeBetweenCollidersY);
                 YourRigidBody.gameObject.Transform.Move(ShortestTime * YourRigidBody.Velocity.X, ShortestTime * YourRigidBody.Velocity.Y);
-                YourRigidBody.Velocity = Vector2.Zero;
+                //YourRigidBody.Velocity = ResetVelocity? Vector2.Zero : YourRigidBody.Velocity;
 
                 if (SlideCollision)
                 {
                     var OldPos = YourRigidBody.gameObject.Transform.Position;
                     if (TimeBetweenCollidersX < TimeBetweenCollidersY)
+                    {
                         YourRigidBody.gameObject.Transform.Position.Y = CollisionPos.Y;
+                        YourRigidBody.Velocity.X = ResetVelocity ? 0 : YourRigidBody.Velocity.X;
+                    }
                     else if (TimeBetweenCollidersX > TimeBetweenCollidersY)
+                    {
                         YourRigidBody.gameObject.Transform.Position.X = CollisionPos.X;
+                        YourRigidBody.Velocity.Y = ResetVelocity ? 0 : YourRigidBody.Velocity.Y;
+                    }
 
                     var ThisDC = this as Collider2D;
                     foreach (Collider2D GO in CDs)

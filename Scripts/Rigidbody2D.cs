@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FN_Engine
@@ -27,9 +29,11 @@ namespace FN_Engine
         public float GravityScale = 1; //This ranges from 0 to 1 to indicate how much the rigidbody should be affected by gravity
         public float Mass = 1; //Might be used for collision response and other physics-related stuff
         public Vector2 Velocity; // 1 pixel per sec => This shouldn't be set every frame as it negates all other forces acting
+        public float FrictionCoefficent = 0;
 
         private float GravityConstant = 10; //Universal gravitational constant (Approximated to 10 for easiness)
         private float DeltaTime = 1.0f / 60;
+        private HashSet<Collider2D> LastFrameCollisionList = new HashSet<Collider2D>();
 
         public override void Update(GameTime gameTime)
         {
@@ -57,13 +61,17 @@ namespace FN_Engine
                     break;
             }
 
-            if (ConstraintHorizontalMovement)
-                Velocity = new Vector2(0, Velocity.Y);
-            if (ConstraintVerticalMovement)
-                Velocity = new Vector2(Velocity.X, 0);
+            if (BodyType != BodyType.Static)
+            {
+                Velocity -= FrictionCoefficent * DeltaTime * Velocity;
 
-            if(BodyType != BodyType.Static)
+                if (ConstraintHorizontalMovement)
+                    Velocity = new Vector2(0, Velocity.Y);
+                if (ConstraintVerticalMovement)
+                    Velocity = new Vector2(Velocity.X, 0);
+
                 gameObject.Transform.Position += Velocity * DeltaTime;
+            }
         }
 
         public void AddForce(Vector2 Value, ForceMode2D Mode = ForceMode2D.Force)
@@ -91,6 +99,11 @@ namespace FN_Engine
             Rigidbody2D clone = this.MemberwiseClone() as Rigidbody2D;
 
             return clone;
+        }
+
+        internal HashSet<Collider2D> CollidedWithLastFrameList()
+        {
+            return LastFrameCollisionList;
         }
     }
 }

@@ -9,17 +9,9 @@ namespace FN_Engine
 
         bool CollisionDetection(Collider2D collider, bool Continous);
 
-        void CollisionResponse(Rigidbody2D YourRigidBody, Collider2D collider, float DeltaTime, ref List<GameObjectComponent> CDs);
+        void CollisionResponse(Rigidbody2D YourRigidBody, Collider2D collider, float DeltaTime, ref List<GameObjectComponent> CDs, Vector2 CollisionPos, bool ResetVelocity);
 
         bool Contains(Vector2 Point);
-
-        void OnCollisionEnter2D();
-
-        void OnTriggerEnter2D();
-
-        void OnCollisionExit2D();
-
-        void OnTriggerExit2D();
 
         bool IsTrigger();
 

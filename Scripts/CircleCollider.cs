@@ -78,7 +78,7 @@ namespace FN_Engine
             return IsTouching(collider);
         }
 
-        public void CollisionResponse(Rigidbody2D RB, Collider2D collider, float DeltaTime, ref List<GameObjectComponent> CDs) //change this
+        public void CollisionResponse(Rigidbody2D RB, Collider2D collider, float DeltaTime, ref List<GameObjectComponent> CDs, Vector2 CollisionPos, bool ResetVelocity) //change this
         {
             if (!isTrigger)
             {
