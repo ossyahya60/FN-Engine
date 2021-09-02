@@ -16,6 +16,7 @@ namespace FN_Engine.FN_Editor
         public static Vector2[] MyRegion;
 
         internal static Assembly GameAssem = null;
+        internal static object DraggedObject = null;
 
         private static IEnumerable<Type> Types;
 
@@ -550,10 +551,20 @@ namespace FN_Engine.FN_Editor
                             ComponentsNotRemoved.Add(true);
 
                         bool[] ComponentsNotRemoved_Arr = ComponentsNotRemoved.ToArray();
+                        int H = 0;
                         foreach (GameObjectComponent GOC in Selected_GO.GameObjectComponents)
                         {
+                            ImGui.PushID(H++);
                             if (ImGui.CollapsingHeader(GOC.GetType().Name, ref ComponentsNotRemoved_Arr[T_Counter], ImGuiTreeNodeFlags.DefaultOpen))
                             {
+                                if(ImGui.BeginDragDropSource())
+                                {
+                                    DraggedObject = GOC;
+                                    ImGui.SetDragDropPayload("CompDragged", IntPtr.Zero, 0);
+
+                                    ImGui.EndDragDropSource();
+                                }
+
                                 FieldInfo[] FIS = GOC.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
                                 foreach (FieldInfo FI in FIS)
                                 {
@@ -753,6 +764,37 @@ namespace FN_Engine.FN_Editor
                                                 { }
 
                                                 ContentWindow.DraggedAsset = null;
+                                            }
+                                            else if(FI.FieldType.BaseType == typeof(GameObjectComponent))
+                                            {
+                                                if(DraggedObject != null)
+                                                {
+                                                    var draggedAsset = DraggedObject as GameObject;
+
+                                                    if (draggedAsset != null)
+                                                    {
+                                                        var component = draggedAsset.GetComponent(FI.FieldType);
+
+                                                        if (component != null)
+                                                        {
+                                                            var OldCompVal = FI.GetValue(GOC);
+                                                            FI.SetValue(GOC, component);
+
+                                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldCompVal), Operation.ChangeValue));
+                                                            GameObjects_Tab.Redo_Buffer.Clear();
+                                                        }
+                                                    }
+                                                    else if (DraggedObject.GetType() == FI.FieldType)
+                                                    {
+                                                        var OldCompVal = FI.GetValue(GOC);
+                                                        FI.SetValue(GOC, DraggedObject);
+
+                                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldCompVal), Operation.ChangeValue));
+                                                        GameObjects_Tab.Redo_Buffer.Clear();
+                                                    }
+
+                                                    DraggedObject = null;
+                                                }
                                             }
                                             else if(ContentWindow.DraggedAsset != null && ContentWindow.DraggedAsset.GetType() == typeof(KeyValuePair<string, Vector4>))
                                             {
@@ -1016,6 +1058,37 @@ namespace FN_Engine.FN_Editor
 
                                                 ContentWindow.DraggedAsset = null;
                                             }
+                                            else if (PI.PropertyType.BaseType == typeof(GameObjectComponent))
+                                            {
+                                                if (DraggedObject != null)
+                                                {
+                                                    var draggedAsset = DraggedObject as GameObject;
+
+                                                    if (draggedAsset != null)
+                                                    {
+                                                        var component = draggedAsset.GetComponent(PI.PropertyType);
+
+                                                        if (component != null)
+                                                        {
+                                                            var OldCompVal = PI.GetValue(GOC);
+                                                            PI.SetValue(GOC, component);
+
+                                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldCompVal), Operation.ChangeValue));
+                                                            GameObjects_Tab.Redo_Buffer.Clear();
+                                                        }
+                                                    }
+                                                    else if (draggedAsset.GetType() == PI.PropertyType)
+                                                    {
+                                                        var OldCompVal = PI.GetValue(GOC);
+                                                        PI.SetValue(GOC, draggedAsset);
+
+                                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldCompVal), Operation.ChangeValue));
+                                                        GameObjects_Tab.Redo_Buffer.Clear();
+                                                    }
+
+                                                    DraggedObject = null;
+                                                }
+                                            }
                                             else if (ContentWindow.DraggedAsset != null && ContentWindow.DraggedAsset.GetType() == typeof(KeyValuePair<string, Vector4>))
                                             {
                                                 if (PI.PropertyType == typeof(string))
@@ -1080,6 +1153,7 @@ namespace FN_Engine.FN_Editor
                                     ImGui.PopID();
                                 }
                             }
+                            ImGui.PopID();
 
                             if (!ComponentsNotRemoved_Arr[T_Counter])
                             {

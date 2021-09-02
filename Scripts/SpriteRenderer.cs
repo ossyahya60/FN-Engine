@@ -55,6 +55,21 @@ namespace FN_Engine
         public SpriteEffects SpriteEffects;
         public Color Color = Color.White;
         public Effect Effect;
+        public Vector2 Origin
+        {
+            set
+            {
+                if(Sprite != null)
+                    Sprite.Origin = value;
+            }
+            get
+            {
+                if(Sprite != null)
+                    return Sprite.Origin;
+
+                return Vector2.Zero;
+            }
+        }
         public Rectangle SourceRectangle //Don't change this name! (It's used in content window in drag and drop)
         {
             set
@@ -62,7 +77,7 @@ namespace FN_Engine
                 if (Sprite != null)
                 {
                     Sprite.SourceRectangle = value;
-                    Sprite.Origin = new Vector2(value.Width * 0.5f, value.Height * 0.5f);
+                    //Sprite.Origin = new Vector2(value.Width * 0.5f, value.Height * 0.5f);
                 }
             }
             get
@@ -112,7 +127,7 @@ namespace FN_Engine
                 DestRect.Location = T.Position.ToPoint();
                 DestRect.Width = (int)(Sprite.SourceRectangle.Width * T.Scale.X);
                 DestRect.Height = (int)(Sprite.SourceRectangle.Height * T.Scale.Y);
-                spriteBatch.Draw(Sprite.Texture, DestRect, Sprite.SourceRectangle, Color, T.Rotation, Sprite.Origin, SpriteEffects, gameObject.Layer);
+                spriteBatch.Draw(Sprite.Texture, DestRect, Sprite.SourceRectangle, Color, T.Rotation, Sprite.Origin * SourceRectangle.Size.ToVector2(), SpriteEffects, gameObject.Layer);
             }
         }
 

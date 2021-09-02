@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
 
 namespace FN_Engine
@@ -47,11 +46,11 @@ namespace FN_Engine
 
                         if (CallerRigidBody.BodyType == BodyType.Dynamic && !CD1Trigger && !CD2Trigger && Collided) //We call the resolution two times for more stable resolutions
                         {
+                            //This approach suits moving vs non moving object, otherwise it will break!
                             Vector2 CollisionPos = CallerRigidBody.gameObject.Transform.Position;
                             CallerRigidBody.gameObject.Transform.Position -= CallerRigidBody.Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-                            CD1.CollisionResponse(CallerRigidBody, CD2, (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f, ref Colliders, CollisionPos, false);
-                            CD1.CollisionResponse(CallerRigidBody, CD2, (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f, ref Colliders, CollisionPos, true);
+                            CD1.CollisionResponse(CallerRigidBody, CD2, (float)gameTime.ElapsedGameTime.TotalSeconds, ref Colliders, CollisionPos, true);
                         }
 
                         if (Collided)
@@ -122,6 +121,8 @@ namespace FN_Engine
                             else if(!CD2Trigger && LastFrameCollisions.Contains(CD2)) //OnCollisionExit CD1
                             {
                                 collider.OnCollisionExit2D(CD2);
+
+                                var CollidedAgaistRB = collider2.gameObject.GetComponent<Rigidbody2D>();
 
                                 LastFrameCollisions.Remove(CD2);
                                 JustRemoved = true;

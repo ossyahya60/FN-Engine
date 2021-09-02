@@ -29,7 +29,8 @@ namespace FN_Engine
         public float GravityScale = 1; //This ranges from 0 to 1 to indicate how much the rigidbody should be affected by gravity
         public float Mass = 1; //Might be used for collision response and other physics-related stuff
         public Vector2 Velocity; // 1 pixel per sec => This shouldn't be set every frame as it negates all other forces acting
-        public float FrictionCoefficent = 0;
+
+        internal bool CollidedThisFrame = false;
 
         private float GravityConstant = 10; //Universal gravitational constant (Approximated to 10 for easiness)
         private float DeltaTime = 1.0f / 60;
@@ -63,7 +64,7 @@ namespace FN_Engine
 
             if (BodyType != BodyType.Static)
             {
-                Velocity -= FrictionCoefficent * DeltaTime * Velocity;
+                Velocity -= LinearDragScale * DeltaTime * Velocity;
 
                 if (ConstraintHorizontalMovement)
                     Velocity = new Vector2(0, Velocity.Y);

@@ -25,7 +25,7 @@ namespace FN_Engine.FN_Editor
             ImGui.GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
             if (ImGui.IsMouseDragging(ImGuiMouseButton.Right))
-                Setup.Camera.Move(Input.MouseDelta(), 1);
+                Setup.Camera.Move(-Input.MouseDelta(), ImGui.GetIO().DeltaTime * 60);
 
             if (ImGui.GetIO().KeyCtrl && Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.S))
                 SceneManager.SerializeScene(SceneManager.ActiveScene.Name);

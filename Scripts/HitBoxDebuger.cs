@@ -69,7 +69,7 @@ namespace FN_Engine
             Thickness = Math.Clamp(Thickness, 2, 50);
             Spacing.X = Math.Clamp(Spacing.X, 1, int.MaxValue);
             Spacing.Y = Math.Clamp(Spacing.Y, 1, int.MaxValue);
-            Position -= new Vector2(Spacing.X * RowsCount, Spacing.Y * ColumnsCount) * 0.5f;
+            Position -= new Vector2(Spacing.X * ColumnsCount, Spacing.Y * RowsCount) * 0.5f;
 
             for (int i = 0; i <= RowsCount; i++)
                 DrawLine(new Vector2(Position.X, Position.Y + i * Spacing.Y), new Vector2(Position.X + Spacing.X * ColumnsCount, Position.Y + i * Spacing.Y), color, Thickness);

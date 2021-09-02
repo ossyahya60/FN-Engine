@@ -16,10 +16,10 @@ namespace FN_Engine
         public Rectangle GetDynamicCollider()
         {
             Rectangle HandyRectangle = Rectangle.Empty;
-            HandyRectangle.X = (int)(gameObject.Transform.Position.X + Bounds.X - Bounds.Width * 0.5f * gameObject.Transform.Scale.X);
-            HandyRectangle.Y = (int)(gameObject.Transform.Position.Y + Bounds.Y - Bounds.Height * 0.5f * gameObject.Transform.Scale.Y);
-            HandyRectangle.Width = (int)(Bounds.Width * gameObject.Transform.Scale.X);
-            HandyRectangle.Height = (int)(Bounds.Height * gameObject.Transform.Scale.Y);
+            HandyRectangle.X = (int)(gameObject.Transform.Position.X + Bounds.X - Bounds.Width * 0.5f * Math.Abs(gameObject.Transform.Scale.X));
+            HandyRectangle.Y = (int)(gameObject.Transform.Position.Y + Bounds.Y - Bounds.Height * 0.5f * Math.Abs(gameObject.Transform.Scale.Y));
+            HandyRectangle.Width = (int)(Bounds.Width * Math.Abs(gameObject.Transform.Scale.X));
+            HandyRectangle.Height = (int)(Bounds.Height * Math.Abs(gameObject.Transform.Scale.Y));
 
             return HandyRectangle;
         }
@@ -79,6 +79,7 @@ namespace FN_Engine
             float TimeBetweenCollidersY = YourRigidBody.Velocity.Y != 0 ? Math.Abs(DistanceBetweenCollidersY / YourRigidBody.Velocity.Y) : 0;
 
             float ShortestTime;
+            var OldPos = YourRigidBody.gameObject.Transform.Position;
 
             if (YourRigidBody.Velocity.X != 0 && YourRigidBody.Velocity.Y == 0)
             {
@@ -103,27 +104,34 @@ namespace FN_Engine
 
                 if (SlideCollision)
                 {
-                    var OldPos = YourRigidBody.gameObject.Transform.Position;
-                    if (TimeBetweenCollidersX < TimeBetweenCollidersY)
+                    if (ShortestTime == TimeBetweenCollidersX)
                     {
-                        YourRigidBody.gameObject.Transform.Position.Y = CollisionPos.Y;
+                        YourRigidBody.gameObject.Transform.Position.X = OldPos.X;
                         YourRigidBody.Velocity.X = ResetVelocity ? 0 : YourRigidBody.Velocity.X;
-                    }
-                    else if (TimeBetweenCollidersX > TimeBetweenCollidersY)
-                    {
-                        YourRigidBody.gameObject.Transform.Position.X = CollisionPos.X;
-                        YourRigidBody.Velocity.Y = ResetVelocity ? 0 : YourRigidBody.Velocity.Y;
+
+                        if (!(this as Collider2D).CollisionDetection(collider, false))
+                            YourRigidBody.gameObject.Transform.Position.Y = CollisionPos.Y;
                     }
 
-                    var ThisDC = this as Collider2D;
-                    foreach (Collider2D GO in CDs)
+                    if (ShortestTime == TimeBetweenCollidersY)
                     {
-                        if(GO != ThisDC && !GO.IsTrigger() && GO.CollisionDetection(ThisDC, false))
-                        {
-                            YourRigidBody.gameObject.Transform.Position = OldPos;
-                            break;
-                        }
+                        YourRigidBody.gameObject.Transform.Position.Y = OldPos.Y;
+                        YourRigidBody.Velocity.Y = ResetVelocity ? 0 : YourRigidBody.Velocity.Y;
+
+                        if (!(this as Collider2D).CollisionDetection(collider, false))
+                            YourRigidBody.gameObject.Transform.Position.X = CollisionPos.X;
                     }
+                }
+                else
+                    YourRigidBody.Velocity = ResetVelocity ? Vector2.Zero : YourRigidBody.Velocity;
+            }
+
+            foreach (Collider2D CD in CDs)
+            {
+                if (this != CD && (this as Collider2D).CollisionDetection(CD, false))
+                {
+                    YourRigidBody.gameObject.Transform.Position = OldPos;
+                    break;
                 }
             }
         }

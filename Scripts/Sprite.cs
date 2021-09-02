@@ -16,14 +16,14 @@ namespace FN_Engine
         public Sprite(Transform transform)
         {
             Transform = transform;
-            Origin = Vector2.Zero;
+            Origin = Vector2.One * 0.5f;
             SourceRectangle = new Rectangle();
             Texture = null;
         }
 
         public Sprite()
         {
-            Origin = Vector2.Zero;
+            Origin = Vector2.One * 0.5f;
             SourceRectangle = new Rectangle();
             Texture = null;
         }
@@ -34,7 +34,6 @@ namespace FN_Engine
             { 
                 Texture = Setup.Content.Load<Texture2D>(path);
                 SourceRectangle = new Rectangle(0, 0, Texture.Width, Texture.Height);
-                Origin = new Vector2(Texture.Width * 0.5f, Texture.Height * 0.5f);
             }
             catch (Microsoft.Xna.Framework.Content.ContentLoadException) { } //Log Error maybe?
         }
@@ -43,8 +42,8 @@ namespace FN_Engine
         {
             Rectangle HandyRectangle = Rectangle.Empty;
 
-            HandyRectangle.X = (int)(Transform.Position.X - Origin.X * Transform.Scale.X);
-            HandyRectangle.Y = (int)(Transform.Position.Y - Origin.Y * Transform.Scale.Y);
+            HandyRectangle.X = (int)(Transform.Position.X - Origin.X * Transform.Scale.X * SourceRectangle.Width);
+            HandyRectangle.Y = (int)(Transform.Position.Y - Origin.Y * Transform.Scale.Y * SourceRectangle.Height);
             HandyRectangle.Width = (int)(SourceRectangle.Width * Transform.Scale.X);
             HandyRectangle.Height = (int)(SourceRectangle.Height * Transform.Scale.Y);
 
@@ -60,11 +59,6 @@ namespace FN_Engine
             Clone.Texture = Texture;
 
             return Clone;
-        }
-
-        public void SetCenterAsOrigin()
-        {
-            Origin = new Vector2(SourceRectangle.Width / 2, SourceRectangle.Height / 2);
         }
 
         public void Serialize(StreamWriter SW, string GameObjectName) //Make the spriterender pass the transform to the sprite in deserialization

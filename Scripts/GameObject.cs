@@ -212,6 +212,15 @@ namespace FN_Engine
             return null;
         }
 
+        public GameObjectComponent GetComponent(Type T)
+        {
+            foreach (GameObjectComponent GOC in GameObjectComponents)
+                if (GOC.GetType() == T)
+                    return GOC;
+
+            return null;
+        }
+
         public bool AddComponent<T>(T component, int Index = -1) where T : GameObjectComponent  //Add a component to a gameobject
         {
             bool CanBeAdded = false;

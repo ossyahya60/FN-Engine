@@ -600,6 +600,7 @@ namespace FN_Engine.FN_Editor
                 {
                     ImGui.SetDragDropPayload("GameObject", IntPtr.Zero, 0);
                     DraggedGO = GO;
+                    InspectorWindow.DraggedObject = GO;
 
                     ImGui.Text(GO.Name);
 
@@ -638,7 +639,7 @@ namespace FN_Engine.FN_Editor
                 if (!Root)
                     ImGui.Unindent();
 
-                if (ImGui.IsItemClicked(ImGuiMouseButton.Left) || ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                if ((ImGui.IsMouseReleased(ImGuiMouseButton.Left) || ImGui.IsMouseReleased(ImGuiMouseButton.Right)) && ImGui.IsItemHovered())
                 {
                     if (ImGui.GetIO().KeyCtrl)
                     {
@@ -683,6 +684,7 @@ namespace FN_Engine.FN_Editor
             {
                 ImGui.SetDragDropPayload("GameObject", IntPtr.Zero, 0);
                 DraggedGO = GO;
+                InspectorWindow.DraggedObject = GO;
 
                 ImGui.Text(GO.Name);
 
@@ -718,7 +720,7 @@ namespace FN_Engine.FN_Editor
                 ImGui.PopStyleColor();
             }
 
-            if (ImGui.IsItemClicked(ImGuiMouseButton.Left) || ImGui.IsItemClicked(ImGuiMouseButton.Right))
+            if ((ImGui.IsMouseReleased(ImGuiMouseButton.Left) || ImGui.IsMouseReleased(ImGuiMouseButton.Right)) && ImGui.IsItemHovered())
             {
                 if (ImGui.GetIO().KeyCtrl)
                 {

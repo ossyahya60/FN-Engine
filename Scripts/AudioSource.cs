@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
+﻿using Microsoft.Xna.Framework.Audio;
 using System;
-using System.IO;
 
 namespace FN_Engine
 {
+
     public class AudioSource: GameObjectComponent //this class is supposed to play sound effects only, use media player to play songs or tracks
     {
         public float Volume
@@ -117,11 +116,16 @@ namespace FN_Engine
             AudioName = Path;
         }
 
-        public void Play()
+        public void Play(bool CanOverwrite = true)
         {
+            if (!Enabled)
+                return;
+
             SoundEffectInstance.Volume = volume;
             SoundEffectInstance.Pitch = pitch;
             SoundEffectInstance.Pan = pan;
+            if(CanOverwrite)
+                SoundEffectInstance.Stop();
             SoundEffectInstance.Play();
         }
 
@@ -133,7 +137,7 @@ namespace FN_Engine
 
         public void Resume()
         {
-            if (SoundEffectInstance.State == SoundState.Paused)
+            if (SoundEffectInstance.State == SoundState.Paused && Enabled)
                 SoundEffectInstance.Resume();
         }
 

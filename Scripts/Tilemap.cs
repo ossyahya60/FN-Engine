@@ -15,6 +15,12 @@ namespace FN_Engine
             {
                 gridSize.X = Math.Clamp(value.X, 1, 1000);
                 gridSize.Y = Math.Clamp(value.Y, 1, 1000);
+
+                if (GridSize.X % 2 != 0)
+                    GridSize += new Point(1, 0);
+
+                if (GridSize.Y % 2 != 0)
+                    GridSize += new Point(0, 1);
             }
             get
             {
@@ -60,7 +66,7 @@ namespace FN_Engine
             }
 
             if (ShowGrid)
-                HitBoxDebuger.DrawGrid(GridSize.X, GridSize.Y, gameObject.Transform.Position, (TileSize.ToVector2() * gameObject.Transform.Scale).ToPoint(), Color.Yellow * Opacity, Thickness);
+                HitBoxDebuger.DrawGrid(GridSize.Y, GridSize.X, gameObject.Transform.Position, (TileSize.ToVector2() * gameObject.Transform.Scale).ToPoint(), Color.Yellow * Opacity, Thickness);
         } 
     }
 }

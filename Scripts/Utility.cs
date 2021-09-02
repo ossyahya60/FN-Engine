@@ -778,8 +778,8 @@ namespace FN_Engine
 
                     }
                 }
-                //else
-                    //throw new Exception("Serialized member is not present in the class!");
+                else //If I found a non existing field/property I just skip
+                    JR.Skip();
             }
 
             return null; //This line shouldn't be logically reachable

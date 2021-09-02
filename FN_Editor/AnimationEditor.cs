@@ -130,6 +130,9 @@ namespace FN_Engine.FN_Editor
                     ImGui.EndDragDropTarget();
                 }
 
+                ImGui.SameLine();
+                ContentWindow.HelpMarker("- To add an animation to a gameobject, \njust drag the animation player on the right \nto this drop down menu called \"Animator\". \n- To delete an existing animation from the \nanimator gameobject, just right click on an entry!");
+
                 if (AnimatorTree)
                 {
                     if (DraggedGO_AnimClips != null)
@@ -237,7 +240,9 @@ namespace FN_Engine.FN_Editor
                         for (int i = 0; i < AnimationClips.Count; i++)
                             ClipNames[i] = AnimationClips[i].Name;
 
-                        AnimationClips[SelectedClip].Name = Utility.UniqueName(AnimationClips[SelectedClip].Name, ClipNames);
+                        
+                        AnimationClips[SelectedClip].Name = AnimationClips[SelectedClip].Name.Equals(AnimationClips[SelectedClip].Name) ? AnimationClips[SelectedClip].Name : Utility.UniqueName(AnimationClips[SelectedClip].Name, ClipNames);
+                        SearchText = AnimationClips[SelectedClip].Name;
                     }
 
                     ImGui.InputText("Tag", ref AnimationClips[SelectedClip].Tag, 50);

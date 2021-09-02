@@ -132,7 +132,6 @@ C:\FN Engine CrossPlatform\FN_Engine\bin\Debug\netcoreapp3.1\runtimes\win-x64\na
 C:\FN Engine CrossPlatform\FN_Engine\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\soft_oal.dll
 C:\FN Engine CrossPlatform\FN_Engine\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\SDL2.dll
 C:\FN Engine CrossPlatform\FN_Engine\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\soft_oal.dll
-C:\FN Engine CrossPlatform\FN_Engine\obj\Debug\netcoreapp3.1\FN_Engine.csprojAssemblyReference.cache
 C:\FN Engine CrossPlatform\FN_Engine\obj\Debug\netcoreapp3.1\FN_Engine.AssemblyInfoInputs.cache
 C:\FN Engine CrossPlatform\FN_Engine\obj\Debug\netcoreapp3.1\FN_Engine.AssemblyInfo.cs
 C:\FN Engine CrossPlatform\FN_Engine\obj\Debug\netcoreapp3.1\FN_Engine.csproj.CoreCompileInputs.cache
@@ -140,3 +139,4 @@ C:\FN Engine CrossPlatform\FN_Engine\obj\Debug\netcoreapp3.1\FN_Engine.csproj.Co
 C:\FN Engine CrossPlatform\FN_Engine\obj\Debug\netcoreapp3.1\FN_Engine.dll
 C:\FN Engine CrossPlatform\FN_Engine\obj\Debug\netcoreapp3.1\FN_Engine.pdb
 C:\FN Engine CrossPlatform\FN_Engine\obj\Debug\netcoreapp3.1\FN_Engine.genruntimeconfig.cache
+C:\FN Engine CrossPlatform\FN_Engine\obj\Debug\netcoreapp3.1\FN_Engine.csprojAssemblyReference.cache

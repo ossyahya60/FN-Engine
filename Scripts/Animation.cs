@@ -37,18 +37,19 @@ namespace FN_Engine
 
         public void Update(GameTime gameTime)
         {
-            if(!Paused && Frames.Count != 0)
+            if (!Paused && Frames.Count != 0)
             {
                 if (TimeCounter >= (FixedTimeBetweenFrames ? FixedTime : Frames[ActiveFrame].Time))
                 {
-                    TimeCounter = 0;
-                    
-                    if(Reverse)
-                        ActiveFrame = ActiveFrame <= 0 ? (Loop? Frames.Count - 1 : 0) : ActiveFrame - 1;
+                    if (Reverse)
+                        ActiveFrame = ActiveFrame <= 0 ? (Loop ? Frames.Count - 1 : 0) : ActiveFrame - 1;
                     else
                         ActiveFrame = ActiveFrame >= Frames.Count - 1 ? (Loop ? 0 : Frames.Count - 1) : ActiveFrame + 1;
 
-                    Paused = !Loop;
+                    if (!Loop)
+                        Paused = Reverse ? ActiveFrame == 0 : ActiveFrame == Frames.Count - 1;
+
+                    TimeCounter = 0;
                 }
                 else
                     TimeCounter += (float)gameTime.ElapsedGameTime.TotalSeconds * Speed;
@@ -56,6 +57,17 @@ namespace FN_Engine
                 SR.Sprite.Texture = Frames[ActiveFrame].Tex;
                 SR.Sprite.SourceRectangle = Frames[ActiveFrame].SourceRectangle;
             }
+
+            Animator.IsAnythingPlaying = !Paused;
+        }
+
+        public float GetAnimationTime()
+        {
+            float Time = 0;
+            foreach (Frame F in Frames)
+                Time += F.Time;
+
+            return Time;
         }
 
         public Animation DeepCopy()

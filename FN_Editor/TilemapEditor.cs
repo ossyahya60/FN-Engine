@@ -48,6 +48,8 @@ namespace FN_Engine.FN_Editor
             TexPtrs = new IntPtr[4];
 
             TexPtrs[0] = Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\Brush"));
+            TexPtrs[1] = Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\Bucket"));
+            TexPtrs[2] = Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\Delete"));
             HandyList = new List<GameObject>();
             HandyList2 = new List<GameObject>();
             TileMapSelectionArea = Microsoft.Xna.Framework.Rectangle.Empty;
@@ -523,6 +525,12 @@ namespace FN_Engine.FN_Editor
 
                     if(ImGui.ImageButton(TexPtrs[0], new Vector2(32, 32))) //Brush
                         ActiveTool = Tools.Brush;
+
+                    if (ImGui.ImageButton(TexPtrs[1], new Vector2(32, 32))) //Bucket
+                        ActiveTool = Tools.Bucket;
+
+                    if (ImGui.ImageButton(TexPtrs[2], new Vector2(32, 32))) //Delete
+                        ActiveTool = Tools.Delete;
 
                     ImGui.PopStyleColor();
 

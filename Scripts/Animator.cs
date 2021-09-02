@@ -5,10 +5,22 @@ namespace FN_Engine
 {
     public class Animator: GameObjectComponent
     {
+        public static bool IsAnythingPlaying
+        {
+            internal set
+            {
+                animationPlaying = value;
+            }
+            get
+            {
+                return animationPlaying;
+            }
+        }
         public List<Animation> AnimationClips;
 
         private Animation ActiveClip = null;
         private SpriteRenderer SR = null;
+        private static bool animationPlaying = false;
 
         public override void Start()
         {
