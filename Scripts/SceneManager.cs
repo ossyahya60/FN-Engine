@@ -11,44 +11,13 @@ namespace FN_Engine
 {
     public static class SceneManager
     {
-        public static Scene ActiveScene = null;
-        public static Dictionary<int, Action> InitializerList = new Dictionary<int, Action>();
-        public static bool ShouldUpdate = true;
+        public static Scene ActiveScene { internal set; get; }
+
+        internal static bool ShouldUpdate = true;
+        internal static string LastLoadPath = "";
 
         private static Scene SceneToBeLoaded = null;
         private static bool FirstTimeLoading = true;
-        private static Vector2 Resolution = Vector2.Zero;
-        private static string ScenesDirectory = "";
-        private static string DefaultScene = "Main Scene";
-        private static List<string> Scenes = new List<string>();
-
-
-        private static void ReadSceneFile()
-        {
-            using (StreamReader SR = new StreamReader(ScenesDirectory + "/Scenes/Scenes.FN", false))
-            {
-                DefaultScene = SR.ReadLine().Split('\t')[1];
-
-                int NumberOfScenes = int.Parse(SR.ReadLine().Split('\t')[1]);
-                for (int i = 0; i < NumberOfScenes; i++)
-                    Scenes.Add(SR.ReadLine());
-            }
-        }
-
-        private static void SaveSceneFile()
-        {
-            using (StreamWriter SW = new StreamWriter(ScenesDirectory + "/Scenes/Scenes.FN", false))
-            {
-                SW.WriteLine("Default Scene:\t" + DefaultScene);
-
-                string[] SceneNames = Directory.GetFiles(ScenesDirectory + "/Scenes").Where(Item => Item.Contains(".FN")).ToArray();
-
-                SW.WriteLine("Number Of Scenes:\t" + SceneNames.Length.ToString());
-
-                foreach (string S in SceneNames)
-                    SW.WriteLine(S);
-            }
-        }
 
         private static void UnloadScene()
         {
@@ -59,40 +28,6 @@ namespace FN_Engine
                 ActiveScene = null;
                 GC.Collect();
             }
-        }
-
-        public static void AddInitializer(Action initializer, int Index)
-        {
-            InitializerList.Add(Index, initializer);
-        }
-
-        public static void LoadSceneNow() //Not For High level user
-        {
-            if (SceneToBeLoaded == null)
-                return;
-
-            UnloadScene();
-            ActiveScene = SceneToBeLoaded;
-
-            foreach (KeyValuePair<int, Action> KVP in InitializerList)
-                if (KVP.Key == ActiveScene.ID)
-                    KVP.Value.Invoke();
-
-            SceneToBeLoaded = null;
-        }
-
-        public static void LoadScene(Scene scene) //Use this
-        {
-            if (FirstTimeLoading)
-            {
-                SceneToBeLoaded = scene;
-                LoadSceneNow();
-                FirstTimeLoading = false;
-                return;
-            }
-
-            scene.GameObjects.Clear();
-            SceneToBeLoaded = scene;
         }
 
         private static Scene DeserlializeV2(string Path = "")
@@ -116,6 +51,11 @@ namespace FN_Engine
 
         public static void LoadScene_Serialization(string Name) //Use this
         {
+            if (FN_Editor.EditorScene.IsThisTheEditor && ShouldUpdate)
+                return;
+
+            LastLoadPath = Name;
+
             if (FirstTimeLoading)
             {
                 SceneToBeLoaded = new Scene(Name);
@@ -127,7 +67,7 @@ namespace FN_Engine
             SceneToBeLoaded = new Scene(Name);
         }
 
-        public static void LoadSceneNow_Serialization() //Not For High level user
+        internal static void LoadSceneNow_Serialization() //Not For High level user
         {
             if (SceneToBeLoaded == null)
                 return;
@@ -142,12 +82,16 @@ namespace FN_Engine
                 ActiveScene = DeserlializeV2(SceneToBeLoaded.Name);
 
             Light.Reset();
-            ActiveScene.Start();
             if (FN_Editor.EditorScene.IsThisTheEditor) //Some clean up
             {
+                ActiveScene.Init();
+                ActiveScene.GameObjects.Find(Item => Item.IsEditor).Start();
+
                 FN_Editor.GameObjects_Tab.Undo_Buffer.Clear();
                 FN_Editor.GameObjects_Tab.Redo_Buffer.Clear();
             }
+            else
+                ActiveScene.Start();
 
             Scene.IsSceneBeingLoaded = false;
             SceneToBeLoaded = null;
@@ -155,7 +99,7 @@ namespace FN_Engine
 
         public static void SerializeScene(string Path = "")
         {
-            if (ActiveScene != null)
+            if (ActiveScene != null && !(FN_Editor.EditorScene.IsThisTheEditor && ShouldUpdate))
             {
                 var CamCont = ActiveScene.FindGameObjectWithName("Camera Controller").GetComponent<CameraController>();
                 bool StoredVal = CamCont.Visualize;
@@ -179,23 +123,6 @@ namespace FN_Engine
                 CamCont.Visualize = StoredVal;
             }
         }
-
-        //public static void LoadSceneNow_Serialization() //Not For High level user
-        //{
-        //    if (SceneToBeLoaded == null)
-        //        return;
-
-        //    UnloadScene();
-        //    ActiveScene = SceneToBeLoaded;
-
-
-        //    //SceneToBeLoaded.Start();
-        //    SceneToBeLoaded.DeserializeV2(SceneToBeLoaded.Name);
-        //    Light.Reset();
-        //    SceneToBeLoaded.Start();
-
-        //    SceneToBeLoaded = null;
-        //}
 
         public static void Initialize()
         {

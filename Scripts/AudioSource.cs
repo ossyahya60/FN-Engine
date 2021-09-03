@@ -3,9 +3,10 @@ using System;
 
 namespace FN_Engine
 {
-
     public class AudioSource: GameObjectComponent //this class is supposed to play sound effects only, use media player to play songs or tracks
     {
+        public string UniqueName = "sound effect";
+
         public float Volume
         {
             set
@@ -43,15 +44,18 @@ namespace FN_Engine
         {
             set
             {
-                if(SoundEffectInstance != null)
-                    SoundEffectInstance.IsLooped = value;
+                isLooping = value;
+
+                if (SoundEffect == null)
+                    return;
+                else if (SoundEffectInstance == null)
+                    SoundEffectInstance = SoundEffect.CreateInstance();
+
+                SoundEffectInstance.IsLooped = value;
             }
             get
             {
-                if (SoundEffectInstance != null)
-                    return SoundEffectInstance.IsLooped;
-
-                return false;
+                return isLooping;
             }
         }
         public string AudioName
@@ -94,6 +98,7 @@ namespace FN_Engine
         private float pitch = 0;
         private float pan = 0;
         private string audioName = null;
+        private bool isLooping = false;
 
         public AudioSource(string AudioName)
         {
@@ -121,11 +126,13 @@ namespace FN_Engine
             if (!Enabled)
                 return;
 
+            if (CanOverwrite)
+                SoundEffectInstance.Stop();
+
             SoundEffectInstance.Volume = volume;
             SoundEffectInstance.Pitch = pitch;
             SoundEffectInstance.Pan = pan;
-            if(CanOverwrite)
-                SoundEffectInstance.Stop();
+            SoundEffectInstance.IsLooped = IsLooping;
             SoundEffectInstance.Play();
         }
 

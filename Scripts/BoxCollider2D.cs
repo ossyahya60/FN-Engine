@@ -7,8 +7,8 @@ namespace FN_Engine
 {
     public class BoxCollider2D : GameObjectComponent, Collider2D
     {
-        public int Entered = 0;
-        public int Exited = 0;
+        //public int Entered = 0;
+        //public int Exited = 0;
         public bool isTrigger = false;
         public bool SlideCollision = true;
         public Rectangle Bounds;
@@ -109,7 +109,7 @@ namespace FN_Engine
                         YourRigidBody.gameObject.Transform.Position.X = OldPos.X;
                         YourRigidBody.Velocity.X = ResetVelocity ? 0 : YourRigidBody.Velocity.X;
 
-                        if (!(this as Collider2D).CollisionDetection(collider, false))
+                        if (!collider.CollisionDetection(this, false))
                             YourRigidBody.gameObject.Transform.Position.Y = CollisionPos.Y;
                     }
 
@@ -118,7 +118,7 @@ namespace FN_Engine
                         YourRigidBody.gameObject.Transform.Position.Y = OldPos.Y;
                         YourRigidBody.Velocity.Y = ResetVelocity ? 0 : YourRigidBody.Velocity.Y;
 
-                        if (!(this as Collider2D).CollisionDetection(collider, false))
+                        if (!collider.CollisionDetection(this, false))
                             YourRigidBody.gameObject.Transform.Position.X = CollisionPos.X;
                     }
                 }
@@ -128,7 +128,7 @@ namespace FN_Engine
 
             foreach (Collider2D CD in CDs)
             {
-                if (this != CD && (this as Collider2D).CollisionDetection(CD, false))
+                if (!gameObject.Name.Equals((CD as GameObjectComponent).gameObject.Name) && CD.CollisionDetection(this, false))
                 {
                     YourRigidBody.gameObject.Transform.Position = OldPos;
                     break;

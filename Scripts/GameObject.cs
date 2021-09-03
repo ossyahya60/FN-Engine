@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FN_Engine
 {
@@ -58,7 +59,7 @@ namespace FN_Engine
         public Transform Transform;
         public List<GameObjectComponent> GameObjectComponents; //List of all  GO componets in a certain scene(scene is not yet implemented)
 
-        private readonly string[] CanBeAddedMultipleTimes = { "BoxCollider2D", "AudioSource", "ParticleEffect", "CircleCollider" };
+        private readonly Type[] CanBeAddedMultipleTimes = { typeof(BoxCollider2D), typeof(AudioSource), typeof(ParticleEffect), typeof(CircleCollider) };
         private GameObject parent = null;
         private float layer = 1;
 
@@ -224,9 +225,14 @@ namespace FN_Engine
         public bool AddComponent<T>(T component, int Index = -1) where T : GameObjectComponent  //Add a component to a gameobject
         {
             bool CanBeAdded = false;
-            foreach (string s in CanBeAddedMultipleTimes)
-                if (s == component.GetType().ToString())
+            foreach (Type type in CanBeAddedMultipleTimes)
+            {
+                if (type == component.GetType())
+                {
                     CanBeAdded = true;
+                    break;
+                }
+            }
 
             if (GameObjectComponents.Find(Item => Item.GetType() == component.GetType()) == null || CanBeAdded)
             {
@@ -246,9 +252,14 @@ namespace FN_Engine
         public bool AddComponent_Generic(GameObjectComponent component)  //Add a component to a gameobject
         {
             bool CanBeAdded = false;
-            foreach (string s in CanBeAddedMultipleTimes)
-                if (s == component.GetType().ToString())
+            foreach (Type type in CanBeAddedMultipleTimes)
+            {
+                if (type == component.GetType())
+                {
                     CanBeAdded = true;
+                    break;
+                }
+            }
 
             if (GameObjectComponents.Find(Item => Item.GetType() == component.GetType()) == null || CanBeAdded)
             {
@@ -261,17 +272,24 @@ namespace FN_Engine
             return false;
         }
 
-        public bool RemoveComponent<T>(T component, bool Destroy = true) where T : GameObjectComponent  //Remove a component from a gameobject
+        public bool RemoveComponent(GameObjectComponent component, bool Destroy = true)  //Remove a component from a gameobject
         {
             if (component == null)
                 return false;
 
-            if (GameObjectComponents.Contains(component))
-            {
-                GameObjectComponents.Remove(component);
-                if(Destroy)
-                    component.Destroy();
+            bool FoundComp = GameObjectComponents.Remove(component);
+            if (Destroy && FoundComp)
+                component.Destroy();
 
+            return FoundComp;
+        }
+
+        public bool RemoveComponent<T>(bool Destroy = true) where T : GameObjectComponent  //Remove a component from a gameobject
+        {
+            var comp = GameObjectComponents.FindIndex(Item => Item is T);
+            if (comp != -1)
+            {
+                GameObjectComponents.RemoveAt(comp);
                 return true;
             }
 
@@ -355,6 +373,17 @@ namespace FN_Engine
                 foreach (GameObjectComponent GOC in GameObjectComponents)
                     if (GOC.Enabled)
                         GOC.DrawUI();
+        }
+
+        public List<T> GetComponents<T>() where T: GameObjectComponent
+        {
+            var comps = GameObjectComponents.FindAll(Item => Item is T);
+            return comps.ConvertAll(new Converter<GameObjectComponent, T>(ConvertGOC<T>));
+        }
+
+        private T ConvertGOC<T>(GameObjectComponent GOC) where T: GameObjectComponent
+        {
+            return GOC as T;
         }
 
         //public static void Destroy(GameObject GO)  //Scene not yet implemented

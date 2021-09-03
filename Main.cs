@@ -123,7 +123,7 @@ namespace FN_Engine
             if (FN_Project.VisualizeEngineStartup.NewProject)
             {
                 Utility.BuildAllContent(Setup.SourceFilePath);
-                SceneManager.ActiveScene = new Scene("DefaultScene", 0);
+                SceneManager.ActiveScene = new Scene("DefaultScene");
 
                 GameObject GO = new GameObject(true);
                 GO.Name = "EditorGameObject";
