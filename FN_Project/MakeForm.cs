@@ -22,9 +22,15 @@ namespace FN_Engine.FN_Project
                     {
                         VisualizeEngineStartup.GamePath = fbd.SelectedPath;
                         if (Directory.GetFiles(fbd.SelectedPath).Length == 0 && Directory.GetDirectories(fbd.SelectedPath).Length == 0) // Make New Project
+                        {
                             VisualizeEngineStartup.MakeNewProject(fbd.SelectedPath);
+                            FN_Editor.ContentWindow.LogText.Add("Project created successfully!");
+                        }
                         else
+                        {
                             VisualizeEngineStartup.OpenExistingProject(fbd.SelectedPath);
+                            FN_Editor.ContentWindow.LogText.Add("Project opened successfully!");
+                        }
 
                         GamePath = fbd.SelectedPath;
                     }

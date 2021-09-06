@@ -43,9 +43,10 @@ namespace FN_Engine
             //DragAndDropForm.Visible = false;
         }
 
-        public static void ConfigurePipelineMG()
+        public static void ConfigurePipelineMG(Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform targetPlatform = Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform.DesktopGL)
         {
             PM = new PipelineManager(SourceFilePath, OutputFilePath, IntermediateFilePath);
+            PM.Platform = targetPlatform;
         }
     }
 }

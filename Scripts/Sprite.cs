@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using Newtonsoft.Json;
+using System;
 
 namespace FN_Engine
 {
@@ -35,7 +36,7 @@ namespace FN_Engine
                 Texture = Setup.Content.Load<Texture2D>(path);
                 SourceRectangle = new Rectangle(0, 0, Texture.Width, Texture.Height);
             }
-            catch (Microsoft.Xna.Framework.Content.ContentLoadException) { } //Log Error maybe?
+            catch (Exception E){ FN_Editor.ContentWindow.LogText.Add(E.Message); } //Log Error maybe?
         }
 
         public Rectangle DynamicScaledRect()

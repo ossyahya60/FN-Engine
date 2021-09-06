@@ -74,14 +74,8 @@ namespace FN_Engine
                     if (SoundEffect != null && !SoundEffect.IsDisposed)
                         SoundEffect.Dispose();
 
-                    try
-                    {
-                        SoundEffect = Setup.Content.Load<SoundEffect>(value);
-                    }
-                    catch (System.InvalidCastException) //Logging instead of throwing exception!
-                    {
-                        throw new Exception("Usupported Sound Effect Type, must be wav, ogg or mp3");
-                    }
+                    try { SoundEffect = Setup.Content.Load<SoundEffect>(value); }
+                    catch (Exception E) { FN_Editor.ContentWindow.LogText.Add(E.Message); } //Log error here!
 
                     SoundEffectInstance = SoundEffect.CreateInstance();
                 }

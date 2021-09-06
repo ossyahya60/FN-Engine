@@ -329,7 +329,7 @@ namespace FN_Engine.FN_Editor
                                 Frame NewFrame = new Frame();
                                 bool Safe = true;
                                 try { NewFrame.Tex = Setup.Content.Load<Texture2D>((string)ContentWindow.DraggedAsset); }
-                                catch (Microsoft.Xna.Framework.Content.ContentLoadException) { Safe = false; }
+                                catch (Exception E) { Safe = false; FN_Editor.ContentWindow.LogText.Add(E.Message); }
 
                                 if (Safe)
                                 {
@@ -346,7 +346,7 @@ namespace FN_Engine.FN_Editor
                                 Frame NewFrame = new Frame();
                                 bool Safe = true;
                                 try { NewFrame.Tex = Setup.Content.Load<Texture2D>(((KeyValuePair<string, Vector4>)ContentWindow.DraggedAsset).Key); }
-                                catch (Microsoft.Xna.Framework.Content.ContentLoadException) { Safe = false; }
+                                catch (Exception E) { Safe = false; FN_Editor.ContentWindow.LogText.Add(E.Message); }
 
                                 if (Safe)
                                 {

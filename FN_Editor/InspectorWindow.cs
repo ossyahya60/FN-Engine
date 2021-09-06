@@ -128,14 +128,8 @@ namespace FN_Engine.FN_Editor
                 ComponentsTypes.Clear();
                 Types.ToList().ForEach(item => ComponentsTypes.Add(item));
             }
-            catch(System.IO.FileNotFoundException) //Log Errors?
-            {
-                Console.Out.WriteLine("Dll is not found, please run the application first");
-            }
-            catch(System.BadImageFormatException)
-            {
-                Console.Out.WriteLine("This shouldn't happen, check Class InspectorWindow, ReloadAssembly Function");
-            }
+            catch (Exception E) // Log Error?
+            { ContentWindow.LogText.Add(E.Message); }
         }
 
         public override void Start()
@@ -165,10 +159,8 @@ namespace FN_Engine.FN_Editor
                     LastExecWriteTime = WriteTime;
                 }
             }
-            catch (System.IO.FileNotFoundException) //Log Errors?
-            {
-                Console.Out.WriteLine("Executable is not found, please run the application first");
-            }
+            catch (Exception E) // Log Error?
+            { ContentWindow.LogText.Add(E.Message); }
 
             ImGui.Begin("Inspector Window");
 
@@ -758,10 +750,8 @@ namespace FN_Engine.FN_Editor
                                                     GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldVal), Operation.ChangeValue));
                                                     GameObjects_Tab.Redo_Buffer.Clear();
                                                 }
-                                                catch (TargetInvocationException) // Log Error?
-                                                { }
-                                                catch (System.ArgumentException)
-                                                { }
+                                                catch (Exception E) // Log Error?
+                                                { ContentWindow.LogText.Add(E.Message); }
 
                                                 ContentWindow.DraggedAsset = null;
                                             }
@@ -1051,10 +1041,8 @@ namespace FN_Engine.FN_Editor
                                                     GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldVal), Operation.ChangeValue));
                                                     GameObjects_Tab.Redo_Buffer.Clear();
                                                 }
-                                                catch (TargetInvocationException) // Log Error?
-                                                { }
-                                                catch (System.ArgumentException)
-                                                { }
+                                                catch (Exception E) // Log Error?
+                                                { ContentWindow.LogText.Add(E.Message); }
 
                                                 ContentWindow.DraggedAsset = null;
                                             }

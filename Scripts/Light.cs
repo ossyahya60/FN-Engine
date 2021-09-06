@@ -38,6 +38,7 @@ namespace FN_Engine
         private static EffectParameter CastShadows_param;
         private static EffectParameter CastShadow_param;
         private static EffectParameter ShadowConstant_param;
+        private static float YOVERX;
         //private static EffectParameter CameraPosNorm_param;
 
         public bool CastShadow = false;
@@ -51,14 +52,27 @@ namespace FN_Engine
         public float DirectionalIntensity = 0.2f;
         public float ShadowIntensity = 0.5f;
 
-        private float YOVERX;
-
         public static void Reset()
         {
             ShaderLoaded = false;
         }
 
         public override void Start()
+        {
+            
+        }
+
+        public override void Destroy()
+        {
+            //LIGHTS.Remove(this);
+        }
+
+        //public void Rebuild() //Not for high level users
+        //{
+        //    //LIGHTS.Add(this);
+        //}
+
+        public static void Init_Light()
         {
             if (!ShaderLoaded || LightEffect.IsDisposed)
             {
@@ -96,20 +110,7 @@ namespace FN_Engine
 
             //LIGHTS.Add(this);
             YOVERX = (float)Setup.graphics.PreferredBackBufferHeight / Setup.graphics.PreferredBackBufferWidth;
-        }
 
-        public override void Destroy()
-        {
-            //LIGHTS.Remove(this);
-        }
-
-        //public void Rebuild() //Not for high level users
-        //{
-        //    //LIGHTS.Add(this);
-        //}
-
-        public static void Init_Light()
-        {
             if (RenderTarget2D == null)
                 RenderTarget2D = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
 
@@ -285,7 +286,7 @@ namespace FN_Engine
             AngularRadius_param.SetValue(AngularRadius);
             X_Bias_param.SetValue(X_Bias);
             Y_Bias_param.SetValue(Y_Bias);
-            YOverX_param.SetValue(LIGHTS[0].YOVERX);
+            YOverX_param.SetValue(YOVERX);
             Color_param.SetValue(COLOR);
             Radius_param.SetValue(Radius);
             InnerRadius_param.SetValue(InnerRadius);

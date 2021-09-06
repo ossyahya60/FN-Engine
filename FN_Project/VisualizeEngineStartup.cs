@@ -59,6 +59,7 @@ namespace FN_Engine.FN_Project
                 "dotnet sln add " + ProjName, //Add the project to the solution
             };
 
+            //Change this accord to which platform you will target!
             Utility.ExecuteCommand(MakeDesktopGLProj, Path);
 
             string[] RunGame = new string[]
@@ -77,7 +78,7 @@ namespace FN_Engine.FN_Project
             File.Copy(Environment.CurrentDirectory + "\\Newtonsoft.Json.dll", GameDebugDir + "\\Newtonsoft.Json.dll");
             File.Copy(Environment.CurrentDirectory + "\\ImGui.NET.dll", GameDebugDir + "\\ImGui.NET.dll");
             File.Copy(Environment.CurrentDirectory + "\\runtimes\\win-x64\\native\\cimgui.dll", GameDebugDir + "\\cimgui.dll"); //x64 and x32?
-
+            File.Copy(Environment.CurrentDirectory + "\\libmojoshader_64.dll", GameDebugDir + "\\libmojoshader_64.dll");
 
             string NameSpaceName = Path.Substring(Path.LastIndexOf('\\') + 1);
             File.WriteAllText(Path + @"\" + NameSpaceName + ".csproj", GetTemplateProjFile());
@@ -98,7 +99,7 @@ namespace FN_Engine.FN_Project
             Directory.CreateDirectory(DestinationDir + "\\Scenes");
             Directory.CreateDirectory(DestinationDir + "\\Default Textures");
             Directory.CreateDirectory(DestinationDir + "\\bin\\DesktopGL");
-            File.Copy(SourceDir + "\\LightShaderCompiled\\LightTest.xnb", DestinationDir + "\\bin\\DesktopGL\\LightTest.xnb");
+            //File.Copy(SourceDir + "\\LightShaderCompiled\\LightTest.xnb", DestinationDir + "\\bin\\DesktopGL\\LightTest.xnb");
 
             CopyAndPasteFiles(SourceDir + "\\Icons", DestinationDir + "\\Icons");
             CopyAndPasteFiles(SourceDir + "\\Default Textures", DestinationDir + "\\Default Textures");

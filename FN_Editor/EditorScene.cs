@@ -44,7 +44,10 @@ namespace FN_Engine.FN_Editor
                 if (SceneManager.ShouldUpdate)
                     SceneManager.ActiveScene.Start();
                 else
+                {
+                    MediaSource.Stop();
                     SceneManager.LoadScene_Serialization(SceneManager.LastLoadPath);
+                }
             }
 
             bool OpenHelp = false;

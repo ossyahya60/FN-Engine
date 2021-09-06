@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.IO;
 
 namespace FN_Engine
 {
@@ -66,6 +67,7 @@ namespace FN_Engine
             ResolutionIndependentRenderer.SetResolution(1366, 768, false);
 
             Exiting += SerializeBeforeExit;
+            AppDomain.CurrentDomain.UnhandledException += CleanUp;
             //Window.ClientSizeChanged += ScreenSizeChanged;
         }
 
@@ -80,6 +82,15 @@ namespace FN_Engine
         private void SerializeBeforeExit(object sender, EventArgs args)
         {
             SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
+        }
+
+        //Clean and save upon crashing
+        private void CleanUp(object sender, UnhandledExceptionEventArgs e)
+        {
+            File.WriteAllText(Environment.CurrentDirectory + "\\CrashLog.txt", "Message => " + ((Exception)e.ExceptionObject).Message + "\n\n" + "Stack Trace => " + ((Exception)e.ExceptionObject).StackTrace);
+
+            if(SceneManager.ActiveScene != null)
+                SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
         }
 
         /// <summary>

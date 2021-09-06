@@ -131,6 +131,7 @@ namespace FN_Engine
                 if (!gameObject.Name.Equals((CD as GameObjectComponent).gameObject.Name) && CD.CollisionDetection(this, false))
                 {
                     YourRigidBody.gameObject.Transform.Position = OldPos;
+                    YourRigidBody.Velocity = Vector2.Zero;
                     break;
                 }
             }

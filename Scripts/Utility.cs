@@ -1377,7 +1377,6 @@ namespace FN_Engine
             PipelineBuildEvent T = null;
             T = Setup.PM.BuildContent(Path); // Excpetion "System.Reflection.ReflectionTypeLoadException" occurs here!
             Setup.PM.ProcessContent(T);
-            
         }
 
         public static void BuildAllContent(string CurrentDirectory)
@@ -1387,7 +1386,7 @@ namespace FN_Engine
                 string[] FileSplit = F.Split('\\');
                 string TexName = FileSplit[FileSplit.Length - 1];
 
-                if (TexRegex.IsMatch(TexName) || MusicRegex.IsMatch(TexName) /*|| ShaderRegex.IsMatch(TexName)*/ || FontRegex.IsMatch(TexName))
+                if (TexRegex.IsMatch(TexName) || MusicRegex.IsMatch(TexName) || ShaderRegex.IsMatch(TexName) || FontRegex.IsMatch(TexName))
                     BuildContentItem(F);
             }
 
