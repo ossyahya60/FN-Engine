@@ -140,6 +140,7 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject clone)
         {
             BoxCollider2D Clone = this.MemberwiseClone() as BoxCollider2D;
+            Clone.gameObject = clone;
             Clone.Bounds = new Rectangle(Bounds.Location, Bounds.Size);
 
             return Clone;

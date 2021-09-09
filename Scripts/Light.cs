@@ -304,7 +304,8 @@ namespace FN_Engine
 
         public override GameObjectComponent DeepCopy(GameObject Clone)
         {
-            Light clone = this.MemberwiseClone() as Light;
+            Light clone = MemberwiseClone() as Light;
+            clone.gameObject = Clone;
 
             //LIGHTS.Add(clone);
 

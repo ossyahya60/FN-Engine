@@ -244,6 +244,13 @@ namespace FN_Engine
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].DrawUI();
 
+            if(FN_Editor.EditorScene.IsThisTheEditor && Input.GetMouseClickUp(MouseButtons.LeftClick))
+            {
+                FN_Editor.GameObjects_Tab.DraggedGO = null;
+                FN_Editor.ContentWindow.DraggedAsset = null;
+                FN_Editor.InspectorWindow.DraggedObject = null;
+            }
+
             //ImGui.PopStyleVar();
             ImGui.PopFont();
 

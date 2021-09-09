@@ -39,6 +39,7 @@ namespace FN_Engine.FN_Editor
         {
             //Debug
             //FPS
+            ImGui.Text(MediaSource.Song == null ? "Not PLaying" : MediaSource.Song.Position.ToString());
             ImGui.Text("FPS: " + Math.Ceiling(ImGui.GetIO().Framerate).ToString());
             ImGui.Text("Undo Buffer Count: " + Undo_Buffer.Count.ToString());
             ImGui.Text("Redo Buffer Count: " + Redo_Buffer.Count.ToString());

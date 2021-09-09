@@ -134,6 +134,7 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject clone)
         {
             SpriteRenderer Clone = MemberwiseClone() as SpriteRenderer;
+            Clone.gameObject = clone;
             Clone.Sprite = Sprite.DeepCopy(clone);
             Clone.Sprite.Transform = clone.Transform;
             Clone.Effect = (Effect == null) ? null : Effect.Clone();

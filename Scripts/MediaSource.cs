@@ -50,7 +50,7 @@ namespace FN_Engine
         {
             if (Song != null)
             {
-                MediaPlayer.Stop();
+                //MediaPlayer.Stop();
                 MediaPlayer.Play(Song);
             }
         }
@@ -86,6 +86,12 @@ namespace FN_Engine
                 SW.Write("Song:\t" + "null\n");
 
             SW.WriteLine("End Of MediaSource");
+        }
+
+        public static void Dispose()
+        {
+            if (Song != null)
+                Song.Dispose();
         }
     }
 }

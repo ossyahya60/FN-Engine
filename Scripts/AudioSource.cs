@@ -150,11 +150,13 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject Clone)
         {
             AudioSource clone = this.MemberwiseClone() as AudioSource;
+            clone.gameObject = Clone;
             clone.volume = volume;
             clone.pitch = pitch;
             clone.pan = pan;
             clone.AudioName = null;
             clone.AudioName = AudioName;
+            clone.UniqueName = UniqueName;
 
             return clone;
         }

@@ -201,6 +201,7 @@ namespace FN_Engine.FN_Project
                    "<ItemGroup>" + "\n" +
                    "<PackageReference Include=\"MonoGame.Framework.DesktopGL\" Version=\"3.8.0.1641\" />" + "\n" +
                    "<PackageReference Include=\"MonoGame.Content.Builder.Task\" Version=\"3.8.0.1641\" />" + "\n" +
+                   "<PackageReference Include=\"MonoGame.Framework.Content.Pipeline\" Version=\"3.8.0.1641\" />" + "\n" +
                    "</ItemGroup>" + "\n" +
                    "<ItemGroup>" + "\n" +
                    "<Reference Include = \"FN_Engine\" >" + "\n" +

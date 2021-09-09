@@ -118,6 +118,7 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject clone)
         {
             TrailRenderer Clone = this.MemberwiseClone() as TrailRenderer;
+            Clone.gameObject = clone;
             Clone.Particles = new Queue();
             Clone.SpawnRateCounter = 0;
 

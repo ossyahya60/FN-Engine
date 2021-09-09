@@ -72,8 +72,11 @@ namespace FN_Engine
             if (SceneToBeLoaded == null)
                 return;
 
+
+            MediaSource.Stop();
+            MediaSource.Dispose();
+
             UnloadScene();
-            //Utility.BuildAllContent(Directory.GetCurrentDirectory());
 
             Scene.IsSceneBeingLoaded = true;
             if(FN_Editor.EditorScene.IsThisTheEditor)

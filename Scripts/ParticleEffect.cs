@@ -212,6 +212,7 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject clone)
         {
             ParticleEffect Clone = this.MemberwiseClone() as ParticleEffect;
+            Clone.gameObject = clone;
             Clone.Particles = new Queue();
             Clone.FireCounter = TimeBetweenFiring;
             Clone.ParticleCounter = 0;

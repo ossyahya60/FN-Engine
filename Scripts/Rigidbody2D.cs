@@ -98,6 +98,7 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject Clone)
         {
             Rigidbody2D clone = this.MemberwiseClone() as Rigidbody2D;
+            clone.gameObject = Clone;
 
             return clone;
         }

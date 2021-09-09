@@ -44,10 +44,7 @@ namespace FN_Engine.FN_Editor
                 if (SceneManager.ShouldUpdate)
                     SceneManager.ActiveScene.Start();
                 else
-                {
-                    MediaSource.Stop();
                     SceneManager.LoadScene_Serialization(SceneManager.LastLoadPath);
-                }
             }
 
             bool OpenHelp = false;
@@ -277,7 +274,7 @@ namespace FN_Engine.FN_Editor
             SceneManager.Initialize();
 
             SceneManager.SerializeScene(NewScene.Name);
-            SceneManager.LoadScene_Serialization(NewScene.Name);
+            SceneManager.LoadScene_Serialization("Scenes\\" + NewScene.Name);
             SceneManager.ActiveScene = ActiveScene;
 
             //settings of ImGui must be loaded or edited

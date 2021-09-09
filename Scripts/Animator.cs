@@ -69,6 +69,7 @@ namespace FN_Engine
             Animator clone = this.MemberwiseClone() as Animator;
             clone.ActiveClip = ActiveClip != null? ActiveClip.DeepCopy() : null;
             clone.AnimationClips = new List<Animation>();
+            clone.gameObject = Clone;
 
             foreach (Animation animation in AnimationClips)
                 clone.AddClip(animation.DeepCopy());

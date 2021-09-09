@@ -150,7 +150,10 @@ namespace FN_Engine
 
         public virtual GameObjectComponent DeepCopy(GameObject Clone)
         {
-            return this.MemberwiseClone() as GameObjectComponent;
+            var clone = MemberwiseClone() as GameObjectComponent;
+            clone.gameObject = Clone;
+
+            return clone;
         }
 
         public virtual void OnTriggerEnter2D(Collider2D collider)

@@ -121,6 +121,7 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject Clone)
         {
             CircleCollider clone = this.MemberwiseClone() as CircleCollider;
+            clone.gameObject = Clone;
 
             return clone;
         }

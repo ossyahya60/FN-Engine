@@ -48,7 +48,7 @@ namespace FN_Engine.FN_Editor
             Vector2 Bias = 0.5f * new Vector2(Setup.graphics.PreferredBackBufferWidth - Setup.Camera.Position.X * 2, Setup.graphics.PreferredBackBufferHeight - Setup.Camera.Position.Y * 2);
             ImGui.SetNextWindowPos(BiasSceneWindow);
             ImGui.SetNextWindowSize(BiasSceneWindowSize);
-            ImGui.Begin("Gizoms", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoBringToFrontOnFocus);
+            ImGui.Begin("Gizmos", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoBringToFrontOnFocus);
 
             IsThisWindowHovered = ImGui.IsWindowHovered();
 
@@ -222,6 +222,15 @@ namespace FN_Engine.FN_Editor
                 if (Colliders.Count != 0) // Scale with Scene Camera?
                     foreach (Collider2D collider in Colliders)
                         collider.Visualize(Bias.X + BiasSceneWindow.X, Bias.Y + BiasSceneWindow.Y);
+            }
+
+            if (ImGui.IsWindowHovered() && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && ContentWindow.DraggedAsset is GameObject)
+            {
+                GameObject prefab = ContentWindow.DraggedAsset as GameObject;
+                GameObject Instance = GameObject.Instantiate(prefab);
+                Instance.Transform.Position = Input.GetMousePosition() + Setup.Camera.Position - ResolutionIndependentRenderer.GetVirtualRes() * 0.5f - new Microsoft.Xna.Framework.Vector2(GameObjects_Tab.MyRegion[1].X + GameObjects_Tab.MyRegion[0].X, 0);
+                
+                ImGui.EndDragDropTarget();
             }
 
             ImGui.End();

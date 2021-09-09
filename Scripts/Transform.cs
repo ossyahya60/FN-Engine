@@ -187,8 +187,9 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject clone)
         {
             Transform Clone = this.MemberwiseClone() as Transform;
+            Clone.gameObject = clone;
 
-            if(clone != null)
+            if (clone != null)
                 clone.Transform = Clone;
 
             return Clone;

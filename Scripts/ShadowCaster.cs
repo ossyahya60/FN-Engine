@@ -53,6 +53,7 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject Clone)
         {
             ShadowCaster clone = this.MemberwiseClone() as ShadowCaster;
+            clone.gameObject = Clone;
 
             clone.SR = Clone.GetComponent<SpriteRenderer>();
             clone.lineOccluders = new LineOccluder[4];

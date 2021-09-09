@@ -86,5 +86,10 @@ namespace FN_Engine
             else
                 HitBoxDebuger.BezierLine(P1 + TransPos, P2 + TransPos, P3 + TransPos, color, gameObject.Layer, Quality);
         }
+
+        public override GameObjectComponent DeepCopy(GameObject Clone)
+        {
+            return base.DeepCopy(Clone);
+        }
     }
 }

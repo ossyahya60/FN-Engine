@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Linq;
 using System.Collections.Specialized;
+using System.Reflection;
 
 namespace FN_Engine.FN_Editor
 {
@@ -24,12 +25,19 @@ namespace FN_Engine.FN_Editor
             internal ImGuiDir IsOpen = ImGuiDir.Right;
         }
 
+        internal class Prefab
+        {
+            public string Directory; //Check if directory exists first!
+            public GameObject Clone; //Make a deep copy!
+        }
+
         public static object DraggedAsset = null;
         public static Vector2[] MyRegion;
         public static List<IntPtr> TexPtrs;
         public static string SelectedTexture = null;
 
         public Dictionary<string, SpriteEditorInfo> SPIs = new Dictionary<string, SpriteEditorInfo>();
+        public List<Prefab> Prefabs = new List<Prefab>();
 
         internal static List<string> LogText = new List<string>();
 
@@ -46,6 +54,8 @@ namespace FN_Engine.FN_Editor
         private bool IsSpriteEditorOpen = false;
         private List<Microsoft.Xna.Framework.Rectangle> SlicedTexs = null;
         private StringCollection ClipboardText = null;
+        private IntPtr PrefabTexPtr;
+        private int UndoBufferPrevCount = 0;
 
         public override void Start()
         {
@@ -68,6 +78,7 @@ namespace FN_Engine.FN_Editor
             ShaderRegex = new Regex(@"([\.]\b(fx)\b)$", RegexOptions.IgnoreCase);
             SceneRegex = new Regex(@"([\.]\b(scene)\b)$", RegexOptions.IgnoreCase);
             MyRegion = new Vector2[2];
+            PrefabTexPtr = Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\PrefabIcon"));
 
             //Utility.BuildAllContent(GameContentPath);
         }
@@ -136,12 +147,24 @@ namespace FN_Engine.FN_Editor
             DirectoryChanged = true;
         }
 
+        private int RandomUniqueInt()
+        {
+            Random random = new Random();
+
+            int randomNum = random.Next();
+            while (Prefabs.Any(Item => Item.Clone.PrefabNum == randomNum))
+                randomNum = random.Next();
+
+            return randomNum;
+        }
+
         public override void DrawUI()
         {
             ImGui.Begin("Content Manager");
 
             if (ImGui.BeginTabBar("Content Tab"))
             {
+                ImGui.BeginGroup();
                 if (ImGui.BeginTabItem("Content"))
                 {
                     ///
@@ -320,6 +343,8 @@ namespace FN_Engine.FN_Editor
                                     AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
                                 }
                                 ImGui.PopStyleColor();
+
+                                bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
 
                                 HelpMarker(AssetPath[AssetPath.Length - 1], false);
 
@@ -528,7 +553,8 @@ namespace FN_Engine.FN_Editor
                                     }
                                 }
 
-                                ImGui.SameLine();
+                                if(Overflow)
+                                    ImGui.SameLine();
                             }
                             else if (MusicRegex.IsMatch(AssetName)) //Found a song or a soundeffect
                             {
@@ -544,6 +570,8 @@ namespace FN_Engine.FN_Editor
                                     AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
                                 }
 
+                                bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
+
                                 HelpMarker(AssetPath[AssetPath.Length - 1], false);
 
                                 // Dragging an asset
@@ -561,7 +589,8 @@ namespace FN_Engine.FN_Editor
 
                                 ImGui.PopStyleColor();
 
-                                ImGui.SameLine();
+                                if(Overflow)
+                                    ImGui.SameLine();
                             }
                             else if (ShaderRegex.IsMatch(AssetName)) // Found a shader
                             {
@@ -577,6 +606,8 @@ namespace FN_Engine.FN_Editor
                                     AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
                                 }
 
+                                bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
+
                                 HelpMarker(AssetPath[AssetPath.Length - 1], false);
 
                                 // Dragging an asset
@@ -594,7 +625,7 @@ namespace FN_Engine.FN_Editor
 
                                 ImGui.PopStyleColor();
 
-                                if (ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X)
+                                if (Overflow)
                                     ImGui.SameLine();
                             }
                             else if (SceneRegex.IsMatch(AssetName)) // Found a shader
@@ -613,6 +644,8 @@ namespace FN_Engine.FN_Editor
 
                                     AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
                                 }
+
+                                bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
 
                                 if (ImGui.IsItemHovered())
                                 {
@@ -640,12 +673,304 @@ namespace FN_Engine.FN_Editor
 
                                 ImGui.PopStyleColor();
 
-                                if (ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X)
+                                if (Overflow)
                                     ImGui.SameLine();
                             }
                         }
                     }
                     DirectoryChanged = false;
+
+                    // Visualize Prefabs (They are stored in the scene file not as individual files)
+                    int DirtyPrefab = -1; //Should be deleted
+                    ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                    for (int i=0; i<Prefabs.Count; i++)
+                    {
+                        if (!GameContentPath.Equals(Prefabs[i].Directory))
+                            continue;
+
+                        ImGui.PushID("Prefab" + i.ToString());
+
+                        ImGui.ImageButton(PrefabTexPtr, new Vector2(64, 64));
+
+                        bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
+
+                        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && ImGui.IsItemHovered())
+                        {
+                            GameObjects_Tab.WhoIsSelected = Prefabs[i].Clone;
+                            UndoBufferPrevCount = GameObjects_Tab.Undo_Buffer.Count;
+                        }
+
+                        /////////////////////////
+                        if(GameObjects_Tab.WhoIsSelected == Prefabs[i].Clone) //Prefab is selected and might be edited
+                        {
+                            if(UndoBufferPrevCount != GameObjects_Tab.Undo_Buffer.Count) //I changed something in the inspector window
+                            {
+                                //I have to check if this change is in inspector window or not
+                                bool Reversed = false;
+                                var Change = GameObjects_Tab.Undo_Buffer.First;
+                                if (UndoBufferPrevCount > GameObjects_Tab.Undo_Buffer.Count)
+                                {
+                                    Change = GameObjects_Tab.Redo_Buffer.First;
+                                    Reversed = true;
+                                }
+
+                                if (Change.Value.Value == (!Reversed? Operation.AddComponent : Operation.RemoveComponent)) //Added a component to the prefab
+                                {
+                                    foreach (GameObject GO in SceneManager.ActiveScene.GameObjects.FindAll(Item => Item.PrefabNum == Prefabs[i].Clone.PrefabNum))
+                                    {
+                                        var component = ((KeyValuePair<GameObject, GameObjectComponent>)Change.Value.Key).Value.DeepCopy(GO);
+                                        component.gameObject = GO;
+                                        GO.AddComponent_Generic(component);
+                                    }
+                                }
+                                else if (Change.Value.Value == (!Reversed ? Operation.RemoveComponent : Operation.AddComponent)) //removed a component from the prefab
+                                {
+                                    foreach (GameObject GO in SceneManager.ActiveScene.GameObjects.FindAll(Item => Item.PrefabNum == Prefabs[i].Clone.PrefabNum))
+                                        GO.RemoveComponent(((KeyValuePair<GameObject, GameObjectComponent>)Change.Value.Key).Value.GetType(), false);
+                                }
+                                else if (Change.Value.Value == Operation.ChangeValue) //changed value of a component in the prefab
+                                {
+                                    foreach (GameObject GO in SceneManager.ActiveScene.GameObjects.FindAll(Item => Item.PrefabNum == Prefabs[i].Clone.PrefabNum))
+                                    {
+                                        KeyValuePair<object, object> ObjectAndField = (KeyValuePair<object, object>)((KeyValuePair<object, object>)Change.Value.Key).Key;
+
+                                        if (ObjectAndField.Key is GameObject)
+                                        {
+                                            if (ObjectAndField.Value is FieldInfo)
+                                            {
+                                                Type FT = (ObjectAndField.Value as FieldInfo).FieldType;
+                                                object ValueChanged = (ObjectAndField.Value as FieldInfo).GetValue(Prefabs[i].Clone);
+                                                object PrevVal = ((KeyValuePair<object, object>)Change.Value.Key).Value;
+
+                                                switch (FT.FullName)
+                                                {
+                                                    case "Microsoft.Xna.Framework.Vector2":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
+                                                        break;
+                                                    case "Microsoft.Xna.Framework.Vector3":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
+                                                        break;
+                                                    case "Microsoft.Xna.Framework.Vector4":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
+                                                        break;
+                                                    case "Int32":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (int)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (int)ValueChanged - (int)PrevVal);
+                                                        break;
+                                                    case "Single":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (float)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (float)ValueChanged - (float)PrevVal);
+                                                        break;
+                                                    case "Double":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (double)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (double)ValueChanged - (double)PrevVal);
+                                                        break;
+                                                    case "System.Numerics.Vector2":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
+                                                        break;
+                                                    case "System.Numerics.Vector3":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
+                                                        break;
+                                                    case "System.Numerics.Vector4":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
+                                                        break;
+                                                    case "Int64":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (long)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (long)ValueChanged - (long)PrevVal);
+                                                        break;
+                                                    case "Int16":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (short)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (short)ValueChanged - (short)PrevVal);
+                                                        break;
+                                                    case "UInt32":
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (uint)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (uint)ValueChanged - (uint)PrevVal);
+                                                        break;
+                                                    default:
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, ValueChanged);
+                                                        break;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Type FT = (ObjectAndField.Value as PropertyInfo).PropertyType;
+                                                object ValueChanged = (ObjectAndField.Value as PropertyInfo).GetValue(Prefabs[i].Clone);
+                                                object PrevVal = ((KeyValuePair<object, object>)Change.Value.Key).Value;
+
+                                                switch (FT.FullName)
+                                                {
+                                                    case "Microsoft.Xna.Framework.Vector2":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
+                                                        break;
+                                                    case "Microsoft.Xna.Framework.Vector3":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
+                                                        break;
+                                                    case "Microsoft.Xna.Framework.Vector4":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
+                                                        break;
+                                                    case "Int32":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (int)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (int)ValueChanged - (int)PrevVal);
+                                                        break;
+                                                    case "Single":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (float)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (float)ValueChanged - (float)PrevVal);
+                                                        break;
+                                                    case "Double":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (double)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (double)ValueChanged - (double)PrevVal);
+                                                        break;
+                                                    case "System.Numerics.Vector2":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
+                                                        break;
+                                                    case "System.Numerics.Vector3":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
+                                                        break;
+                                                    case "System.Numerics.Vector4":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
+                                                        break;
+                                                    case "Int64":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (long)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (long)ValueChanged - (long)PrevVal);
+                                                        break;
+                                                    case "Int16":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (short)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (short)ValueChanged - (short)PrevVal);
+                                                        break;
+                                                    case "UInt32":
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (uint)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (uint)ValueChanged - (uint)PrevVal);
+                                                        break;
+                                                    default:
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, ValueChanged);
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var component = GO.GetComponent(ObjectAndField.Key.GetType());
+
+                                            if (component != null)
+                                            {
+                                                if (ObjectAndField.Value is FieldInfo)
+                                                {
+                                                    Type FT = (ObjectAndField.Value as FieldInfo).FieldType;
+                                                    object ValueChanged = (ObjectAndField.Value as FieldInfo).GetValue(Prefabs[i].Clone.GetComponent(ObjectAndField.Key.GetType()));
+                                                    object PrevVal = ((KeyValuePair<object, object>)Change.Value.Key).Value;
+
+                                                    switch (FT.FullName)
+                                                    {
+                                                        case "Microsoft.Xna.Framework.Vector2":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
+                                                            break;
+                                                        case "Microsoft.Xna.Framework.Vector3":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
+                                                            break;
+                                                        case "Microsoft.Xna.Framework.Vector4":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
+                                                            break;
+                                                        case "Int32":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (int)((FieldInfo)ObjectAndField.Value).GetValue(component) + (int)ValueChanged - (int)PrevVal);
+                                                            break;
+                                                        case "Single":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (float)((FieldInfo)ObjectAndField.Value).GetValue(component) + (float)ValueChanged - (float)PrevVal);
+                                                            break;
+                                                        case "Double":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (double)((FieldInfo)ObjectAndField.Value).GetValue(component) + (double)ValueChanged - (double)PrevVal);
+                                                            break;
+                                                        case "System.Numerics.Vector2":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
+                                                            break;
+                                                        case "System.Numerics.Vector3":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
+                                                            break;
+                                                        case "System.Numerics.Vector4":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
+                                                            break;
+                                                        case "Int64":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (long)((FieldInfo)ObjectAndField.Value).GetValue(component) + (long)ValueChanged - (long)PrevVal);
+                                                            break;
+                                                        case "Int16":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (short)((FieldInfo)ObjectAndField.Value).GetValue(component) + (short)ValueChanged - (short)PrevVal);
+                                                            break;
+                                                        case "UInt32":
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (uint)((FieldInfo)ObjectAndField.Value).GetValue(component) + (uint)ValueChanged - (uint)PrevVal);
+                                                            break;
+                                                        default:
+                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, ValueChanged);
+                                                            break;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    Type FT = (ObjectAndField.Value as PropertyInfo).PropertyType;
+                                                    object ValueChanged = (ObjectAndField.Value as PropertyInfo).GetValue(Prefabs[i].Clone.GetComponent(ObjectAndField.Key.GetType()));
+                                                    object PrevVal = ((KeyValuePair<object, object>)Change.Value.Key).Value;
+
+                                                    switch (FT.FullName)
+                                                    {
+                                                        case "Microsoft.Xna.Framework.Vector2":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
+                                                            break;
+                                                        case "Microsoft.Xna.Framework.Vector3":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
+                                                            break;
+                                                        case "Microsoft.Xna.Framework.Vector4":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
+                                                            break;
+                                                        case "Int32":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (int)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (int)ValueChanged - (int)PrevVal);
+                                                            break;
+                                                        case "Single":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (float)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (float)ValueChanged - (float)PrevVal);
+                                                            break;
+                                                        case "Double":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (double)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (double)ValueChanged - (double)PrevVal);
+                                                            break;
+                                                        case "System.Numerics.Vector2":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
+                                                            break;
+                                                        case "System.Numerics.Vector3":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
+                                                            break;
+                                                        case "System.Numerics.Vector4":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
+                                                            break;
+                                                        case "Int64":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (long)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (long)ValueChanged - (long)PrevVal);
+                                                            break;
+                                                        case "Int16":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (short)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (short)ValueChanged - (short)PrevVal);
+                                                            break;
+                                                        case "UInt32":
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (uint)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (uint)ValueChanged - (uint)PrevVal);
+                                                            break;
+                                                        default:
+                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, ValueChanged);
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                UndoBufferPrevCount = GameObjects_Tab.Undo_Buffer.Count;
+                            }
+                            else if(UndoBufferPrevCount > GameObjects_Tab.Undo_Buffer.Count) //Undo something
+                            {
+
+                            }
+                        }
+                        /////////////////////////
+                        
+                        if (ImGui.BeginDragDropSource())
+                        {
+                            DraggedAsset = Prefabs[i].Clone;
+
+                            ImGui.SetDragDropPayload("Prefab", IntPtr.Zero, 0);
+
+                            ImGui.EndDragDropSource();
+                        }
+
+                        HelpMarker(Prefabs[i].Clone.Name, false);
+
+                        ImGui.PopID();
+
+                        if (Overflow)
+                            ImGui.SameLine();
+                    }
+                    ImGui.PopStyleColor();
+                    //
 
                     //Sprite editor
                     ImGui.PushStyleColor(ImGuiCol.PopupBg, new Vector4(0.25f, 0.25f, 0.25f, 1));
@@ -762,7 +1087,30 @@ namespace FN_Engine.FN_Editor
                     ImGui.EndTabItem();
                 }
 
-                if(ImGui.BeginTabItem("Log"))
+                ImGui.EndGroup();
+
+                //Drag GameObject here as a prefab
+                if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && GameObjects_Tab.DraggedGO != null)
+                {
+                    Prefab prefab = new Prefab()
+                    {
+                        Directory = GameContentPath,
+                        Clone = GameObject.Instantiate(GameObjects_Tab.DraggedGO, null, false)
+                    };
+                    prefab.Clone.Name = GameObjects_Tab.DraggedGO.Name;
+                    prefab.Clone.PrefabNum = RandomUniqueInt();
+
+                    int PrefabIndex = Prefabs.FindIndex(Item => Item.Clone.Name == prefab.Clone.Name);
+                    if (PrefabIndex != -1) //Overwirte
+                        Prefabs.RemoveAt(PrefabIndex);
+
+                    Prefabs.Add(prefab);
+
+                    ImGui.EndDragDropTarget();
+                }
+                //
+
+                if (ImGui.BeginTabItem("Log"))
                 {
                     for (int i = 0; i < LogText.Count; i++)
                         ImGui.TextWrapped("=> " + LogText[i]);

@@ -89,6 +89,7 @@ namespace FN_Engine
         public override GameObjectComponent DeepCopy(GameObject Clone)
         {
             Text clone = this.MemberwiseClone() as Text;
+            clone.gameObject = Clone;
             clone.transform = Clone.Transform;
             Clone.Layer = LayerUI.GetLayer("Text");
 
