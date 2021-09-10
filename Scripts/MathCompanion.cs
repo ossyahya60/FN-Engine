@@ -70,6 +70,11 @@ namespace FN_Engine
                 return -1;
         }
 
+        public static Vector2 Sign(Vector2 vector2)
+        {
+            return new Vector2((float)Math.Sin(vector2.X), (float)Math.Sin(vector2.Y));
+        }
+
         public static double Atan(float y, float x)
         {
             return Math.Atan2(y, x);

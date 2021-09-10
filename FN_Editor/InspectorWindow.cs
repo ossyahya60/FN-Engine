@@ -1220,7 +1220,8 @@ namespace FN_Engine.FN_Editor
 
                             if (AddedSuccessfully)
                             {
-                                GOC.Start();
+                                if(GOC.GetType().Assembly != GameAssem)
+                                    GOC.Start();
 
                                 KeyValuePair<GameObject, GameObjectComponent> Info = new KeyValuePair<GameObject, GameObjectComponent>(Selected_GO, GOC);
                                 var KVP = new KeyValuePair<object, Operation>(Info, Operation.AddComponent);

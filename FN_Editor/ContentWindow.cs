@@ -525,7 +525,7 @@ namespace FN_Engine.FN_Editor
                                             bool EnteredButton2 = false;
                                             ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
                                             ImGui.PushID(i3.ToString() + "Noice");
-                                            if (ImGui.ImageButton(TexPtrs[SelTexIndex], new Vector2(64 * ((float)SlicedTexs[i3].Width / SlicedTexs[i3].Height), 64), new Vector2(SlicedTexs[i3].X / 10000.0f, SlicedTexs[i3].Y / 10000.0f), new Vector2(SlicedTexs[i3].Right / 10000.0f, SlicedTexs[i3].Bottom / 10000.0f)))
+                                            if (ImGui.ImageButton(TexPtrs[SelTexIndex], new Vector2(64 /** ((float)SlicedTexs[i3].Width / SlicedTexs[i3].Height)*/, 64), new Vector2(SlicedTexs[i3].X / 10000.0f, SlicedTexs[i3].Y / 10000.0f), new Vector2(SlicedTexs[i3].Right / 10000.0f, SlicedTexs[i3].Bottom / 10000.0f)))
                                             {
                                                 ImGui.PopID();
                                                 EnteredButton2 = true;
@@ -685,19 +685,22 @@ namespace FN_Engine.FN_Editor
                     ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
                     for (int i=0; i<Prefabs.Count; i++)
                     {
-                        if (!GameContentPath.Equals(Prefabs[i].Directory))
-                            continue;
-
                         ImGui.PushID("Prefab" + i.ToString());
-
-                        ImGui.ImageButton(PrefabTexPtr, new Vector2(64, 64));
-
-                        bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
-
-                        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && ImGui.IsItemHovered())
+                        bool Overflow = false;
+                        if (GameContentPath.Equals(Prefabs[i].Directory))
                         {
-                            GameObjects_Tab.WhoIsSelected = Prefabs[i].Clone;
-                            UndoBufferPrevCount = GameObjects_Tab.Undo_Buffer.Count;
+                            ImGui.ImageButton(PrefabTexPtr, new Vector2(64, 64));
+
+                            if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                                ImGui.OpenPopup("Exclude Prefab");
+
+                            Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
+
+                            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && ImGui.IsItemHovered())
+                            {
+                                GameObjects_Tab.WhoIsSelected = Prefabs[i].Clone;
+                                UndoBufferPrevCount = GameObjects_Tab.Undo_Buffer.Count;
+                            }
                         }
 
                         /////////////////////////
@@ -946,10 +949,6 @@ namespace FN_Engine.FN_Editor
 
                                 UndoBufferPrevCount = GameObjects_Tab.Undo_Buffer.Count;
                             }
-                            else if(UndoBufferPrevCount > GameObjects_Tab.Undo_Buffer.Count) //Undo something
-                            {
-
-                            }
                         }
                         /////////////////////////
                         
@@ -962,14 +961,25 @@ namespace FN_Engine.FN_Editor
                             ImGui.EndDragDropSource();
                         }
 
-                        HelpMarker(Prefabs[i].Clone.Name, false);
+                        if(GameContentPath.Equals(Prefabs[i].Directory))
+                            HelpMarker(Prefabs[i].Clone.Name, false);
 
+                        if (ImGui.BeginPopup("Exclude Prefab"))
+                        {
+                            if (ImGui.Button("Exclude this prefab? (Can't be undone)"))
+                                DirtyPrefab = i;
+
+                            ImGui.EndPopup();
+                        }
                         ImGui.PopID();
 
                         if (Overflow)
                             ImGui.SameLine();
                     }
                     ImGui.PopStyleColor();
+
+                    if (DirtyPrefab != -1)
+                        Prefabs.RemoveAt(DirtyPrefab);
                     //
 
                     //Sprite editor

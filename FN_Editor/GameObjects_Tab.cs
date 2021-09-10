@@ -90,8 +90,15 @@ namespace FN_Engine.FN_Editor
                 }
 
                 foreach (GameObject GO in SelectedGOs)
-                    if(GO.Name != "Camera Controller")
+                {
+                    if (GO.Name != "Camera Controller")
+                    {
                         GO.ShouldBeRemoved = true;
+
+                        if (GO == WhoIsSelected)
+                            WhoIsSelected = null;
+                    }
+                }
             }
 
             //Some Scene window functionalities
@@ -177,10 +184,20 @@ namespace FN_Engine.FN_Editor
                                 GameObject[] gameObjects = GOs as GameObject[];
 
                                 for (int i = 0; i < gameObjects.Length; i++)
+                                {
                                     gameObjects[i].ShouldBeRemoved = true;
+
+                                    if (gameObjects[i] == WhoIsSelected)
+                                        WhoIsSelected = null;
+                                }
                             }
                             else
+                            {
                                 (GOs as GameObject).ShouldBeRemoved = true;
+
+                                if ((GOs as GameObject) == WhoIsSelected)
+                                    WhoIsSelected = null;
+                            }
 
                             break;
                         case Operation.Delete:
@@ -263,6 +280,8 @@ namespace FN_Engine.FN_Editor
                                 ((PropertyInfo)ObjectAndField.Value).SetValue(ObjectAndField.Key, ValueChanged.Value);
                             }
 
+                            WhoIsSelected = ObjectAndField.Key is GameObject? ObjectAndField.Key as GameObject : (ObjectAndField.Key as GameObjectComponent).gameObject;
+
                             break;
                     }
                 }
@@ -306,10 +325,20 @@ namespace FN_Engine.FN_Editor
                                 GameObject[] gameObjects = GOs as GameObject[];
 
                                 for (int i = 0; i < gameObjects.Length; i++)
+                                {
                                     gameObjects[i].ShouldBeRemoved = true;
+
+                                    if (gameObjects[i] == WhoIsSelected)
+                                        WhoIsSelected = null;
+                                }
                             }
                             else
+                            {
                                 (GOs as GameObject).ShouldBeRemoved = true;
+
+                                if ((GOs as GameObject) == WhoIsSelected)
+                                    WhoIsSelected = null;
+                            }
 
                             break;
                         case Operation.GO_DragAndDrop:
@@ -359,6 +388,8 @@ namespace FN_Engine.FN_Editor
                                 AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(ObjectAndField, ((PropertyInfo)ObjectAndField.Value).GetValue(ObjectAndField.Key)), Operation.ChangeValue));
                                 ((PropertyInfo)ObjectAndField.Value).SetValue(ObjectAndField.Key, ValueChanged.Value);
                             }
+
+                            WhoIsSelected = ObjectAndField.Key is GameObject ? ObjectAndField.Key as GameObject : (ObjectAndField.Key as GameObjectComponent).gameObject;
 
                             break;
                     }

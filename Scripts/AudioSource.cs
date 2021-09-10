@@ -106,7 +106,7 @@ namespace FN_Engine
 
         public override void Start()
         {
-            if (AudioName != "null" && SoundEffect == null)
+            if (AudioName != "null" && !string.IsNullOrEmpty(AudioName) && (SoundEffect == null || SoundEffect.IsDisposed))
                 LoadSoundEffect(AudioName);
         }
 
