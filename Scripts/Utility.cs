@@ -1376,7 +1376,7 @@ namespace FN_Engine
             Setup.PM.RegisterContent(Path);
             PipelineBuildEvent T = null;
             T = Setup.PM.BuildContent(Path); // Excpetion "System.Reflection.ReflectionTypeLoadException" occurs here!
-            Setup.PM.ProcessContent(T);
+            //Setup.PM.ProcessContent(T);
         }
 
         public static void BuildAllContent(string CurrentDirectory)

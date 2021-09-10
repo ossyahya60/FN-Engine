@@ -62,7 +62,7 @@ namespace FN_Engine
         {
             set
             {
-                if (audioName == value)
+                if (audioName == value && SoundEffect != null && !SoundEffect.IsDisposed)
                     return;
 
                 audioName = value;
@@ -71,9 +71,10 @@ namespace FN_Engine
                     //Clean Up
                     if(SoundEffectInstance != null && !SoundEffectInstance.IsDisposed)
                         SoundEffectInstance.Dispose();
-                    if (SoundEffect != null && !SoundEffect.IsDisposed)
-                        SoundEffect.Dispose();
+                    //if (SoundEffect != null && !SoundEffect.IsDisposed)
+                    //    SoundEffect.Dispose();
 
+                    
                     try { SoundEffect = Setup.Content.Load<SoundEffect>(value); }
                     catch (Exception E) { FN_Editor.ContentWindow.LogText.Add(E.Message); } //Log error here!
 
@@ -166,9 +167,15 @@ namespace FN_Engine
             return (float)SoundEffect.Duration.TotalSeconds;
         }
 
-        public void Dispose() //Used if you will not use this sound effect on this object again
+        public void Dispose()
         {
             SoundEffectInstance.Dispose();
+        }
+
+        public void DisposeFinal() //Used if you will not use this sound effect on this object again
+        {
+            if(SoundEffect != null)
+                SoundEffect.Dispose();
         }
 
         //public override void Serialize(StreamWriter SW) //Load effect using audio name in deserialization
