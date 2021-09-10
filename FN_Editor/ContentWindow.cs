@@ -374,7 +374,21 @@ namespace FN_Engine.FN_Editor
                                 if (SPIs.ContainsKey(AssetLoadName))
                                 {
                                     ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
-                                    if (SPIs[AssetLoadName].IsSpriteSheet && ImGui.ArrowButton("ThisTex" + i.ToString(), SPIs[AssetLoadName].IsOpen))
+                                    bool ArrButt = SPIs[AssetLoadName].IsSpriteSheet && ImGui.ArrowButton("ThisTex" + i.ToString(), SPIs[AssetLoadName].IsOpen);
+
+                                    if(SPIs[AssetLoadName].IsSpriteSheet && ImGui.BeginDragDropSource())
+                                    {
+                                        ImGui.SetDragDropPayload("Sliced Spritesheet", IntPtr.Zero, 0);
+
+                                        if (SPIs[AssetLoadName].IsSpriteSheet && SPIs[AssetLoadName].IsOpen == ImGuiDir.Left)
+                                            AnimationEditor.slicedTexs = new KeyValuePair<string, List<Microsoft.Xna.Framework.Rectangle>>(AssetLoadName, SlicedTexs);
+                                        else
+                                            AnimationEditor.slicedTexs = new KeyValuePair<string, List<Microsoft.Xna.Framework.Rectangle>>(null, null);
+
+                                        ImGui.EndDragDropSource();
+                                    }
+
+                                    if (ArrButt)
                                     {
                                         SelectedTexture = AssetLoadName;
                                         SelTexIndex = Enumerator - 1;
@@ -384,128 +398,125 @@ namespace FN_Engine.FN_Editor
                                         {
                                             SPIs[AssetLoadName].IsOpen = ImGuiDir.Left;
 
-                                            if (SPIs[AssetLoadName].IsSpriteSheet)
+                                            SlicedTexs.Clear();
+                                            Texture2D Tex = Setup.Content.Load<Texture2D>(SelectedTexture);
+                                            SpriteEditorInfo SPI = SPIs[SelectedTexture];
+
+                                            if (SPI.BySize)
                                             {
-                                                SlicedTexs.Clear();
-                                                Texture2D Tex = Setup.Content.Load<Texture2D>(SelectedTexture);
-                                                SpriteEditorInfo SPI = SPIs[SelectedTexture];
+                                                SPI.SizeOrCount[0] = (int)Math.Clamp(SPI.SizeOrCount[0], Tex.Width / 30.0f, Tex.Width);
+                                                SPI.SizeOrCount[1] = (int)Math.Clamp(SPI.SizeOrCount[1], Tex.Height / 30.0f, Tex.Height);
 
-                                                if (SPI.BySize)
+                                                for (int i2 = 0; i2 < Tex.Height; i2 += SPI.SizeOrCount[1])
                                                 {
-                                                    SPI.SizeOrCount[0] = (int)Math.Clamp(SPI.SizeOrCount[0], Tex.Width / 30.0f, Tex.Width);
-                                                    SPI.SizeOrCount[1] = (int)Math.Clamp(SPI.SizeOrCount[1], Tex.Height / 30.0f, Tex.Height);
-
-                                                    for (int i2 = 0; i2 < Tex.Height; i2 += SPI.SizeOrCount[1])
+                                                    for (int j = 0; j < Tex.Width; j += SPI.SizeOrCount[0])
                                                     {
-                                                        for (int j = 0; j < Tex.Width; j += SPI.SizeOrCount[0])
+                                                        Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i2 != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
+                                                        Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
+                                                        Vector2 UV0 = new Vector2(j, i2) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+                                                        Vector2 UV1 = new Vector2(j + SPI.SizeOrCount[0], i2 + SPI.SizeOrCount[1]) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+
+                                                        Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)Math.Clamp((UV0.X * Tex.Width), 0, Tex.Width - 1), (int)Math.Clamp((UV0.Y * Tex.Height), 0, Tex.Height - 1), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
+                                                        Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1); //Bug here!
+                                                        Rect.Height = Math.Clamp(Rect.Height, 0, Tex.Height - Rect.Y - 1);
+                                                        Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[Rect.Width * Rect.Height];
+
+                                                        Tex.GetData(0, Rect, buffer, 0, Rect.Width * Rect.Height);
+
+                                                        Vector2 Min = new Vector2(int.MaxValue, int.MaxValue), Max = new Vector2(int.MinValue, int.MinValue);
+
+                                                        if (SPI.TrimSprite)
                                                         {
-                                                            Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i2 != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
-                                                            Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
-                                                            Vector2 UV0 = new Vector2(j, i2) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
-                                                            Vector2 UV1 = new Vector2(j + SPI.SizeOrCount[0], i2 + SPI.SizeOrCount[1]) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+                                                            bool Empty = true;
 
-                                                            Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)Math.Clamp((UV0.X * Tex.Width), 0, Tex.Width - 1), (int)Math.Clamp((UV0.Y * Tex.Height), 0, Tex.Height - 1), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
-                                                            Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1); //Bug here!
-                                                            Rect.Height = Math.Clamp(Rect.Height, 0, Tex.Height - Rect.Y - 1);
-                                                            Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[Rect.Width * Rect.Height];
-
-                                                            Tex.GetData(0, Rect, buffer, 0, Rect.Width * Rect.Height);
-
-                                                            Vector2 Min = new Vector2(int.MaxValue, int.MaxValue), Max = new Vector2(int.MinValue, int.MinValue);
-
-                                                            if (SPI.TrimSprite)
+                                                            for (int i4 = 0; i4 < Rect.Height; i4++)
                                                             {
-                                                                bool Empty = true;
-
-                                                                for (int i4 = 0; i4 < Rect.Height; i4++)
+                                                                for (int j2 = 0; j2 < Rect.Width; j2++)
                                                                 {
-                                                                    for (int j2 = 0; j2 < Rect.Width; j2++)
+                                                                    if (buffer[i4 * Rect.Width + j2].A != 0)
                                                                     {
-                                                                        if (buffer[i4 * Rect.Width + j2].A != 0)
-                                                                        {
-                                                                            Empty = false;
+                                                                        Empty = false;
 
-                                                                            if (j2 < Min.X)
-                                                                                Min.X = j2;
+                                                                        if (j2 < Min.X)
+                                                                            Min.X = j2;
 
-                                                                            if (i4 < Min.Y)
-                                                                                Min.Y = i4;
+                                                                        if (i4 < Min.Y)
+                                                                            Min.Y = i4;
 
-                                                                            if (j2 > Max.X)
-                                                                                Max.X = j2;
+                                                                        if (j2 > Max.X)
+                                                                            Max.X = j2;
 
-                                                                            if (i4 > Max.Y)
-                                                                                Max.Y = i4;
-                                                                        }
+                                                                        if (i4 > Max.Y)
+                                                                            Max.Y = i4;
                                                                     }
                                                                 }
-
-                                                                if (!Empty)
-                                                                    SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)((UV0.X + Min.X / Tex.Width) * 10000), (int)((UV0.Y + Min.Y / Tex.Height) * 10000), (int)(Math.Abs((Max.X - Min.X + 1) / Rect.Width) * Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs((Max.Y - Min.Y + 1) / Rect.Height) * Math.Abs(UV1.Y - UV0.Y) * 10000)));
                                                             }
-                                                            else if (!buffer.All(Item => Item.A == 0))
-                                                                SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * 10000), (int)(UV0.Y * 10000), (int)(Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs(UV1.Y - UV0.Y) * 10000)));
+
+                                                            if (!Empty)
+                                                                SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)((UV0.X + Min.X / Tex.Width) * 10000), (int)((UV0.Y + Min.Y / Tex.Height) * 10000), (int)(Math.Abs((Max.X - Min.X + 1) / Rect.Width) * Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs((Max.Y - Min.Y + 1) / Rect.Height) * Math.Abs(UV1.Y - UV0.Y) * 10000)));
                                                         }
+                                                        else if (!buffer.All(Item => Item.A == 0))
+                                                            SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * 10000), (int)(UV0.Y * 10000), (int)(Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs(UV1.Y - UV0.Y) * 10000)));
                                                     }
                                                 }
-                                                else
+                                            }
+                                            else
+                                            {
+                                                SPI.SizeOrCount[0] = Math.Clamp(SPI.SizeOrCount[0], 1, 32);
+                                                SPI.SizeOrCount[1] = Math.Clamp(SPI.SizeOrCount[1], 1, 32);
+                                                Vector2 ImageSize = new Vector2(1.0f / SPI.SizeOrCount[1], 1.0f / SPI.SizeOrCount[0]);
+
+                                                for (int i2 = 0; i2 < SPI.SizeOrCount[0]; i2++)
                                                 {
-                                                    SPI.SizeOrCount[0] = Math.Clamp(SPI.SizeOrCount[0], 1, 32);
-                                                    SPI.SizeOrCount[1] = Math.Clamp(SPI.SizeOrCount[1], 1, 32);
-                                                    Vector2 ImageSize = new Vector2(1.0f / SPI.SizeOrCount[1], 1.0f / SPI.SizeOrCount[0]);
-
-                                                    for (int i2 = 0; i2 < SPI.SizeOrCount[0]; i2++)
+                                                    for (int j = 0; j < SPI.SizeOrCount[1]; j++)
                                                     {
-                                                        for (int j = 0; j < SPI.SizeOrCount[1]; j++)
+                                                        Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i2 != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
+                                                        Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
+                                                        Vector2 UV0 = new Vector2(j * ImageSize.X, i2 * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+                                                        Vector2 UV1 = new Vector2((j + 1) * ImageSize.X, (i2 + 1) * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+
+                                                        //Eliminating empty textures
+                                                        Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)Math.Clamp((UV0.X * Tex.Width), 0, Tex.Width), (int)Math.Clamp((UV0.Y * Tex.Height), 0, Tex.Height), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
+                                                        Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1);
+                                                        Rect.Height = Math.Clamp(Rect.Height, 0, Tex.Height - Rect.Y - 1);
+                                                        Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[Rect.Width * Rect.Height];
+
+                                                        Tex.GetData(0, Rect, buffer, 0, Rect.Width * Rect.Height);
+
+                                                        Vector2 Min = new Vector2(int.MaxValue, int.MaxValue), Max = new Vector2(int.MinValue, int.MinValue);
+
+                                                        if (SPI.TrimSprite)
                                                         {
-                                                            Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i2 != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
-                                                            Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
-                                                            Vector2 UV0 = new Vector2(j * ImageSize.X, i2 * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
-                                                            Vector2 UV1 = new Vector2((j + 1) * ImageSize.X, (i2 + 1) * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+                                                            bool Empty = true;
 
-                                                            //Eliminating empty textures
-                                                            Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)Math.Clamp((UV0.X * Tex.Width), 0, Tex.Width), (int)Math.Clamp((UV0.Y * Tex.Height), 0, Tex.Height), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
-                                                            Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1);
-                                                            Rect.Height = Math.Clamp(Rect.Height, 0, Tex.Height - Rect.Y - 1);
-                                                            Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[Rect.Width * Rect.Height];
-
-                                                            Tex.GetData(0, Rect, buffer, 0, Rect.Width * Rect.Height);
-
-                                                            Vector2 Min = new Vector2(int.MaxValue, int.MaxValue), Max = new Vector2(int.MinValue, int.MinValue);
-
-                                                            if (SPI.TrimSprite)
+                                                            for (int i4 = 0; i4 < Rect.Height; i4++)
                                                             {
-                                                                bool Empty = true;
-
-                                                                for (int i4 = 0; i4 < Rect.Height; i4++)
+                                                                for (int j2 = 0; j2 < Rect.Width; j2++)
                                                                 {
-                                                                    for (int j2 = 0; j2 < Rect.Width; j2++)
+                                                                    if (buffer[i4 * Rect.Width + j2].A != 0)
                                                                     {
-                                                                        if (buffer[i4 * Rect.Width + j2].A != 0)
-                                                                        {
-                                                                            Empty = false;
+                                                                        Empty = false;
 
-                                                                            if (j2 < Min.X)
-                                                                                Min.X = j2;
+                                                                        if (j2 < Min.X)
+                                                                            Min.X = j2;
 
-                                                                            if (i4 < Min.Y)
-                                                                                Min.Y = i4;
+                                                                        if (i4 < Min.Y)
+                                                                            Min.Y = i4;
 
-                                                                            if (j2 > Max.X)
-                                                                                Max.X = j2;
+                                                                        if (j2 > Max.X)
+                                                                            Max.X = j2;
 
-                                                                            if (i4 > Max.Y)
-                                                                                Max.Y = i4;
-                                                                        }
+                                                                        if (i4 > Max.Y)
+                                                                            Max.Y = i4;
                                                                     }
                                                                 }
-
-                                                                if (!Empty)
-                                                                    SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)((UV0.X + Min.X / Tex.Width) * 10000), (int)((UV0.Y + Min.Y / Tex.Height) * 10000), (int)(Math.Abs((Max.X - Min.X + 1) / Rect.Width) * Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs((Max.Y - Min.Y + 1) / Rect.Height) * Math.Abs(UV1.Y - UV0.Y) * 10000)));
                                                             }
-                                                            else if (!buffer.All(Item => Item.A == 0))
-                                                                SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * 10000), (int)(UV0.Y * 10000), (int)(Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs(UV1.Y - UV0.Y) * 10000)));
+
+                                                            if (!Empty)
+                                                                SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)((UV0.X + Min.X / Tex.Width) * 10000), (int)((UV0.Y + Min.Y / Tex.Height) * 10000), (int)(Math.Abs((Max.X - Min.X + 1) / Rect.Width) * Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs((Max.Y - Min.Y + 1) / Rect.Height) * Math.Abs(UV1.Y - UV0.Y) * 10000)));
                                                         }
+                                                        else if (!buffer.All(Item => Item.A == 0))
+                                                            SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * 10000), (int)(UV0.Y * 10000), (int)(Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs(UV1.Y - UV0.Y) * 10000)));
                                                     }
                                                 }
                                             }

@@ -13,6 +13,8 @@ namespace FN_Engine.FN_Editor
 
         public List<AnimationInfo> AnimationClips;
 
+        internal static KeyValuePair<string, List<Microsoft.Xna.Framework.Rectangle>> slicedTexs;
+
         private int SelectedClip = -1;
         private IntPtr DragAndDropTex = IntPtr.Zero;
         private int DraggedFrame = -1;
@@ -361,6 +363,32 @@ namespace FN_Engine.FN_Editor
                             }
 
                             ContentWindow.DraggedAsset = null;
+                        }
+                        else if(slicedTexs.Key != null)
+                        {
+                            bool Safe = true;
+                            Texture2D T2D = null;
+                            try { T2D = Setup.Content.Load<Texture2D>(slicedTexs.Key); }
+                            catch (Exception E) { Safe = false; ContentWindow.LogText.Add(E.Message); }
+
+                            if (Safe)
+                            {
+                                foreach (Microsoft.Xna.Framework.Rectangle Rect in slicedTexs.Value)
+                                {
+                                    Frame NewFrame = new Frame();
+                                    NewFrame.Tex = T2D;
+                                    Vector4 SrcRect = new Vector4(Rect.X, Rect.Y, Rect.Width, Rect.Height);
+                                    NewFrame.SourceRectangle = new Microsoft.Xna.Framework.Rectangle((int)Math.Round(SrcRect.X * (NewFrame.Tex.Width / 10000.0f)), (int)Math.Round(SrcRect.Y * (NewFrame.Tex.Height / 10000.0f)), (int)Math.Round(SrcRect.Z * (NewFrame.Tex.Width / 10000.0f)), (int)Math.Round(SrcRect.W * (NewFrame.Tex.Height / 10000.0f)));
+                                    NewFrame.Time = 0.25f;
+                                    NewFrame.TexPtr = Scene.GuiRenderer.BindTexture(NewFrame.Tex);
+
+                                    AnimationClips[SelectedClip].Frames.Add(NewFrame);
+                                }
+
+                                ActiveFrame = 0;
+                            }
+
+                            slicedTexs = new KeyValuePair<string, List<Microsoft.Xna.Framework.Rectangle>>(null, null);
                         }
 
                         ImGui.EndDragDropTarget();
