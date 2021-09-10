@@ -7,8 +7,6 @@ namespace FN_Engine
 {
     public class BoxCollider2D : GameObjectComponent, Collider2D
     {
-        //public int Entered = 0;
-        //public int Exited = 0;
         public bool isTrigger = false;
         public bool SlideCollision = true;
         public Rectangle Bounds;

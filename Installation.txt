@@ -1,0 +1,8 @@
+1- Download Visual Studio 2019
+2- Download .Net programming package
+3- From Visual Studio, open Extensiion in the toolbar, then search for Monogame Project Templates and download them.
+4- In a commad window, run this command:
+dotnet new --install MonoGame.Templates.CSharp::3.8.0.1641
+5- Clone the project from github:
+https://github.com/ossyahya60/FN-Engine.git
+6- Anti-virus may interfere with the process of the engine, so try exclude the Engine.exe from the anti-virus.

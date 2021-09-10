@@ -30,11 +30,10 @@ namespace FN_Engine
         public float Mass = 1; //Might be used for collision response and other physics-related stuff
         public Vector2 Velocity; // 1 pixel per sec => This shouldn't be set every frame as it negates all other forces acting
 
-        internal bool CollidedThisFrame = false;
+        internal Dictionary<Collider2D, List<Collider2D>> LastFrameCollisionList = new Dictionary<Collider2D, List<Collider2D>>();
 
-        private float GravityConstant = 10; //Universal gravitational constant (Approximated to 10 for easiness)
+        private readonly float GravityConstant = 10; //Universal gravitational constant (Approximated to 10 for easiness)
         private float DeltaTime = 1.0f / 60;
-        private HashSet<Collider2D> LastFrameCollisionList = new HashSet<Collider2D>();
 
         public override void Update(GameTime gameTime)
         {
@@ -101,11 +100,6 @@ namespace FN_Engine
             clone.gameObject = Clone;
 
             return clone;
-        }
-
-        internal HashSet<Collider2D> CollidedWithLastFrameList()
-        {
-            return LastFrameCollisionList;
         }
     }
 }

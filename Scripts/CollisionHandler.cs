@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FN_Engine
 {
@@ -31,7 +32,10 @@ namespace FN_Engine
                 if (CallerRigidBody == null || !CallerRigidBody.Enabled) //Condition for any event related to collision to happen
                     continue;
 
-                HashSet<Collider2D> LastFrameCollisions = CallerRigidBody.CollidedWithLastFrameList();
+                if (!CallerRigidBody.LastFrameCollisionList.ContainsKey(collider as Collider2D))
+                    CallerRigidBody.LastFrameCollisionList.Add(collider as Collider2D, new List<Collider2D>(2));
+
+                List<Collider2D> LastFrameCollisions = CallerRigidBody.LastFrameCollisionList[collider as Collider2D];
 
                 foreach (var collider2 in Colliders)
                 {
@@ -53,6 +57,9 @@ namespace FN_Engine
 
                         CD1.CollisionResponse(CallerRigidBody, CD2, (float)gameTime.ElapsedGameTime.TotalSeconds, ref Colliders, CollisionPos, true);
                     }
+
+                    if (LastFrameCollisions == null)
+                        LastFrameCollisions = new List<Collider2D>(3);
 
                     if (Collided)
                     {
