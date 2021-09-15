@@ -527,7 +527,6 @@ namespace FN_Engine.FN_Editor
 
                 ImGui.EndPopup();
             }
-
             if (ImGui.BeginPopup("Renaming"))
             {
                 ImGui.Text("Edit name:");
@@ -679,7 +678,7 @@ namespace FN_Engine.FN_Editor
                 if (!Root)
                     ImGui.Unindent();
 
-                if ((ImGui.IsMouseReleased(ImGuiMouseButton.Left) || ImGui.IsMouseReleased(ImGuiMouseButton.Right)) && ImGui.IsItemHovered())
+                if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && ImGui.IsItemHovered())
                 {
                     if (ImGui.GetIO().KeyCtrl)
                     {
@@ -687,6 +686,42 @@ namespace FN_Engine.FN_Editor
                             SelectedGOs.Remove(GO);
                         else
                             WhoIsSelected = GO;
+                    }
+                    else if (ImGui.GetIO().KeyShift)
+                    {
+                        if (SelectedGOs.Count == 0)
+                        {
+                            SelectedGOs.Add(GO);
+                            WhoIsSelected = GO;
+                        }
+                        else
+                        {
+                            SelectedGOs.Clear();
+                            int CurrentGoIndex = -1;
+                            int LastOneIndex = -1;
+
+                            for (int i = 0; i < SceneManager.ActiveScene.GameObjects.Count; i++)
+                            {
+                                if (SceneManager.ActiveScene.GameObjects[i] == GO)
+                                    CurrentGoIndex = i;
+
+                                if (SceneManager.ActiveScene.GameObjects[i] == WhoIsSelected)
+                                    LastOneIndex = i;
+                            }
+
+                            WhoIsSelected = GO;
+
+                            if (CurrentGoIndex > LastOneIndex)
+                            {
+                                for (int i = LastOneIndex; i <= CurrentGoIndex; i++)
+                                    SelectedGOs.Add(SceneManager.ActiveScene.GameObjects[i]);
+                            }
+                            else
+                            {
+                                for (int i = CurrentGoIndex; i <= LastOneIndex; i++)
+                                    SelectedGOs.Add(SceneManager.ActiveScene.GameObjects[i]);
+                            }
+                        }
                     }
                     else
                     {
@@ -696,9 +731,6 @@ namespace FN_Engine.FN_Editor
                         else
                             WhoIsSelected = GO;
                     }
-
-                    if (SelectedGOs.Count > 1)
-                        WhoIsSelected = null;
                 }
 
                 return;
@@ -760,14 +792,51 @@ namespace FN_Engine.FN_Editor
                 ImGui.PopStyleColor();
             }
 
-            if ((ImGui.IsMouseReleased(ImGuiMouseButton.Left) || ImGui.IsMouseReleased(ImGuiMouseButton.Right)) && ImGui.IsItemHovered())
+            if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && ImGui.IsItemHovered())
             {
                 if (ImGui.GetIO().KeyCtrl)
                 {
                     if (!SelectedGOs.Add(GO))
                         SelectedGOs.Remove(GO);
-                    else
+
+                    if(SelectedGOs.Count != 0)
                         WhoIsSelected = GO;
+                }
+                else if (ImGui.GetIO().KeyShift)
+                {
+                    if (SelectedGOs.Count == 0)
+                    {
+                        SelectedGOs.Add(GO);
+                        WhoIsSelected = GO;
+                    }
+                    else
+                    {
+                        SelectedGOs.Clear();
+                        int CurrentGoIndex = -1;
+                        int LastOneIndex = -1;
+
+                        for (int i = 0; i < SceneManager.ActiveScene.GameObjects.Count; i++)
+                        {
+                            if (SceneManager.ActiveScene.GameObjects[i] == GO)
+                                CurrentGoIndex = i;
+
+                            if (SceneManager.ActiveScene.GameObjects[i] == WhoIsSelected)
+                                LastOneIndex = i;
+                        }
+
+                        WhoIsSelected = GO;
+
+                        if(CurrentGoIndex > LastOneIndex)
+                        {
+                            for (int i = LastOneIndex; i <= CurrentGoIndex; i++)
+                                SelectedGOs.Add(SceneManager.ActiveScene.GameObjects[i]);
+                        }
+                        else
+                        {
+                            for (int i = CurrentGoIndex; i <= LastOneIndex; i++)
+                                SelectedGOs.Add(SceneManager.ActiveScene.GameObjects[i]);
+                        }
+                    }
                 }
                 else
                 {
@@ -777,9 +846,6 @@ namespace FN_Engine.FN_Editor
                     else
                         WhoIsSelected = GO;
                 }
-
-                if (SelectedGOs.Count > 1)
-                    WhoIsSelected = null;
             }
 
             for (int i = 0; i < ChildrenCount; i++)

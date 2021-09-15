@@ -156,8 +156,6 @@ namespace FN_Engine
                 {
                     if (GameObjects[Count - i].Active)
                     {
-                        GameObjects[Count - i].Update(gameTime);
-
                         //Adjusting Transforms
                         if (!FN_Editor.EditorScene.IsThisTheEditor && GameObjects[Count - i].Parent == null && GameObjects[Count - i].Transform != null)
                         {
@@ -168,6 +166,9 @@ namespace FN_Engine
                         }
                     }
                 }
+
+                for (int i = Count; i >= 0; i--)
+                    GameObjects[Count - i].Update(gameTime);
             }
 
             //Update Physics
