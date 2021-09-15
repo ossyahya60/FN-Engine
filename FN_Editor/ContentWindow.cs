@@ -39,8 +39,6 @@ namespace FN_Engine.FN_Editor
         public Dictionary<string, SpriteEditorInfo> SPIs = new Dictionary<string, SpriteEditorInfo>();
         public List<Prefab> Prefabs = new List<Prefab>();
 
-        internal static List<string> LogText = new List<string>();
-
         private string GameContentPath = null;
         private bool DirectoryChanged = true;
         private Regex TexRegex = null;
@@ -133,7 +131,7 @@ namespace FN_Engine.FN_Editor
                     if (TexRegex.IsMatch(AssetName) || MusicRegex.IsMatch(AssetName) || ShaderRegex.IsMatch(AssetName))
                     {
                         try { File.Copy(Item, GameContentPath + "\\" + AssetName, true); }
-                        catch (Exception E){ LogText.Add(E.Message); } //Log error here!
+                        catch (Exception E){ Utility.Log(E.Message); } //Log error here!
                     }
                     else
                         continue;
@@ -1133,8 +1131,8 @@ namespace FN_Engine.FN_Editor
 
                 if (ImGui.BeginTabItem("Log"))
                 {
-                    for (int i = 0; i < LogText.Count; i++)
-                        ImGui.TextWrapped("=> " + LogText[i]);
+                    for (int i = 0; i < Utility.LogText.Count; i++)
+                        ImGui.TextWrapped("=> " + Utility.LogText[i]);
 
                     ImGui.EndTabItem();
                 }

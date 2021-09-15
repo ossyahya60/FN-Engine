@@ -102,13 +102,21 @@ namespace FN_Engine.FN_Editor
             }
 
             //Some Scene window functionalities
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered())
+            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right) && ImGui.IsWindowHovered())
+            {
                 ImGui.OpenPopup("Functionalities");
+
+                if (!ImGui.IsAnyItemHovered())
+                {
+                    WhoIsSelected = null;
+                    SelectedGOs.Clear();
+                }
+            }
 
             //Copy GOs
             if (ImGui.GetIO().KeyCtrl)
             {
-                if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.C))) //Copy
+                if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.C)) && ImGui.IsWindowFocused()) //Copy
                 {
                     if (SelectedGOs.Count != 0)
                     {
@@ -139,7 +147,7 @@ namespace FN_Engine.FN_Editor
 
                     IsCopy = true;
                 }
-                else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.X))) //Cut
+                else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.X)) && ImGui.IsWindowFocused()) //Cut
                 {
                     if (SelectedGOs.Count != 0)
                     {
@@ -157,7 +165,7 @@ namespace FN_Engine.FN_Editor
                     }
                     IsCopy = false;
                 }
-                else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.D)) //Duplicate //Not functioning well...
+                else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.D) && ImGui.IsWindowFocused()) //Duplicate //Not functioning well...
                 {
                     GameObject[] Instances = SelectedGOs.ToArray();
                     for (int i = 0; i < SelectedGOs.Count; i++)
@@ -394,7 +402,7 @@ namespace FN_Engine.FN_Editor
                             break;
                     }
                 }
-                else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.V))) //Paste
+                else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.V)) && ImGui.IsWindowFocused()) //Paste
                 {
                     if (GOs_Clipboard != null)
                     {
@@ -427,7 +435,7 @@ namespace FN_Engine.FN_Editor
                         Redo_Buffer.Clear();
                     }
                 }
-                else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.A))) //Select All
+                else if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.A)) && ImGui.IsWindowFocused()) //Select All
                 {
                     foreach (GameObject GO in SceneManager.ActiveScene.GameObjects)
                         if (!GO.IsEditor)

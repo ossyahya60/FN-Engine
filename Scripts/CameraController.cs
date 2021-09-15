@@ -6,10 +6,60 @@ namespace FN_Engine
     public class CameraController: GameObjectComponent
     {
         public bool Visualize = true;
-        public bool IsFullScreen = false;
-        public float CameraZoom = 1;
-        public Point ScreenSize = new Point(1366, 768);
-        public Point TargetResolution = new Point(1366, 768);
+        public bool IsFullScreen
+        {
+            set
+            {
+                Dirty = true;
+                fullScreen = value;
+            }
+            get
+            {
+                return fullScreen;
+            }
+        }
+        public float CameraZoom
+        {
+            set
+            {
+                Dirty = true;
+                cameraZoom = value;
+            }
+            get
+            {
+                return cameraZoom;
+            }
+        }
+        public Point ScreenSize
+        {
+            set
+            {
+                Dirty = true;
+                screenSize = value;
+            }
+            get
+            {
+                return screenSize;
+            }
+        }
+        public Point TargetResolution
+        {
+            set
+            {
+                Dirty = true;
+                targetResolution = value;
+            }
+            get
+            {
+                return targetResolution;
+            }
+        }
+
+        private bool Dirty = true;
+        private Point screenSize = new Point(1366, 768);
+        private Point targetResolution = new Point(1366, 768);
+        private bool fullScreen = false;
+        private float cameraZoom = 1;
 
         public override void Start()
         {
@@ -22,16 +72,20 @@ namespace FN_Engine
 
         public override void Update(GameTime gameTime)
         {
-            gameObject.Name = "Camera Controller";
-            gameObject.ShouldBeDeleted = false;
-            gameObject.ShouldBeRemoved = false;
+            if (Dirty)
+            {
+                Dirty = false;
+                gameObject.Name = "Camera Controller";
+                gameObject.ShouldBeDeleted = false;
+                gameObject.ShouldBeRemoved = false;
 
-            Setup.Camera.Position = gameObject.Transform.Position;
-            Setup.Camera.Rotation = gameObject.Transform.Rotation;
-            Setup.Camera.Zoom = CameraZoom;
+                Setup.Camera.Position = gameObject.Transform.Position;
+                Setup.Camera.Rotation = gameObject.Transform.Rotation;
+                Setup.Camera.Zoom = CameraZoom;
 
-            ResolutionIndependentRenderer.SetVirtualResolution(TargetResolution.X, TargetResolution.Y);
-            ResolutionIndependentRenderer.SetResolution(ScreenSize.X, ScreenSize.Y, IsFullScreen);
+                ResolutionIndependentRenderer.SetVirtualResolution(TargetResolution.X, TargetResolution.Y);
+                ResolutionIndependentRenderer.SetResolution(ScreenSize.X, ScreenSize.Y, IsFullScreen);
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)

@@ -18,6 +18,8 @@ namespace FN_Engine
     {
         public static ObjectIDGenerator OIG = new ObjectIDGenerator();
 
+        internal static List<string> LogText;
+
         private static Regex NameRegex = null;
         private static Regex NameFormatRegex = null;
         private static Regex TexRegex = null;
@@ -33,6 +35,15 @@ namespace FN_Engine
             MusicRegex = new Regex(@"([\.]\b(wav|ogg|wma|mp3)\b)$", RegexOptions.IgnoreCase);
             ShaderRegex = new Regex(@"([\.]\b(fx)\b)$", RegexOptions.IgnoreCase);
             FontRegex = new Regex(@"([\.]\b(spritefont)\b)$", RegexOptions.IgnoreCase);
+            LogText = new List<string>();
+        }
+
+        public static void Log(string Message)
+        {
+            if (LogText.Count > 200)
+                LogText.RemoveRange(0, 100);
+
+            LogText.Add(Message);
         }
 
         public static bool CircleContains(Vector2 Center, int Radius, Vector2 Point)

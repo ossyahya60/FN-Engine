@@ -10,10 +10,17 @@ namespace FN_Engine
         private LineOccluder[] lineOccluders;
         private SpriteRenderer SR = null;
 
+        public ShadowCaster()
+        {
+            lineOccluders = new LineOccluder[4];
+            for (int i = 0; i < lineOccluders.Length; i++)
+                lineOccluders[i] = new LineOccluder();
+
+        }
+
         public override void Start()
         {
             SR = gameObject.GetComponent<SpriteRenderer>();
-            lineOccluders = new LineOccluder[4];
 
             Rectangle Occluder = SR.Sprite.DynamicScaledRect();
 
@@ -40,6 +47,9 @@ namespace FN_Engine
 
         public LineOccluder[] ConvertToLineOccluders()
         {
+            if (SR == null)
+                SR = gameObject.GetComponent<SpriteRenderer>();
+
             Rectangle Occluder = SR.Sprite.DynamicScaledRect();
 
             lineOccluders[0].SetOccluder(new Vector2(Occluder.Left, Occluder.Top), new Vector2(Occluder.Right, Occluder.Top));

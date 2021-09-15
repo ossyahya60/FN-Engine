@@ -76,7 +76,7 @@ namespace FN_Engine
 
                     
                     try { SoundEffect = Setup.Content.Load<SoundEffect>(value); }
-                    catch (Exception E) { FN_Editor.ContentWindow.LogText.Add(E.Message); } //Log error here!
+                    catch (Exception E) { Utility.Log(E.Message); } //Log error here!
 
                     SoundEffectInstance = SoundEffect.CreateInstance();
                 }

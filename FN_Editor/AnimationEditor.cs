@@ -331,7 +331,7 @@ namespace FN_Engine.FN_Editor
                                 Frame NewFrame = new Frame();
                                 bool Safe = true;
                                 try { NewFrame.Tex = Setup.Content.Load<Texture2D>((string)ContentWindow.DraggedAsset); }
-                                catch (Exception E) { Safe = false; FN_Editor.ContentWindow.LogText.Add(E.Message); }
+                                catch (Exception E) { Safe = false; Utility.Log(E.Message); }
 
                                 if (Safe)
                                 {
@@ -348,7 +348,7 @@ namespace FN_Engine.FN_Editor
                                 Frame NewFrame = new Frame();
                                 bool Safe = true;
                                 try { NewFrame.Tex = Setup.Content.Load<Texture2D>(((KeyValuePair<string, Vector4>)ContentWindow.DraggedAsset).Key); }
-                                catch (Exception E) { Safe = false; FN_Editor.ContentWindow.LogText.Add(E.Message); }
+                                catch (Exception E) { Safe = false; Utility.Log(E.Message); }
 
                                 if (Safe)
                                 {
@@ -369,7 +369,7 @@ namespace FN_Engine.FN_Editor
                             bool Safe = true;
                             Texture2D T2D = null;
                             try { T2D = Setup.Content.Load<Texture2D>(slicedTexs.Key); }
-                            catch (Exception E) { Safe = false; ContentWindow.LogText.Add(E.Message); }
+                            catch (Exception E) { Safe = false; Utility.Log(E.Message); }
 
                             if (Safe)
                             {

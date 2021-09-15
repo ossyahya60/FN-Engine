@@ -129,7 +129,7 @@ namespace FN_Engine.FN_Editor
                 Types.ToList().ForEach(item => ComponentsTypes.Add(item));
             }
             catch (Exception E) // Log Error?
-            { ContentWindow.LogText.Add(E.Message); }
+            { Utility.Log(E.Message); }
         }
 
         public override void Start()
@@ -160,7 +160,7 @@ namespace FN_Engine.FN_Editor
                 }
             }
             catch (Exception E) // Log Error?
-            { ContentWindow.LogText.Add(E.Message); }
+            { Utility.Log(E.Message); }
 
             ImGui.Begin("Inspector Window");
 
@@ -623,7 +623,7 @@ namespace FN_Engine.FN_Editor
                                                     GameObjects_Tab.Redo_Buffer.Clear();
                                                 }
                                                 catch (Exception E) // Log Error?
-                                                { ContentWindow.LogText.Add(E.Message); }
+                                                { Utility.Log(E.Message); }
 
                                                 GameObjects_Tab.DraggedGO = null;
                                                 ContentWindow.DraggedAsset = null;
@@ -806,7 +806,7 @@ namespace FN_Engine.FN_Editor
                                                     GameObjects_Tab.Redo_Buffer.Clear();
                                                 }
                                                 catch (Exception E) // Log Error?
-                                                { ContentWindow.LogText.Add(E.Message); }
+                                                { Utility.Log(E.Message); }
 
                                                 ContentWindow.DraggedAsset = null;
                                             }
@@ -939,7 +939,7 @@ namespace FN_Engine.FN_Editor
                                                     GameObjects_Tab.Redo_Buffer.Clear();
                                                 }
                                                 catch (Exception E) // Log Error?
-                                                { ContentWindow.LogText.Add(E.Message); }
+                                                { Utility.Log(E.Message); }
 
                                                 GameObjects_Tab.DraggedGO = null;
                                                 ContentWindow.DraggedAsset = null;
@@ -1121,7 +1121,7 @@ namespace FN_Engine.FN_Editor
                                                     GameObjects_Tab.Redo_Buffer.Clear();
                                                 }
                                                 catch (Exception E) // Log Error?
-                                                { ContentWindow.LogText.Add(E.Message); }
+                                                { Utility.Log(E.Message); }
 
                                                 ContentWindow.DraggedAsset = null;
                                             }

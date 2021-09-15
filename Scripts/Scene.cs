@@ -200,8 +200,6 @@ namespace FN_Engine
             {
                 for (int i = Count; i >= 0; i--)
                 {
-                    GameObjects[Count - i].UpdateUI(gameTime);
-
                     //Adjusting Transforms
                     if (GameObjects[Count - i].Parent == null && GameObjects[Count - i].Transform != null && GameObjects[Count - i].Active)
                     {
@@ -211,6 +209,9 @@ namespace FN_Engine
                         QueueInOrder(Transforms);
                     }
                 }
+
+                for (int i = Count; i >= 0; i--)
+                    GameObjects[Count - i].UpdateUI(gameTime);
             }
         }
 

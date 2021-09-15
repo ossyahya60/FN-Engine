@@ -6,6 +6,8 @@ namespace FN_Engine
 {
     internal static class CollisionHandler
     {
+        private static int Counter = 6;
+
         static public void Update(GameTime gameTime)
         {
             List<GameObjectComponent> Colliders = new List<GameObjectComponent>();
@@ -58,30 +60,31 @@ namespace FN_Engine
                         CD1.CollisionResponse(CallerRigidBody, CD2, (float)gameTime.ElapsedGameTime.TotalSeconds, ref Colliders, CollisionPos, true);
                     }
 
-                    if (LastFrameCollisions == null)
-                        LastFrameCollisions = new List<Collider2D>(3);
-
                     if (Collided)
                     {
                         bool JustAdded = false;
                         if (CD1Trigger)
                         {
-                            if (LastFrameCollisions.Contains(CD2)) //OnTriggerStay CD1
-                                collider.gameObject.GameObjectComponents.ForEach(Item => Item.OnTriggerStay2D(CD2));
-                            else
+                            if (LastFrameCollisions.Contains(CD2))
+                                for (int i = collider.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnTriggerStay CD1
+                                    collider.gameObject.GameObjectComponents[i].OnTriggerStay2D(CD2);
+                            else if(Counter > 5)
                             {
-                                collider.gameObject.GameObjectComponents.ForEach(Item => Item.OnTriggerEnter2D(CD2)); //OnTriggerEnter CD1
+                                for (int i = collider.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnTriggerEnter CD1
+                                    collider.gameObject.GameObjectComponents[i].OnTriggerEnter2D(CD2);
                                 LastFrameCollisions.Add(CD2);
                                 JustAdded = true;
                             }
                         }
                         else if(!CD2Trigger) //Collidable
                         {
-                            if (LastFrameCollisions.Contains(CD2)) //OnCollisionStay CD1
-                                collider.gameObject.GameObjectComponents.ForEach(Item => Item.OnCollisionStay2D(CD2));
-                            else
+                            if (LastFrameCollisions.Contains(CD2))
+                                for (int i = collider.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnCollisionStay CD1
+                                    collider.gameObject.GameObjectComponents[i].OnCollisionStay2D(CD2);
+                            else if (Counter > 5)
                             {
-                                collider.gameObject.GameObjectComponents.ForEach(Item => Item.OnCollisionEnter2D(CD2)); //OnCollisionEnter CD1
+                                for (int i = collider.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnCollisionEnter CD1
+                                    collider.gameObject.GameObjectComponents[i].OnCollisionEnter2D(CD2);
                                 LastFrameCollisions.Add(CD2);
 
                                 //(collider as BoxCollider2D).Entered++;
@@ -91,11 +94,13 @@ namespace FN_Engine
 
                         if(CD2Trigger)
                         {
-                            if(LastFrameCollisions.Contains(CD2) && !JustAdded) //OnTriggerStay CD2
-                                collider2.gameObject.GameObjectComponents.ForEach(Item => Item.OnTriggerStay2D(CD1));
-                            else
+                            if(LastFrameCollisions.Contains(CD2) && !JustAdded)
+                                for (int i = collider2.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnTriggerStay CD2
+                                    collider2.gameObject.GameObjectComponents[i].OnTriggerStay2D(CD1);
+                            else if (Counter > 5)
                             {
-                                collider2.gameObject.GameObjectComponents.ForEach(Item => Item.OnTriggerEnter2D(CD1)); //OnTriggerEnter CD2
+                                for (int i = collider2.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnTriggerEnter CD2
+                                    collider2.gameObject.GameObjectComponents[i].OnTriggerEnter2D(CD1);
 
                                 if (!JustAdded)
                                     LastFrameCollisions.Add(CD2);
@@ -104,31 +109,35 @@ namespace FN_Engine
                         else if (!CD1Trigger) //Collidable
                         {
                             if (LastFrameCollisions.Contains(CD2) && !JustAdded) //OnCollisionStay CD2
-                                collider2.gameObject.GameObjectComponents.ForEach(Item => Item.OnCollisionStay2D(CD1));
-                            else
+                                for (int i = collider2.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnCollisionStay CD2
+                                    collider2.gameObject.GameObjectComponents[i].OnCollisionStay2D(CD1);
+                            else if (Counter > 5)
                             {
-                                collider2.gameObject.GameObjectComponents.ForEach(Item => Item.OnCollisionEnter2D(CD1)); //OnCollisionEnter CD2
+                                for (int i = collider2.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnCollisionEnter CD2
+                                    collider2.gameObject.GameObjectComponents[i].OnCollisionEnter2D(CD1);
 
                                 if (!JustAdded)
                                     LastFrameCollisions.Add(CD2);
                             }
                         }
                     }
-                    else
+                    else if (Counter > 5)
                     {
                         bool JustRemoved = false;
                         if (CD1Trigger) //OnTriggerExit CD1
                         {
                             if (LastFrameCollisions.Contains(CD2))
                             {
-                                collider.gameObject.GameObjectComponents.ForEach(Item => Item.OnTriggerExit2D(CD2));
+                                for (int i = collider.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnTriggerExit CD1
+                                    collider.gameObject.GameObjectComponents[i].OnTriggerExit2D(CD2);
                                 LastFrameCollisions.Remove(CD2);
                                 JustRemoved = true;
                             }
                         }
                         else if(!CD2Trigger && LastFrameCollisions.Contains(CD2)) //OnCollisionExit CD1
                         {
-                            collider.gameObject.GameObjectComponents.ForEach(Item => Item.OnCollisionExit2D(CD2));
+                            for (int i = collider.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnCollisionExit2D CD1
+                                collider.gameObject.GameObjectComponents[i].OnCollisionExit2D(CD2);
 
                             LastFrameCollisions.Remove(CD2);
                             JustRemoved = true;
@@ -139,7 +148,8 @@ namespace FN_Engine
                         {
                             if (JustRemoved || LastFrameCollisions.Contains(CD2))
                             {
-                                collider2.gameObject.GameObjectComponents.ForEach(Item => Item.OnTriggerExit2D(CD1));
+                                for (int i = collider2.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnTriggerExit CD2
+                                    collider2.gameObject.GameObjectComponents[i].OnTriggerExit2D(CD1);
 
                                 if (!JustRemoved)
                                     LastFrameCollisions.Remove(CD2);
@@ -147,7 +157,8 @@ namespace FN_Engine
                         }
                         else if (!CD1Trigger && (JustRemoved || LastFrameCollisions.Contains(CD2))) //OnCollisionExit CD2
                         {
-                            collider2.gameObject.GameObjectComponents.ForEach(Item => Item.OnCollisionExit2D(CD1));
+                            for (int i = collider2.gameObject.GameObjectComponents.Count - 1; i >= 0; i--) //OnCollisionExit2D CD2
+                                collider2.gameObject.GameObjectComponents[i].OnCollisionExit2D(CD1);
 
                             if (!JustRemoved)
                                 LastFrameCollisions.Remove(CD2);
@@ -155,6 +166,11 @@ namespace FN_Engine
                     }
                 }
             }
+
+            if (Counter > 5)
+                Counter = 0;
+
+            Counter++;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -6,31 +7,9 @@ namespace FN_Engine
 {
     public class CircleCollider : GameObjectComponent, Collider2D
     {
-        public bool CenteredOrigin = true;
         public bool isTrigger = true;
         public int Radius = 50;
-        public Vector2 Center
-        {
-            set
-            {
-                center = value;
-            }
-            get
-            {
-                if (CenteredOrigin)
-                {
-                    var SR = gameObject.GetComponent<SpriteRenderer>();
-                    if (SR == null)
-                        return gameObject.Transform.Position;
-                    else
-                        return gameObject.Transform.Position;
-                }
-
-                return center;
-            }
-        }
-
-        private Vector2 center = Vector2.Zero;
+        public Vector2 Center;
 
         public CircleCollider(int Radius)
         {
@@ -39,13 +18,26 @@ namespace FN_Engine
 
         public CircleCollider()
         {
-            this.Radius = 50;
+            Radius = 50;
+        }
+
+        public override void Start()
+        {
+            var SR = gameObject.GetComponent<SpriteRenderer>();
+            if (SR != null && Center.X == 0)  //Initializing Collider bounds with the sprite bounds if exists
+            {
+                if (SR.Sprite != null)
+                {
+                    Center = new Vector2(SR.Sprite.SourceRectangle.Size.X * 0.5f);
+                    Radius = (int)Center.X;
+                }
+            }
         }
 
         public bool Contains(Vector2 Point)
-        {//Support uniform scale only (For Now)
-            Vector2 Output = gameObject.Transform.Position - Point;
-            if (MathCompanion.Abs(Output.Length()) > Radius*gameObject.Transform.Scale.X)
+        {
+            Vector2 Output = gameObject.Transform.Position + Center - Point;
+            if (Output.LengthSquared() > Radius * Radius)
                 return false;
 
             return true;
@@ -55,18 +47,27 @@ namespace FN_Engine
         {
             if(collider is CircleCollider) //Assuming Center as Origin
             {
-                Vector2 Output = gameObject.Transform.Position - (collider as CircleCollider).gameObject.Transform.Position;
-                if ((int)Output.Length() > Radius + (collider as CircleCollider).Radius)
+                Vector2 Center1 = gameObject.Transform.Position + Center;
+                CircleCollider CR2 = collider as CircleCollider;
+                Vector2 Center2 = CR2.gameObject.Transform.Position + CR2.Center;
+
+                if (Math.Abs(Center1.X - Center2.X) > Radius + CR2.Radius)
                     return false;
+
+                if (Math.Abs(Center1.Y - Center2.Y) > Radius + CR2.Radius)
+                    return false;
+
+                //if ((Center1 - Center2).LengthSquared() > (Radius + CR2.Radius) * (Radius + CR2.Radius))
+                //    return false;
             }
             else if(collider is BoxCollider2D) //Assuming Center as Origin
             {
                 Rectangle TempCollider = (collider as BoxCollider2D).GetDynamicCollider();
 
-                if (MathCompanion.Abs(Center.X - TempCollider.Center.X) > Radius + TempCollider.Width/2)
+                if (Math.Abs(Center.X + gameObject.Transform.Position.X - TempCollider.Center.X) > Radius + TempCollider.Width/2)
                     return false;
 
-                if (MathCompanion.Abs(Center.Y - TempCollider.Center.Y) > Radius + TempCollider.Height/2)
+                if (Math.Abs(Center.Y + gameObject.Transform.Position.Y - TempCollider.Center.Y) > Radius + TempCollider.Height/2)
                     return false;
             }
 
@@ -80,11 +81,7 @@ namespace FN_Engine
 
         public void CollisionResponse(Rigidbody2D RB, Collider2D collider, float DeltaTime, ref List<GameObjectComponent> CDs, Vector2 CollisionPos, bool ResetVelocity) //change this
         {
-            if (!isTrigger)
-            {
-                gameObject.Transform.Move(-RB.Velocity.X * DeltaTime, -RB.Velocity.Y * DeltaTime);
-                RB.Velocity = Vector2.Zero;
-            }
+            
         }
 
         public bool IsTrigger()
@@ -115,7 +112,7 @@ namespace FN_Engine
         void Collider2D.Visualize(float X_Bias, float Y_Bias)
         {
             if (Enabled)
-                HitBoxDebuger.DrawCircle(Center + new Vector2(X_Bias, Y_Bias), Radius);
+                HitBoxDebuger.DrawCircle(Center + gameObject.Transform.Position + new Vector2(X_Bias, Y_Bias), Radius);
         }
 
         public override GameObjectComponent DeepCopy(GameObject Clone)

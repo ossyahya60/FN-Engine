@@ -37,7 +37,7 @@ namespace FN_Engine.FN_Project
         //    ImGui.End();
         //}
 
-        private void DownloadPrerequisites()
+        private static void DownloadPrerequisites()
         {
             string[] Commands = new string[]
             {
@@ -49,11 +49,20 @@ namespace FN_Engine.FN_Project
 
         public static void MakeNewProject(string Path)
         {
+            //Prequisites
             string ProjName = Path.Split('\\')[(Path.Split('\\').Length - 1)] + ".csproj";
+
+            string EngineDir = Environment.CurrentDirectory.Substring(0, Environment.CurrentDirectory.LastIndexOf("\\bin"));
+            if(!File.Exists(EngineDir + "\\FirstSetup.txt"))
+            {
+                File.Create(EngineDir + "\\FirstSetup.txt");
+                DownloadPrerequisites();
+            }    
+
             string[] MakeDesktopGLProj = new string[]
             {
                 //"dotnet new -i MonoGame.Templates.CSharp::3.8.0.1641", //Download Template
-                "cd " + Path, //Go to the new directory
+                "cd /d " + Path, //Go to the new directory
                 "dotnet new mgdesktopgl", //DesktopGL
                 "dotnet new sln", //Make a new visual studio solution
                 "dotnet sln add " + ProjName, //Add the project to the solution
@@ -64,7 +73,7 @@ namespace FN_Engine.FN_Project
 
             string[] RunGame = new string[]
             {
-                "cd " + Path, //Go to the new directory
+                "cd /d " + Path, //Go to the new directory
                 "dotnet build"//,
                 //"dotnet run"
             };
@@ -110,7 +119,7 @@ namespace FN_Engine.FN_Project
 
             NewProject = true;
 
-            //Utility.ExecuteCommand(new string[] { "cd " + Path + "\\Content", })
+            //Utility.ExecuteCommand(new string[] { "cd /d " + Path + "\\Content", })
 
             Utility.ExecuteCommand(RunGame, Path);
 
@@ -129,11 +138,21 @@ namespace FN_Engine.FN_Project
 
         public static void OpenExistingProject(string Path)
         {
+            //Prequisites
+            string ProjName = Path.Split('\\')[(Path.Split('\\').Length - 1)] + ".csproj";
+
+            string EngineDir = Environment.CurrentDirectory.Substring(0, Environment.CurrentDirectory.LastIndexOf("\\bin"));
+            if (!File.Exists(EngineDir + "\\FirstSetup.txt"))
+            {
+                File.Create(EngineDir + "\\FirstSetup.txt");
+                DownloadPrerequisites();
+            }
+
             string SlnName = Path.Split('\\')[(Path.Split('\\').Length - 1)] + ".sln";
             string[] OpenProj = new string[]
             {
                 //"dotnet new -i MonoGame.Templates.CSharp::3.8.0.1641", //Download Template
-                "cd " + Path, //Go to the existing directory
+                "cd /d " + Path, //Go to the existing directory
                 //"start " + SlnName
                 //"mgcb-editor " + "Content\\Content.mgcb" //Open MGCB Editor (Optional)
             };
@@ -151,7 +170,7 @@ namespace FN_Engine.FN_Project
             string[] RunGM = new string[]
             {
                 //"dotnet new -i MonoGame.Templates.CSharp::3.8.0.1641", //Download Template
-                "cd " + GamePath, //Go to the existing directory
+                "cd /d " + GamePath, //Go to the existing directory
                 "dotnet build",
                 "dotnet run"
             };
@@ -164,7 +183,7 @@ namespace FN_Engine.FN_Project
             string[] RunGM = new string[]
             {
                 //"dotnet new -i MonoGame.Templates.CSharp::3.8.0.1641", //Download Template
-                "cd " + GamePath + "\\bin\\Debug\\netcoreapp3.1", //Go to the existing directory
+                "cd /d " + GamePath + "\\bin\\Debug\\netcoreapp3.1", //Go to the existing directory
                 "start " + GameName + ".exe"
             };
 

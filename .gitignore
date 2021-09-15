@@ -1,2 +1,4 @@
 ##bin/Debug/netcoreapp3.1/Content/*
+##bin/Release/netcoreapp3.1/Content/*
 Content/bin/DesktopGL/*
+FirstSetup.txt

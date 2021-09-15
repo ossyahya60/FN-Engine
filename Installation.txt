@@ -6,3 +6,5 @@ dotnet new --install MonoGame.Templates.CSharp::3.8.0.1641
 5- Clone the project from github:
 https://github.com/ossyahya60/FN-Engine.git
 6- Anti-virus may interfere with the process of the engine, so try exclude the Engine.exe from the anti-virus.
+7- Engine can run in release mode, just don't forget to supply the missing files from the release bin folder (get them from the debug folder)
+8- If you want to run the game in release mode, copy the content folder from the debug bin to the release one.

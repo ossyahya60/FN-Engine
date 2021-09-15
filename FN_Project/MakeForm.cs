@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.IO;
 
@@ -24,12 +23,12 @@ namespace FN_Engine.FN_Project
                         if (Directory.GetFiles(fbd.SelectedPath).Length == 0 && Directory.GetDirectories(fbd.SelectedPath).Length == 0) // Make New Project
                         {
                             VisualizeEngineStartup.MakeNewProject(fbd.SelectedPath);
-                            FN_Editor.ContentWindow.LogText.Add("Project created successfully!");
+                            Utility.Log("Project created successfully!");
                         }
                         else
                         {
                             VisualizeEngineStartup.OpenExistingProject(fbd.SelectedPath);
-                            FN_Editor.ContentWindow.LogText.Add("Project opened successfully!");
+                            Utility.Log("Project opened successfully!");
                         }
 
                         GamePath = fbd.SelectedPath;

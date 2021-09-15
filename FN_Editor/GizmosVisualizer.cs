@@ -229,7 +229,10 @@ namespace FN_Engine.FN_Editor
                 GameObject prefab = ContentWindow.DraggedAsset as GameObject;
                 GameObject Instance = GameObject.Instantiate(prefab);
                 Instance.Transform.Position = Input.GetMousePosition() + Setup.Camera.Position - ResolutionIndependentRenderer.GetVirtualRes() * 0.5f - new Microsoft.Xna.Framework.Vector2(GameObjects_Tab.MyRegion[1].X + GameObjects_Tab.MyRegion[0].X, 0);
-                
+
+                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(Instance, Operation.Create));
+                GameObjects_Tab.Redo_Buffer.Clear();
+
                 ImGui.EndDragDropTarget();
             }
 

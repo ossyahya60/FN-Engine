@@ -47,10 +47,10 @@ namespace FN_Engine
                 CircleCollider TempCollider = collider as CircleCollider;
                 var ThisCollider = GetDynamicCollider();
 
-                if (MathCompanion.Abs(ThisCollider.Center.X - TempCollider.Center.X) > TempCollider.Radius + ThisCollider.Width / 2)
+                if (MathCompanion.Abs(ThisCollider.Center.X - (TempCollider.Center.X + TempCollider.gameObject.Transform.Position.X)) > TempCollider.Radius + ThisCollider.Width / 2)
                     return false;
 
-                if (MathCompanion.Abs(ThisCollider.Center.Y - TempCollider.Center.Y) > TempCollider.Radius + ThisCollider.Height / 2)
+                if (MathCompanion.Abs(ThisCollider.Center.Y - (TempCollider.Center.Y + TempCollider.gameObject.Transform.Position.Y)) > TempCollider.Radius + ThisCollider.Height / 2)
                     return false;
             }
 
@@ -126,7 +126,7 @@ namespace FN_Engine
 
             foreach (Collider2D CD in CDs)
             {
-                if (!gameObject.Name.Equals((CD as GameObjectComponent).gameObject.Name) && CD.CollisionDetection(this, false))
+                if (!gameObject.Name.Equals((CD as GameObjectComponent).gameObject.Name) && !CD.IsTrigger() && CD.CollisionDetection(this, false))
                 {
                     YourRigidBody.gameObject.Transform.Position = OldPos;
                     YourRigidBody.Velocity = Vector2.Zero;
