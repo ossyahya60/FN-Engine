@@ -112,7 +112,7 @@ namespace FN_Engine
         void Collider2D.Visualize(float X_Bias, float Y_Bias)
         {
             if (Enabled)
-                HitBoxDebuger.DrawCircle(Center + gameObject.Transform.Position + new Vector2(X_Bias, Y_Bias), Radius);
+                HitBoxDebuger.DrawCircleNonFilled(Center + gameObject.Transform.Position + new Vector2(X_Bias, Y_Bias), Radius, (int)(Radius * 0.9f), Color.Yellow, -0.1f, gameObject.Transform.Scale.X);
         }
 
         public override GameObjectComponent DeepCopy(GameObject Clone)

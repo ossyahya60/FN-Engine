@@ -16,6 +16,8 @@ namespace FN_Engine
         Camera2D Camera;
         ////////<Variables>/////
         public static SpriteFont spriteFont;
+
+        private Vector2 PrevRes = Vector2.Zero;
         ////////////////////////
 
         public Main()
@@ -66,18 +68,24 @@ namespace FN_Engine
             ResolutionIndependentRenderer.SetVirtualResolution(1366, 768);
             ResolutionIndependentRenderer.SetResolution(1366, 768, false);
 
+            PrevRes = new Vector2(1366, 768);
+
             Exiting += SerializeBeforeExit;
             AppDomain.CurrentDomain.UnhandledException += CleanUp;
-            //Window.ClientSizeChanged += ScreenSizeChanged;
+            Window.ClientSizeChanged += ScreenSizeChanged;
         }
 
-        //private void ScreenSizeChanged(object sender, EventArgs args)
-        //{
-        //    Setup.graphics.PreferredBackBufferWidth = Setup.GameWindow.ClientBounds.Width;
-        //    Setup.graphics.PreferredBackBufferHeight = Setup.GameWindow.ClientBounds.Height;
-        //    Setup.graphics.ApplyChanges();
-        //    ResolutionIndependentRenderer.Init(ref graphics);
-        //}
+        private void ScreenSizeChanged(object sender, EventArgs args)
+        {
+            ResolutionIndependentRenderer.SetResolution(Setup.GameWindow.ClientBounds.Width, Setup.GameWindow.ClientBounds.Height, false);
+            ResolutionIndependentRenderer.SetVirtualResolution(Setup.GameWindow.ClientBounds.Width, Setup.GameWindow.ClientBounds.Height);
+            //ResolutionIndependentRenderer.Init(ref graphics);
+
+            Scene.ImGUI_RenderTarget = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+            Light.RenderTarget2D = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+            Light.ShadowMap = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None); //Depth is not needed
+            SceneManager.SceneTexPtr = Scene.GuiRenderer.BindTexture(Light.RenderTarget2D);
+        }
 
         private void SerializeBeforeExit(object sender, EventArgs args)
         {
@@ -180,15 +188,18 @@ namespace FN_Engine
 
             ///////////////////////////////////////
             if (Input.GetKey(Keys.Z, KeyboardFlags.SHIFT))
-                Camera.Zoom += (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
+                Camera.Zoom += (float)gameTime.ElapsedGameTime.TotalSeconds;
             else if (Input.GetKey(Keys.X, KeyboardFlags.SHIFT))
-                Camera.Zoom -= (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
+                Camera.Zoom -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             //passing a property as a refrence using delegates
             //Arrow.GetComponent<PropertiesAnimator>().GetKeyFrame("Rotate360").GetFeedback(value => Arrow.Transform.Rotation = value);
 
             if (Input.GetKeyUp(Keys.O, KeyboardFlags.CTRL))
                 SceneManager.SerializeScene("Scenes\\DefaultScene");
+
+            if (Input.GetMouseClickUp(MouseButtons.MouseWheelClick))
+                Setup.Camera.Zoom = 1;
 
             if (Input.GetKeyUp(Keys.R, KeyboardFlags.CTRL))
                 SceneManager.LoadScene_Serialization("Scenes\\DefaultScene");

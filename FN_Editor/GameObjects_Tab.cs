@@ -39,7 +39,6 @@ namespace FN_Engine.FN_Editor
         {
             //Debug
             //FPS
-            ImGui.Text(MediaSource.Song == null ? "Not PLaying" : MediaSource.Song.Position.ToString());
             ImGui.Text("FPS: " + Math.Ceiling(ImGui.GetIO().Framerate).ToString());
             ImGui.Text("Undo Buffer Count: " + Undo_Buffer.Count.ToString());
             ImGui.Text("Redo Buffer Count: " + Redo_Buffer.Count.ToString());
@@ -54,22 +53,6 @@ namespace FN_Engine.FN_Editor
             ImGui.Begin("Scene Window");
             ImGui.TextColored(new Vector4(0, 1, 0, 1), SceneManager.ActiveScene.Name);
             ImGui.Separator();
-
-            ///
-            if (EditorScene.AutoConfigureWindows && MyRegion[1].Y != 0)
-            {
-                float DeltaSize = MyRegion[1].Y - ImGui.GetWindowSize().Y;
-
-                if (DeltaSize != 0)
-                {
-                    ImGui.SetWindowSize("Content Manager", ContentWindow.MyRegion[1] + new Vector2(0, DeltaSize));
-                    ImGui.SetWindowPos("Content Manager", ContentWindow.MyRegion[0] - new Vector2(0, DeltaSize));
-                }
-            }
-
-            MyRegion[0] = ImGui.GetWindowPos();
-            MyRegion[1] = ImGui.GetWindowSize();
-            ///
 
             //ImGui.Indent();
 
@@ -632,7 +615,7 @@ namespace FN_Engine.FN_Editor
 
                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                     if (ImGui.IsItemClicked())
-                        Setup.Camera.Position = GO.Transform.Position + (MyRegion[1].X + MyRegion[0].X) * Microsoft.Xna.Framework.Vector2.UnitX;
+                        Setup.Camera.Position = GO.Transform.Position + new Microsoft.Xna.Framework.Vector2(-GizmosVisualizer.SceneWindow.Z * 0.5f + Setup.graphics.PreferredBackBufferWidth * 0.5f, -GizmosVisualizer.SceneWindow.W * 0.5f + Setup.graphics.PreferredBackBufferHeight * 0.5f);
 
                 //Accept Drag and Drop
                 if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.SourceNoDisableHover))
@@ -856,7 +839,7 @@ namespace FN_Engine.FN_Editor
                 if (Open)
                     TreeRecursive(GO.Children[i], false);
             }
-
+            
             if (Open)
                 ImGui.TreePop();
 

@@ -47,15 +47,18 @@ namespace FN_Engine
                 ActiveClip = AM;
         }
 
-        public void Play(string Name)
+        public void Play(string Name, bool Overwrite = true)
         {
             foreach (Animation Anim in AnimationClips)
+            {
                 if (Anim.Name == Name)
                 {
                     Anim.SR = SR;
-                    Anim.Play();
+                    if(Overwrite || ActiveClip != Anim || Anim.Paused)
+                        Anim.Play();
                     ActiveClip = Anim;
                 }
+            }
         }
 
         public override void Update(GameTime gameTime)

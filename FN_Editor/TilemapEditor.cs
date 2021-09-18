@@ -59,7 +59,7 @@ namespace FN_Engine.FN_Editor
         {
             if(IsWindowOpen)
             {
-                ImGui.Begin("Tilemap Editor", ImGuiWindowFlags.AlwaysAutoResize);
+                ImGui.Begin("Tilemap Editor");
 
                 if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.D))
                     ActiveTool = Tools.Delete;

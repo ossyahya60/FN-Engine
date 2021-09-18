@@ -13,6 +13,8 @@ namespace FN_Engine
         public static ImGUI.ImGuiRenderer GuiRenderer { private set; get; } = null; //This is the ImGuiRenderer
         public static bool IsSceneBeingLoaded = false;
 
+        internal static RenderTarget2D ImGUI_RenderTarget = null;
+
         public bool ShouldSort = false; //Should be sorted every frame?
         public bool Active = true;
         public string Name;
@@ -20,9 +22,7 @@ namespace FN_Engine
 
         internal List<Rigidbody2D> Rigidbody2Ds;
 
-        private static RenderTarget2D ImGUI_RenderTarget = null;
-
-        private ImFontPtr LoadedFont;
+        //private ImFontPtr LoadedFont;
 
         public Scene(string name)
         {
@@ -116,7 +116,6 @@ namespace FN_Engine
             if (GuiRenderer == null)
             {
                 GuiRenderer = new ImGUI.ImGuiRenderer(Setup.Game);
-                LoadedFont = ImGui.GetIO().Fonts.AddFontFromFileTTF("Roboto-Regular.ttf", 15);
                 GuiRenderer.RebuildFontAtlas();
             }
 
@@ -136,7 +135,7 @@ namespace FN_Engine
             if (GuiRenderer == null)
             {
                 GuiRenderer = new ImGUI.ImGuiRenderer(Setup.Game);
-                LoadedFont = ImGui.GetIO().Fonts.AddFontFromFileTTF("Roboto-Regular.ttf", 15);
+                //LoadedFont = ImGui.GetIO().Fonts.AddFontFromFileTTF("Roboto-Regular.ttf", 15);
                 GuiRenderer.RebuildFontAtlas();
             }
 
@@ -233,20 +232,29 @@ namespace FN_Engine
             Setup.GraphicsDevice.SetRenderTarget(ImGUI_RenderTarget);
             Setup.GraphicsDevice.Clear(Color.Transparent);
 
+            ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+
             GuiRenderer.BeforeLayout(gameTime); // Must be called prior to calling any ImGui controls
 
-            ImGui.PushFont(LoadedFont);
+            //ImGui.PushFont(LoadedFont);
             ImGui.GetIO().ConfigWindowsResizeFromEdges = true;
             ImGui.GetStyle().FrameRounding = 12;
             //ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 2);
 
             int Count = GameObjects.Count - 1;
 
+            ImGui.DockSpaceOverViewport();
+
             if (Active)
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].DrawUI();
 
-            if(FN_Editor.EditorScene.IsThisTheEditor && Input.GetMouseClickUp(MouseButtons.LeftClick))
+            ImGuiNET.ImGui.Begin("Scene", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+            ImGuiNET.ImGui.Image(SceneManager.SceneTexPtr, new System.Numerics.Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight));
+            FN_Editor.GizmosVisualizer.DrawGizmos();
+            ImGuiNET.ImGui.End();
+
+            if (FN_Editor.EditorScene.IsThisTheEditor && Input.GetMouseClickUp(MouseButtons.LeftClick))
             {
                 FN_Editor.GameObjects_Tab.DraggedGO = null;
                 FN_Editor.ContentWindow.DraggedAsset = null;
@@ -254,7 +262,7 @@ namespace FN_Engine
             }
 
             //ImGui.PopStyleVar();
-            ImGui.PopFont();
+            //ImGui.PopFont();
 
             GuiRenderer.AfterLayout(); // Must be called after ImGui control calls
             Setup.GraphicsDevice.SetRenderTarget(null);

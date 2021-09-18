@@ -15,6 +15,7 @@ namespace FN_Engine
 
         internal static bool ShouldUpdate = true;
         internal static string LastLoadPath = "";
+        internal static IntPtr SceneTexPtr = IntPtr.Zero;
 
         private static Scene SceneToBeLoaded = null;
         private static bool FirstTimeLoading = true;
@@ -135,20 +136,6 @@ namespace FN_Engine
 
         public static void Update(GameTime gameTime)
         {
-            //if (!Setup.Game.IsActive) //Pause Game when minimized
-            //return;
-
-            if (Input.GetKey(Keys.RightAlt) && Input.GetKeyUp(Keys.Enter))
-            {
-                Setup.graphics.ToggleFullScreen();
-            }
-
-            /////////Resolution related//////////// -> Mandatory
-            //if (Resolution != new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight))
-                //ResolutionIndependentRenderer.Init(ref Setup.graphics);
-
-            //Resolution = new Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
-
             // I moved this here, because Update rate is not the same as draw rate, so Input is not synchronized well
             ActiveScene.DrawUI(gameTime); //Draw UI
 

@@ -12,11 +12,12 @@ namespace FN_Engine
     {
         public static bool CastShadows_Global = true;
 
+        internal static RenderTarget2D RenderTarget2D;
+        internal static RenderTarget2D ShadowMap;
+
         private static bool ShaderLoaded = false;
         private static int MAX_LIGHT_COUNT = 15;
-        private static RenderTarget2D RenderTarget2D;
         private static Effect LightEffect;
-        private static RenderTarget2D ShadowMap;
         private static List<LineOccluder> HandyList;
         private static List<Vector2> Points;
         private static List<Vector2> PointsTriangle;
@@ -80,6 +81,7 @@ namespace FN_Engine
                 Points = new List<Vector2>();
                 HandyList = new List<LineOccluder>();
                 RenderTarget2D = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+                SceneManager.SceneTexPtr = Scene.GuiRenderer.BindTexture(RenderTarget2D);
                 //LIGHTS = new List<Light>();
                 LightEffect = Setup.Content.Load<Effect>("LightTest");
                 ShaderLoaded = true;
@@ -112,7 +114,10 @@ namespace FN_Engine
             YOVERX = (float)Setup.graphics.PreferredBackBufferHeight / Setup.graphics.PreferredBackBufferWidth;
 
             if (RenderTarget2D == null)
+            {
                 RenderTarget2D = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+                SceneManager.SceneTexPtr = Scene.GuiRenderer.BindTexture(RenderTarget2D);
+            }
 
             Setup.GraphicsDevice.SetRenderTarget(RenderTarget2D); //Render Target
         }
@@ -128,9 +133,9 @@ namespace FN_Engine
             if (LIGHTS == null || LIGHTS.Length == 0)
             {
                 Setup.GraphicsDevice.SetRenderTarget(null);
-                Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix());
-                Setup.spriteBatch.Draw(RenderTarget2D, BiasScene.Location.ToVector2(), new Rectangle(Point.Zero, BiasScene.Size), Color.White);
-                Setup.spriteBatch.End();
+                //Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix());
+                //Setup.spriteBatch.Draw(RenderTarget2D, BiasScene.Location.ToVector2(), new Rectangle(Point.Zero, BiasScene.Size), Color.White);
+                //Setup.spriteBatch.End();
 
                 return;
             }
@@ -297,9 +302,9 @@ namespace FN_Engine
             ShadowConstant_param.SetValue(ShadowIntensity);
 
             Setup.GraphicsDevice.SetRenderTarget(null);
-            Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightEffect, Setup.Camera.GetViewTransformationMatrix());
-            Setup.spriteBatch.Draw(RenderTarget2D, BiasScene.Location.ToVector2(), new Rectangle(Point.Zero, BiasScene.Size), Color.White);
-            Setup.spriteBatch.End();
+            //Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightEffect, Setup.Camera.GetViewTransformationMatrix());
+            //Setup.spriteBatch.Draw(RenderTarget2D, BiasScene.Location.ToVector2(), new Rectangle(Point.Zero, BiasScene.Size), Color.White);
+            //Setup.spriteBatch.End();
         }
 
         public override GameObjectComponent DeepCopy(GameObject Clone)

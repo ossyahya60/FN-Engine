@@ -57,7 +57,7 @@ namespace FN_Engine.FN_Editor
 
                 ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 2);
                 ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 1));                
-                ImGui.Begin("Animation Editor", ImGuiWindowFlags.AlwaysAutoResize);
+                ImGui.Begin("Animation Editor");
 
                 if (ImGui.Button("New Animation"))
                 {
@@ -262,7 +262,7 @@ namespace FN_Engine.FN_Editor
 
                     if (AnimationClips[SelectedClip].Frames.Count != 0)
                     {
-                        ImGui.BeginChild("Frames", new Vector2(Math.Clamp(AnimationClips[SelectedClip].Frames.Count * 80, 0, 5 * 80), 84), false, AnimationClips[SelectedClip].Frames.Count > 5 ? ImGuiWindowFlags.AlwaysHorizontalScrollbar : ImGuiWindowFlags.None);
+                        ImGui.BeginChild("Frames", Vector2.Zero, false, ImGuiWindowFlags.HorizontalScrollbar);
 
                         for (int i = 0; i < AnimationClips[SelectedClip].Frames.Count; i++)
                         {

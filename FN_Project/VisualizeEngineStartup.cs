@@ -55,9 +55,9 @@ namespace FN_Engine.FN_Project
             string EngineDir = Environment.CurrentDirectory.Substring(0, Environment.CurrentDirectory.LastIndexOf("\\bin"));
             if(!File.Exists(EngineDir + "\\FirstSetup.txt"))
             {
-                File.Create(EngineDir + "\\FirstSetup.txt");
                 DownloadPrerequisites();
-            }    
+                File.Create(EngineDir + "\\FirstSetup.txt");
+            }
 
             string[] MakeDesktopGLProj = new string[]
             {

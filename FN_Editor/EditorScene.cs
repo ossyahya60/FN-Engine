@@ -25,10 +25,13 @@ namespace FN_Engine.FN_Editor
             ImGui.GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
             if (ImGui.IsMouseDragging(ImGuiMouseButton.Right))
-                Setup.Camera.Move(-Input.MouseDelta(), ImGui.GetIO().DeltaTime * 60);
+                Setup.Camera.Move(-Input.MouseDelta(), ImGui.GetIO().DeltaTime * 60 / Setup.Camera.Zoom);
 
             if (ImGui.GetIO().KeyCtrl && Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.S)) //Save scene
                 SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
+
+            if (ImGui.GetIO().KeyCtrl && Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.G)) //Show Gizmos
+                GizmosVisualizer.ShowGizmos = !GizmosVisualizer.ShowGizmos;
 
             if (ImGui.GetIO().KeyCtrl && Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.L)) //Launch game
             {
@@ -149,7 +152,8 @@ namespace FN_Engine.FN_Editor
                         Threader.Invoke(FN_Project.VisualizeEngineStartup.RunExecutable, 0);
                     }
 
-                    ImGui.Checkbox("Auto Config Windows", ref AutoConfigureWindows);
+                    if (ImGui.MenuItem("Open Sln"))
+                        Utility.ExecuteCommand(new string[] {"start " + FN_Project.VisualizeEngineStartup.GamePath + "\\" + FN_Project.VisualizeEngineStartup.GamePath.Substring(FN_Project.VisualizeEngineStartup.GamePath.LastIndexOf("\\") + 1) + ".sln" }, FN_Project.VisualizeEngineStartup.GamePath);
 
                     ImGui.EndMenu();
                 }
@@ -161,6 +165,14 @@ namespace FN_Engine.FN_Editor
 
                     if (ImGui.MenuItem("TileMap Editor"))
                         TilemapEditor.IsWindowOpen = true;
+
+                    ImGui.EndMenu();
+                }
+
+                if (ImGui.BeginMenu("Config"))
+                {
+                    ImGui.Checkbox("Show Gizmos (CTRL + G)", ref GizmosVisualizer.ShowGizmos);
+                    ImGui.Checkbox("Auto Config Windows", ref AutoConfigureWindows);
 
                     ImGui.EndMenu();
                 }

@@ -23,7 +23,7 @@ namespace FN_Engine
         static private int _VWidth = 1024;
         static private int _VHeight = 768;
         static private Matrix _ScaleMatrix;
-        static private bool _FullScreen = false;
+        static internal bool _FullScreen = false;
         static private bool _dirtyMatrix = true;
 
         static public void Init(ref GraphicsDeviceManager device)

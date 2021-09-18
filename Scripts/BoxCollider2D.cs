@@ -183,7 +183,7 @@ namespace FN_Engine
                 var DynCollid = GetDynamicCollider();
                 DynCollid.Offset(new Point((int)X_Bias, (int)Y_Bias));
 
-                HitBoxDebuger.DrawNonFilledRectangle_Effect(DynCollid);
+                HitBoxDebuger.DrawNonFilledRectangle(DynCollid);
             }
         }
 

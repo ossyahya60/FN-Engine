@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace FN_Engine.FN_Editor
 {
-    internal class ContentWindow: GameObjectComponent
+    internal class ContentWindow : GameObjectComponent
     {
         internal class SpriteEditorInfo
         {
@@ -131,7 +131,7 @@ namespace FN_Engine.FN_Editor
                     if (TexRegex.IsMatch(AssetName) || MusicRegex.IsMatch(AssetName) || ShaderRegex.IsMatch(AssetName))
                     {
                         try { File.Copy(Item, GameContentPath + "\\" + AssetName, true); }
-                        catch (Exception E){ Utility.Log(E.Message); } //Log error here!
+                        catch (Exception E) { Utility.Log(E.Message); } //Log error here!
                     }
                     else
                         continue;
@@ -158,953 +158,932 @@ namespace FN_Engine.FN_Editor
 
         public override void DrawUI()
         {
-            ImGui.Begin("Content Manager");
+            if (ImGui.Begin("Log"))
+                for (int i = 0; i < Utility.LogText.Count; i++)
+                    ImGui.TextWrapped("=> " + Utility.LogText[i]);
+            ImGui.End();
 
-            if (ImGui.BeginTabBar("Content Tab"))
+            if (ImGui.Begin("Content Manager"))
             {
                 ImGui.BeginGroup();
-                if (ImGui.BeginTabItem("Content"))
+                ///
+
+                //Update ContentWindow when there is a change in the directory
+                //if (Directory.GetLastWriteTime(GameContentPath).CompareTo(StartingDate) > 0)
+                //{
+                //    StartingDate = Directory.GetLastWriteTime(GameContentPath);
+                //    DirectoryChanged = true;
+                //}
+
+                // Back Button
+                //ImGui.PushStyleColor(ImGuiCol.Border, 1);
+                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                if (ImGui.ArrowButton("Back", ImGuiDir.Left))
                 {
-                    ///
-                    if (EditorScene.AutoConfigureWindows)
+                    if (!GameContentPath.Equals(Directory.GetCurrentDirectory()))
                     {
-                        if (MyRegion[1].X != 0)
-                        {
-                            float DeltaSize = MyRegion[1].X - ImGui.GetWindowSize().X;
-
-                            if (DeltaSize != 0)
-                            {
-                                ImGui.SetWindowSize("Inspector", InspectorWindow.MyRegion[1] + new Vector2(DeltaSize, 0));
-                                ImGui.SetWindowPos("Inspector", InspectorWindow.MyRegion[0] - new Vector2(DeltaSize, 0));
-                            }
-                        }
-
-                        if (MyRegion[1].Y != 0)
-                        {
-                            float DeltaSize = MyRegion[1].Y - ImGui.GetWindowSize().Y;
-
-                            if (DeltaSize != 0)
-                                ImGui.SetWindowSize(SceneManager.ActiveScene.Name, GameObjects_Tab.MyRegion[1] + new Vector2(0, DeltaSize));
-                        }
+                        string[] GCP = GameContentPath.Split('\\');
+                        GameContentPath = GameContentPath.Remove(GameContentPath.Length - GCP[GCP.Length - 1].Length - 1, GCP[GCP.Length - 1].Length + 1);
+                        DirectoryChanged = true;
                     }
+                }
+                ImGui.SameLine(0, 15);
 
-                    MyRegion[0] = ImGui.GetWindowPos();
-                    MyRegion[1] = ImGui.GetWindowSize();
-                    ///
+                //New Folder
+                if (ImGui.Button("New Folder"))
+                    ImGui.OpenPopup("NewFolder");
 
-                    //Update ContentWindow when there is a change in the directory
-                    //if (Directory.GetLastWriteTime(GameContentPath).CompareTo(StartingDate) > 0)
-                    //{
-                    //    StartingDate = Directory.GetLastWriteTime(GameContentPath);
-                    //    DirectoryChanged = true;
-                    //}
+                ImGui.SameLine(0, 15);
 
-                    // Back Button
-                    //ImGui.PushStyleColor(ImGuiCol.Border, 1);
-                    ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
-                    if (ImGui.ArrowButton("Back", ImGuiDir.Left))
-                    {
-                        if (!GameContentPath.Equals(Directory.GetCurrentDirectory()))
-                        {
-                            string[] GCP = GameContentPath.Split('\\');
-                            GameContentPath = GameContentPath.Remove(GameContentPath.Length - GCP[GCP.Length - 1].Length - 1, GCP[GCP.Length - 1].Length + 1);
-                            DirectoryChanged = true;
-                        }
-                    }
-                    ImGui.SameLine(0, 15);
+                if (ImGui.Button("Paste Clipboard"))
+                    PasteFromClipboard();
 
-                    //New Folder
-                    if (ImGui.Button("New Folder"))
-                        ImGui.OpenPopup("NewFolder");
+                ImGui.PopStyleColor();
 
-                    ImGui.SameLine(0, 15);
-
-                    if (ImGui.Button("Paste Clipboard"))
+                if (ImGui.GetIO().KeyCtrl && ImGui.IsWindowFocused())
+                    if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.V))) //Copy
                         PasteFromClipboard();
 
-                    ImGui.PopStyleColor();
-
-                    if (ImGui.GetIO().KeyCtrl && ImGui.IsWindowFocused())
-                        if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.V))) //Copy
-                            PasteFromClipboard();
-
-                    if (ImGui.BeginPopup("NewFolder"))
+                if (ImGui.BeginPopup("NewFolder"))
+                {
+                    string NameBuffer = "New Folder";
+                    ImGui.Text("Enter Name: ");
+                    ImGui.InputText("Folder Name", ref NameBuffer, 50, ImGuiInputTextFlags.AutoSelectAll);
+                    if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Enter)))
                     {
-                        string NameBuffer = "New Folder";
-                        ImGui.Text("Enter Name: ");
-                        ImGui.InputText("Folder Name", ref NameBuffer, 50, ImGuiInputTextFlags.AutoSelectAll);
-                        if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Enter)))
-                        {
-                            if (NameBuffer.Replace(" ", "").Length > 0)
-                                if (!Directory.Exists(GameContentPath + "\\" + NameBuffer))
-                                    Directory.CreateDirectory(GameContentPath + "\\" + NameBuffer);
+                        if (NameBuffer.Replace(" ", "").Length > 0)
+                            if (!Directory.Exists(GameContentPath + "\\" + NameBuffer))
+                                Directory.CreateDirectory(GameContentPath + "\\" + NameBuffer);
 
-                            ImGui.CloseCurrentPopup();
-                        }
-
-                        ImGui.EndPopup();
+                        ImGui.CloseCurrentPopup();
                     }
 
-                    if (DirectoryChanged)
+                    ImGui.EndPopup();
+                }
+
+                if (DirectoryChanged)
+                {
+                    TexPtrs.Clear(); //?
+                    TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\FolderIcon")));
+                    TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\MusicIcon")));
+                    TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\ShaderIcon")));
+                    TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\Logo")));
+                }
+
+                int Enumerator = 4;
+
+                ImGui.BeginChild("Assets");
+
+                //Folders
+                bool Entered = false;
+                int ID_F = 0;
+                foreach (string Dir in Directory.GetDirectories(GameContentPath))
+                {
+                    Entered = true;
+
+                    ImGui.BeginGroup();
+                    ImGui.PushID(ID_F++);
+                    ImGui.PushStyleColor(ImGuiCol.Button, 0);
+                    if (ImGui.ImageButton(TexPtrs[0], new Vector2(64.0f, 64.0f), Vector2.Zero, Vector2.One, 0, Vector4.Zero))
                     {
-                        TexPtrs.Clear(); //?
-                        TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\FolderIcon")));
-                        TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\MusicIcon")));
-                        TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\ShaderIcon")));
-                        TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>("Icons\\Logo")));
-                    }
-
-                    int Enumerator = 4;
-
-                    ImGui.BeginChild("Assets");
-
-                    //Folders
-                    bool Entered = false;
-                    int ID_F = 0;
-                    foreach (string Dir in Directory.GetDirectories(GameContentPath))
-                    {
-                        Entered = true;
-
-                        ImGui.BeginGroup();
-                        ImGui.PushID(ID_F++);
-                        ImGui.PushStyleColor(ImGuiCol.Button, 0);
-                        if (ImGui.ImageButton(TexPtrs[0], new Vector2(64.0f, 64.0f), Vector2.Zero, Vector2.One, 0, Vector4.Zero))
-                        {
-                            GameContentPath = Dir;
-                            DirectoryChanged = true;
-                            return;
-                        }
+                        GameContentPath = Dir;
+                        DirectoryChanged = true;
                         ImGui.PopStyleColor();
                         ImGui.PopID();
-                        ImGui.PushTextWrapPos(ImGui.GetItemRectMin().X + 64);
-                        ImGui.Text(Dir.Remove(0, GameContentPath.Length + 1));
-                        ImGui.PopTextWrapPos();
                         ImGui.EndGroup();
-
-                        if (ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X)
-                            ImGui.SameLine();
+                        ImGui.EndChild();
+                        ImGui.EndGroup();
+                        ImGui.End();
+                        return;
                     }
+                    ImGui.PopStyleColor();
+                    ImGui.PopID();
+                    ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + 64);
+                    ImGui.Text(Dir.Remove(0, GameContentPath.Length + 1));
+                    ImGui.PopTextWrapPos();
+                    ImGui.EndGroup();
 
-                    if (Entered)
+                    if (ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X)
+                        ImGui.SameLine();
+                }
+
+                if (Entered)
+                {
+                    ImGui.NewLine();
+                    ImGui.Separator();
+                    ImGui.NewLine();
+                }
+
+                //Assets
+                ImGui.BeginChild("Files", Vector2.Zero, false);
+
+                string[] Files = Directory.GetFiles(GameContentPath);
+
+                Files = Directory.GetFiles(GameContentPath);
+                ID_F = 0;
+
+                if (Files != null)
+                {
+                    for (int i = 0; i < Files.Length; i++)
                     {
-                        ImGui.NewLine();
-                        ImGui.Separator();
-                        ImGui.NewLine();
-                    }
+                        if (NotLoadedAssets.Contains(Files[i]))
+                            continue;
 
-                    //Assets
-                    ImGui.BeginChild("Files", new Vector2(ImGui.GetWindowSize().X * 0.98f, 100), false, ImGuiWindowFlags.HorizontalScrollbar);
+                        string[] AssetPath = Files[i].Split('\\');
+                        string AssetName = AssetPath[AssetPath.Length - 1];
 
-                    string[] Files = Directory.GetFiles(GameContentPath);
+                        //string[] AssetLoadNameComposite = Files[i].Remove(0, ContentFolderDirectory.Length + 1).Split('.');
+                        //string AssetLoadName = AssetLoadNameComposite[AssetLoadNameComposite.Length - 2];
 
-                    Files = Directory.GetFiles(GameContentPath);
-                    ID_F = 0;
+                        string AssPath = Files[i].Remove(0, ContentFolderDirectory.Length + 1);
+                        int idx = AssPath.LastIndexOf('.');
+                        string AssetLoadName = AssPath.Substring(0, idx);
 
-                    if (Files != null)
-                    {
-                        for (int i = 0; i < Files.Length; i++)
+                        if (TexRegex.IsMatch(AssetName)) //Found a texture
                         {
-                            if (NotLoadedAssets.Contains(Files[i]))
+                            try
+                            {
+                                if (DirectoryChanged) //Rebuild content
+                                    TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>(AssetLoadName)));
+                            }
+                            catch (Microsoft.Xna.Framework.Content.ContentLoadException)
+                            {
+                                NotLoadedAssets.Add(Files[i]);
+                                continue;
+                            }
+
+                            if (TexPtrs.Count <= Enumerator)
                                 continue;
 
-                            string[] AssetPath = Files[i].Split('\\');
-                            string AssetName = AssetPath[AssetPath.Length - 1];
-
-                            //string[] AssetLoadNameComposite = Files[i].Remove(0, ContentFolderDirectory.Length + 1).Split('.');
-                            //string AssetLoadName = AssetLoadNameComposite[AssetLoadNameComposite.Length - 2];
-
-                            string AssPath = Files[i].Remove(0, ContentFolderDirectory.Length + 1);
-                            int idx = AssPath.LastIndexOf('.');
-                            string AssetLoadName = AssPath.Substring(0, idx);
-
-                            if (TexRegex.IsMatch(AssetName)) //Found a texture
+                            IntPtr ID = TexPtrs[Enumerator++];
+                            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                            if (ImGui.ImageButton(ID, new Vector2(64.0f, 64.0f)))
                             {
-                                try
-                                {
-                                    if (DirectoryChanged) //Rebuild content
-                                        TexPtrs.Add(Scene.GuiRenderer.BindTexture(Setup.Content.Load<Texture2D>(AssetLoadName)));
-                                }
-                                catch (Microsoft.Xna.Framework.Content.ContentLoadException)
-                                {
-                                    NotLoadedAssets.Add(Files[i]);
-                                    continue;
-                                }
-
-                                if (TexPtrs.Count <= Enumerator)
-                                    continue;
-
-                                IntPtr ID = TexPtrs[Enumerator++];
-                                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
-                                if (ImGui.ImageButton(ID, new Vector2(64.0f, 64.0f)))
-                                {
-                                    //ImGui.OpenPopup("AssetName");
-                                    AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
-                                }
-                                ImGui.PopStyleColor();
-
-                                bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
-
-                                HelpMarker(AssetPath[AssetPath.Length - 1], false);
-
-                                //if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                                //    ImGui.OpenPopup("Rename File");
-
-                                // Dragging an asset
-                                if (ImGui.BeginDragDropSource())
-                                {
-                                    ImGui.SetDragDropPayload("Asset", IntPtr.Zero, 0);
-
-                                    DraggedAsset = AssetLoadName;
-
-                                    ImGui.EndDragDropSource();
-                                }
-
-                                if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                                {
-                                    ImGui.OpenPopup("Sprite Editor Props");
-                                    SelectedTexture = AssetLoadName;
-                                    SelTexIndex = Enumerator - 1;
-                                    IsSpriteEditorOpen = true;
-                                }
-
-                                ImGui.SameLine();
-
-                                if (SPIs.ContainsKey(AssetLoadName))
-                                {
-                                    ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
-                                    bool ArrButt = SPIs[AssetLoadName].IsSpriteSheet && ImGui.ArrowButton("ThisTex" + i.ToString(), SPIs[AssetLoadName].IsOpen);
-
-                                    if(SPIs[AssetLoadName].IsSpriteSheet && ImGui.BeginDragDropSource())
-                                    {
-                                        ImGui.SetDragDropPayload("Sliced Spritesheet", IntPtr.Zero, 0);
-
-                                        if (SPIs[AssetLoadName].IsSpriteSheet && SPIs[AssetLoadName].IsOpen == ImGuiDir.Left)
-                                            AnimationEditor.slicedTexs = new KeyValuePair<string, List<Microsoft.Xna.Framework.Rectangle>>(AssetLoadName, SlicedTexs);
-                                        else
-                                            AnimationEditor.slicedTexs = new KeyValuePair<string, List<Microsoft.Xna.Framework.Rectangle>>(null, null);
-
-                                        ImGui.EndDragDropSource();
-                                    }
-
-                                    if (ArrButt)
-                                    {
-                                        SelectedTexture = AssetLoadName;
-                                        SelTexIndex = Enumerator - 1;
-                                        if (SPIs[AssetLoadName].IsOpen == ImGuiDir.Left)
-                                            SPIs[AssetLoadName].IsOpen = ImGuiDir.Right;
-                                        else
-                                        {
-                                            SPIs[AssetLoadName].IsOpen = ImGuiDir.Left;
-
-                                            SlicedTexs.Clear();
-                                            Texture2D Tex = Setup.Content.Load<Texture2D>(SelectedTexture);
-                                            SpriteEditorInfo SPI = SPIs[SelectedTexture];
-
-                                            if (SPI.BySize)
-                                            {
-                                                SPI.SizeOrCount[0] = (int)Math.Clamp(SPI.SizeOrCount[0], Tex.Width / 30.0f, Tex.Width);
-                                                SPI.SizeOrCount[1] = (int)Math.Clamp(SPI.SizeOrCount[1], Tex.Height / 30.0f, Tex.Height);
-
-                                                for (int i2 = 0; i2 < Tex.Height; i2 += SPI.SizeOrCount[1])
-                                                {
-                                                    for (int j = 0; j < Tex.Width; j += SPI.SizeOrCount[0])
-                                                    {
-                                                        Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i2 != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
-                                                        Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
-                                                        Vector2 UV0 = new Vector2(j, i2) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
-                                                        Vector2 UV1 = new Vector2(j + SPI.SizeOrCount[0], i2 + SPI.SizeOrCount[1]) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
-
-                                                        Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)Math.Clamp((UV0.X * Tex.Width), 0, Tex.Width - 1), (int)Math.Clamp((UV0.Y * Tex.Height), 0, Tex.Height - 1), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
-                                                        Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1); //Bug here!
-                                                        Rect.Height = Math.Clamp(Rect.Height, 0, Tex.Height - Rect.Y - 1);
-                                                        Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[Rect.Width * Rect.Height];
-
-                                                        Tex.GetData(0, Rect, buffer, 0, Rect.Width * Rect.Height);
-
-                                                        Vector2 Min = new Vector2(int.MaxValue, int.MaxValue), Max = new Vector2(int.MinValue, int.MinValue);
-
-                                                        if (SPI.TrimSprite)
-                                                        {
-                                                            bool Empty = true;
-
-                                                            for (int i4 = 0; i4 < Rect.Height; i4++)
-                                                            {
-                                                                for (int j2 = 0; j2 < Rect.Width; j2++)
-                                                                {
-                                                                    if (buffer[i4 * Rect.Width + j2].A != 0)
-                                                                    {
-                                                                        Empty = false;
-
-                                                                        if (j2 < Min.X)
-                                                                            Min.X = j2;
-
-                                                                        if (i4 < Min.Y)
-                                                                            Min.Y = i4;
-
-                                                                        if (j2 > Max.X)
-                                                                            Max.X = j2;
-
-                                                                        if (i4 > Max.Y)
-                                                                            Max.Y = i4;
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            if (!Empty)
-                                                                SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)((UV0.X + Min.X / Tex.Width) * 10000), (int)((UV0.Y + Min.Y / Tex.Height) * 10000), (int)(Math.Abs((Max.X - Min.X + 1) / Rect.Width) * Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs((Max.Y - Min.Y + 1) / Rect.Height) * Math.Abs(UV1.Y - UV0.Y) * 10000)));
-                                                        }
-                                                        else if (!buffer.All(Item => Item.A == 0))
-                                                            SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * 10000), (int)(UV0.Y * 10000), (int)(Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs(UV1.Y - UV0.Y) * 10000)));
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                SPI.SizeOrCount[0] = Math.Clamp(SPI.SizeOrCount[0], 1, 32);
-                                                SPI.SizeOrCount[1] = Math.Clamp(SPI.SizeOrCount[1], 1, 32);
-                                                Vector2 ImageSize = new Vector2(1.0f / SPI.SizeOrCount[1], 1.0f / SPI.SizeOrCount[0]);
-
-                                                for (int i2 = 0; i2 < SPI.SizeOrCount[0]; i2++)
-                                                {
-                                                    for (int j = 0; j < SPI.SizeOrCount[1]; j++)
-                                                    {
-                                                        Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i2 != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
-                                                        Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
-                                                        Vector2 UV0 = new Vector2(j * ImageSize.X, i2 * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
-                                                        Vector2 UV1 = new Vector2((j + 1) * ImageSize.X, (i2 + 1) * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
-
-                                                        //Eliminating empty textures
-                                                        Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)Math.Clamp((UV0.X * Tex.Width), 0, Tex.Width), (int)Math.Clamp((UV0.Y * Tex.Height), 0, Tex.Height), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
-                                                        Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1);
-                                                        Rect.Height = Math.Clamp(Rect.Height, 0, Tex.Height - Rect.Y - 1);
-                                                        Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[Rect.Width * Rect.Height];
-
-                                                        Tex.GetData(0, Rect, buffer, 0, Rect.Width * Rect.Height);
-
-                                                        Vector2 Min = new Vector2(int.MaxValue, int.MaxValue), Max = new Vector2(int.MinValue, int.MinValue);
-
-                                                        if (SPI.TrimSprite)
-                                                        {
-                                                            bool Empty = true;
-
-                                                            for (int i4 = 0; i4 < Rect.Height; i4++)
-                                                            {
-                                                                for (int j2 = 0; j2 < Rect.Width; j2++)
-                                                                {
-                                                                    if (buffer[i4 * Rect.Width + j2].A != 0)
-                                                                    {
-                                                                        Empty = false;
-
-                                                                        if (j2 < Min.X)
-                                                                            Min.X = j2;
-
-                                                                        if (i4 < Min.Y)
-                                                                            Min.Y = i4;
-
-                                                                        if (j2 > Max.X)
-                                                                            Max.X = j2;
-
-                                                                        if (i4 > Max.Y)
-                                                                            Max.Y = i4;
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            if (!Empty)
-                                                                SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)((UV0.X + Min.X / Tex.Width) * 10000), (int)((UV0.Y + Min.Y / Tex.Height) * 10000), (int)(Math.Abs((Max.X - Min.X + 1) / Rect.Width) * Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs((Max.Y - Min.Y + 1) / Rect.Height) * Math.Abs(UV1.Y - UV0.Y) * 10000)));
-                                                        }
-                                                        else if (!buffer.All(Item => Item.A == 0))
-                                                            SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * 10000), (int)(UV0.Y * 10000), (int)(Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs(UV1.Y - UV0.Y) * 10000)));
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    ImGui.PopStyleColor();
-
-                                    if (SPIs[AssetLoadName].IsOpen == ImGuiDir.Left) //Texture pack is open
-                                    {
-                                        ImGui.SameLine();
-                                        ImGui.BeginChild(AssetLoadName, Vector2.Zero, true, ImGuiWindowFlags.NoMove | ImGuiWindowFlags.AlwaysHorizontalScrollbar);
-
-                                        Microsoft.Xna.Framework.Rectangle Rect = SlicedTexs[0];
-
-                                        for (int i3 = 0; i3 < SlicedTexs.Count; i3++)
-                                        {
-                                            bool EnteredButton2 = false;
-                                            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
-                                            ImGui.PushID(i3.ToString() + "Noice");
-                                            if (ImGui.ImageButton(TexPtrs[SelTexIndex], new Vector2(64 /** ((float)SlicedTexs[i3].Width / SlicedTexs[i3].Height)*/, 64), new Vector2(SlicedTexs[i3].X / 10000.0f, SlicedTexs[i3].Y / 10000.0f), new Vector2(SlicedTexs[i3].Right / 10000.0f, SlicedTexs[i3].Bottom / 10000.0f)))
-                                            {
-                                                ImGui.PopID();
-                                                EnteredButton2 = true;
-                                            }
-
-                                            // Dragging an asset
-                                            if (ImGui.BeginDragDropSource())
-                                            {
-                                                ImGui.SetDragDropPayload("Asset2", IntPtr.Zero, 0);
-                                                DraggedAsset = new KeyValuePair<string, Vector4>(AssetLoadName, new Vector4(SlicedTexs[i3].X, SlicedTexs[i3].Y, SlicedTexs[i3].Width, SlicedTexs[i3].Height));
-
-                                                ImGui.EndDragDropSource();
-                                            }
-
-                                            if (!EnteredButton2)
-                                                ImGui.PopID();
-
-                                            ImGui.PopStyleColor();
-
-                                            if (i3 != SlicedTexs.Count - 1)
-                                                ImGui.SameLine();
-                                        }
-
-                                        ImGui.EndChild();
-                                    }
-                                }
-
-                                if(Overflow)
-                                    ImGui.SameLine();
+                                //ImGui.OpenPopup("AssetName");
+                                AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
                             }
-                            else if (MusicRegex.IsMatch(AssetName)) //Found a song or a soundeffect
+                            ImGui.PopStyleColor();
+
+                            bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
+
+                            HelpMarker(AssetPath[AssetPath.Length - 1], false);
+
+                            //if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                            //    ImGui.OpenPopup("Rename File");
+
+                            // Dragging an asset
+                            if (ImGui.BeginDragDropSource())
                             {
-                                bool EnteredButton = false;
-                                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
-                                ImGui.PushID(ID_F++);
+                                ImGui.SetDragDropPayload("Asset", IntPtr.Zero, 0);
 
-                                if (ImGui.ImageButton(TexPtrs[1], new Vector2(64.0f, 64.0f)))
-                                {
-                                    EnteredButton = true;
-                                    ImGui.PopID();
+                                DraggedAsset = AssetLoadName;
 
-                                    AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
-                                }
-
-                                bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
-
-                                HelpMarker(AssetPath[AssetPath.Length - 1], false);
-
-                                // Dragging an asset
-                                if (ImGui.BeginDragDropSource())
-                                {
-                                    ImGui.SetDragDropPayload("Asset", IntPtr.Zero, 0);
-
-                                    DraggedAsset = AssetLoadName;
-
-                                    ImGui.EndDragDropSource();
-                                }
-
-                                if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
-                                    ImGui.PopID();
-
-                                ImGui.PopStyleColor();
-
-                                if(Overflow)
-                                    ImGui.SameLine();
+                                ImGui.EndDragDropSource();
                             }
-                            else if (ShaderRegex.IsMatch(AssetName)) // Found a shader
-                            {
-                                bool EnteredButton = false;
-                                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
-                                ImGui.PushID(ID_F++);
-
-                                if (ImGui.ImageButton(TexPtrs[2], new Vector2(64.0f, 64.0f)))
-                                {
-                                    EnteredButton = true;
-                                    ImGui.PopID();
-
-                                    AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
-                                }
-
-                                bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
-
-                                HelpMarker(AssetPath[AssetPath.Length - 1], false);
-
-                                // Dragging an asset
-                                if (ImGui.BeginDragDropSource())
-                                {
-                                    ImGui.SetDragDropPayload("Asset", IntPtr.Zero, 0);
-
-                                    DraggedAsset = AssetLoadName;
-
-                                    ImGui.EndDragDropSource();
-                                }
-
-                                if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
-                                    ImGui.PopID();
-
-                                ImGui.PopStyleColor();
-
-                                if (Overflow)
-                                    ImGui.SameLine();
-                            }
-                            else if (SceneRegex.IsMatch(AssetName)) // Found a shader
-                            {
-                                if (AssetLoadName.Contains("_Editor"))
-                                    continue;
-
-                                bool EnteredButton = false;
-                                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
-                                ImGui.PushID(ID_F++);
-
-                                if (ImGui.ImageButton(TexPtrs[3], new Vector2(64.0f, 64.0f)))
-                                {
-                                    EnteredButton = true;
-                                    ImGui.PopID();
-
-                                    AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
-                                }
-
-                                bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
-
-                                if (ImGui.IsItemHovered())
-                                {
-                                    if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                                    {
-                                        SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
-                                        SceneManager.LoadScene_Serialization(AssetLoadName);
-                                    }
-                                }
-
-                                HelpMarker(AssetPath[AssetPath.Length - 1], false);
-
-                                // Dragging an asset
-                                if (ImGui.BeginDragDropSource())
-                                {
-                                    ImGui.SetDragDropPayload("Asset", IntPtr.Zero, 0);
-
-                                    DraggedAsset = AssetLoadName;
-
-                                    ImGui.EndDragDropSource();
-                                }
-
-                                if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
-                                    ImGui.PopID();
-
-                                ImGui.PopStyleColor();
-
-                                if (Overflow)
-                                    ImGui.SameLine();
-                            }
-                        }
-                    }
-                    DirectoryChanged = false;
-
-                    // Visualize Prefabs (They are stored in the scene file not as individual files)
-                    int DirtyPrefab = -1; //Should be deleted
-                    ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
-                    for (int i=0; i<Prefabs.Count; i++)
-                    {
-                        ImGui.PushID("Prefab" + i.ToString());
-                        bool Overflow = false;
-                        if (GameContentPath.Equals(Prefabs[i].Directory))
-                        {
-                            ImGui.ImageButton(PrefabTexPtr, new Vector2(64, 64));
 
                             if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                                ImGui.OpenPopup("Exclude Prefab");
-
-                            Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
-
-                            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && ImGui.IsItemHovered())
                             {
-                                GameObjects_Tab.WhoIsSelected = Prefabs[i].Clone;
-                                UndoBufferPrevCount = GameObjects_Tab.Undo_Buffer.Count;
+                                ImGui.OpenPopup("Sprite Editor Props");
+                                SelectedTexture = AssetLoadName;
+                                SelTexIndex = Enumerator - 1;
+                                IsSpriteEditorOpen = true;
                             }
-                        }
 
-                        /////////////////////////
-                        if(GameObjects_Tab.WhoIsSelected == Prefabs[i].Clone) //Prefab is selected and might be edited
-                        {
-                            if(UndoBufferPrevCount != GameObjects_Tab.Undo_Buffer.Count) //I changed something in the inspector window
+                            ImGui.SameLine();
+
+                            if (SPIs.ContainsKey(AssetLoadName))
                             {
-                                //I have to check if this change is in inspector window or not
-                                bool Reversed = false;
-                                var Change = GameObjects_Tab.Undo_Buffer.First;
-                                if (UndoBufferPrevCount > GameObjects_Tab.Undo_Buffer.Count)
+                                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                                bool ArrButt = SPIs[AssetLoadName].IsSpriteSheet && ImGui.ArrowButton("ThisTex" + i.ToString(), SPIs[AssetLoadName].IsOpen);
+
+                                if (SPIs[AssetLoadName].IsSpriteSheet && ImGui.BeginDragDropSource())
                                 {
-                                    Change = GameObjects_Tab.Redo_Buffer.First;
-                                    Reversed = true;
+                                    ImGui.SetDragDropPayload("Sliced Spritesheet", IntPtr.Zero, 0);
+
+                                    if (SPIs[AssetLoadName].IsSpriteSheet && SPIs[AssetLoadName].IsOpen == ImGuiDir.Left)
+                                        AnimationEditor.slicedTexs = new KeyValuePair<string, List<Microsoft.Xna.Framework.Rectangle>>(AssetLoadName, SlicedTexs);
+                                    else
+                                        AnimationEditor.slicedTexs = new KeyValuePair<string, List<Microsoft.Xna.Framework.Rectangle>>(null, null);
+
+                                    ImGui.EndDragDropSource();
                                 }
 
-                                if (Change.Value.Value == (!Reversed? Operation.AddComponent : Operation.RemoveComponent)) //Added a component to the prefab
+                                if (ArrButt)
                                 {
-                                    foreach (GameObject GO in SceneManager.ActiveScene.GameObjects.FindAll(Item => Item.PrefabNum == Prefabs[i].Clone.PrefabNum))
+                                    SelectedTexture = AssetLoadName;
+                                    SelTexIndex = Enumerator - 1;
+                                    if (SPIs[AssetLoadName].IsOpen == ImGuiDir.Left)
+                                        SPIs[AssetLoadName].IsOpen = ImGuiDir.Right;
+                                    else
                                     {
-                                        var component = ((KeyValuePair<GameObject, GameObjectComponent>)Change.Value.Key).Value.DeepCopy(GO);
-                                        component.gameObject = GO;
-                                        GO.AddComponent_Generic(component);
+                                        SPIs[AssetLoadName].IsOpen = ImGuiDir.Left;
+
+                                        SlicedTexs.Clear();
+                                        Texture2D Tex = Setup.Content.Load<Texture2D>(SelectedTexture);
+                                        SpriteEditorInfo SPI = SPIs[SelectedTexture];
+
+                                        if (SPI.BySize)
+                                        {
+                                            SPI.SizeOrCount[0] = (int)Math.Clamp(SPI.SizeOrCount[0], Tex.Width / 30.0f, Tex.Width);
+                                            SPI.SizeOrCount[1] = (int)Math.Clamp(SPI.SizeOrCount[1], Tex.Height / 30.0f, Tex.Height);
+
+                                            for (int i2 = 0; i2 < Tex.Height; i2 += SPI.SizeOrCount[1])
+                                            {
+                                                for (int j = 0; j < Tex.Width; j += SPI.SizeOrCount[0])
+                                                {
+                                                    Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i2 != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
+                                                    Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
+                                                    Vector2 UV0 = new Vector2(j, i2) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+                                                    Vector2 UV1 = new Vector2(j + SPI.SizeOrCount[0], i2 + SPI.SizeOrCount[1]) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+
+                                                    Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)Math.Clamp((UV0.X * Tex.Width), 0, Tex.Width - 1), (int)Math.Clamp((UV0.Y * Tex.Height), 0, Tex.Height - 1), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
+                                                    Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1); //Bug here!
+                                                    Rect.Height = Math.Clamp(Rect.Height, 0, Tex.Height - Rect.Y - 1);
+                                                    Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[Rect.Width * Rect.Height];
+
+                                                    Tex.GetData(0, Rect, buffer, 0, Rect.Width * Rect.Height);
+
+                                                    Vector2 Min = new Vector2(int.MaxValue, int.MaxValue), Max = new Vector2(int.MinValue, int.MinValue);
+
+                                                    if (SPI.TrimSprite)
+                                                    {
+                                                        bool Empty = true;
+
+                                                        for (int i4 = 0; i4 < Rect.Height; i4++)
+                                                        {
+                                                            for (int j2 = 0; j2 < Rect.Width; j2++)
+                                                            {
+                                                                if (buffer[i4 * Rect.Width + j2].A != 0)
+                                                                {
+                                                                    Empty = false;
+
+                                                                    if (j2 < Min.X)
+                                                                        Min.X = j2;
+
+                                                                    if (i4 < Min.Y)
+                                                                        Min.Y = i4;
+
+                                                                    if (j2 > Max.X)
+                                                                        Max.X = j2;
+
+                                                                    if (i4 > Max.Y)
+                                                                        Max.Y = i4;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if (!Empty)
+                                                            SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)((UV0.X + Min.X / Tex.Width) * 10000), (int)((UV0.Y + Min.Y / Tex.Height) * 10000), (int)(Math.Abs((Max.X - Min.X + 1) / Rect.Width) * Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs((Max.Y - Min.Y + 1) / Rect.Height) * Math.Abs(UV1.Y - UV0.Y) * 10000)));
+                                                    }
+                                                    else if (!buffer.All(Item => Item.A == 0))
+                                                        SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * 10000), (int)(UV0.Y * 10000), (int)(Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs(UV1.Y - UV0.Y) * 10000)));
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            SPI.SizeOrCount[0] = Math.Clamp(SPI.SizeOrCount[0], 1, 32);
+                                            SPI.SizeOrCount[1] = Math.Clamp(SPI.SizeOrCount[1], 1, 32);
+                                            Vector2 ImageSize = new Vector2(1.0f / SPI.SizeOrCount[1], 1.0f / SPI.SizeOrCount[0]);
+
+                                            for (int i2 = 0; i2 < SPI.SizeOrCount[0]; i2++)
+                                            {
+                                                for (int j = 0; j < SPI.SizeOrCount[1]; j++)
+                                                {
+                                                    Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i2 != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
+                                                    Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
+                                                    Vector2 UV0 = new Vector2(j * ImageSize.X, i2 * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+                                                    Vector2 UV1 = new Vector2((j + 1) * ImageSize.X, (i2 + 1) * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height);
+
+                                                    //Eliminating empty textures
+                                                    Microsoft.Xna.Framework.Rectangle Rect = new Microsoft.Xna.Framework.Rectangle((int)Math.Clamp((UV0.X * Tex.Width), 0, Tex.Width), (int)Math.Clamp((UV0.Y * Tex.Height), 0, Tex.Height), (int)(Math.Abs(UV1.X - UV0.X) * Tex.Width), (int)(Math.Abs(UV1.Y - UV0.Y) * Tex.Height));
+                                                    Rect.Width = Math.Clamp(Rect.Width, 0, Tex.Width - Rect.X - 1);
+                                                    Rect.Height = Math.Clamp(Rect.Height, 0, Tex.Height - Rect.Y - 1);
+                                                    Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[Rect.Width * Rect.Height];
+
+                                                    Tex.GetData(0, Rect, buffer, 0, Rect.Width * Rect.Height);
+
+                                                    Vector2 Min = new Vector2(int.MaxValue, int.MaxValue), Max = new Vector2(int.MinValue, int.MinValue);
+
+                                                    if (SPI.TrimSprite)
+                                                    {
+                                                        bool Empty = true;
+
+                                                        for (int i4 = 0; i4 < Rect.Height; i4++)
+                                                        {
+                                                            for (int j2 = 0; j2 < Rect.Width; j2++)
+                                                            {
+                                                                if (buffer[i4 * Rect.Width + j2].A != 0)
+                                                                {
+                                                                    Empty = false;
+
+                                                                    if (j2 < Min.X)
+                                                                        Min.X = j2;
+
+                                                                    if (i4 < Min.Y)
+                                                                        Min.Y = i4;
+
+                                                                    if (j2 > Max.X)
+                                                                        Max.X = j2;
+
+                                                                    if (i4 > Max.Y)
+                                                                        Max.Y = i4;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if (!Empty)
+                                                            SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)((UV0.X + Min.X / Tex.Width) * 10000), (int)((UV0.Y + Min.Y / Tex.Height) * 10000), (int)(Math.Abs((Max.X - Min.X + 1) / Rect.Width) * Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs((Max.Y - Min.Y + 1) / Rect.Height) * Math.Abs(UV1.Y - UV0.Y) * 10000)));
+                                                    }
+                                                    else if (!buffer.All(Item => Item.A == 0))
+                                                        SlicedTexs.Add(new Microsoft.Xna.Framework.Rectangle((int)(UV0.X * 10000), (int)(UV0.Y * 10000), (int)(Math.Abs(UV1.X - UV0.X) * 10000), (int)(Math.Abs(UV1.Y - UV0.Y) * 10000)));
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                                else if (Change.Value.Value == (!Reversed ? Operation.RemoveComponent : Operation.AddComponent)) //removed a component from the prefab
-                                {
-                                    foreach (GameObject GO in SceneManager.ActiveScene.GameObjects.FindAll(Item => Item.PrefabNum == Prefabs[i].Clone.PrefabNum))
-                                        GO.RemoveComponent(((KeyValuePair<GameObject, GameObjectComponent>)Change.Value.Key).Value.GetType(), false);
-                                }
-                                else if (Change.Value.Value == Operation.ChangeValue) //changed value of a component in the prefab
-                                {
-                                    foreach (GameObject GO in SceneManager.ActiveScene.GameObjects.FindAll(Item => Item.PrefabNum == Prefabs[i].Clone.PrefabNum))
-                                    {
-                                        KeyValuePair<object, object> ObjectAndField = (KeyValuePair<object, object>)((KeyValuePair<object, object>)Change.Value.Key).Key;
+                                ImGui.PopStyleColor();
 
-                                        if (ObjectAndField.Key is GameObject)
+                                if (SPIs[AssetLoadName].IsOpen == ImGuiDir.Left) //Texture pack is open
+                                {
+                                    ImGui.SameLine();
+                                    ImGui.BeginChild(AssetLoadName, Vector2.Zero, true, ImGuiWindowFlags.HorizontalScrollbar);
+
+                                    Microsoft.Xna.Framework.Rectangle Rect = SlicedTexs[0];
+
+                                    for (int i3 = 0; i3 < SlicedTexs.Count; i3++)
+                                    {
+                                        bool EnteredButton2 = false;
+                                        ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                                        ImGui.PushID(i3.ToString() + "Noice");
+                                        if (ImGui.ImageButton(TexPtrs[SelTexIndex], new Vector2(64 /** ((float)SlicedTexs[i3].Width / SlicedTexs[i3].Height)*/, 64), new Vector2(SlicedTexs[i3].X / 10000.0f, SlicedTexs[i3].Y / 10000.0f), new Vector2(SlicedTexs[i3].Right / 10000.0f, SlicedTexs[i3].Bottom / 10000.0f)))
+                                        {
+                                            ImGui.PopID();
+                                            EnteredButton2 = true;
+                                        }
+
+                                        // Dragging an asset
+                                        if (ImGui.BeginDragDropSource())
+                                        {
+                                            ImGui.SetDragDropPayload("Asset2", IntPtr.Zero, 0);
+                                            DraggedAsset = new KeyValuePair<string, Vector4>(AssetLoadName, new Vector4(SlicedTexs[i3].X, SlicedTexs[i3].Y, SlicedTexs[i3].Width, SlicedTexs[i3].Height));
+
+                                            ImGui.EndDragDropSource();
+                                        }
+
+                                        if (!EnteredButton2)
+                                            ImGui.PopID();
+
+                                        ImGui.PopStyleColor();
+
+                                        if (i3 != SlicedTexs.Count - 1)
+                                            ImGui.SameLine();
+                                    }
+
+                                    ImGui.EndChild();
+                                }
+                            }
+
+                            if (Overflow)
+                                ImGui.SameLine();
+                        }
+                        else if (MusicRegex.IsMatch(AssetName)) //Found a song or a soundeffect
+                        {
+                            bool EnteredButton = false;
+                            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                            ImGui.PushID(ID_F++);
+
+                            if (ImGui.ImageButton(TexPtrs[1], new Vector2(64.0f, 64.0f)))
+                            {
+                                EnteredButton = true;
+                                ImGui.PopID();
+
+                                AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
+                            }
+
+                            bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
+
+                            HelpMarker(AssetPath[AssetPath.Length - 1], false);
+
+                            // Dragging an asset
+                            if (ImGui.BeginDragDropSource())
+                            {
+                                ImGui.SetDragDropPayload("Asset", IntPtr.Zero, 0);
+
+                                DraggedAsset = AssetLoadName;
+
+                                ImGui.EndDragDropSource();
+                            }
+
+                            if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
+                                ImGui.PopID();
+
+                            ImGui.PopStyleColor();
+
+                            if (Overflow)
+                                ImGui.SameLine();
+                        }
+                        else if (ShaderRegex.IsMatch(AssetName)) // Found a shader
+                        {
+                            bool EnteredButton = false;
+                            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                            ImGui.PushID(ID_F++);
+
+                            if (ImGui.ImageButton(TexPtrs[2], new Vector2(64.0f, 64.0f)))
+                            {
+                                EnteredButton = true;
+                                ImGui.PopID();
+
+                                AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
+                            }
+
+                            bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
+
+                            HelpMarker(AssetPath[AssetPath.Length - 1], false);
+
+                            // Dragging an asset
+                            if (ImGui.BeginDragDropSource())
+                            {
+                                ImGui.SetDragDropPayload("Asset", IntPtr.Zero, 0);
+
+                                DraggedAsset = AssetLoadName;
+
+                                ImGui.EndDragDropSource();
+                            }
+
+                            if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
+                                ImGui.PopID();
+
+                            ImGui.PopStyleColor();
+
+                            if (Overflow)
+                                ImGui.SameLine();
+                        }
+                        else if (SceneRegex.IsMatch(AssetName)) // Found a shader
+                        {
+                            if (AssetLoadName.Contains("_Editor"))
+                                continue;
+
+                            bool EnteredButton = false;
+                            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                            ImGui.PushID(ID_F++);
+
+                            if (ImGui.ImageButton(TexPtrs[3], new Vector2(64.0f, 64.0f)))
+                            {
+                                EnteredButton = true;
+                                ImGui.PopID();
+
+                                AssName = AssetLoadName + "." + AssPath.Substring(idx + 1);
+                            }
+
+                            bool Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
+
+                            if (ImGui.IsItemHovered())
+                            {
+                                if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                                {
+                                    SceneManager.SerializeScene(SceneManager.ActiveScene.Name);
+                                    SceneManager.LoadScene_Serialization(AssetLoadName);
+                                }
+                            }
+
+                            HelpMarker(AssetPath[AssetPath.Length - 1], false);
+
+                            // Dragging an asset
+                            if (ImGui.BeginDragDropSource())
+                            {
+                                ImGui.SetDragDropPayload("Asset", IntPtr.Zero, 0);
+
+                                DraggedAsset = AssetLoadName;
+
+                                ImGui.EndDragDropSource();
+                            }
+
+                            if (!EnteredButton) //OpenPopup and BeginPopup have to be on the same ID stack level
+                                ImGui.PopID();
+
+                            ImGui.PopStyleColor();
+
+                            if (Overflow)
+                                ImGui.SameLine();
+                        }
+                    }
+                }
+                DirectoryChanged = false;
+
+                // Visualize Prefabs (They are stored in the scene file not as individual files)
+                int DirtyPrefab = -1; //Should be deleted
+                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 1, 1, 0.1f));
+                for (int i = 0; i < Prefabs.Count; i++)
+                {
+                    ImGui.PushID("Prefab" + i.ToString());
+                    bool Overflow = false;
+                    if (GameContentPath.Equals(Prefabs[i].Directory))
+                    {
+                        ImGui.ImageButton(PrefabTexPtr, new Vector2(64, 64));
+
+                        if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                            ImGui.OpenPopup("Exclude Prefab");
+
+                        Overflow = ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X;
+
+                        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && ImGui.IsItemHovered())
+                        {
+                            GameObjects_Tab.WhoIsSelected = Prefabs[i].Clone;
+                            UndoBufferPrevCount = GameObjects_Tab.Undo_Buffer.Count;
+                        }
+                    }
+
+                    /////////////////////////
+                    if (GameObjects_Tab.WhoIsSelected == Prefabs[i].Clone) //Prefab is selected and might be edited
+                    {
+                        if (UndoBufferPrevCount != GameObjects_Tab.Undo_Buffer.Count) //I changed something in the inspector window
+                        {
+                            //I have to check if this change is in inspector window or not
+                            bool Reversed = false;
+                            var Change = GameObjects_Tab.Undo_Buffer.First;
+                            if (UndoBufferPrevCount > GameObjects_Tab.Undo_Buffer.Count)
+                            {
+                                Change = GameObjects_Tab.Redo_Buffer.First;
+                                Reversed = true;
+                            }
+
+                            if (Change.Value.Value == (!Reversed ? Operation.AddComponent : Operation.RemoveComponent)) //Added a component to the prefab
+                            {
+                                foreach (GameObject GO in SceneManager.ActiveScene.GameObjects.FindAll(Item => Item.PrefabNum == Prefabs[i].Clone.PrefabNum))
+                                {
+                                    var component = ((KeyValuePair<GameObject, GameObjectComponent>)Change.Value.Key).Value.DeepCopy(GO);
+                                    component.gameObject = GO;
+                                    GO.AddComponent_Generic(component);
+                                }
+                            }
+                            else if (Change.Value.Value == (!Reversed ? Operation.RemoveComponent : Operation.AddComponent)) //removed a component from the prefab
+                            {
+                                foreach (GameObject GO in SceneManager.ActiveScene.GameObjects.FindAll(Item => Item.PrefabNum == Prefabs[i].Clone.PrefabNum))
+                                    GO.RemoveComponent(((KeyValuePair<GameObject, GameObjectComponent>)Change.Value.Key).Value.GetType(), false);
+                            }
+                            else if (Change.Value.Value == Operation.ChangeValue) //changed value of a component in the prefab
+                            {
+                                foreach (GameObject GO in SceneManager.ActiveScene.GameObjects.FindAll(Item => Item.PrefabNum == Prefabs[i].Clone.PrefabNum))
+                                {
+                                    KeyValuePair<object, object> ObjectAndField = (KeyValuePair<object, object>)((KeyValuePair<object, object>)Change.Value.Key).Key;
+
+                                    if (ObjectAndField.Key is GameObject)
+                                    {
+                                        if (ObjectAndField.Value is FieldInfo)
+                                        {
+                                            Type FT = (ObjectAndField.Value as FieldInfo).FieldType;
+                                            object ValueChanged = (ObjectAndField.Value as FieldInfo).GetValue(Prefabs[i].Clone);
+                                            object PrevVal = ((KeyValuePair<object, object>)Change.Value.Key).Value;
+
+                                            switch (FT.FullName)
+                                            {
+                                                case "Microsoft.Xna.Framework.Vector2":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
+                                                    break;
+                                                case "Microsoft.Xna.Framework.Vector3":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
+                                                    break;
+                                                case "Microsoft.Xna.Framework.Vector4":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
+                                                    break;
+                                                case "Int32":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (int)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (int)ValueChanged - (int)PrevVal);
+                                                    break;
+                                                case "Single":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (float)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (float)ValueChanged - (float)PrevVal);
+                                                    break;
+                                                case "Double":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (double)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (double)ValueChanged - (double)PrevVal);
+                                                    break;
+                                                case "System.Numerics.Vector2":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
+                                                    break;
+                                                case "System.Numerics.Vector3":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
+                                                    break;
+                                                case "System.Numerics.Vector4":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
+                                                    break;
+                                                case "Int64":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (long)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (long)ValueChanged - (long)PrevVal);
+                                                    break;
+                                                case "Int16":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (short)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (short)ValueChanged - (short)PrevVal);
+                                                    break;
+                                                case "UInt32":
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, (uint)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (uint)ValueChanged - (uint)PrevVal);
+                                                    break;
+                                                default:
+                                                    ((FieldInfo)ObjectAndField.Value).SetValue(GO, ValueChanged);
+                                                    break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Type FT = (ObjectAndField.Value as PropertyInfo).PropertyType;
+                                            object ValueChanged = (ObjectAndField.Value as PropertyInfo).GetValue(Prefabs[i].Clone);
+                                            object PrevVal = ((KeyValuePair<object, object>)Change.Value.Key).Value;
+
+                                            switch (FT.FullName)
+                                            {
+                                                case "Microsoft.Xna.Framework.Vector2":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
+                                                    break;
+                                                case "Microsoft.Xna.Framework.Vector3":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
+                                                    break;
+                                                case "Microsoft.Xna.Framework.Vector4":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
+                                                    break;
+                                                case "Int32":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (int)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (int)ValueChanged - (int)PrevVal);
+                                                    break;
+                                                case "Single":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (float)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (float)ValueChanged - (float)PrevVal);
+                                                    break;
+                                                case "Double":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (double)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (double)ValueChanged - (double)PrevVal);
+                                                    break;
+                                                case "System.Numerics.Vector2":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
+                                                    break;
+                                                case "System.Numerics.Vector3":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
+                                                    break;
+                                                case "System.Numerics.Vector4":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
+                                                    break;
+                                                case "Int64":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (long)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (long)ValueChanged - (long)PrevVal);
+                                                    break;
+                                                case "Int16":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (short)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (short)ValueChanged - (short)PrevVal);
+                                                    break;
+                                                case "UInt32":
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (uint)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (uint)ValueChanged - (uint)PrevVal);
+                                                    break;
+                                                default:
+                                                    ((PropertyInfo)ObjectAndField.Value).SetValue(GO, ValueChanged);
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var component = GO.GetComponent(ObjectAndField.Key.GetType());
+
+                                        if (component != null)
                                         {
                                             if (ObjectAndField.Value is FieldInfo)
                                             {
                                                 Type FT = (ObjectAndField.Value as FieldInfo).FieldType;
-                                                object ValueChanged = (ObjectAndField.Value as FieldInfo).GetValue(Prefabs[i].Clone);
+                                                object ValueChanged = (ObjectAndField.Value as FieldInfo).GetValue(Prefabs[i].Clone.GetComponent(ObjectAndField.Key.GetType()));
                                                 object PrevVal = ((KeyValuePair<object, object>)Change.Value.Key).Value;
 
                                                 switch (FT.FullName)
                                                 {
                                                     case "Microsoft.Xna.Framework.Vector2":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
                                                         break;
                                                     case "Microsoft.Xna.Framework.Vector3":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
                                                         break;
                                                     case "Microsoft.Xna.Framework.Vector4":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
                                                         break;
                                                     case "Int32":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (int)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (int)ValueChanged - (int)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (int)((FieldInfo)ObjectAndField.Value).GetValue(component) + (int)ValueChanged - (int)PrevVal);
                                                         break;
                                                     case "Single":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (float)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (float)ValueChanged - (float)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (float)((FieldInfo)ObjectAndField.Value).GetValue(component) + (float)ValueChanged - (float)PrevVal);
                                                         break;
                                                     case "Double":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (double)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (double)ValueChanged - (double)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (double)((FieldInfo)ObjectAndField.Value).GetValue(component) + (double)ValueChanged - (double)PrevVal);
                                                         break;
                                                     case "System.Numerics.Vector2":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
                                                         break;
                                                     case "System.Numerics.Vector3":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
                                                         break;
                                                     case "System.Numerics.Vector4":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
                                                         break;
                                                     case "Int64":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (long)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (long)ValueChanged - (long)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (long)((FieldInfo)ObjectAndField.Value).GetValue(component) + (long)ValueChanged - (long)PrevVal);
                                                         break;
                                                     case "Int16":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (short)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (short)ValueChanged - (short)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (short)((FieldInfo)ObjectAndField.Value).GetValue(component) + (short)ValueChanged - (short)PrevVal);
                                                         break;
                                                     case "UInt32":
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, (uint)((FieldInfo)ObjectAndField.Value).GetValue(GO) + (uint)ValueChanged - (uint)PrevVal);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, (uint)((FieldInfo)ObjectAndField.Value).GetValue(component) + (uint)ValueChanged - (uint)PrevVal);
                                                         break;
                                                     default:
-                                                        ((FieldInfo)ObjectAndField.Value).SetValue(GO, ValueChanged);
+                                                        ((FieldInfo)ObjectAndField.Value).SetValue(component, ValueChanged);
                                                         break;
                                                 }
                                             }
                                             else
                                             {
                                                 Type FT = (ObjectAndField.Value as PropertyInfo).PropertyType;
-                                                object ValueChanged = (ObjectAndField.Value as PropertyInfo).GetValue(Prefabs[i].Clone);
+                                                object ValueChanged = (ObjectAndField.Value as PropertyInfo).GetValue(Prefabs[i].Clone.GetComponent(ObjectAndField.Key.GetType()));
                                                 object PrevVal = ((KeyValuePair<object, object>)Change.Value.Key).Value;
 
                                                 switch (FT.FullName)
                                                 {
                                                     case "Microsoft.Xna.Framework.Vector2":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
                                                         break;
                                                     case "Microsoft.Xna.Framework.Vector3":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
                                                         break;
                                                     case "Microsoft.Xna.Framework.Vector4":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (Microsoft.Xna.Framework.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
                                                         break;
                                                     case "Int32":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (int)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (int)ValueChanged - (int)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (int)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (int)ValueChanged - (int)PrevVal);
                                                         break;
                                                     case "Single":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (float)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (float)ValueChanged - (float)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (float)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (float)ValueChanged - (float)PrevVal);
                                                         break;
                                                     case "Double":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (double)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (double)ValueChanged - (double)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (double)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (double)ValueChanged - (double)PrevVal);
                                                         break;
                                                     case "System.Numerics.Vector2":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
                                                         break;
                                                     case "System.Numerics.Vector3":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
                                                         break;
                                                     case "System.Numerics.Vector4":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (System.Numerics.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
                                                         break;
                                                     case "Int64":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (long)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (long)ValueChanged - (long)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (long)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (long)ValueChanged - (long)PrevVal);
                                                         break;
                                                     case "Int16":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (short)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (short)ValueChanged - (short)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (short)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (short)ValueChanged - (short)PrevVal);
                                                         break;
                                                     case "UInt32":
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, (uint)((PropertyInfo)ObjectAndField.Value).GetValue(GO) + (uint)ValueChanged - (uint)PrevVal);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, (uint)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (uint)ValueChanged - (uint)PrevVal);
                                                         break;
                                                     default:
-                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(GO, ValueChanged);
+                                                        ((PropertyInfo)ObjectAndField.Value).SetValue(component, ValueChanged);
                                                         break;
                                                 }
                                             }
                                         }
-                                        else
-                                        {
-                                            var component = GO.GetComponent(ObjectAndField.Key.GetType());
-
-                                            if (component != null)
-                                            {
-                                                if (ObjectAndField.Value is FieldInfo)
-                                                {
-                                                    Type FT = (ObjectAndField.Value as FieldInfo).FieldType;
-                                                    object ValueChanged = (ObjectAndField.Value as FieldInfo).GetValue(Prefabs[i].Clone.GetComponent(ObjectAndField.Key.GetType()));
-                                                    object PrevVal = ((KeyValuePair<object, object>)Change.Value.Key).Value;
-
-                                                    switch (FT.FullName)
-                                                    {
-                                                        case "Microsoft.Xna.Framework.Vector2":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
-                                                            break;
-                                                        case "Microsoft.Xna.Framework.Vector3":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
-                                                            break;
-                                                        case "Microsoft.Xna.Framework.Vector4":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
-                                                            break;
-                                                        case "Int32":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (int)((FieldInfo)ObjectAndField.Value).GetValue(component) + (int)ValueChanged - (int)PrevVal);
-                                                            break;
-                                                        case "Single":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (float)((FieldInfo)ObjectAndField.Value).GetValue(component) + (float)ValueChanged - (float)PrevVal);
-                                                            break;
-                                                        case "Double":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (double)((FieldInfo)ObjectAndField.Value).GetValue(component) + (double)ValueChanged - (double)PrevVal);
-                                                            break;
-                                                        case "System.Numerics.Vector2":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector2)((FieldInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
-                                                            break;
-                                                        case "System.Numerics.Vector3":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector3)((FieldInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
-                                                            break;
-                                                        case "System.Numerics.Vector4":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector4)((FieldInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
-                                                            break;
-                                                        case "Int64":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (long)((FieldInfo)ObjectAndField.Value).GetValue(component) + (long)ValueChanged - (long)PrevVal);
-                                                            break;
-                                                        case "Int16":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (short)((FieldInfo)ObjectAndField.Value).GetValue(component) + (short)ValueChanged - (short)PrevVal);
-                                                            break;
-                                                        case "UInt32":
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, (uint)((FieldInfo)ObjectAndField.Value).GetValue(component) + (uint)ValueChanged - (uint)PrevVal);
-                                                            break;
-                                                        default:
-                                                            ((FieldInfo)ObjectAndField.Value).SetValue(component, ValueChanged);
-                                                            break;
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    Type FT = (ObjectAndField.Value as PropertyInfo).PropertyType;
-                                                    object ValueChanged = (ObjectAndField.Value as PropertyInfo).GetValue(Prefabs[i].Clone.GetComponent(ObjectAndField.Key.GetType()));
-                                                    object PrevVal = ((KeyValuePair<object, object>)Change.Value.Key).Value;
-
-                                                    switch (FT.FullName)
-                                                    {
-                                                        case "Microsoft.Xna.Framework.Vector2":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector2)ValueChanged - (Microsoft.Xna.Framework.Vector2)PrevVal);
-                                                            break;
-                                                        case "Microsoft.Xna.Framework.Vector3":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector3)ValueChanged - (Microsoft.Xna.Framework.Vector3)PrevVal);
-                                                            break;
-                                                        case "Microsoft.Xna.Framework.Vector4":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (Microsoft.Xna.Framework.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (Microsoft.Xna.Framework.Vector4)ValueChanged - (Microsoft.Xna.Framework.Vector4)PrevVal);
-                                                            break;
-                                                        case "Int32":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (int)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (int)ValueChanged - (int)PrevVal);
-                                                            break;
-                                                        case "Single":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (float)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (float)ValueChanged - (float)PrevVal);
-                                                            break;
-                                                        case "Double":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (double)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (double)ValueChanged - (double)PrevVal);
-                                                            break;
-                                                        case "System.Numerics.Vector2":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector2)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector2)ValueChanged - (System.Numerics.Vector2)PrevVal);
-                                                            break;
-                                                        case "System.Numerics.Vector3":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector3)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector3)ValueChanged - (System.Numerics.Vector3)PrevVal);
-                                                            break;
-                                                        case "System.Numerics.Vector4":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (System.Numerics.Vector4)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (System.Numerics.Vector4)ValueChanged - (System.Numerics.Vector4)PrevVal);
-                                                            break;
-                                                        case "Int64":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (long)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (long)ValueChanged - (long)PrevVal);
-                                                            break;
-                                                        case "Int16":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (short)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (short)ValueChanged - (short)PrevVal);
-                                                            break;
-                                                        case "UInt32":
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, (uint)((PropertyInfo)ObjectAndField.Value).GetValue(component) + (uint)ValueChanged - (uint)PrevVal);
-                                                            break;
-                                                        default:
-                                                            ((PropertyInfo)ObjectAndField.Value).SetValue(component, ValueChanged);
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }
                                     }
                                 }
-
-                                UndoBufferPrevCount = GameObjects_Tab.Undo_Buffer.Count;
                             }
+
+                            UndoBufferPrevCount = GameObjects_Tab.Undo_Buffer.Count;
                         }
-                        /////////////////////////
-                        
-                        if (ImGui.BeginDragDropSource())
-                        {
-                            DraggedAsset = Prefabs[i].Clone;
-
-                            ImGui.SetDragDropPayload("Prefab", IntPtr.Zero, 0);
-
-                            ImGui.EndDragDropSource();
-                        }
-
-                        if(GameContentPath.Equals(Prefabs[i].Directory))
-                            HelpMarker(Prefabs[i].Clone.Name, false);
-
-                        if (ImGui.BeginPopup("Exclude Prefab"))
-                        {
-                            if (ImGui.Button("Exclude this prefab? (Can't be undone)"))
-                                DirtyPrefab = i;
-
-                            ImGui.EndPopup();
-                        }
-                        ImGui.PopID();
-
-                        if (Overflow)
-                            ImGui.SameLine();
                     }
-                    ImGui.PopStyleColor();
+                    /////////////////////////
 
-                    if (DirtyPrefab != -1)
-                        Prefabs.RemoveAt(DirtyPrefab);
-                    //
-
-                    //Sprite editor
-                    ImGui.PushStyleColor(ImGuiCol.PopupBg, new Vector4(0.25f, 0.25f, 0.25f, 1));
-                    if (ImGui.BeginPopupModal("Sprite Editor Props", ref IsSpriteEditorOpen, ImGuiWindowFlags.AlwaysAutoResize))
+                    if (ImGui.BeginDragDropSource())
                     {
-                        string SelectedTex = SelectedTexture;
+                        DraggedAsset = Prefabs[i].Clone;
 
-                        if (SelectedTex == null)
-                            return;
+                        ImGui.SetDragDropPayload("Prefab", IntPtr.Zero, 0);
 
-                        if (!SPIs.ContainsKey(SelectedTex)) //First time edit
-                            SPIs.Add(SelectedTex, new SpriteEditorInfo() { SizeOrCount = new int[2], Offset = new int[2], Spacing = new int[2] });
+                        ImGui.EndDragDropSource();
+                    }
 
-                        SpriteEditorInfo SPI = SPIs[SelectedTex];
+                    if (GameContentPath.Equals(Prefabs[i].Directory))
+                        HelpMarker(Prefabs[i].Clone.Name, false);
 
-                        ImGui.Checkbox("Spritesheet?", ref SPI.IsSpriteSheet);
-
-                        if (SPI.IsSpriteSheet)
-                        {
-                            Texture2D Tex = Setup.Content.Load<Texture2D>(SelectedTexture);
-
-                            ImGui.Checkbox("Trim Sprite", ref SPI.TrimSprite);
-                            ImGui.Checkbox("Slice By Size", ref SPI.BySize);
-                            ImGui.Text("Texture Dimensions: " + new Vector2(Tex.Width, Tex.Height).ToString());
-                            ImGui.InputInt2("Size/Count", ref SPI.SizeOrCount[0]);
-                            ImGui.InputInt2("Offset", ref SPI.Offset[0]);
-                            ImGui.InputInt2("Spacing", ref SPI.Spacing[0]);
-
-                            if (SPI.BySize)
-                            {
-                                SPI.SizeOrCount[0] = (int)Math.Clamp(SPI.SizeOrCount[0], Tex.Width / 30.0f, Tex.Width);
-                                SPI.SizeOrCount[1] = (int)Math.Clamp(SPI.SizeOrCount[1], Tex.Height / 30.0f, Tex.Height);
-                                Vector2 ImageSize = new Vector2((float)SPI.SizeOrCount[0] / Tex.Width, (float)SPI.SizeOrCount[1] / Tex.Height);
-
-                                ImGui.SetNextWindowSizeConstraints(Vector2.Zero, new Vector2(Setup.graphics.PreferredBackBufferWidth * 0.75f, Setup.graphics.PreferredBackBufferHeight * 0.65f));
-                                ImGui.BeginChild("Slices", new Vector2(600, 500), false, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.AlwaysHorizontalScrollbar);
-                                for (int i = 0; i < Tex.Height; i += SPI.SizeOrCount[1])
-                                {
-                                    for (int j = 0; j < Tex.Width; j += SPI.SizeOrCount[0])
-                                    {
-                                        Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
-                                        Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
-                                        ImGui.Image(TexPtrs[SelTexIndex], ImageSize * 512, new Vector2(j, i) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), new Vector2(j + SPI.SizeOrCount[0], i + SPI.SizeOrCount[1]) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), Vector4.One, Vector4.One);
-
-                                        if (j < Tex.Width - SPI.SizeOrCount[0])
-                                            ImGui.SameLine();
-                                    }
-                                }
-                                ImGui.EndChild();
-                            }
-                            else
-                            {
-                                SPI.SizeOrCount[0] = Math.Clamp(SPI.SizeOrCount[0], 1, 32);
-                                SPI.SizeOrCount[1] = Math.Clamp(SPI.SizeOrCount[1], 1, 32);
-                                Vector2 ImageSize = new Vector2(1.0f / SPI.SizeOrCount[1], 1.0f / SPI.SizeOrCount[0]);
-
-                                for (int i = 0; i < SPI.SizeOrCount[0]; i++)
-                                {
-                                    for (int j = 0; j < SPI.SizeOrCount[1]; j++)
-                                    {
-                                        Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
-                                        Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
-                                        ImGui.Image(TexPtrs[SelTexIndex], ImageSize * 512, new Vector2(j * ImageSize.X, i * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), new Vector2((j + 1) * ImageSize.X, (i + 1) * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), Vector4.One, Vector4.One);
-
-                                        if (j != SPI.SizeOrCount[1] - 1)
-                                            ImGui.SameLine();
-                                    }
-                                }
-                            }
-                        }
-
-                        if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Escape)))
-                        {
-                            ImGui.CloseCurrentPopup();
-                            IsSpriteEditorOpen = false;
-                        }
+                    if (ImGui.BeginPopup("Exclude Prefab"))
+                    {
+                        if (ImGui.Button("Exclude this prefab? (Can't be undone)"))
+                            DirtyPrefab = i;
 
                         ImGui.EndPopup();
                     }
-                    ImGui.PopStyleColor();
+                    ImGui.PopID();
 
-                    ////////////////////////
-
-                    if (ImGui.BeginPopup("AssetName"))
-                    {
-                        ImGui.Text(AssName);
-                        ImGui.EndPopup();
-                    }
-
-                    //if (ImGui.BeginPopup("Rename File"))
-                    //{
-                    //    ImGui.Text("Edit name:");
-                    //    ImGui.InputText("##editF", ref NameBuffer, 50, ImGuiInputTextFlags.AutoSelectAll);
-                    //    if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Enter)))
-                    //    {
-                    //        if (NameBuffer.Replace(" ", "").Length > 0 && NameBuffer != WhoIsSelected.Name)
-                    //        {
-                    //            KeyValuePair<GameObject, string> BufferedObject = new KeyValuePair<GameObject, string>(WhoIsSelected, WhoIsSelected.Name);
-                    //            AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(BufferedObject, Operation.Rename));
-                    //            Redo_Buffer.Clear();
-
-                    //            NameBuffer = Utility.UniqueGameObjectName(NameBuffer);
-                    //            WhoIsSelected.Name = NameBuffer;
-                    //        }
-                    //        ImGui.CloseCurrentPopup();
-                    //    }
-
-                    //    ImGui.EndPopup();
-                    //}
-
-                    ImGui.EndChild();
-                    ImGui.EndChild();
-
-                    ImGui.EndTabItem();
+                    if (Overflow)
+                        ImGui.SameLine();
                 }
+                ImGui.PopStyleColor();
+
+                if (DirtyPrefab != -1)
+                    Prefabs.RemoveAt(DirtyPrefab);
+                //
+
+                //Sprite editor
+                ImGui.PushStyleColor(ImGuiCol.PopupBg, new Vector4(0.25f, 0.25f, 0.25f, 1));
+                if (ImGui.BeginPopupModal("Sprite Editor Props", ref IsSpriteEditorOpen, ImGuiWindowFlags.AlwaysAutoResize))
+                {
+                    string SelectedTex = SelectedTexture;
+
+                    if (SelectedTex == null)
+                        return;
+
+                    if (!SPIs.ContainsKey(SelectedTex)) //First time edit
+                        SPIs.Add(SelectedTex, new SpriteEditorInfo() { SizeOrCount = new int[2], Offset = new int[2], Spacing = new int[2] });
+
+                    SpriteEditorInfo SPI = SPIs[SelectedTex];
+
+                    ImGui.Checkbox("Spritesheet?", ref SPI.IsSpriteSheet);
+
+                    if (SPI.IsSpriteSheet)
+                    {
+                        Texture2D Tex = Setup.Content.Load<Texture2D>(SelectedTexture);
+
+                        ImGui.Checkbox("Trim Sprite", ref SPI.TrimSprite);
+                        ImGui.Checkbox("Slice By Size", ref SPI.BySize);
+                        ImGui.Text("Texture Dimensions: " + new Vector2(Tex.Width, Tex.Height).ToString());
+                        ImGui.InputInt2("Size/Count", ref SPI.SizeOrCount[0]);
+                        ImGui.InputInt2("Offset", ref SPI.Offset[0]);
+                        ImGui.InputInt2("Spacing", ref SPI.Spacing[0]);
+
+                        if (SPI.BySize)
+                        {
+                            SPI.SizeOrCount[0] = (int)Math.Clamp(SPI.SizeOrCount[0], Tex.Width / 30.0f, Tex.Width);
+                            SPI.SizeOrCount[1] = (int)Math.Clamp(SPI.SizeOrCount[1], Tex.Height / 30.0f, Tex.Height);
+                            Vector2 ImageSize = new Vector2((float)SPI.SizeOrCount[0] / Tex.Width, (float)SPI.SizeOrCount[1] / Tex.Height);
+
+                            ImGui.SetNextWindowSizeConstraints(Vector2.Zero, new Vector2(Setup.graphics.PreferredBackBufferWidth * 0.75f, Setup.graphics.PreferredBackBufferHeight * 0.65f));
+                            ImGui.BeginChild("Slices", new Vector2(600, 500), false, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.AlwaysHorizontalScrollbar);
+                            for (int i = 0; i < Tex.Height; i += SPI.SizeOrCount[1])
+                            {
+                                for (int j = 0; j < Tex.Width; j += SPI.SizeOrCount[0])
+                                {
+                                    Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
+                                    Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
+                                    ImGui.Image(TexPtrs[SelTexIndex], ImageSize * 512, new Vector2(j, i) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), new Vector2(j + SPI.SizeOrCount[0], i + SPI.SizeOrCount[1]) / new Vector2(Tex.Width, Tex.Height) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), Vector4.One, Vector4.One);
+
+                                    if (j < Tex.Width - SPI.SizeOrCount[0])
+                                        ImGui.SameLine();
+                                }
+                            }
+                            ImGui.EndChild();
+                        }
+                        else
+                        {
+                            SPI.SizeOrCount[0] = Math.Clamp(SPI.SizeOrCount[0], 1, 32);
+                            SPI.SizeOrCount[1] = Math.Clamp(SPI.SizeOrCount[1], 1, 32);
+                            Vector2 ImageSize = new Vector2(1.0f / SPI.SizeOrCount[1], 1.0f / SPI.SizeOrCount[0]);
+
+                            for (int i = 0; i < SPI.SizeOrCount[0]; i++)
+                            {
+                                for (int j = 0; j < SPI.SizeOrCount[1]; j++)
+                                {
+                                    Vector2 Spacing = new Vector2((j != 0) ? Math.Abs(SPI.Spacing[0]) : 0, (i != 0) ? Math.Abs(SPI.Spacing[1]) : 0);
+                                    Vector2 Offset = new Vector2(SPI.Offset[0], SPI.Offset[1]);
+                                    ImGui.Image(TexPtrs[SelTexIndex], ImageSize * 512, new Vector2(j * ImageSize.X, i * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), new Vector2((j + 1) * ImageSize.X, (i + 1) * ImageSize.Y) + new Vector2((float)(Offset.X + Spacing.X) / Tex.Width, (float)(Offset.Y + Spacing.Y) / Tex.Height), Vector4.One, Vector4.One);
+
+                                    if (j != SPI.SizeOrCount[1] - 1)
+                                        ImGui.SameLine();
+                                }
+                            }
+                        }
+                    }
+
+                    if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Escape)))
+                    {
+                        ImGui.CloseCurrentPopup();
+                        IsSpriteEditorOpen = false;
+                    }
+
+                    ImGui.EndPopup();
+                }
+                ImGui.PopStyleColor();
+
+                ////////////////////////
+
+                if (ImGui.BeginPopup("AssetName"))
+                {
+                    ImGui.Text(AssName);
+                    ImGui.EndPopup();
+                }
+
+                //if (ImGui.BeginPopup("Rename File"))
+                //{
+                //    ImGui.Text("Edit name:");
+                //    ImGui.InputText("##editF", ref NameBuffer, 50, ImGuiInputTextFlags.AutoSelectAll);
+                //    if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Enter)))
+                //    {
+                //        if (NameBuffer.Replace(" ", "").Length > 0 && NameBuffer != WhoIsSelected.Name)
+                //        {
+                //            KeyValuePair<GameObject, string> BufferedObject = new KeyValuePair<GameObject, string>(WhoIsSelected, WhoIsSelected.Name);
+                //            AddToACircularBuffer(Undo_Buffer, new KeyValuePair<object, Operation>(BufferedObject, Operation.Rename));
+                //            Redo_Buffer.Clear();
+
+                //            NameBuffer = Utility.UniqueGameObjectName(NameBuffer);
+                //            WhoIsSelected.Name = NameBuffer;
+                //        }
+                //        ImGui.CloseCurrentPopup();
+                //    }
+
+                //    ImGui.EndPopup();
+                //}
+
+                ImGui.EndChild();
+                ImGui.EndChild();
 
                 ImGui.EndGroup();
 
@@ -1127,30 +1106,18 @@ namespace FN_Engine.FN_Editor
 
                     ImGui.EndDragDropTarget();
                 }
-                //
-
-                if (ImGui.BeginTabItem("Log"))
-                {
-                    for (int i = 0; i < Utility.LogText.Count; i++)
-                        ImGui.TextWrapped("=> " + Utility.LogText[i]);
-
-                    ImGui.EndTabItem();
-                }
-
-                ImGui.EndTabBar();
             }
-
             ImGui.End();
         }
 
         public static void HelpMarker(string desc, bool DisplayMarker = true)
-        {   
-            if(DisplayMarker)
+        {
+            if (DisplayMarker)
                 ImGui.TextDisabled("(?)");
             if (ImGui.IsItemHovered())
             {
                 ImGui.BeginTooltip();
-                ImGui.PushTextWrapPos(ImGui.GetFontSize()* 35.0f);
+                ImGui.PushTextWrapPos(ImGui.GetFontSize() * 35.0f);
                 ImGui.TextUnformatted(desc);
                 ImGui.PopTextWrapPos();
                 ImGui.EndTooltip();

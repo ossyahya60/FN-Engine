@@ -83,8 +83,12 @@ namespace FN_Engine
                 Setup.Camera.Rotation = gameObject.Transform.Rotation;
                 Setup.Camera.Zoom = CameraZoom;
 
-                ResolutionIndependentRenderer.SetVirtualResolution(TargetResolution.X, TargetResolution.Y);
-                ResolutionIndependentRenderer.SetResolution(ScreenSize.X, ScreenSize.Y, IsFullScreen);
+                if (!FN_Editor.EditorScene.IsThisTheEditor)
+                {
+                    ResolutionIndependentRenderer.SetVirtualResolution(TargetResolution.X, TargetResolution.Y);
+                    ResolutionIndependentRenderer.SetResolution(ScreenSize.X, ScreenSize.Y, IsFullScreen);
+                    ResolutionIndependentRenderer.Init(ref Setup.graphics);
+                }
             }
         }
 

@@ -27,14 +27,16 @@ namespace FN_Engine.FN_Editor
         }
 
         public static bool IsThisWindowHovered = true;
+        public static bool ShowGizmos = true;
+        public static Vector4 SceneWindow;
 
-        private IntPtr Arrow;
-        private IntPtr ScaleGizmo;
-        private IntPtr RotationGizmo;
-        private ActiveGizmo ActiveGizmo = ActiveGizmo.Movement;
-        private bool EnteredRotationZone = false;
-        private bool WasMouseHeld = false;
-        private object OldTransVal = null;
+        private static IntPtr Arrow;
+        private static IntPtr ScaleGizmo;
+        private static IntPtr RotationGizmo;
+        private static ActiveGizmo ActiveGizmo = ActiveGizmo.Movement;
+        private static bool EnteredRotationZone = false;
+        private static bool WasMouseHeld = false;
+        private static object OldTransVal = null;
 
         public override void Start()
         {
@@ -43,18 +45,20 @@ namespace FN_Engine.FN_Editor
             RotationGizmo = Scene.GuiRenderer.BindTexture(HitBoxDebuger.CreateCircleTextureShell(64, 62, Microsoft.Xna.Framework.Color.LightYellow));
         }
 
-        public override void DrawUI()
+        public static void DrawGizmos()
         {
-            Vector2 Bias = 0.5f * new Vector2(Setup.graphics.PreferredBackBufferWidth - Setup.Camera.Position.X * 2, Setup.graphics.PreferredBackBufferHeight - Setup.Camera.Position.Y * 2);
-            ImGui.SetNextWindowPos(BiasSceneWindow);
-            ImGui.SetNextWindowSize(BiasSceneWindowSize);
-            ImGui.Begin("Gizmos", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoBringToFrontOnFocus);
+            SceneWindow = new Vector4(ImGui.GetWindowPos().X, ImGui.GetWindowPos().Y, ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
 
             IsThisWindowHovered = ImGui.IsWindowHovered();
 
+            var Vec3 = Setup.Camera.GetViewTransformationMatrix().Translation;
+            Vector2 Bias = new Vector2(-Vec3.X, -Vec3.Y);
+
             GameObject SelectedGO = GameObjects_Tab.WhoIsSelected;
-            if (SelectedGO != null && SelectedGO.Transform != null)
+            if (ShowGizmos && SelectedGO != null && SelectedGO.Transform != null)
             {
+                var PlayerPos = SelectedGO.Transform.Position * Setup.Camera.Zoom;
+
                 //Transform Visualization
                 if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.Q))
                     ActiveGizmo = ActiveGizmo.Movement;
@@ -63,27 +67,30 @@ namespace FN_Engine.FN_Editor
                 else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.E))
                     ActiveGizmo = ActiveGizmo.Scale;
 
+                ImGui.PushStyleColor(ImGuiCol.Button, 0);
+                ImGui.PushStyleColor(ImGuiCol.ButtonActive, 0);
+                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, 0);
                 switch (ActiveGizmo)
                 {
                     case ActiveGizmo.Movement:
 
                         //Vertical Arrow
-                        ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 8, SelectedGO.Transform.Position.Y - 64) + Bias);
+                        ImGui.SetCursorPos(new Vector2(PlayerPos.X, PlayerPos.Y - 44) - Bias);
                         ImGui.PushID("SelectedGO.Name + VertArrow");
-                        ImGui.ImageButton(Arrow, new Vector2(16, 64), Vector2.UnitX * (96.0f / 512.0f), new Vector2(159.0f / 512.0f, 1), 1, Vector4.Zero, new Vector4(0, 1, 0, 1));
+                        ImGui.ImageButton(Arrow, new Vector2(16, 64), Vector2.UnitX * (96.0f / 512.0f), new Vector2(159.0f / 512.0f, 1), 0, Vector4.Zero, new Vector4(0, 1, 0, 1));
                         ImGui.PopID();
 
                         if (ImGui.IsItemActive())
                         {
                             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
-                                OldTransVal = SelectedGO.Transform.Position;
+                                OldTransVal = PlayerPos;
 
                             SelectedGO.Transform.MoveY(Input.MouseDeltaY());
                             WasMouseHeld = true;
                         }
 
                         //Horizontal Arrow
-                        ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X + 8, SelectedGO.Transform.Position.Y) + Bias);
+                        ImGui.SetCursorPos(new Vector2(PlayerPos.X + 16, PlayerPos.Y + 20) - Bias);
                         ImGui.PushID(SelectedGO.Name + "HorizArrow");
                         ImGui.ImageButton(Arrow, new Vector2(64, 16), new Vector2(256.0f / 512.0f, 96.0f / 256.0f), new Vector2(1, 159.0f / 256.0f), 1, Vector4.Zero, new Vector4(0, 1, 1, 1));
                         ImGui.PopID();
@@ -91,14 +98,14 @@ namespace FN_Engine.FN_Editor
                         if (ImGui.IsItemActive())
                         {
                             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
-                                OldTransVal = SelectedGO.Transform.Position;
+                                OldTransVal = PlayerPos;
 
                             SelectedGO.Transform.MoveX(Input.MouseDeltaX());
                             WasMouseHeld = true;
                         }
 
                         //Cube (Full Movement)
-                        ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 8, SelectedGO.Transform.Position.Y) + Bias);
+                        ImGui.SetCursorPos(new Vector2(PlayerPos.X, PlayerPos.Y + 20) - Bias);
                         ImGui.PushID("SelectedGO.Name + Cube");
                         ImGui.ImageButton(Arrow, new Vector2(16, 16), Vector2.Zero, new Vector2(32.0f / 512.0f, 32.0f / 256.0f), 1, Vector4.Zero, new Vector4(1, 1, 0, 1));
                         ImGui.PopID();
@@ -106,7 +113,7 @@ namespace FN_Engine.FN_Editor
                         if (ImGui.IsItemActive())
                         {
                             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
-                                OldTransVal = SelectedGO.Transform.Position;
+                                OldTransVal = PlayerPos;
 
                             SelectedGO.Transform.Move(Input.MouseDelta());
                             WasMouseHeld = true;
@@ -123,7 +130,7 @@ namespace FN_Engine.FN_Editor
                     case ActiveGizmo.Rotation:
 
                         //Circular Shell
-                        ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 64, SelectedGO.Transform.Position.Y - 64) + Bias);
+                        ImGui.SetCursorPos(new Vector2(PlayerPos.X - 57, PlayerPos.Y - 37) - Bias);
                         ImGui.PushID("SelectedGO.Name + RotationGizmo");
                         ImGui.Image(RotationGizmo, new Vector2(128, 128));
                         ImGui.PopID();
@@ -138,10 +145,10 @@ namespace FN_Engine.FN_Editor
 
                             WasMouseHeld = true;
 
-                            Microsoft.Xna.Framework.Vector2 SameBias = new Microsoft.Xna.Framework.Vector2(Bias.X + BiasSceneWindow.X, Bias.Y + BiasSceneWindow.Y);
-                            if (EnteredRotationZone || Utility.CircleContains(SelectedGO.Transform.Position + SameBias, 64, Input.GetMousePosition()))
+                            Microsoft.Xna.Framework.Vector2 SameBias = new Microsoft.Xna.Framework.Vector2(BiasSceneWindow.X, BiasSceneWindow.Y);
+                            if (EnteredRotationZone || Utility.CircleContains(PlayerPos + SameBias, 64, Input.GetMousePosition()))
                             {
-                                SelectedGO.Transform.Rotation = MathCompanion.GetAngle_Rad(SelectedGO.Transform.Position + SameBias, Input.GetMousePosition());
+                                SelectedGO.Transform.Rotation = MathCompanion.GetAngle_Rad(PlayerPos + SameBias, Input.GetMousePosition());
                                 EnteredRotationZone = true;
                             }
                         }
@@ -157,7 +164,7 @@ namespace FN_Engine.FN_Editor
                     case ActiveGizmo.Scale:
 
                         //Vertical Scale
-                        ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 8, SelectedGO.Transform.Position.Y - 64) + Bias);
+                        ImGui.SetCursorPos(new Vector2(PlayerPos.X, PlayerPos.Y - 44) - Bias);
                         ImGui.PushID("SelectedGO.Name + VertScale");
                         ImGui.ImageButton(ScaleGizmo, new Vector2(16, 64), Vector2.UnitX * (96.0f / 512.0f), new Vector2(159.0f / 512.0f, 1), 1, Vector4.Zero, new Vector4(0, 1, 0, 1));
                         ImGui.PopID();
@@ -173,7 +180,7 @@ namespace FN_Engine.FN_Editor
                         }
 
                         //Horizontal Scale
-                        ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X + 8, SelectedGO.Transform.Position.Y) + Bias);
+                        ImGui.SetCursorPos(new Vector2(PlayerPos.X + 16, PlayerPos.Y + 20) - Bias);
                         ImGui.PushID("SelectedGO.Name + HorizScale");
                         ImGui.ImageButton(ScaleGizmo, new Vector2(64, 16), new Vector2(256.0f / 512.0f, 96.0f / 256.0f), new Vector2(1, 159.0f / 256.0f), 1, Vector4.Zero, new Vector4(0, 1, 1, 1));
                         ImGui.PopID();
@@ -189,7 +196,7 @@ namespace FN_Engine.FN_Editor
                         }
 
                         //Cube (Full Scale)
-                        ImGui.SetCursorPos(new Vector2(SelectedGO.Transform.Position.X - 8, SelectedGO.Transform.Position.Y) + Bias);
+                        ImGui.SetCursorPos(new Vector2(PlayerPos.X, PlayerPos.Y + 20) - Bias);
                         ImGui.PushID("SelectedGO.Name + FullScale");
                         ImGui.ImageButton(ScaleGizmo, new Vector2(16, 16), Vector2.Zero, new Vector2(32.0f / 512.0f, 32.0f / 256.0f), 1, Vector4.Zero, new Vector4(1, 1, 0, 1));
                         ImGui.PopID();
@@ -215,28 +222,34 @@ namespace FN_Engine.FN_Editor
 
                         break;
                 }
-
-                //Collider Visualization
-                var Colliders = SelectedGO.GameObjectComponents.FindAll(Item => Item is Collider2D);
-
-                if (Colliders.Count != 0) // Scale with Scene Camera?
-                    foreach (Collider2D collider in Colliders)
-                        collider.Visualize(Bias.X + BiasSceneWindow.X, Bias.Y + BiasSceneWindow.Y);
+                ImGui.PopStyleColor(3);
             }
 
             if (ImGui.IsWindowHovered() && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && ContentWindow.DraggedAsset is GameObject)
             {
                 GameObject prefab = ContentWindow.DraggedAsset as GameObject;
                 GameObject Instance = GameObject.Instantiate(prefab);
-                Instance.Transform.Position = Input.GetMousePosition() + Setup.Camera.Position - ResolutionIndependentRenderer.GetVirtualRes() * 0.5f - new Microsoft.Xna.Framework.Vector2(GameObjects_Tab.MyRegion[1].X + GameObjects_Tab.MyRegion[0].X, 0);
+                var NewBias = Bias - ImGui.GetWindowPos();
+                Instance.Transform.Position = Input.GetMousePosition() + new Microsoft.Xna.Framework.Vector2(NewBias.X, NewBias.Y);
 
                 GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(Instance, Operation.Create));
                 GameObjects_Tab.Redo_Buffer.Clear();
 
                 ImGui.EndDragDropTarget();
             }
+        }
 
-            ImGui.End();
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            if (GameObjects_Tab.WhoIsSelected != null)
+            {
+                //Collider Visualization
+                var Colliders = GameObjects_Tab.WhoIsSelected.GameObjectComponents.FindAll(Item => Item is Collider2D);
+
+                if (Colliders.Count != 0) // Scale with Scene Camera?
+                    foreach (Collider2D collider in Colliders)
+                        collider.Visualize();
+            }
         }
     }
 }

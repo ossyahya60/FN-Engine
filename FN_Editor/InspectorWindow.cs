@@ -19,6 +19,7 @@ namespace FN_Engine.FN_Editor
         internal static object DraggedObject = null;
 
         private static IEnumerable<Type> Types;
+        private static DateTime LastExecWriteTime = DateTime.MinValue;
 
         private IntPtr intPointer;
         private IntPtr intPointerL;
@@ -32,7 +33,6 @@ namespace FN_Engine.FN_Editor
         private List<bool> ComponentsNotRemoved = new List<bool>();
         private object ValueToChange = null;
         private bool ComboChanged = false;
-        private static DateTime LastExecWriteTime = DateTime.MinValue;
 
         static InspectorWindow() //This should be called again on 'Hot reloading'
         {
@@ -164,65 +164,455 @@ namespace FN_Engine.FN_Editor
 
             ImGui.Begin("Inspector Window");
 
-            if (ImGui.BeginTabBar("Inspector Tab", ImGuiTabBarFlags.Reorderable))
+            GameObject Selected_GO = FN_Editor.GameObjects_Tab.WhoIsSelected;
+
+            if (Selected_GO != null)
             {
-                if (ImGui.BeginTabItem("Inspector"))
+                if (Selected_GO.ShouldBeDeleted)
                 {
-                    ///
-                    if (EditorScene.AutoConfigureWindows && MyRegion[1].X != 0)
-                    {
-                        float DeltaSize = MyRegion[1].X - ImGui.GetWindowSize().X;
+                    GameObjects_Tab.WhoIsSelected = null;
+                    return;
+                }
 
-                        if (DeltaSize != 0 && ImGui.IsWindowFocused())
-                            ImGui.SetWindowSize("Content Manager", ContentWindow.MyRegion[1] + new Vector2(DeltaSize, 0));
+                int IDs = 0;
+
+                //Name Of GameObject
+                ImGui.Indent((ImGui.GetWindowSize().X - ImGui.CalcTextSize(Selected_GO.Name + " ---- ").X) * 0.5f);
+                ImGui.Text("-- " + Selected_GO.Name + " --");
+                ImGui.Unindent((ImGui.GetWindowSize().X - ImGui.CalcTextSize(Selected_GO.Name + " ---- ").X) * 0.5f);
+                ImGui.Text("\n");
+
+                //Contents Of GameObject
+                //foreach(GameObjectComponent GOC in Selected_GO.GameObjectComponents)
+                //{
+                //    if(ImGui.CollapsingHeader(GOC.ToString().Remove(0, 9), ImGuiTreeNodeFlags.DefaultOpen)) //8 is "MyEngine.", change it if you change the name of the namespace
+                //    {
+                //        ImGui.Checkbox("Enabled", ref GOC.Enabled);
+                //    }
+                //}
+
+                FieldInfo[] FIS_GO = Selected_GO.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
+                foreach (FieldInfo FI in FIS_GO)
+                {
+                    var GOC_SO = FI.GetValue(Selected_GO) as GameObjectComponent;
+                    if (GOC_SO != null)
+                    {
+                        ImGui.InputText(FI.Name, ref GOC_SO.gameObject.Name, 50, ImGuiInputTextFlags.ReadOnly);
+                        continue;
                     }
-                    
-                    MyRegion[0] = ImGui.GetWindowPos();
-                    MyRegion[1] = ImGui.GetWindowSize();
-                    ///
-
-                    GameObject Selected_GO = FN_Editor.GameObjects_Tab.WhoIsSelected;
-
-                    if (Selected_GO != null)
+                    else
                     {
-                        if (Selected_GO.ShouldBeDeleted)
+                        var GO = FI.GetValue(Selected_GO) as GameObject;
+                        if (GO != null)
                         {
-                            GameObjects_Tab.WhoIsSelected = null;
-                            return;
+                            ImGui.InputText(FI.Name, ref GO.Name, 50, ImGuiInputTextFlags.ReadOnly);
+                            continue;
+                        }
+                    }
+
+                    bool EnteredHere = true;
+                    ImGui.PushID(IDs++);
+                    switch (FI.FieldType.FullName) //Here, I handle basic types
+                    {
+                        case "System.Single": //float
+                            float T = (float)FI.GetValue(Selected_GO);
+                            ImGui.DragFloat(FI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            FI.SetValue(Selected_GO, T);
+                            break;
+                        case "System.Double": //double
+                            double D = (double)FI.GetValue(Selected_GO);
+                            ImGui.InputDouble(FI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            FI.SetValue(Selected_GO, D);
+                            break;
+                        case "System.Int32": //int 32
+                            int I = (int)FI.GetValue(Selected_GO);
+                            ImGui.InputInt(FI.Name, ref I);
+                            FI.SetValue(Selected_GO, I);
+                            break;
+                        case "System.String": //string
+                            string ST = (string)FI.GetValue(Selected_GO);
+                            if (ST == null)
+                                ST = "null";
+                            ImGui.InputText(FI.Name, ref ST, 50);
+                            FI.SetValue(Selected_GO, ST);
+                            break;
+                        case "System.Int16": //int 16
+                            short S = (short)FI.GetValue(Selected_GO);
+                            Marshal.WriteInt16(intPointer, S);
+                            ImGui.InputScalar(FI.Name, ImGuiDataType.S16, intPointer);
+                            FI.SetValue(Selected_GO, Marshal.ReadInt16(intPointer));
+                            break;
+                        case "System.Int64": //int 64
+                            long L = (long)FI.GetValue(Selected_GO);
+                            Marshal.WriteInt64(intPointerL, L);
+                            ImGui.InputScalar(FI.Name, ImGuiDataType.S64, intPointerL);
+                            FI.SetValue(Selected_GO, Marshal.ReadInt64(intPointerL));
+                            break;
+                        case "System.UInt32": //uint 32
+                            uint U32 = (uint)FI.GetValue(Selected_GO);
+                            Marshal.WriteInt32(intPointerU32, (int)U32);
+                            ImGui.InputScalar(FI.Name, ImGuiDataType.U32, intPointerU32);
+                            FI.SetValue(Selected_GO, Marshal.ReadInt32(intPointerU32));
+                            break;
+                        //case "System.UInt16": //uint 16
+                        //    FI.SetValue(this, ushort.Parse(Line[2]));
+                        //    fieldInfos.Add(FI);
+                        //    break;
+                        //case "System.UInt64": //uint 64
+                        //    FI.SetValue(this, ulong.Parse(Line[2]));
+                        //    fieldInfos.Add(FI);
+                        //    break;
+                        case "System.Boolean": //bool
+                            bool B = (bool)FI.GetValue(Selected_GO);
+                            ImGui.Checkbox(FI.Name, ref B);
+                            FI.SetValue(Selected_GO, B);
+                            break;
+                        case "Microsoft.Xna.Framework.Vector2": //Vector2
+                            Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)FI.GetValue(Selected_GO);
+                            Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
+                            ImGui.DragFloat2(FI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
+                            break;
+                        case "Microsoft.Xna.Framework.Vector3": //Vector3
+                            Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)FI.GetValue(Selected_GO);
+                            Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
+                            ImGui.DragFloat3(FI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
+                            break;
+                        case "Microsoft.Xna.Framework.Vector4": //Vector4
+                            Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)FI.GetValue(Selected_GO);
+                            Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
+                            ImGui.DragFloat4(FI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
+                            break;
+                        case "System.Numerics.Vector2": //Vector2
+                            System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)FI.GetValue(Selected_GO);
+                            Vector2 V2_IMGUI_Numeric = new System.Numerics.Vector2(V2_Numeric.X, V2_Numeric.Y);
+                            ImGui.DragFloat2(FI.Name, ref V2_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            FI.SetValue(Selected_GO, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
+                            break;
+                        case "System.Numerics.Vector3": //Vector3
+                            System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)FI.GetValue(Selected_GO);
+                            Vector3 V3_IMGUI_Numeric = new System.Numerics.Vector3(V3_Numeric.X, V3_Numeric.Y, V3_Numeric.Z);
+                            ImGui.DragFloat3(FI.Name, ref V3_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            FI.SetValue(Selected_GO, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
+                            break;
+                        case "System.Numerics.Vector4": //Vector4
+                            System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)FI.GetValue(Selected_GO);
+                            Vector4 V4_IMGUI_Numeric = new System.Numerics.Vector4(V4_Numeric.X, V4_Numeric.Y, V4_Numeric.Z, V4_Numeric.W);
+                            ImGui.DragFloat4(FI.Name, ref V4_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            FI.SetValue(Selected_GO, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
+                            break;
+                        case "Microsoft.Xna.Framework.Rectangle": //Rectangle
+                            Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)FI.GetValue(Selected_GO);
+                            int[] Rec_ARR = new int[4] { Rec.X, Rec.Y, Rec.Width, Rec.Height };
+                            ImGui.DragInt4(FI.Name, ref Rec_ARR[0]);
+                            FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
+                            break;
+                        case "Microsoft.Xna.Framework.Point": //Point
+                            Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)FI.GetValue(Selected_GO);
+                            int[] P2_ARR = new int[2] { P2.X, P2.Y };
+                            ImGui.DragInt2(FI.Name, ref P2_ARR[0]);
+                            FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
+                            break;
+                        default:
+                            EnteredHere = false;
+                            if (FI.FieldType.IsEnum)
+                            {
+                                EnteredHere = true;
+                                int CurrentItem = (int)FI.GetValue(Selected_GO);
+                                int TempCurrentItem = CurrentItem;
+                                ImGui.Combo(FI.Name, ref CurrentItem, Enum.GetNames(FI.FieldType), Enum.GetNames(FI.FieldType).Length);
+                                if (TempCurrentItem != CurrentItem)
+                                    ComboChanged = true;
+                                FI.SetValue(Selected_GO, CurrentItem);
+                            }
+                            break;
+                    }
+
+                    if (EnteredHere)
+                    {
+                        if (ImGui.IsItemActivated()) //Item Is In Edit Mode
+                            ValueToChange = FI.GetValue(Selected_GO);
+                        else if (ComboChanged || ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
+                        {
+                            ComboChanged = false;
+                            if (ValueToChange != FI.GetValue(Selected_GO))
+                            {
+                                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(Selected_GO, FI), ValueToChange), Operation.ChangeValue));
+                                GameObjects_Tab.Redo_Buffer.Clear();
+                            }
+                            ValueToChange = null;
+                        }
+                    }
+
+                    ImGui.PopID();
+                }
+
+                PropertyInfo[] PIS_GO = Selected_GO.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                foreach (PropertyInfo PI in PIS_GO)
+                {
+                    if (PI.GetMethod == null || !PI.GetMethod.IsPublic || PI.SetMethod == null || !PI.SetMethod.IsPublic)
+                        continue;
+
+                    GameObjectComponent GOC_SO = PI.GetValue(Selected_GO) as GameObjectComponent;
+                    if (GOC_SO != null)
+                    {
+                        ImGui.InputText(PI.Name, ref GOC_SO.gameObject.Name, 50, ImGuiInputTextFlags.ReadOnly);
+                        continue;
+                    }
+                    else
+                    {
+                        GameObject GO = PI.GetValue(Selected_GO) as GameObject;
+                        if (GO != null)
+                        {
+                            ImGui.InputText(PI.Name, ref GO.Name, 50, ImGuiInputTextFlags.ReadOnly);
+                            continue;
+                        }
+                    }
+
+                    bool EnteredHere = true;
+                    ImGui.PushID(IDs++);
+                    switch (PI.PropertyType.FullName) //Here, I handle basic types
+                    {
+                        case "System.Single": //float
+                            float T = (float)PI.GetValue(Selected_GO);
+                            ImGui.DragFloat(PI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            PI.SetValue(Selected_GO, T);
+                            break;
+                        case "System.Double": //double
+                            double D = (double)PI.GetValue(Selected_GO);
+                            ImGui.InputDouble(PI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            PI.SetValue(Selected_GO, D);
+                            break;
+                        case "System.Int32": //int 32
+                            int I = (int)PI.GetValue(Selected_GO);
+                            ImGui.InputInt(PI.Name, ref I);
+                            PI.SetValue(Selected_GO, I);
+                            break;
+                        case "System.String": //string
+                            string ST = (string)PI.GetValue(Selected_GO);
+                            if (ST == null)
+                                ST = "null";
+                            ImGui.InputText(PI.Name, ref ST, 50);
+                            PI.SetValue(Selected_GO, ST);
+                            break;
+                        case "System.Int16": //int 16
+                            short S = (short)PI.GetValue(Selected_GO);
+                            Marshal.WriteInt16(intPointer, S);
+                            ImGui.InputScalar(PI.Name, ImGuiDataType.S16, intPointer);
+                            PI.SetValue(Selected_GO, Marshal.ReadInt16(intPointer));
+                            break;
+                        case "System.Int64": //int 64
+                            long L = (long)PI.GetValue(Selected_GO);
+                            Marshal.WriteInt64(intPointerL, L);
+                            ImGui.InputScalar(PI.Name, ImGuiDataType.S64, intPointerL);
+                            PI.SetValue(Selected_GO, Marshal.ReadInt64(intPointerL));
+                            break;
+                        case "System.UInt32": //uint 32
+                            uint U32 = (uint)PI.GetValue(Selected_GO);
+                            Marshal.WriteInt32(intPointerU32, (int)U32);
+                            ImGui.InputScalar(PI.Name, ImGuiDataType.U32, intPointerU32);
+                            PI.SetValue(Selected_GO, Marshal.ReadInt32(intPointerU32));
+                            break;
+                        //case "System.UInt16": //uint 16
+                        //    FI.SetValue(this, ushort.Parse(Line[2]));
+                        //    fieldInfos.Add(FI);
+                        //    break;
+                        //case "System.UInt64": //uint 64
+                        //    FI.SetValue(this, ulong.Parse(Line[2]));
+                        //    fieldInfos.Add(FI);
+                        //    break;
+                        case "System.Boolean": //bool
+                            bool B = (bool)PI.GetValue(Selected_GO);
+                            ImGui.Checkbox(PI.Name, ref B);
+                            PI.SetValue(Selected_GO, B);
+                            break;
+                        case "Microsoft.Xna.Framework.Vector2": //Vector2
+                            Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)PI.GetValue(Selected_GO);
+                            Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
+                            ImGui.DragFloat2(PI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
+                            break;
+                        case "Microsoft.Xna.Framework.Vector3": //Vector3
+                            Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)PI.GetValue(Selected_GO);
+                            Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
+                            ImGui.DragFloat3(PI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
+                            break;
+                        case "Microsoft.Xna.Framework.Vector4": //Vector4
+                            Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)PI.GetValue(Selected_GO);
+                            Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
+                            ImGui.DragFloat4(PI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
+                            break;
+                        case "System.Numerics.Vector2": //Vector2
+                            System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)PI.GetValue(Selected_GO);
+                            Vector2 V2_IMGUI_Numeric = new System.Numerics.Vector2(V2_Numeric.X, V2_Numeric.Y);
+                            ImGui.DragFloat2(PI.Name, ref V2_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            PI.SetValue(Selected_GO, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
+                            break;
+                        case "System.Numerics.Vector3": //Vector3
+                            System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)PI.GetValue(Selected_GO);
+                            Vector3 V3_IMGUI_Numeric = new System.Numerics.Vector3(V3_Numeric.X, V3_Numeric.Y, V3_Numeric.Z);
+                            ImGui.DragFloat3(PI.Name, ref V3_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            PI.SetValue(Selected_GO, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
+                            break;
+                        case "System.Numerics.Vector4": //Vector4
+                            System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)PI.GetValue(Selected_GO);
+                            Vector4 V4_IMGUI_Numeric = new System.Numerics.Vector4(V4_Numeric.X, V4_Numeric.Y, V4_Numeric.Z, V4_Numeric.W);
+                            ImGui.DragFloat4(PI.Name, ref V4_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
+                            PI.SetValue(Selected_GO, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
+                            break;
+                        case "Microsoft.Xna.Framework.Rectangle": //Rectangle
+                            Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)PI.GetValue(Selected_GO);
+                            int[] Rec_ARR = new int[4] { Rec.X, Rec.Y, Rec.Width, Rec.Height };
+                            ImGui.DragInt4(PI.Name, ref Rec_ARR[0]);
+                            PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
+                            break;
+                        case "Microsoft.Xna.Framework.Point": //Point
+                            Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)PI.GetValue(Selected_GO);
+                            int[] P2_ARR = new int[2] { P2.X, P2.Y };
+                            ImGui.DragInt2(PI.Name, ref P2_ARR[0]);
+                            PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
+                            break;
+                        default:
+                            EnteredHere = false;
+                            if (PI.PropertyType.IsEnum)
+                            {
+                                EnteredHere = true;
+                                int CurrentItem = (int)PI.GetValue(Selected_GO);
+                                int TempCurrentItem = CurrentItem;
+                                ImGui.Combo(PI.Name, ref CurrentItem, Enum.GetNames(PI.PropertyType), Enum.GetNames(PI.PropertyType).Length);
+                                if (TempCurrentItem != CurrentItem)
+                                    ComboChanged = true;
+                                PI.SetValue(Selected_GO, CurrentItem);
+                            }
+                            break;
+                    }
+
+                    if (EnteredHere)
+                    {
+                        if (ImGui.IsItemActivated()) //Item Is In Edit Mode
+                            ValueToChange = PI.GetValue(Selected_GO);
+                        else if (ComboChanged || ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
+                        {
+                            ComboChanged = false;
+                            if (ValueToChange != PI.GetValue(Selected_GO))
+                            {
+                                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(Selected_GO, PI), ValueToChange), Operation.ChangeValue));
+                                GameObjects_Tab.Redo_Buffer.Clear();
+                            }
+                            ValueToChange = null;
+                        }
+                    }
+
+                    ImGui.PopID();
+                }
+
+                ImGui.NewLine();
+                ImGui.Separator();
+                ImGui.NewLine();
+
+                ImGui.Indent((ImGui.GetWindowSize().X - ImGui.CalcTextSize("Components" + " ---- ").X) * 0.5f);
+                ImGui.Text("-- " + "Components" + "--");
+                ImGui.Unindent((ImGui.GetWindowSize().X - ImGui.CalcTextSize("Components" + "---- ").X) * 0.5f);
+                ImGui.Text("\n");
+
+                GameObjectComponent GOC_Removed = null;
+                int T_Counter = 0;
+
+                while (ComponentsNotRemoved.Count < Selected_GO.GameObjectComponents.Count)
+                    ComponentsNotRemoved.Add(true);
+
+                bool[] ComponentsNotRemoved_Arr = ComponentsNotRemoved.ToArray();
+                int H = 0;
+                foreach (GameObjectComponent GOC in Selected_GO.GameObjectComponents)
+                {
+                    ImGui.PushID(H++);
+                    if (ImGui.CollapsingHeader(GOC.GetType().Name, ref ComponentsNotRemoved_Arr[T_Counter], ImGuiTreeNodeFlags.DefaultOpen))
+                    {
+                        if(ImGui.BeginDragDropSource())
+                        {
+                            DraggedObject = GOC;
+                            ImGui.SetDragDropPayload("CompDragged", IntPtr.Zero, 0);
+
+                            ImGui.EndDragDropSource();
                         }
 
-                        int IDs = 0;
-
-                        //Name Of GameObject
-                        ImGui.Indent((ImGui.GetWindowSize().X - ImGui.CalcTextSize(Selected_GO.Name + " ---- ").X) * 0.5f);
-                        ImGui.Text("-- " + Selected_GO.Name + " --");
-                        ImGui.Unindent((ImGui.GetWindowSize().X - ImGui.CalcTextSize(Selected_GO.Name + " ---- ").X) * 0.5f);
-                        ImGui.Text("\n");
-
-                        //Contents Of GameObject
-                        //foreach(GameObjectComponent GOC in Selected_GO.GameObjectComponents)
-                        //{
-                        //    if(ImGui.CollapsingHeader(GOC.ToString().Remove(0, 9), ImGuiTreeNodeFlags.DefaultOpen)) //8 is "MyEngine.", change it if you change the name of the namespace
-                        //    {
-                        //        ImGui.Checkbox("Enabled", ref GOC.Enabled);
-                        //    }
-                        //}
-
-                        FieldInfo[] FIS_GO = Selected_GO.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
-                        foreach (FieldInfo FI in FIS_GO)
+                        FieldInfo[] FIS = GOC.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
+                        foreach (FieldInfo FI in FIS)
                         {
-                            var GOC_SO = FI.GetValue(Selected_GO) as GameObjectComponent;
-                            if (GOC_SO != null)
+                            //if (FI.GetValue(GOC) == null)
+                            //continue;
+                                    
+                            var GOC_SO = FI.GetValue(GOC) as GameObjectComponent;
+                            if (FI.FieldType.BaseType == typeof(GameObjectComponent))
                             {
-                                ImGui.InputText(FI.Name, ref GOC_SO.gameObject.Name, 50, ImGuiInputTextFlags.ReadOnly);
+                                string GO_Name = GOC_SO == null ? "null" : GOC_SO.gameObject.Name;
+                                ImGui.InputText(FI.Name, ref GO_Name, 50, ImGuiInputTextFlags.ReadOnly);
+
+
+                                if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && DraggedObject != null)
+                                {
+                                    var draggedAsset = DraggedObject as GameObject;
+
+                                    if (draggedAsset != null)
+                                    {
+                                        var component = draggedAsset.GetComponent(FI.FieldType);
+
+                                        if (component != null)
+                                        {
+                                            var OldCompVal = FI.GetValue(GOC);
+                                            FI.SetValue(GOC, component);
+
+                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldCompVal), Operation.ChangeValue));
+                                            GameObjects_Tab.Redo_Buffer.Clear();
+                                        }
+                                    }
+                                    else if (DraggedObject.GetType() == FI.FieldType)
+                                    {
+                                        var OldCompVal = FI.GetValue(GOC);
+                                        FI.SetValue(GOC, DraggedObject);
+
+                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldCompVal), Operation.ChangeValue));
+                                        GameObjects_Tab.Redo_Buffer.Clear();
+                                    }
+
+                                    DraggedObject = null;
+                                }
+
                                 continue;
                             }
                             else
                             {
-                                var GO = FI.GetValue(Selected_GO) as GameObject;
+                                var GO = FI.GetValue(GOC) as GameObject;
                                 if (GO != null)
                                 {
                                     ImGui.InputText(FI.Name, ref GO.Name, 50, ImGuiInputTextFlags.ReadOnly);
+
+                                    if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                                    {
+                                        object OldVal = FI.GetValue(GOC);
+
+                                        try
+                                        {
+                                            if (FI.Name != "gameObject" && (ContentWindow.DraggedAsset == null || !(ContentWindow.DraggedAsset is GameObject)) && GameObjects_Tab.DraggedGO == null)
+                                                continue;
+
+                                            FI.SetValue(GOC, ContentWindow.DraggedAsset != null? ContentWindow.DraggedAsset : GameObjects_Tab.DraggedGO);
+
+                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldVal), Operation.ChangeValue));
+                                            GameObjects_Tab.Redo_Buffer.Clear();
+                                        }
+                                        catch (Exception E) // Log Error?
+                                        { Utility.Log(E.Message); }
+
+                                        GameObjects_Tab.DraggedGO = null;
+                                        ContentWindow.DraggedAsset = null;
+                                        ImGui.EndDragDropTarget();
+                                    }
+
                                     continue;
                                 }
                             }
@@ -232,44 +622,44 @@ namespace FN_Engine.FN_Editor
                             switch (FI.FieldType.FullName) //Here, I handle basic types
                             {
                                 case "System.Single": //float
-                                    float T = (float)FI.GetValue(Selected_GO);
+                                    float T = (float)FI.GetValue(GOC);
                                     ImGui.DragFloat(FI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    FI.SetValue(Selected_GO, T);
+                                    FI.SetValue(GOC, T);
                                     break;
                                 case "System.Double": //double
-                                    double D = (double)FI.GetValue(Selected_GO);
+                                    double D = (double)FI.GetValue(GOC);
                                     ImGui.InputDouble(FI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    FI.SetValue(Selected_GO, D);
+                                    FI.SetValue(GOC, D);
                                     break;
                                 case "System.Int32": //int 32
-                                    int I = (int)FI.GetValue(Selected_GO);
+                                    int I = (int)FI.GetValue(GOC);
                                     ImGui.InputInt(FI.Name, ref I);
-                                    FI.SetValue(Selected_GO, I);
+                                    FI.SetValue(GOC, I);
                                     break;
                                 case "System.String": //string
-                                    string ST = (string)FI.GetValue(Selected_GO);
+                                    string ST = (string)FI.GetValue(GOC);
                                     if (ST == null)
                                         ST = "null";
                                     ImGui.InputText(FI.Name, ref ST, 50);
-                                    FI.SetValue(Selected_GO, ST);
+                                    FI.SetValue(GOC, ST);
                                     break;
                                 case "System.Int16": //int 16
-                                    short S = (short)FI.GetValue(Selected_GO);
+                                    short S = (short)FI.GetValue(GOC);
                                     Marshal.WriteInt16(intPointer, S);
                                     ImGui.InputScalar(FI.Name, ImGuiDataType.S16, intPointer);
-                                    FI.SetValue(Selected_GO, Marshal.ReadInt16(intPointer));
+                                    FI.SetValue(GOC, Marshal.ReadInt16(intPointer));
                                     break;
                                 case "System.Int64": //int 64
-                                    long L = (long)FI.GetValue(Selected_GO);
+                                    long L = (long)FI.GetValue(GOC);
                                     Marshal.WriteInt64(intPointerL, L);
                                     ImGui.InputScalar(FI.Name, ImGuiDataType.S64, intPointerL);
-                                    FI.SetValue(Selected_GO, Marshal.ReadInt64(intPointerL));
+                                    FI.SetValue(GOC, Marshal.ReadInt64(intPointerL));
                                     break;
                                 case "System.UInt32": //uint 32
-                                    uint U32 = (uint)FI.GetValue(Selected_GO);
+                                    uint U32 = (uint)FI.GetValue(GOC);
                                     Marshal.WriteInt32(intPointerU32, (int)U32);
                                     ImGui.InputScalar(FI.Name, ImGuiDataType.U32, intPointerU32);
-                                    FI.SetValue(Selected_GO, Marshal.ReadInt32(intPointerU32));
+                                    FI.SetValue(GOC, Marshal.ReadInt32(intPointerU32));
                                     break;
                                 //case "System.UInt16": //uint 16
                                 //    FI.SetValue(this, ushort.Parse(Line[2]));
@@ -280,83 +670,183 @@ namespace FN_Engine.FN_Editor
                                 //    fieldInfos.Add(FI);
                                 //    break;
                                 case "System.Boolean": //bool
-                                    bool B = (bool)FI.GetValue(Selected_GO);
+                                    bool B = (bool)FI.GetValue(GOC);
                                     ImGui.Checkbox(FI.Name, ref B);
-                                    FI.SetValue(Selected_GO, B);
+                                    FI.SetValue(GOC, B);
                                     break;
                                 case "Microsoft.Xna.Framework.Vector2": //Vector2
-                                    Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)FI.GetValue(Selected_GO);
+                                    Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)FI.GetValue(GOC);
                                     Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
                                     ImGui.DragFloat2(FI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
+                                    FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
                                     break;
                                 case "Microsoft.Xna.Framework.Vector3": //Vector3
-                                    Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)FI.GetValue(Selected_GO);
+                                    Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)FI.GetValue(GOC);
                                     Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
                                     ImGui.DragFloat3(FI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
+                                    FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
                                     break;
                                 case "Microsoft.Xna.Framework.Vector4": //Vector4
-                                    Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)FI.GetValue(Selected_GO);
+                                    Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)FI.GetValue(GOC);
                                     Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
                                     ImGui.DragFloat4(FI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
+                                    FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
                                     break;
                                 case "System.Numerics.Vector2": //Vector2
-                                    System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)FI.GetValue(Selected_GO);
+                                    System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)FI.GetValue(GOC);
                                     Vector2 V2_IMGUI_Numeric = new System.Numerics.Vector2(V2_Numeric.X, V2_Numeric.Y);
                                     ImGui.DragFloat2(FI.Name, ref V2_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    FI.SetValue(Selected_GO, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
+                                    FI.SetValue(GOC, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
                                     break;
                                 case "System.Numerics.Vector3": //Vector3
-                                    System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)FI.GetValue(Selected_GO);
+                                    System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)FI.GetValue(GOC);
                                     Vector3 V3_IMGUI_Numeric = new System.Numerics.Vector3(V3_Numeric.X, V3_Numeric.Y, V3_Numeric.Z);
                                     ImGui.DragFloat3(FI.Name, ref V3_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    FI.SetValue(Selected_GO, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
+                                    FI.SetValue(GOC, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
                                     break;
                                 case "System.Numerics.Vector4": //Vector4
-                                    System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)FI.GetValue(Selected_GO);
+                                    System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)FI.GetValue(GOC);
                                     Vector4 V4_IMGUI_Numeric = new System.Numerics.Vector4(V4_Numeric.X, V4_Numeric.Y, V4_Numeric.Z, V4_Numeric.W);
                                     ImGui.DragFloat4(FI.Name, ref V4_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    FI.SetValue(Selected_GO, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
+                                    FI.SetValue(GOC, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
                                     break;
                                 case "Microsoft.Xna.Framework.Rectangle": //Rectangle
-                                    Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)FI.GetValue(Selected_GO);
+                                    Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)FI.GetValue(GOC);
                                     int[] Rec_ARR = new int[4] { Rec.X, Rec.Y, Rec.Width, Rec.Height };
                                     ImGui.DragInt4(FI.Name, ref Rec_ARR[0]);
-                                    FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
+                                    FI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
+                                    break;
+                                case "Microsoft.Xna.Framework.Color": //Color
+                                    Microsoft.Xna.Framework.Color V4_C = (Microsoft.Xna.Framework.Color)FI.GetValue(GOC);
+                                    Vector4 V4_IMGUI_C = new Vector4(V4_C.R / 255.0f, V4_C.G / 255.0f, V4_C.B / 255.0f, V4_C.A / 255.0f);
+                                    ImGui.ColorButton(FI.Name, V4_IMGUI_C);
+                                    if (ImGui.IsItemClicked())
+                                    {
+                                        if (ActiveFI == FI && GOC == ActiveGOC)
+                                            ColorClicked = !ColorClicked;
+                                        else
+                                            ColorClicked = false;
+                                        ActiveFI = FI;
+                                        ActiveGOC = GOC;
+                                    }
+
+                                    if (ActiveFI == FI && GOC == ActiveGOC && !ColorClicked)
+                                    {
+                                        ImGui.PushID(IDs++);
+                                        ImGui.ColorPicker4("Color", ref V4_IMGUI_C);
+                                        ImGui.PopID();
+                                    }
+
+                                    FI.SetValue(GOC, new Microsoft.Xna.Framework.Color(V4_IMGUI_C.X, V4_IMGUI_C.Y, V4_IMGUI_C.Z, V4_IMGUI_C.W));
                                     break;
                                 case "Microsoft.Xna.Framework.Point": //Point
-                                    Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)FI.GetValue(Selected_GO);
+                                    Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)FI.GetValue(GOC);
                                     int[] P2_ARR = new int[2] { P2.X, P2.Y };
                                     ImGui.DragInt2(FI.Name, ref P2_ARR[0]);
-                                    FI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
+                                    FI.SetValue(GOC, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
                                     break;
                                 default:
                                     EnteredHere = false;
+
                                     if (FI.FieldType.IsEnum)
                                     {
                                         EnteredHere = true;
-                                        int CurrentItem = (int)FI.GetValue(Selected_GO);
+                                        int CurrentItem = (int)FI.GetValue(GOC);
                                         int TempCurrentItem = CurrentItem;
                                         ImGui.Combo(FI.Name, ref CurrentItem, Enum.GetNames(FI.FieldType), Enum.GetNames(FI.FieldType).Length);
+
                                         if (TempCurrentItem != CurrentItem)
                                             ComboChanged = true;
-                                        FI.SetValue(Selected_GO, CurrentItem);
+                                        FI.SetValue(GOC, CurrentItem);
                                     }
+                                    else if (FI.GetType().IsClass && FI.GetType().GetInterface("IEnumerable") == null)
+                                    {
+                                        EnteredHere = true;
+                                        var Name = FI.GetValue(GOC);
+                                        if (FI.GetType().IsClass)
+                                        {
+                                            string DummyRef = (Name != null) ? Name.ToString() : "null";
+                                            ImGui.InputText(FI.Name, ref DummyRef, 20, ImGuiInputTextFlags.ReadOnly);
+                                        }
+                                    }
+
                                     break;
+                            }
+
+                            if (ImGui.BeginDragDropTarget())
+                            {
+                                if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                                {
+                                    if (ContentWindow.DraggedAsset != null && ContentWindow.DraggedAsset.GetType() == FI.FieldType)
+                                    {
+                                        object OldVal = FI.GetValue(GOC);
+
+                                        try
+                                        {
+                                            FI.SetValue(GOC, ContentWindow.DraggedAsset);
+
+                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldVal), Operation.ChangeValue));
+                                            GameObjects_Tab.Redo_Buffer.Clear();
+                                        }
+                                        catch (Exception E) // Log Error?
+                                        { Utility.Log(E.Message); }
+
+                                        ContentWindow.DraggedAsset = null;
+                                    }
+                                    else if(ContentWindow.DraggedAsset != null && ContentWindow.DraggedAsset.GetType() == typeof(KeyValuePair<string, Vector4>))
+                                    {
+                                        if(FI.FieldType == typeof(string))
+                                        {
+                                            object OldVal = FI.GetValue(GOC);
+
+                                            KeyValuePair<string, Vector4> DraggedTex = (KeyValuePair<string, Vector4>)ContentWindow.DraggedAsset;
+
+                                            FI.SetValue(GOC, DraggedTex.Key);
+
+                                            if(GOC is SpriteRenderer && FI.Name == "TextureName")
+                                            {
+                                                var ThisFI = GOC.GetType().GetField("SourceRectangle", BindingFlags.Public | BindingFlags.Instance);
+                                                var ThisPI = GOC.GetType().GetProperty("SourceRectangle", BindingFlags.Public | BindingFlags.Instance);
+                                                Microsoft.Xna.Framework.Graphics.Texture2D texture2D = Setup.Content.Load<Microsoft.Xna.Framework.Graphics.Texture2D>(DraggedTex.Key);
+
+                                                if (ThisFI != null)
+                                                {
+                                                    object OldVal2 = ThisFI.GetValue(GOC);
+                                                    ThisFI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle((int)Math.Round(DraggedTex.Value.X * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.Y * (texture2D.Height / 10000.0f)), (int)Math.Round(DraggedTex.Value.Z * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.W * (texture2D.Height / 10000.0f))));
+
+                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, ThisFI), OldVal2), Operation.ChangeValue));
+                                                }
+                                                else if (ThisPI != null)
+                                                {
+                                                    object OldVal2 = ThisPI.GetValue(GOC);
+                                                    ThisPI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle((int)Math.Round(DraggedTex.Value.X * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.Y * (texture2D.Height / 10000.0f)), (int)Math.Round(DraggedTex.Value.Z * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.W * (texture2D.Height / 10000.0f))));
+
+                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, ThisPI), OldVal2), Operation.ChangeValue));
+                                                }
+                                                else
+                                                    throw new Exception("SourceRectangle member is not found, see if you edited Sprite Renderer");
+                                            }
+
+                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldVal), Operation.ChangeValue));
+                                            GameObjects_Tab.Redo_Buffer.Clear();
+
+                                            ContentWindow.DraggedAsset = null;
+                                        }
+                                    }
+                                }
+                                ImGui.EndDragDropTarget();
                             }
 
                             if (EnteredHere)
                             {
                                 if (ImGui.IsItemActivated()) //Item Is In Edit Mode
-                                    ValueToChange = FI.GetValue(Selected_GO);
+                                    ValueToChange = FI.GetValue(GOC);
                                 else if (ComboChanged || ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
                                 {
                                     ComboChanged = false;
-                                    if (ValueToChange != FI.GetValue(Selected_GO))
+                                    if (ValueToChange != FI.GetValue(GOC))
                                     {
-                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(Selected_GO, FI), ValueToChange), Operation.ChangeValue));
+                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), ValueToChange), Operation.ChangeValue));
                                         GameObjects_Tab.Redo_Buffer.Clear();
                                     }
                                     ValueToChange = null;
@@ -366,24 +856,79 @@ namespace FN_Engine.FN_Editor
                             ImGui.PopID();
                         }
 
-                        PropertyInfo[] PIS_GO = Selected_GO.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                        foreach (PropertyInfo PI in PIS_GO)
+                        PropertyInfo[] PIS = GOC.GetType().GetProperties();
+                        foreach (PropertyInfo PI in PIS)
                         {
                             if (PI.GetMethod == null || !PI.GetMethod.IsPublic || PI.SetMethod == null || !PI.SetMethod.IsPublic)
                                 continue;
 
-                            GameObjectComponent GOC_SO = PI.GetValue(Selected_GO) as GameObjectComponent;
-                            if (GOC_SO != null)
+                            var GOC_SO = PI.GetValue(GOC) as GameObjectComponent;
+                            if (PI.PropertyType.BaseType == typeof(GameObjectComponent))
                             {
-                                ImGui.InputText(PI.Name, ref GOC_SO.gameObject.Name, 50, ImGuiInputTextFlags.ReadOnly);
+                                string GO_Name = GOC_SO == null ? "null" : GOC_SO.gameObject.Name;
+                                ImGui.InputText(PI.Name, ref GO_Name, 50, ImGuiInputTextFlags.ReadOnly);
+
+
+                                if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && DraggedObject != null)
+                                {
+                                    var draggedAsset = DraggedObject as GameObject;
+
+                                    if (draggedAsset != null)
+                                    {
+                                        var component = draggedAsset.GetComponent(PI.PropertyType);
+
+                                        if (component != null)
+                                        {
+                                            var OldCompVal = PI.GetValue(GOC);
+                                            PI.SetValue(GOC, component);
+
+                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldCompVal), Operation.ChangeValue));
+                                            GameObjects_Tab.Redo_Buffer.Clear();
+                                        }
+                                    }
+                                    else if (DraggedObject.GetType() == PI.PropertyType)
+                                    {
+                                        var OldCompVal = PI.GetValue(GOC);
+                                        PI.SetValue(GOC, DraggedObject);
+
+                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldCompVal), Operation.ChangeValue));
+                                        GameObjects_Tab.Redo_Buffer.Clear();
+                                    }
+
+                                    DraggedObject = null;
+                                }
+
                                 continue;
                             }
                             else
                             {
-                                GameObject GO = PI.GetValue(Selected_GO) as GameObject;
+                                var GO = PI.GetValue(GOC) as GameObject;
                                 if (GO != null)
                                 {
                                     ImGui.InputText(PI.Name, ref GO.Name, 50, ImGuiInputTextFlags.ReadOnly);
+
+                                    if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                                    {
+                                        object OldVal = PI.GetValue(GOC);
+
+                                        try
+                                        {
+                                            if (PI.Name != "gameObject" && (ContentWindow.DraggedAsset == null || !(ContentWindow.DraggedAsset is GameObject)) && GameObjects_Tab.DraggedGO == null)
+                                                continue;
+
+                                            PI.SetValue(GOC, ContentWindow.DraggedAsset != null ? ContentWindow.DraggedAsset : GameObjects_Tab.DraggedGO);
+
+                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldVal), Operation.ChangeValue));
+                                            GameObjects_Tab.Redo_Buffer.Clear();
+                                        }
+                                        catch (Exception E) // Log Error?
+                                        { Utility.Log(E.Message); }
+
+                                        GameObjects_Tab.DraggedGO = null;
+                                        ContentWindow.DraggedAsset = null;
+                                        ImGui.EndDragDropTarget();
+                                    }
+
                                     continue;
                                 }
                             }
@@ -393,44 +938,44 @@ namespace FN_Engine.FN_Editor
                             switch (PI.PropertyType.FullName) //Here, I handle basic types
                             {
                                 case "System.Single": //float
-                                    float T = (float)PI.GetValue(Selected_GO);
+                                    float T = (float)PI.GetValue(GOC);
                                     ImGui.DragFloat(PI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    PI.SetValue(Selected_GO, T);
+                                    PI.SetValue(GOC, T);
                                     break;
                                 case "System.Double": //double
-                                    double D = (double)PI.GetValue(Selected_GO);
+                                    double D = (double)PI.GetValue(GOC);
                                     ImGui.InputDouble(PI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    PI.SetValue(Selected_GO, D);
+                                    PI.SetValue(GOC, D);
                                     break;
                                 case "System.Int32": //int 32
-                                    int I = (int)PI.GetValue(Selected_GO);
+                                    int I = (int)PI.GetValue(GOC);
                                     ImGui.InputInt(PI.Name, ref I);
-                                    PI.SetValue(Selected_GO, I);
+                                    PI.SetValue(GOC, I);
                                     break;
                                 case "System.String": //string
-                                    string ST = (string)PI.GetValue(Selected_GO);
+                                    string ST = (string)PI.GetValue(GOC);
                                     if (ST == null)
                                         ST = "null";
                                     ImGui.InputText(PI.Name, ref ST, 50);
-                                    PI.SetValue(Selected_GO, ST);
+                                    PI.SetValue(GOC, ST);
                                     break;
                                 case "System.Int16": //int 16
-                                    short S = (short)PI.GetValue(Selected_GO);
+                                    short S = (short)PI.GetValue(GOC);
                                     Marshal.WriteInt16(intPointer, S);
                                     ImGui.InputScalar(PI.Name, ImGuiDataType.S16, intPointer);
-                                    PI.SetValue(Selected_GO, Marshal.ReadInt16(intPointer));
+                                    PI.SetValue(GOC, Marshal.ReadInt16(intPointer));
                                     break;
                                 case "System.Int64": //int 64
-                                    long L = (long)PI.GetValue(Selected_GO);
+                                    long L = (long)PI.GetValue(GOC);
                                     Marshal.WriteInt64(intPointerL, L);
                                     ImGui.InputScalar(PI.Name, ImGuiDataType.S64, intPointerL);
-                                    PI.SetValue(Selected_GO, Marshal.ReadInt64(intPointerL));
+                                    PI.SetValue(GOC, Marshal.ReadInt64(intPointerL));
                                     break;
                                 case "System.UInt32": //uint 32
-                                    uint U32 = (uint)PI.GetValue(Selected_GO);
+                                    uint U32 = (uint)PI.GetValue(GOC);
                                     Marshal.WriteInt32(intPointerU32, (int)U32);
                                     ImGui.InputScalar(PI.Name, ImGuiDataType.U32, intPointerU32);
-                                    PI.SetValue(Selected_GO, Marshal.ReadInt32(intPointerU32));
+                                    PI.SetValue(GOC, Marshal.ReadInt32(intPointerU32));
                                     break;
                                 //case "System.UInt16": //uint 16
                                 //    FI.SetValue(this, ushort.Parse(Line[2]));
@@ -441,83 +986,183 @@ namespace FN_Engine.FN_Editor
                                 //    fieldInfos.Add(FI);
                                 //    break;
                                 case "System.Boolean": //bool
-                                    bool B = (bool)PI.GetValue(Selected_GO);
+                                    bool B = (bool)PI.GetValue(GOC);
                                     ImGui.Checkbox(PI.Name, ref B);
-                                    PI.SetValue(Selected_GO, B);
+                                    PI.SetValue(GOC, B);
                                     break;
                                 case "Microsoft.Xna.Framework.Vector2": //Vector2
-                                    Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)PI.GetValue(Selected_GO);
+                                    Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)PI.GetValue(GOC);
                                     Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
                                     ImGui.DragFloat2(PI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
+                                    PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
                                     break;
                                 case "Microsoft.Xna.Framework.Vector3": //Vector3
-                                    Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)PI.GetValue(Selected_GO);
+                                    Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)PI.GetValue(GOC);
                                     Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
                                     ImGui.DragFloat3(PI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
+                                    PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
                                     break;
                                 case "Microsoft.Xna.Framework.Vector4": //Vector4
-                                    Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)PI.GetValue(Selected_GO);
+                                    Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)PI.GetValue(GOC);
                                     Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
                                     ImGui.DragFloat4(PI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
+                                    PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
                                     break;
                                 case "System.Numerics.Vector2": //Vector2
-                                    System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)PI.GetValue(Selected_GO);
+                                    System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)PI.GetValue(GOC);
                                     Vector2 V2_IMGUI_Numeric = new System.Numerics.Vector2(V2_Numeric.X, V2_Numeric.Y);
                                     ImGui.DragFloat2(PI.Name, ref V2_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    PI.SetValue(Selected_GO, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
+                                    PI.SetValue(GOC, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
                                     break;
                                 case "System.Numerics.Vector3": //Vector3
-                                    System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)PI.GetValue(Selected_GO);
+                                    System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)PI.GetValue(GOC);
                                     Vector3 V3_IMGUI_Numeric = new System.Numerics.Vector3(V3_Numeric.X, V3_Numeric.Y, V3_Numeric.Z);
                                     ImGui.DragFloat3(PI.Name, ref V3_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    PI.SetValue(Selected_GO, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
+                                    PI.SetValue(GOC, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
                                     break;
                                 case "System.Numerics.Vector4": //Vector4
-                                    System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)PI.GetValue(Selected_GO);
+                                    System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)PI.GetValue(GOC);
                                     Vector4 V4_IMGUI_Numeric = new System.Numerics.Vector4(V4_Numeric.X, V4_Numeric.Y, V4_Numeric.Z, V4_Numeric.W);
                                     ImGui.DragFloat4(PI.Name, ref V4_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                    PI.SetValue(Selected_GO, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
+                                    PI.SetValue(GOC, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
                                     break;
                                 case "Microsoft.Xna.Framework.Rectangle": //Rectangle
-                                    Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)PI.GetValue(Selected_GO);
+                                    Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)PI.GetValue(GOC);
                                     int[] Rec_ARR = new int[4] { Rec.X, Rec.Y, Rec.Width, Rec.Height };
                                     ImGui.DragInt4(PI.Name, ref Rec_ARR[0]);
-                                    PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
+                                    PI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
+                                    break;
+                                case "Microsoft.Xna.Framework.Color": //Color
+                                    Microsoft.Xna.Framework.Color V4_C = (Microsoft.Xna.Framework.Color)PI.GetValue(GOC);
+                                    Vector4 V4_IMGUI_C = new Vector4(V4_C.R / 255.0f, V4_C.G / 255.0f, V4_C.B / 255.0f, V4_C.A / 255.0f);
+                                    ImGui.ColorButton(PI.Name, V4_IMGUI_C);
+                                    if (ImGui.IsItemClicked())
+                                    {
+                                        if (ActivePI == PI && GOC == ActiveGOC)
+                                            ColorClicked = !ColorClicked;
+                                        else
+                                            ColorClicked = false;
+                                        ActivePI = PI;
+                                        ActiveGOC = GOC;
+                                    }
+
+                                    if (ActivePI == PI && GOC == ActiveGOC && !ColorClicked)
+                                    {
+                                        ImGui.PushID(IDs++);
+                                        ImGui.ColorPicker4("Color", ref V4_IMGUI_C);
+                                        ImGui.PopID();
+                                    }
+
+                                    PI.SetValue(GOC, new Microsoft.Xna.Framework.Color(V4_IMGUI_C.X, V4_IMGUI_C.Y, V4_IMGUI_C.Z, V4_IMGUI_C.W));
                                     break;
                                 case "Microsoft.Xna.Framework.Point": //Point
-                                    Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)PI.GetValue(Selected_GO);
+                                    Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)PI.GetValue(GOC);
                                     int[] P2_ARR = new int[2] { P2.X, P2.Y };
                                     ImGui.DragInt2(PI.Name, ref P2_ARR[0]);
-                                    PI.SetValue(Selected_GO, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
+                                    PI.SetValue(GOC, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
                                     break;
                                 default:
                                     EnteredHere = false;
+
                                     if (PI.PropertyType.IsEnum)
                                     {
                                         EnteredHere = true;
-                                        int CurrentItem = (int)PI.GetValue(Selected_GO);
+                                        int CurrentItem = (int)PI.GetValue(GOC);
                                         int TempCurrentItem = CurrentItem;
                                         ImGui.Combo(PI.Name, ref CurrentItem, Enum.GetNames(PI.PropertyType), Enum.GetNames(PI.PropertyType).Length);
                                         if (TempCurrentItem != CurrentItem)
                                             ComboChanged = true;
-                                        PI.SetValue(Selected_GO, CurrentItem);
+                                        PI.SetValue(GOC, CurrentItem);
                                     }
+                                    else if (PI.GetType().IsClass && PI.GetType().GetInterface("IEnumerable") == null)
+                                    {
+                                        EnteredHere = true;
+                                        var Name = PI.GetValue(GOC);
+                                        if (PI.GetType().IsClass)
+                                        {
+                                            string DummyRef = (Name != null) ? Name.ToString() : "null";
+                                            ImGui.InputText(PI.Name, ref DummyRef, 20, ImGuiInputTextFlags.ReadOnly);
+                                        }
+                                    }
+
                                     break;
+                            }
+
+                            if (ImGui.BeginDragDropTarget())
+                            {
+                                if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                                {
+                                    if (ContentWindow.DraggedAsset != null && ContentWindow.DraggedAsset.GetType() == PI.PropertyType)
+                                    {
+                                        object OldVal = PI.GetValue(GOC);
+
+                                        try
+                                        {
+                                            PI.SetValue(GOC, ContentWindow.DraggedAsset);
+
+                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldVal), Operation.ChangeValue));
+                                            GameObjects_Tab.Redo_Buffer.Clear();
+                                        }
+                                        catch (Exception E) // Log Error?
+                                        { Utility.Log(E.Message); }
+
+                                        ContentWindow.DraggedAsset = null;
+                                    }
+                                    else if (ContentWindow.DraggedAsset != null && ContentWindow.DraggedAsset.GetType() == typeof(KeyValuePair<string, Vector4>))
+                                    {
+                                        if (PI.PropertyType == typeof(string))
+                                        {
+                                            object OldVal = PI.GetValue(GOC);
+
+                                            KeyValuePair<string, Vector4> DraggedTex = (KeyValuePair<string, Vector4>)ContentWindow.DraggedAsset;
+
+                                            PI.SetValue(GOC, DraggedTex.Key);
+
+                                            if (GOC is SpriteRenderer && PI.Name == "TextureName")
+                                            {
+                                                var ThisFI = GOC.GetType().GetField("SourceRectangle", BindingFlags.Public | BindingFlags.Instance);
+                                                var ThisPI = GOC.GetType().GetProperty("SourceRectangle", BindingFlags.Public | BindingFlags.Instance);
+                                                Microsoft.Xna.Framework.Graphics.Texture2D texture2D = Setup.Content.Load<Microsoft.Xna.Framework.Graphics.Texture2D>(DraggedTex.Key);
+
+                                                if (ThisFI != null)
+                                                {
+                                                    object OldVal2 = ThisFI.GetValue(GOC);
+                                                    ThisFI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle((int)Math.Round(DraggedTex.Value.X * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.Y * (texture2D.Height / 10000.0f)), (int)Math.Round(DraggedTex.Value.Z * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.W * (texture2D.Height / 10000.0f))));
+
+                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, ThisFI), OldVal2), Operation.ChangeValue));
+                                                }
+                                                else if (ThisPI != null)
+                                                {
+                                                    object OldVal2 = ThisPI.GetValue(GOC);
+                                                    ThisPI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle((int)Math.Round(DraggedTex.Value.X * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.Y * (texture2D.Height / 10000.0f)), (int)Math.Round(DraggedTex.Value.Z * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.W * (texture2D.Height / 10000.0f))));
+
+                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, ThisPI), OldVal2), Operation.ChangeValue));
+                                                }
+                                                else
+                                                    throw new Exception("SourceRectangle member is not found, see if you edited Sprite Renderer");
+                                            }
+
+                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldVal), Operation.ChangeValue));
+                                            GameObjects_Tab.Redo_Buffer.Clear();
+
+                                            ContentWindow.DraggedAsset = null;
+                                        }
+                                    }
+                                }
+
+                                ImGui.EndDragDropTarget();
                             }
 
                             if (EnteredHere)
                             {
                                 if (ImGui.IsItemActivated()) //Item Is In Edit Mode
-                                    ValueToChange = PI.GetValue(Selected_GO);
+                                    ValueToChange = PI.GetValue(GOC);
                                 else if (ComboChanged || ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
                                 {
                                     ComboChanged = false;
-                                    if (ValueToChange != PI.GetValue(Selected_GO))
+                                    if (ValueToChange != PI.GetValue(GOC))
                                     {
-                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(Selected_GO, PI), ValueToChange), Operation.ChangeValue));
+                                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), ValueToChange), Operation.ChangeValue));
                                         GameObjects_Tab.Redo_Buffer.Clear();
                                     }
                                     ValueToChange = null;
@@ -526,726 +1171,58 @@ namespace FN_Engine.FN_Editor
 
                             ImGui.PopID();
                         }
+                    }
+                    ImGui.PopID();
 
-                        ImGui.NewLine();
-                        ImGui.Separator();
-                        ImGui.NewLine();
-
-                        ImGui.Indent((ImGui.GetWindowSize().X - ImGui.CalcTextSize("Components" + " ---- ").X) * 0.5f);
-                        ImGui.Text("-- " + "Components" + "--");
-                        ImGui.Unindent((ImGui.GetWindowSize().X - ImGui.CalcTextSize("Components" + "---- ").X) * 0.5f);
-                        ImGui.Text("\n");
-
-                        GameObjectComponent GOC_Removed = null;
-                        int T_Counter = 0;
-
-                        while (ComponentsNotRemoved.Count < Selected_GO.GameObjectComponents.Count)
-                            ComponentsNotRemoved.Add(true);
-
-                        bool[] ComponentsNotRemoved_Arr = ComponentsNotRemoved.ToArray();
-                        int H = 0;
-                        foreach (GameObjectComponent GOC in Selected_GO.GameObjectComponents)
+                    if (!ComponentsNotRemoved_Arr[T_Counter])
+                    {
+                        if (GOC.gameObject.Name != "Camera Controller")
                         {
-                            ImGui.PushID(H++);
-                            if (ImGui.CollapsingHeader(GOC.GetType().Name, ref ComponentsNotRemoved_Arr[T_Counter], ImGuiTreeNodeFlags.DefaultOpen))
-                            {
-                                if(ImGui.BeginDragDropSource())
-                                {
-                                    DraggedObject = GOC;
-                                    ImGui.SetDragDropPayload("CompDragged", IntPtr.Zero, 0);
-
-                                    ImGui.EndDragDropSource();
-                                }
-
-                                FieldInfo[] FIS = GOC.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
-                                foreach (FieldInfo FI in FIS)
-                                {
-                                    //if (FI.GetValue(GOC) == null)
-                                    //continue;
-                                    
-                                    var GOC_SO = FI.GetValue(GOC) as GameObjectComponent;
-                                    if (FI.FieldType.BaseType == typeof(GameObjectComponent))
-                                    {
-                                        string GO_Name = GOC_SO == null ? "null" : GOC_SO.gameObject.Name;
-                                        ImGui.InputText(FI.Name, ref GO_Name, 50, ImGuiInputTextFlags.ReadOnly);
-
-
-                                        if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && DraggedObject != null)
-                                        {
-                                            var draggedAsset = DraggedObject as GameObject;
-
-                                            if (draggedAsset != null)
-                                            {
-                                                var component = draggedAsset.GetComponent(FI.FieldType);
-
-                                                if (component != null)
-                                                {
-                                                    var OldCompVal = FI.GetValue(GOC);
-                                                    FI.SetValue(GOC, component);
-
-                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldCompVal), Operation.ChangeValue));
-                                                    GameObjects_Tab.Redo_Buffer.Clear();
-                                                }
-                                            }
-                                            else if (DraggedObject.GetType() == FI.FieldType)
-                                            {
-                                                var OldCompVal = FI.GetValue(GOC);
-                                                FI.SetValue(GOC, DraggedObject);
-
-                                                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldCompVal), Operation.ChangeValue));
-                                                GameObjects_Tab.Redo_Buffer.Clear();
-                                            }
-
-                                            DraggedObject = null;
-                                        }
-
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        var GO = FI.GetValue(GOC) as GameObject;
-                                        if (GO != null)
-                                        {
-                                            ImGui.InputText(FI.Name, ref GO.Name, 50, ImGuiInputTextFlags.ReadOnly);
-
-                                            if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
-                                            {
-                                                object OldVal = FI.GetValue(GOC);
-
-                                                try
-                                                {
-                                                    if (FI.Name != "gameObject" && (ContentWindow.DraggedAsset == null || !(ContentWindow.DraggedAsset is GameObject)) && GameObjects_Tab.DraggedGO == null)
-                                                        continue;
-
-                                                    FI.SetValue(GOC, ContentWindow.DraggedAsset != null? ContentWindow.DraggedAsset : GameObjects_Tab.DraggedGO);
-
-                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldVal), Operation.ChangeValue));
-                                                    GameObjects_Tab.Redo_Buffer.Clear();
-                                                }
-                                                catch (Exception E) // Log Error?
-                                                { Utility.Log(E.Message); }
-
-                                                GameObjects_Tab.DraggedGO = null;
-                                                ContentWindow.DraggedAsset = null;
-                                                ImGui.EndDragDropTarget();
-                                            }
-
-                                            continue;
-                                        }
-                                    }
-
-                                    bool EnteredHere = true;
-                                    ImGui.PushID(IDs++);
-                                    switch (FI.FieldType.FullName) //Here, I handle basic types
-                                    {
-                                        case "System.Single": //float
-                                            float T = (float)FI.GetValue(GOC);
-                                            ImGui.DragFloat(FI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            FI.SetValue(GOC, T);
-                                            break;
-                                        case "System.Double": //double
-                                            double D = (double)FI.GetValue(GOC);
-                                            ImGui.InputDouble(FI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            FI.SetValue(GOC, D);
-                                            break;
-                                        case "System.Int32": //int 32
-                                            int I = (int)FI.GetValue(GOC);
-                                            ImGui.InputInt(FI.Name, ref I);
-                                            FI.SetValue(GOC, I);
-                                            break;
-                                        case "System.String": //string
-                                            string ST = (string)FI.GetValue(GOC);
-                                            if (ST == null)
-                                                ST = "null";
-                                            ImGui.InputText(FI.Name, ref ST, 50);
-                                            FI.SetValue(GOC, ST);
-                                            break;
-                                        case "System.Int16": //int 16
-                                            short S = (short)FI.GetValue(GOC);
-                                            Marshal.WriteInt16(intPointer, S);
-                                            ImGui.InputScalar(FI.Name, ImGuiDataType.S16, intPointer);
-                                            FI.SetValue(GOC, Marshal.ReadInt16(intPointer));
-                                            break;
-                                        case "System.Int64": //int 64
-                                            long L = (long)FI.GetValue(GOC);
-                                            Marshal.WriteInt64(intPointerL, L);
-                                            ImGui.InputScalar(FI.Name, ImGuiDataType.S64, intPointerL);
-                                            FI.SetValue(GOC, Marshal.ReadInt64(intPointerL));
-                                            break;
-                                        case "System.UInt32": //uint 32
-                                            uint U32 = (uint)FI.GetValue(GOC);
-                                            Marshal.WriteInt32(intPointerU32, (int)U32);
-                                            ImGui.InputScalar(FI.Name, ImGuiDataType.U32, intPointerU32);
-                                            FI.SetValue(GOC, Marshal.ReadInt32(intPointerU32));
-                                            break;
-                                        //case "System.UInt16": //uint 16
-                                        //    FI.SetValue(this, ushort.Parse(Line[2]));
-                                        //    fieldInfos.Add(FI);
-                                        //    break;
-                                        //case "System.UInt64": //uint 64
-                                        //    FI.SetValue(this, ulong.Parse(Line[2]));
-                                        //    fieldInfos.Add(FI);
-                                        //    break;
-                                        case "System.Boolean": //bool
-                                            bool B = (bool)FI.GetValue(GOC);
-                                            ImGui.Checkbox(FI.Name, ref B);
-                                            FI.SetValue(GOC, B);
-                                            break;
-                                        case "Microsoft.Xna.Framework.Vector2": //Vector2
-                                            Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)FI.GetValue(GOC);
-                                            Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
-                                            ImGui.DragFloat2(FI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
-                                            break;
-                                        case "Microsoft.Xna.Framework.Vector3": //Vector3
-                                            Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)FI.GetValue(GOC);
-                                            Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
-                                            ImGui.DragFloat3(FI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
-                                            break;
-                                        case "Microsoft.Xna.Framework.Vector4": //Vector4
-                                            Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)FI.GetValue(GOC);
-                                            Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
-                                            ImGui.DragFloat4(FI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            FI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
-                                            break;
-                                        case "System.Numerics.Vector2": //Vector2
-                                            System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)FI.GetValue(GOC);
-                                            Vector2 V2_IMGUI_Numeric = new System.Numerics.Vector2(V2_Numeric.X, V2_Numeric.Y);
-                                            ImGui.DragFloat2(FI.Name, ref V2_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            FI.SetValue(GOC, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
-                                            break;
-                                        case "System.Numerics.Vector3": //Vector3
-                                            System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)FI.GetValue(GOC);
-                                            Vector3 V3_IMGUI_Numeric = new System.Numerics.Vector3(V3_Numeric.X, V3_Numeric.Y, V3_Numeric.Z);
-                                            ImGui.DragFloat3(FI.Name, ref V3_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            FI.SetValue(GOC, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
-                                            break;
-                                        case "System.Numerics.Vector4": //Vector4
-                                            System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)FI.GetValue(GOC);
-                                            Vector4 V4_IMGUI_Numeric = new System.Numerics.Vector4(V4_Numeric.X, V4_Numeric.Y, V4_Numeric.Z, V4_Numeric.W);
-                                            ImGui.DragFloat4(FI.Name, ref V4_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            FI.SetValue(GOC, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
-                                            break;
-                                        case "Microsoft.Xna.Framework.Rectangle": //Rectangle
-                                            Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)FI.GetValue(GOC);
-                                            int[] Rec_ARR = new int[4] { Rec.X, Rec.Y, Rec.Width, Rec.Height };
-                                            ImGui.DragInt4(FI.Name, ref Rec_ARR[0]);
-                                            FI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
-                                            break;
-                                        case "Microsoft.Xna.Framework.Color": //Color
-                                            Microsoft.Xna.Framework.Color V4_C = (Microsoft.Xna.Framework.Color)FI.GetValue(GOC);
-                                            Vector4 V4_IMGUI_C = new Vector4(V4_C.R / 255.0f, V4_C.G / 255.0f, V4_C.B / 255.0f, V4_C.A / 255.0f);
-                                            ImGui.ColorButton(FI.Name, V4_IMGUI_C);
-                                            if (ImGui.IsItemClicked())
-                                            {
-                                                if (ActiveFI == FI && GOC == ActiveGOC)
-                                                    ColorClicked = !ColorClicked;
-                                                else
-                                                    ColorClicked = false;
-                                                ActiveFI = FI;
-                                                ActiveGOC = GOC;
-                                            }
-
-                                            if (ActiveFI == FI && GOC == ActiveGOC && !ColorClicked)
-                                            {
-                                                ImGui.PushID(IDs++);
-                                                ImGui.ColorPicker4("Color", ref V4_IMGUI_C);
-                                                ImGui.PopID();
-                                            }
-
-                                            FI.SetValue(GOC, new Microsoft.Xna.Framework.Color(V4_IMGUI_C.X, V4_IMGUI_C.Y, V4_IMGUI_C.Z, V4_IMGUI_C.W));
-                                            break;
-                                        case "Microsoft.Xna.Framework.Point": //Point
-                                            Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)FI.GetValue(GOC);
-                                            int[] P2_ARR = new int[2] { P2.X, P2.Y };
-                                            ImGui.DragInt2(FI.Name, ref P2_ARR[0]);
-                                            FI.SetValue(GOC, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
-                                            break;
-                                        default:
-                                            EnteredHere = false;
-
-                                            if (FI.FieldType.IsEnum)
-                                            {
-                                                EnteredHere = true;
-                                                int CurrentItem = (int)FI.GetValue(GOC);
-                                                int TempCurrentItem = CurrentItem;
-                                                ImGui.Combo(FI.Name, ref CurrentItem, Enum.GetNames(FI.FieldType), Enum.GetNames(FI.FieldType).Length);
-
-                                                if (TempCurrentItem != CurrentItem)
-                                                    ComboChanged = true;
-                                                FI.SetValue(GOC, CurrentItem);
-                                            }
-                                            else if (FI.GetType().IsClass && FI.GetType().GetInterface("IEnumerable") == null)
-                                            {
-                                                EnteredHere = true;
-                                                var Name = FI.GetValue(GOC);
-                                                if (FI.GetType().IsClass)
-                                                {
-                                                    string DummyRef = (Name != null) ? Name.ToString() : "null";
-                                                    ImGui.InputText(FI.Name, ref DummyRef, 20, ImGuiInputTextFlags.ReadOnly);
-                                                }
-                                            }
-
-                                            break;
-                                    }
-
-                                    if (ImGui.BeginDragDropTarget())
-                                    {
-                                        if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
-                                        {
-                                            if (ContentWindow.DraggedAsset != null && ContentWindow.DraggedAsset.GetType() == FI.FieldType)
-                                            {
-                                                object OldVal = FI.GetValue(GOC);
-
-                                                try
-                                                {
-                                                    FI.SetValue(GOC, ContentWindow.DraggedAsset);
-
-                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldVal), Operation.ChangeValue));
-                                                    GameObjects_Tab.Redo_Buffer.Clear();
-                                                }
-                                                catch (Exception E) // Log Error?
-                                                { Utility.Log(E.Message); }
-
-                                                ContentWindow.DraggedAsset = null;
-                                            }
-                                            else if(ContentWindow.DraggedAsset != null && ContentWindow.DraggedAsset.GetType() == typeof(KeyValuePair<string, Vector4>))
-                                            {
-                                                if(FI.FieldType == typeof(string))
-                                                {
-                                                    object OldVal = FI.GetValue(GOC);
-
-                                                    KeyValuePair<string, Vector4> DraggedTex = (KeyValuePair<string, Vector4>)ContentWindow.DraggedAsset;
-
-                                                    FI.SetValue(GOC, DraggedTex.Key);
-
-                                                    if(GOC is SpriteRenderer && FI.Name == "TextureName")
-                                                    {
-                                                        var ThisFI = GOC.GetType().GetField("SourceRectangle", BindingFlags.Public | BindingFlags.Instance);
-                                                        var ThisPI = GOC.GetType().GetProperty("SourceRectangle", BindingFlags.Public | BindingFlags.Instance);
-                                                        Microsoft.Xna.Framework.Graphics.Texture2D texture2D = Setup.Content.Load<Microsoft.Xna.Framework.Graphics.Texture2D>(DraggedTex.Key);
-
-                                                        if (ThisFI != null)
-                                                        {
-                                                            object OldVal2 = ThisFI.GetValue(GOC);
-                                                            ThisFI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle((int)Math.Round(DraggedTex.Value.X * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.Y * (texture2D.Height / 10000.0f)), (int)Math.Round(DraggedTex.Value.Z * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.W * (texture2D.Height / 10000.0f))));
-
-                                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, ThisFI), OldVal2), Operation.ChangeValue));
-                                                        }
-                                                        else if (ThisPI != null)
-                                                        {
-                                                            object OldVal2 = ThisPI.GetValue(GOC);
-                                                            ThisPI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle((int)Math.Round(DraggedTex.Value.X * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.Y * (texture2D.Height / 10000.0f)), (int)Math.Round(DraggedTex.Value.Z * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.W * (texture2D.Height / 10000.0f))));
-
-                                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, ThisPI), OldVal2), Operation.ChangeValue));
-                                                        }
-                                                        else
-                                                            throw new Exception("SourceRectangle member is not found, see if you edited Sprite Renderer");
-                                                    }
-
-                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), OldVal), Operation.ChangeValue));
-                                                    GameObjects_Tab.Redo_Buffer.Clear();
-
-                                                    ContentWindow.DraggedAsset = null;
-                                                }
-                                            }
-                                        }
-                                        ImGui.EndDragDropTarget();
-                                    }
-
-                                    if (EnteredHere)
-                                    {
-                                        if (ImGui.IsItemActivated()) //Item Is In Edit Mode
-                                            ValueToChange = FI.GetValue(GOC);
-                                        else if (ComboChanged || ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
-                                        {
-                                            ComboChanged = false;
-                                            if (ValueToChange != FI.GetValue(GOC))
-                                            {
-                                                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, FI), ValueToChange), Operation.ChangeValue));
-                                                GameObjects_Tab.Redo_Buffer.Clear();
-                                            }
-                                            ValueToChange = null;
-                                        }
-                                    }
-
-                                    ImGui.PopID();
-                                }
-
-                                PropertyInfo[] PIS = GOC.GetType().GetProperties();
-                                foreach (PropertyInfo PI in PIS)
-                                {
-                                    if (PI.GetMethod == null || !PI.GetMethod.IsPublic || PI.SetMethod == null || !PI.SetMethod.IsPublic)
-                                        continue;
-
-                                    var GOC_SO = PI.GetValue(GOC) as GameObjectComponent;
-                                    if (PI.PropertyType.BaseType == typeof(GameObjectComponent))
-                                    {
-                                        string GO_Name = GOC_SO == null ? "null" : GOC_SO.gameObject.Name;
-                                        ImGui.InputText(PI.Name, ref GO_Name, 50, ImGuiInputTextFlags.ReadOnly);
-
-
-                                        if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && DraggedObject != null)
-                                        {
-                                            var draggedAsset = DraggedObject as GameObject;
-
-                                            if (draggedAsset != null)
-                                            {
-                                                var component = draggedAsset.GetComponent(PI.PropertyType);
-
-                                                if (component != null)
-                                                {
-                                                    var OldCompVal = PI.GetValue(GOC);
-                                                    PI.SetValue(GOC, component);
-
-                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldCompVal), Operation.ChangeValue));
-                                                    GameObjects_Tab.Redo_Buffer.Clear();
-                                                }
-                                            }
-                                            else if (DraggedObject.GetType() == PI.PropertyType)
-                                            {
-                                                var OldCompVal = PI.GetValue(GOC);
-                                                PI.SetValue(GOC, DraggedObject);
-
-                                                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldCompVal), Operation.ChangeValue));
-                                                GameObjects_Tab.Redo_Buffer.Clear();
-                                            }
-
-                                            DraggedObject = null;
-                                        }
-
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        var GO = PI.GetValue(GOC) as GameObject;
-                                        if (GO != null)
-                                        {
-                                            ImGui.InputText(PI.Name, ref GO.Name, 50, ImGuiInputTextFlags.ReadOnly);
-
-                                            if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
-                                            {
-                                                object OldVal = PI.GetValue(GOC);
-
-                                                try
-                                                {
-                                                    if (PI.Name != "gameObject" && (ContentWindow.DraggedAsset == null || !(ContentWindow.DraggedAsset is GameObject)) && GameObjects_Tab.DraggedGO == null)
-                                                        continue;
-
-                                                    PI.SetValue(GOC, ContentWindow.DraggedAsset != null ? ContentWindow.DraggedAsset : GameObjects_Tab.DraggedGO);
-
-                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldVal), Operation.ChangeValue));
-                                                    GameObjects_Tab.Redo_Buffer.Clear();
-                                                }
-                                                catch (Exception E) // Log Error?
-                                                { Utility.Log(E.Message); }
-
-                                                GameObjects_Tab.DraggedGO = null;
-                                                ContentWindow.DraggedAsset = null;
-                                                ImGui.EndDragDropTarget();
-                                            }
-
-                                            continue;
-                                        }
-                                    }
-
-                                    bool EnteredHere = true;
-                                    ImGui.PushID(IDs++);
-                                    switch (PI.PropertyType.FullName) //Here, I handle basic types
-                                    {
-                                        case "System.Single": //float
-                                            float T = (float)PI.GetValue(GOC);
-                                            ImGui.DragFloat(PI.Name, ref T, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            PI.SetValue(GOC, T);
-                                            break;
-                                        case "System.Double": //double
-                                            double D = (double)PI.GetValue(GOC);
-                                            ImGui.InputDouble(PI.Name, ref D, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            PI.SetValue(GOC, D);
-                                            break;
-                                        case "System.Int32": //int 32
-                                            int I = (int)PI.GetValue(GOC);
-                                            ImGui.InputInt(PI.Name, ref I);
-                                            PI.SetValue(GOC, I);
-                                            break;
-                                        case "System.String": //string
-                                            string ST = (string)PI.GetValue(GOC);
-                                            if (ST == null)
-                                                ST = "null";
-                                            ImGui.InputText(PI.Name, ref ST, 50);
-                                            PI.SetValue(GOC, ST);
-                                            break;
-                                        case "System.Int16": //int 16
-                                            short S = (short)PI.GetValue(GOC);
-                                            Marshal.WriteInt16(intPointer, S);
-                                            ImGui.InputScalar(PI.Name, ImGuiDataType.S16, intPointer);
-                                            PI.SetValue(GOC, Marshal.ReadInt16(intPointer));
-                                            break;
-                                        case "System.Int64": //int 64
-                                            long L = (long)PI.GetValue(GOC);
-                                            Marshal.WriteInt64(intPointerL, L);
-                                            ImGui.InputScalar(PI.Name, ImGuiDataType.S64, intPointerL);
-                                            PI.SetValue(GOC, Marshal.ReadInt64(intPointerL));
-                                            break;
-                                        case "System.UInt32": //uint 32
-                                            uint U32 = (uint)PI.GetValue(GOC);
-                                            Marshal.WriteInt32(intPointerU32, (int)U32);
-                                            ImGui.InputScalar(PI.Name, ImGuiDataType.U32, intPointerU32);
-                                            PI.SetValue(GOC, Marshal.ReadInt32(intPointerU32));
-                                            break;
-                                        //case "System.UInt16": //uint 16
-                                        //    FI.SetValue(this, ushort.Parse(Line[2]));
-                                        //    fieldInfos.Add(FI);
-                                        //    break;
-                                        //case "System.UInt64": //uint 64
-                                        //    FI.SetValue(this, ulong.Parse(Line[2]));
-                                        //    fieldInfos.Add(FI);
-                                        //    break;
-                                        case "System.Boolean": //bool
-                                            bool B = (bool)PI.GetValue(GOC);
-                                            ImGui.Checkbox(PI.Name, ref B);
-                                            PI.SetValue(GOC, B);
-                                            break;
-                                        case "Microsoft.Xna.Framework.Vector2": //Vector2
-                                            Microsoft.Xna.Framework.Vector2 V2 = (Microsoft.Xna.Framework.Vector2)PI.GetValue(GOC);
-                                            Vector2 V2_IMGUI = new Vector2(V2.X, V2.Y);
-                                            ImGui.DragFloat2(PI.Name, ref V2_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector2(V2_IMGUI.X, V2_IMGUI.Y));
-                                            break;
-                                        case "Microsoft.Xna.Framework.Vector3": //Vector3
-                                            Microsoft.Xna.Framework.Vector3 V3 = (Microsoft.Xna.Framework.Vector3)PI.GetValue(GOC);
-                                            Vector3 V3_IMGUI = new Vector3(V3.X, V3.Y, V3.Z);
-                                            ImGui.DragFloat3(PI.Name, ref V3_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector3(V3_IMGUI.X, V3_IMGUI.Y, V3_IMGUI.Z));
-                                            break;
-                                        case "Microsoft.Xna.Framework.Vector4": //Vector4
-                                            Microsoft.Xna.Framework.Vector4 V4 = (Microsoft.Xna.Framework.Vector4)PI.GetValue(GOC);
-                                            Vector4 V4_IMGUI = new Vector4(V4.X, V4.Y, V4.Z, V4.W);
-                                            ImGui.DragFloat4(PI.Name, ref V4_IMGUI, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            PI.SetValue(GOC, new Microsoft.Xna.Framework.Vector4(V4_IMGUI.X, V4_IMGUI.Y, V4_IMGUI.Z, V4_IMGUI.W));
-                                            break;
-                                        case "System.Numerics.Vector2": //Vector2
-                                            System.Numerics.Vector2 V2_Numeric = (System.Numerics.Vector2)PI.GetValue(GOC);
-                                            Vector2 V2_IMGUI_Numeric = new System.Numerics.Vector2(V2_Numeric.X, V2_Numeric.Y);
-                                            ImGui.DragFloat2(PI.Name, ref V2_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            PI.SetValue(GOC, new System.Numerics.Vector2(V2_IMGUI_Numeric.X, V2_IMGUI_Numeric.Y));
-                                            break;
-                                        case "System.Numerics.Vector3": //Vector3
-                                            System.Numerics.Vector3 V3_Numeric = (System.Numerics.Vector3)PI.GetValue(GOC);
-                                            Vector3 V3_IMGUI_Numeric = new System.Numerics.Vector3(V3_Numeric.X, V3_Numeric.Y, V3_Numeric.Z);
-                                            ImGui.DragFloat3(PI.Name, ref V3_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            PI.SetValue(GOC, new System.Numerics.Vector3(V3_IMGUI_Numeric.X, V3_IMGUI_Numeric.Y, V3_IMGUI_Numeric.Z));
-                                            break;
-                                        case "System.Numerics.Vector4": //Vector4
-                                            System.Numerics.Vector4 V4_Numeric = (System.Numerics.Vector4)PI.GetValue(GOC);
-                                            Vector4 V4_IMGUI_Numeric = new System.Numerics.Vector4(V4_Numeric.X, V4_Numeric.Y, V4_Numeric.Z, V4_Numeric.W);
-                                            ImGui.DragFloat4(PI.Name, ref V4_IMGUI_Numeric, 0.01f * Math.Abs(ImGui.GetMouseDragDelta().X));
-                                            PI.SetValue(GOC, new System.Numerics.Vector4(V4_IMGUI_Numeric.X, V4_IMGUI_Numeric.Y, V4_IMGUI_Numeric.Z, V4_IMGUI_Numeric.W));
-                                            break;
-                                        case "Microsoft.Xna.Framework.Rectangle": //Rectangle
-                                            Microsoft.Xna.Framework.Rectangle Rec = (Microsoft.Xna.Framework.Rectangle)PI.GetValue(GOC);
-                                            int[] Rec_ARR = new int[4] { Rec.X, Rec.Y, Rec.Width, Rec.Height };
-                                            ImGui.DragInt4(PI.Name, ref Rec_ARR[0]);
-                                            PI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle(Rec_ARR[0], Rec_ARR[1], Rec_ARR[2], Rec_ARR[3]));
-                                            break;
-                                        case "Microsoft.Xna.Framework.Color": //Color
-                                            Microsoft.Xna.Framework.Color V4_C = (Microsoft.Xna.Framework.Color)PI.GetValue(GOC);
-                                            Vector4 V4_IMGUI_C = new Vector4(V4_C.R / 255.0f, V4_C.G / 255.0f, V4_C.B / 255.0f, V4_C.A / 255.0f);
-                                            ImGui.ColorButton(PI.Name, V4_IMGUI_C);
-                                            if (ImGui.IsItemClicked())
-                                            {
-                                                if (ActivePI == PI && GOC == ActiveGOC)
-                                                    ColorClicked = !ColorClicked;
-                                                else
-                                                    ColorClicked = false;
-                                                ActivePI = PI;
-                                                ActiveGOC = GOC;
-                                            }
-
-                                            if (ActivePI == PI && GOC == ActiveGOC && !ColorClicked)
-                                            {
-                                                ImGui.PushID(IDs++);
-                                                ImGui.ColorPicker4("Color", ref V4_IMGUI_C);
-                                                ImGui.PopID();
-                                            }
-
-                                            PI.SetValue(GOC, new Microsoft.Xna.Framework.Color(V4_IMGUI_C.X, V4_IMGUI_C.Y, V4_IMGUI_C.Z, V4_IMGUI_C.W));
-                                            break;
-                                        case "Microsoft.Xna.Framework.Point": //Point
-                                            Microsoft.Xna.Framework.Point P2 = (Microsoft.Xna.Framework.Point)PI.GetValue(GOC);
-                                            int[] P2_ARR = new int[2] { P2.X, P2.Y };
-                                            ImGui.DragInt2(PI.Name, ref P2_ARR[0]);
-                                            PI.SetValue(GOC, new Microsoft.Xna.Framework.Point(P2_ARR[0], P2_ARR[1]));
-                                            break;
-                                        default:
-                                            EnteredHere = false;
-
-                                            if (PI.PropertyType.IsEnum)
-                                            {
-                                                EnteredHere = true;
-                                                int CurrentItem = (int)PI.GetValue(GOC);
-                                                int TempCurrentItem = CurrentItem;
-                                                ImGui.Combo(PI.Name, ref CurrentItem, Enum.GetNames(PI.PropertyType), Enum.GetNames(PI.PropertyType).Length);
-                                                if (TempCurrentItem != CurrentItem)
-                                                    ComboChanged = true;
-                                                PI.SetValue(GOC, CurrentItem);
-                                            }
-                                            else if (PI.GetType().IsClass && PI.GetType().GetInterface("IEnumerable") == null)
-                                            {
-                                                EnteredHere = true;
-                                                var Name = PI.GetValue(GOC);
-                                                if (PI.GetType().IsClass)
-                                                {
-                                                    string DummyRef = (Name != null) ? Name.ToString() : "null";
-                                                    ImGui.InputText(PI.Name, ref DummyRef, 20, ImGuiInputTextFlags.ReadOnly);
-                                                }
-                                            }
-
-                                            break;
-                                    }
-
-                                    if (ImGui.BeginDragDropTarget())
-                                    {
-                                        if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
-                                        {
-                                            if (ContentWindow.DraggedAsset != null && ContentWindow.DraggedAsset.GetType() == PI.PropertyType)
-                                            {
-                                                object OldVal = PI.GetValue(GOC);
-
-                                                try
-                                                {
-                                                    PI.SetValue(GOC, ContentWindow.DraggedAsset);
-
-                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldVal), Operation.ChangeValue));
-                                                    GameObjects_Tab.Redo_Buffer.Clear();
-                                                }
-                                                catch (Exception E) // Log Error?
-                                                { Utility.Log(E.Message); }
-
-                                                ContentWindow.DraggedAsset = null;
-                                            }
-                                            else if (ContentWindow.DraggedAsset != null && ContentWindow.DraggedAsset.GetType() == typeof(KeyValuePair<string, Vector4>))
-                                            {
-                                                if (PI.PropertyType == typeof(string))
-                                                {
-                                                    object OldVal = PI.GetValue(GOC);
-
-                                                    KeyValuePair<string, Vector4> DraggedTex = (KeyValuePair<string, Vector4>)ContentWindow.DraggedAsset;
-
-                                                    PI.SetValue(GOC, DraggedTex.Key);
-
-                                                    if (GOC is SpriteRenderer && PI.Name == "TextureName")
-                                                    {
-                                                        var ThisFI = GOC.GetType().GetField("SourceRectangle", BindingFlags.Public | BindingFlags.Instance);
-                                                        var ThisPI = GOC.GetType().GetProperty("SourceRectangle", BindingFlags.Public | BindingFlags.Instance);
-                                                        Microsoft.Xna.Framework.Graphics.Texture2D texture2D = Setup.Content.Load<Microsoft.Xna.Framework.Graphics.Texture2D>(DraggedTex.Key);
-
-                                                        if (ThisFI != null)
-                                                        {
-                                                            object OldVal2 = ThisFI.GetValue(GOC);
-                                                            ThisFI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle((int)Math.Round(DraggedTex.Value.X * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.Y * (texture2D.Height / 10000.0f)), (int)Math.Round(DraggedTex.Value.Z * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.W * (texture2D.Height / 10000.0f))));
-
-                                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, ThisFI), OldVal2), Operation.ChangeValue));
-                                                        }
-                                                        else if (ThisPI != null)
-                                                        {
-                                                            object OldVal2 = ThisPI.GetValue(GOC);
-                                                            ThisPI.SetValue(GOC, new Microsoft.Xna.Framework.Rectangle((int)Math.Round(DraggedTex.Value.X * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.Y * (texture2D.Height / 10000.0f)), (int)Math.Round(DraggedTex.Value.Z * (texture2D.Width / 10000.0f)), (int)Math.Round(DraggedTex.Value.W * (texture2D.Height / 10000.0f))));
-
-                                                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, ThisPI), OldVal2), Operation.ChangeValue));
-                                                        }
-                                                        else
-                                                            throw new Exception("SourceRectangle member is not found, see if you edited Sprite Renderer");
-                                                    }
-
-                                                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), OldVal), Operation.ChangeValue));
-                                                    GameObjects_Tab.Redo_Buffer.Clear();
-
-                                                    ContentWindow.DraggedAsset = null;
-                                                }
-                                            }
-                                        }
-
-                                        ImGui.EndDragDropTarget();
-                                    }
-
-                                    if (EnteredHere)
-                                    {
-                                        if (ImGui.IsItemActivated()) //Item Is In Edit Mode
-                                            ValueToChange = PI.GetValue(GOC);
-                                        else if (ComboChanged || ImGui.IsItemDeactivatedAfterEdit()) //Item Left Edit Mode
-                                        {
-                                            ComboChanged = false;
-                                            if (ValueToChange != PI.GetValue(GOC))
-                                            {
-                                                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(GOC, PI), ValueToChange), Operation.ChangeValue));
-                                                GameObjects_Tab.Redo_Buffer.Clear();
-                                            }
-                                            ValueToChange = null;
-                                        }
-                                    }
-
-                                    ImGui.PopID();
-                                }
-                            }
-                            ImGui.PopID();
-
-                            if (!ComponentsNotRemoved_Arr[T_Counter])
-                            {
-                                if (GOC.gameObject.Name != "Camera Controller")
-                                {
-                                    GOC_Removed = GOC;
-                                    ComponentsNotRemoved.RemoveAt(T_Counter++);
-                                }
-                            }
-
-                            ImGui.NewLine();
-                            ImGui.Separator();
-                            ImGui.NewLine();
+                            GOC_Removed = GOC;
+                            ComponentsNotRemoved.RemoveAt(T_Counter++);
                         }
-
-                        if (Selected_GO.RemoveComponent(GOC_Removed, false))
-                        {
-                            KeyValuePair<GameObject, GameObjectComponent> Info = new KeyValuePair<GameObject, GameObjectComponent>(Selected_GO, GOC_Removed);
-                            var KVP = new KeyValuePair<object, Operation>(Info, Operation.RemoveComponent);
-                            GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, KVP);
-                            GameObjects_Tab.Redo_Buffer.Clear();
-                        }
-
-                        if (ImGui.Button("Add Component", new Vector2(ImGui.GetWindowSize().X, 20)) && ChosenComponent != -1)
-                        {
-                            var GOC = Utility.GetInstance(ComponentsTypes[ChosenComponent]) as GameObjectComponent;
-                            bool AddedSuccessfully = Selected_GO.AddComponent_Generic(GOC);
-
-                            if (AddedSuccessfully)
-                            {
-                                if(GOC.GetType().Assembly != GameAssem)
-                                    GOC.Start();
-
-                                KeyValuePair<GameObject, GameObjectComponent> Info = new KeyValuePair<GameObject, GameObjectComponent>(Selected_GO, GOC);
-                                var KVP = new KeyValuePair<object, Operation>(Info, Operation.AddComponent);
-                                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, KVP);
-                                GameObjects_Tab.Redo_Buffer.Clear();
-                            }
-                            else
-                            {
-                                GOC.Destroy();
-                                GOC = null;
-                            }
-                        }
-
-                        string[] Names = new string[ComponentsTypes.Count];
-                        for (int i = 0; i < Names.Length; i++)
-                            Names[i] = ComponentsTypes[i].Name;
-
-                        ImGui.Combo("Components", ref ChosenComponent, Names, Names.Length);
                     }
 
-                    ImGui.EndTabItem();
+                    ImGui.NewLine();
+                    ImGui.Separator();
+                    ImGui.NewLine();
                 }
 
-                ImGui.EndTabBar();
+                if (Selected_GO.RemoveComponent(GOC_Removed, false))
+                {
+                    KeyValuePair<GameObject, GameObjectComponent> Info = new KeyValuePair<GameObject, GameObjectComponent>(Selected_GO, GOC_Removed);
+                    var KVP = new KeyValuePair<object, Operation>(Info, Operation.RemoveComponent);
+                    GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, KVP);
+                    GameObjects_Tab.Redo_Buffer.Clear();
+                }
+
+                if (ImGui.Button("Add Component", new Vector2(ImGui.GetWindowSize().X, 20)) && ChosenComponent != -1)
+                {
+                    var GOC = Utility.GetInstance(ComponentsTypes[ChosenComponent]) as GameObjectComponent;
+                    bool AddedSuccessfully = Selected_GO.AddComponent_Generic(GOC);
+
+                    if (AddedSuccessfully)
+                    {
+                        if(GOC.GetType().Assembly != GameAssem)
+                            GOC.Start();
+
+                        KeyValuePair<GameObject, GameObjectComponent> Info = new KeyValuePair<GameObject, GameObjectComponent>(Selected_GO, GOC);
+                        var KVP = new KeyValuePair<object, Operation>(Info, Operation.AddComponent);
+                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, KVP);
+                        GameObjects_Tab.Redo_Buffer.Clear();
+                    }
+                    else
+                    {
+                        GOC.Destroy();
+                        GOC = null;
+                    }
+                }
+
+                string[] Names = new string[ComponentsTypes.Count];
+                for (int i = 0; i < Names.Length; i++)
+                    Names[i] = ComponentsTypes[i].Name;
+
+                ImGui.Combo("Components", ref ChosenComponent, Names, Names.Length);
             }
 
             ImGui.End();
