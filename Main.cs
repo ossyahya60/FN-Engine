@@ -187,6 +187,7 @@ namespace FN_Engine
             //Exit();
 
             ///////////////////////////////////////
+
             if (Input.GetKey(Keys.Z, KeyboardFlags.SHIFT))
                 Camera.Zoom += (float)gameTime.ElapsedGameTime.TotalSeconds;
             else if (Input.GetKey(Keys.X, KeyboardFlags.SHIFT))

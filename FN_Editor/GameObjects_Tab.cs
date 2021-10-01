@@ -51,6 +51,12 @@ namespace FN_Engine.FN_Editor
 
             //Scene Tab
             ImGui.Begin("Scene Window");
+
+            //
+            MyRegion[0] = ImGui.GetWindowPos();
+            MyRegion[1] = ImGui.GetWindowSize();
+            //
+
             ImGui.TextColored(new Vector4(0, 1, 0, 1), SceneManager.ActiveScene.Name);
             ImGui.Separator();
 

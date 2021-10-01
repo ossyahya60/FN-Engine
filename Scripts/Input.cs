@@ -176,5 +176,10 @@ namespace FN_Engine
         {
             return (CurrentMouseState.Position - LastMouseState.Position).Y;
         }
+
+        public static int MouseWheelDelta()
+        {
+            return CurrentMouseState.ScrollWheelValue - LastMouseState.ScrollWheelValue;
+        }
     }
 }

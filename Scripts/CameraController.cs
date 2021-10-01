@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace FN_Engine
 {
-    public class CameraController: GameObjectComponent
+    public class CameraController : GameObjectComponent
     {
         public bool Visualize = true;
         public bool IsFullScreen
@@ -72,29 +72,27 @@ namespace FN_Engine
 
         public override void Update(GameTime gameTime)
         {
-            if (Dirty)
+            gameObject.Name = "Camera Controller";
+            gameObject.ShouldBeDeleted = false;
+            gameObject.ShouldBeRemoved = false;
+
+            Setup.Camera.Position = gameObject.Transform.Position;
+            Setup.Camera.Rotation = gameObject.Transform.Rotation;
+            gameObject.Transform.Scale = Vector2.One;
+            Setup.Camera.Zoom = CameraZoom;
+
+            if (Dirty && !FN_Editor.EditorScene.IsThisTheEditor)
             {
                 Dirty = false;
-                gameObject.Name = "Camera Controller";
-                gameObject.ShouldBeDeleted = false;
-                gameObject.ShouldBeRemoved = false;
-
-                Setup.Camera.Position = gameObject.Transform.Position;
-                Setup.Camera.Rotation = gameObject.Transform.Rotation;
-                Setup.Camera.Zoom = CameraZoom;
-
-                if (!FN_Editor.EditorScene.IsThisTheEditor)
-                {
-                    ResolutionIndependentRenderer.SetVirtualResolution(TargetResolution.X, TargetResolution.Y);
-                    ResolutionIndependentRenderer.SetResolution(ScreenSize.X, ScreenSize.Y, IsFullScreen);
-                    ResolutionIndependentRenderer.Init(ref Setup.graphics);
-                }
+                ResolutionIndependentRenderer.SetVirtualResolution(TargetResolution.X, TargetResolution.Y);
+                ResolutionIndependentRenderer.SetResolution(ScreenSize.X, ScreenSize.Y, IsFullScreen);
+                ResolutionIndependentRenderer.Init(ref Setup.graphics);
             }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if(Visualize)
+            if (Visualize)
                 HitBoxDebuger.DrawNonFilledRectangle(new Rectangle(gameObject.Transform.Position.ToPoint() - new Point((int)(TargetResolution.X * 0.5f), (int)(TargetResolution.Y * 0.5f)), TargetResolution), 2);
         }
     }

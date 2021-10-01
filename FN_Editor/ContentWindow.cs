@@ -263,7 +263,7 @@ namespace FN_Engine.FN_Editor
                     ImGui.PopTextWrapPos();
                     ImGui.EndGroup();
 
-                    if (ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionMax().X)
+                    if (ImGui.GetItemRectMax().X < ImGui.GetWindowContentRegionWidth())
                         ImGui.SameLine();
                 }
 

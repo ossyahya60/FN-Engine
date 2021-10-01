@@ -308,11 +308,13 @@ namespace FN_Engine.FN_Editor
                                 
                                 if (tilemap != null)
                                 {
-                                    var Bias = Setup.Camera.Position - ResolutionIndependentRenderer.GetVirtualRes() * 0.5f - new Microsoft.Xna.Framework.Vector2(GameObjects_Tab.MyRegion[1].X + GameObjects_Tab.MyRegion[0].X, 0);
+                                    var Bias = Setup.Camera.Position - ResolutionIndependentRenderer.GetVirtualRes() * 0.5f - new Microsoft.Xna.Framework.Vector2(GizmosVisualizer.SceneWindow.X + 7, GizmosVisualizer.SceneWindow.Y + 28);
                                     var GridSize = tilemap.TileSize.ToVector2() * tilemap.GridSize.ToVector2() * tilemap.gameObject.Transform.Scale;
                                     var MapRect = new Microsoft.Xna.Framework.Rectangle((tilemap.gameObject.Transform.Position - GridSize * 0.5f).ToPoint(), GridSize.ToPoint());
 
                                     bool InsideBoundaries = MapRect.Contains(Bias + Input.GetMousePosition());
+
+                                    ImGui.Text(InsideBoundaries.ToString());
 
                                     if (InsideBoundaries)
                                     {

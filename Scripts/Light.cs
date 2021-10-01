@@ -10,7 +10,7 @@ namespace FN_Engine
 
     public class Light : GameObjectComponent
     {
-        public static bool CastShadows_Global = true;
+        public static bool CastShadows_Global = false;
 
         internal static RenderTarget2D RenderTarget2D;
         internal static RenderTarget2D ShadowMap;
@@ -132,7 +132,7 @@ namespace FN_Engine
             Light[] LIGHTS = SceneManager.ActiveScene.FindGameObjectComponents<Light>();
             if (LIGHTS == null || LIGHTS.Length == 0)
             {
-                Setup.GraphicsDevice.SetRenderTarget(null);
+                //Setup.GraphicsDevice.SetRenderTarget(null);
                 //Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Setup.Camera.GetViewTransformationMatrix());
                 //Setup.spriteBatch.Draw(RenderTarget2D, BiasScene.Location.ToVector2(), new Rectangle(Point.Zero, BiasScene.Size), Color.White);
                 //Setup.spriteBatch.End();
@@ -258,6 +258,7 @@ namespace FN_Engine
                 }
                 
                 ShadowMap_param.SetValue(ShadowMap);
+                Setup.GraphicsDevice.SetRenderTarget(RenderTarget2D);
             }
 
             for (int i = 0; i < CappedLightCount; i++)
@@ -301,10 +302,11 @@ namespace FN_Engine
             CastShadow_param.SetValue(CastShadow);
             ShadowConstant_param.SetValue(ShadowIntensity);
 
-            Setup.GraphicsDevice.SetRenderTarget(null);
-            //Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightEffect, Setup.Camera.GetViewTransformationMatrix());
-            //Setup.spriteBatch.Draw(RenderTarget2D, BiasScene.Location.ToVector2(), new Rectangle(Point.Zero, BiasScene.Size), Color.White);
-            //Setup.spriteBatch.End();
+            //Setup.GraphicsDevice.SetRenderTarget(null);
+            //Setup.GraphicsDevice.SetRenderTarget(RenderTarget2D);
+            Setup.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, LightEffect, Setup.Camera.GetViewTransformationMatrix());
+            Setup.spriteBatch.Draw(RenderTarget2D, BiasScene.Location.ToVector2(), Color.White);
+            Setup.spriteBatch.End();
         }
 
         public override GameObjectComponent DeepCopy(GameObject Clone)
