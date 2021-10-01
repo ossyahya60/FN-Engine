@@ -12,6 +12,9 @@ namespace FN_Engine
         public Vector2 Center;
         public bool SlideCollision = true;
 
+        private Vector2 vRayToNearest;
+        private float fOverlap;
+
         public CircleCollider(int Radius)
         {
             this.Radius = Radius;
@@ -52,17 +55,27 @@ namespace FN_Engine
                 CircleCollider CR2 = collider as CircleCollider;
                 Vector2 Center2 = CR2.gameObject.Transform.Position + CR2.Center;
 
-                if (MathCompanion.Abs(Center1 - Center2).LengthSquared() >= (Radius + CR2.Radius) * (Radius + CR2.Radius))
+                if ((Center1 - Center2).LengthSquared() > (Radius + CR2.Radius) * (Radius + CR2.Radius))
                     return false;
             }
             else if(collider is BoxCollider2D) //Assuming Center as Origin
             {
-                Rectangle TempCollider = (collider as BoxCollider2D).GetDynamicCollider();
+                Rectangle IncomingCollider = (collider as BoxCollider2D).GetDynamicCollider();
 
-                if (Math.Abs(Center.X + gameObject.Transform.Position.X - TempCollider.Center.X ) > Radius + TempCollider.Width/2)
-                    return false;
+                /////////////////////////This code is heavily inspired by "OneLoneCoder" the youtuber///////////////////////
 
-                if (Math.Abs(Center.Y + gameObject.Transform.Position.Y - TempCollider.Center.Y) > Radius + TempCollider.Height/2)
+                Vector2 vNearestPoint;
+                vNearestPoint.X = Math.Clamp(gameObject.Transform.Position.X, IncomingCollider.Left, IncomingCollider.Right);
+                vNearestPoint.Y = Math.Clamp(gameObject.Transform.Position.Y, IncomingCollider.Top, IncomingCollider.Bottom);
+
+                vRayToNearest = vNearestPoint - gameObject.Transform.Position;
+                fOverlap = Radius - vRayToNearest.Length();
+                //if (std::isnan(fOverlap)) fOverlap = 0;
+
+                // If overlap is positive, then a collision has occurred, so we displace backwards by the 
+                // overlap amount. The potential position is then tested against other tiles in the area
+                // therefore "statically" resolving the collision
+                if (fOverlap <= 0)
                     return false;
             }
 
@@ -81,31 +94,24 @@ namespace FN_Engine
                 CircleCollider circle2 = collider as CircleCollider;
                 Vector2 C2 = circle2.Center + circle2.gameObject.Transform.Position;
 
-                var OldPos = RB.gameObject.Transform.Position;
                 gameObject.Transform.Position = C2 + (Radius + circle2.Radius) * -Vector2.Normalize(C2 - Center - CollisionPos);
                 Vector2 Diff = MathCompanion.Abs(C2 - Center - gameObject.Transform.Position) / (Radius + circle2.Radius);
-
                 RB.Velocity = new Vector2(RB.Velocity.X * Diff.Y, RB.Velocity.Y * Diff.X);
-                //RB.Velocity = Vector2.Zero;
-                //RB.gameObject.Transform.Position = CollisionPos;
-                //RB.gameObject.Transform.Move(-MathCompanion.Sign(RB.Velocity) * ((Radius + circle2.Radius) * Vector2.One - DistanceBetweenColliders));
-                //RB.Velocity = ResetVelocity ? RB.Velocity * new Vector2(DistanceBetweenColliders.Y, DistanceBetweenColliders.X) / circle2.Radius : RB.Velocity;
-                //if (!collider.CollisionDetection(this, false))
-                //    RB.gameObject.Transform.Position = CollisionPos;
-
-                //foreach (Collider2D CD in CDs)
-                //{
-                //    if (!gameObject.Name.Equals((CD as GameObjectComponent).gameObject.Name) && !CD.IsTrigger() && CD.CollisionDetection(this, false))
-                //    {
-                //        RB.gameObject.Transform.Position = OldPos;
-                //        RB.Velocity = Vector2.Zero;
-                //        break;
-                //    }
-                //}
             }
             else if(collider is BoxCollider2D)
             {
+                Rectangle IncomingCollider = (collider as BoxCollider2D).GetDynamicCollider();
 
+                /////////////////////////This code is heavily inspired by "OneLoneCoder" the youtuber///////////////////////
+
+                gameObject.Transform.Position = CollisionPos;
+                // Statically resolve the collision
+                gameObject.Transform.Position -= Vector2.Normalize(vRayToNearest) * fOverlap;
+
+                if(gameObject.Transform.Position.Y + Center.Y > IncomingCollider.Top && gameObject.Transform.Position.Y + Center.Y < IncomingCollider.Bottom)
+                    RB.Velocity.X = 0;
+                if (gameObject.Transform.Position.X + Center.X > IncomingCollider.Left && gameObject.Transform.Position.X + Center.X < IncomingCollider.Right)
+                    RB.Velocity.Y = 0;
             }
         }
 

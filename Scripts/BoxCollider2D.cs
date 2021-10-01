@@ -11,6 +11,9 @@ namespace FN_Engine
         public bool SlideCollision = true;
         public Rectangle Bounds;
 
+        private Vector2 vRayToNearest = Vector2.Zero;
+        private float fOverlap = 0;
+
         public Rectangle GetDynamicCollider()
         {
             Rectangle HandyRectangle = Rectangle.Empty;
@@ -44,13 +47,23 @@ namespace FN_Engine
             }
             else if (collider is CircleCollider) //Assuming Center as Origin
             {
-                CircleCollider TempCollider = collider as CircleCollider;
-                var ThisCollider = GetDynamicCollider();
+                CircleCollider IncomingCollider = collider as CircleCollider;
+                Rectangle ThisCollider = GetDynamicCollider();
 
-                if (MathCompanion.Abs(ThisCollider.Center.X - (TempCollider.Center.X + TempCollider.gameObject.Transform.Position.X)) > TempCollider.Radius + ThisCollider.Width / 2)
-                    return false;
+                /////////////////////////This code is heavily inspired by "OneLoneCoder" the youtuber///////////////////////
 
-                if (MathCompanion.Abs(ThisCollider.Center.Y - (TempCollider.Center.Y + TempCollider.gameObject.Transform.Position.Y)) > TempCollider.Radius + ThisCollider.Height / 2)
+                Vector2 vNearestPoint;
+                vNearestPoint.X = Math.Clamp(gameObject.Transform.Position.X, IncomingCollider.gameObject.Transform.Position.X + IncomingCollider.Center.X - IncomingCollider.Radius, IncomingCollider.gameObject.Transform.Position.X + IncomingCollider.Center.X + IncomingCollider.Radius);
+                vNearestPoint.Y = Math.Clamp(gameObject.Transform.Position.Y, IncomingCollider.gameObject.Transform.Position.Y + IncomingCollider.Center.Y - IncomingCollider.Radius, IncomingCollider.gameObject.Transform.Position.Y + IncomingCollider.Center.Y + IncomingCollider.Radius);
+
+                vRayToNearest = vNearestPoint - gameObject.Transform.Position;
+                fOverlap = IncomingCollider.Radius - vRayToNearest.Length();
+                //if (std::isnan(fOverlap)) fOverlap = 0;
+
+                // If overlap is positive, then a collision has occurred, so we displace backwards by the 
+                // overlap amount. The potential position is then tested against other tiles in the area
+                // therefore "statically" resolving the collision
+                if (fOverlap <= 0)
                     return false;
             }
 
@@ -59,7 +72,7 @@ namespace FN_Engine
 
         bool Collider2D.CollisionDetection(Collider2D collider, bool Continous) //AABB collision detection =>We should check if the two "Bounding Boxes are touching, then make SAT Collision detection
         {
-            return collider.IsTouching(this);
+            return IsTouching(collider);
         }
 
         //Note: This code is inspired by:
@@ -67,70 +80,89 @@ namespace FN_Engine
         //SAT Collision response is good, you will possess the vector to push the two objects from each other
         void Collider2D.CollisionResponse(Rigidbody2D YourRigidBody, Collider2D collider, float DeltaTime, ref List<GameObjectComponent> CDs, Vector2 CollisionPos, bool ResetVelocity)
         {
-            Rectangle DC1 = GetDynamicCollider();
-            Rectangle DC2 = (collider as BoxCollider2D).GetDynamicCollider();
-
-            float DistanceBetweenCollidersX = YourRigidBody.Velocity.X > 0 ? Math.Abs(DC1.Right - DC2.Left) : Math.Abs(DC1.Left - DC2.Right);
-            float DistanceBetweenCollidersY = YourRigidBody.Velocity.Y > 0 ? Math.Abs(DC1.Bottom - DC2.Top) : Math.Abs(DC1.Top - DC2.Bottom);
-
-            float TimeBetweenCollidersX = YourRigidBody.Velocity.X != 0 ? Math.Abs(DistanceBetweenCollidersX / YourRigidBody.Velocity.X) : 0;
-            float TimeBetweenCollidersY = YourRigidBody.Velocity.Y != 0 ? Math.Abs(DistanceBetweenCollidersY / YourRigidBody.Velocity.Y) : 0;
-
-            float ShortestTime;
-            var OldPos = YourRigidBody.gameObject.Transform.Position;
-
-            if (YourRigidBody.Velocity.X != 0 && YourRigidBody.Velocity.Y == 0)
+            if (collider is CircleCollider)
             {
-                // Colliison on X-axis only
-                ShortestTime = TimeBetweenCollidersX;
-                YourRigidBody.gameObject.Transform.MoveX(ShortestTime * YourRigidBody.Velocity.X);
-                YourRigidBody.Velocity.X = ResetVelocity? 0 : YourRigidBody.Velocity.X;
-            }
-            else if (YourRigidBody.Velocity.X == 0 && YourRigidBody.Velocity.Y != 0)
-            {
-                // Colliison on Y-axis only
-                ShortestTime = TimeBetweenCollidersY;
-                YourRigidBody.gameObject.Transform.MoveY(ShortestTime * YourRigidBody.Velocity.Y);
-                YourRigidBody.Velocity.Y = ResetVelocity? 0 : YourRigidBody.Velocity.Y;
+                Rectangle ThisCollider = GetDynamicCollider();
+                CircleCollider IncomingCollider = collider as CircleCollider;
+
+                /////////////////////////This code is heavily inspired by "OneLoneCoder" the youtuber///////////////////////
+
+                gameObject.Transform.Position = CollisionPos;
+                // Statically resolve the collision
+                gameObject.Transform.Position -= Vector2.Normalize(vRayToNearest) * fOverlap;
+
+                if (IncomingCollider.gameObject.Transform.Position.Y + IncomingCollider.Center.Y > ThisCollider.Top && IncomingCollider.gameObject.Transform.Position.Y + IncomingCollider.Center.Y < ThisCollider.Bottom)
+                    YourRigidBody.Velocity.X = 0;
+                if (IncomingCollider.gameObject.Transform.Position.X + IncomingCollider.Center.X > ThisCollider.Left && IncomingCollider.gameObject.Transform.Position.X + IncomingCollider.Center.X < ThisCollider.Right)
+                    YourRigidBody.Velocity.Y = 0;
             }
             else
             {
-                // Colliison on both axis
-                ShortestTime = Math.Min(TimeBetweenCollidersX, TimeBetweenCollidersY);
-                YourRigidBody.gameObject.Transform.Move(ShortestTime * YourRigidBody.Velocity.X, ShortestTime * YourRigidBody.Velocity.Y);
-                //YourRigidBody.Velocity = ResetVelocity? Vector2.Zero : YourRigidBody.Velocity;
+                Rectangle DC1 = GetDynamicCollider();
+                Rectangle DC2 = (collider as BoxCollider2D).GetDynamicCollider();
 
-                if (SlideCollision)
+                float DistanceBetweenCollidersX = YourRigidBody.Velocity.X > 0 ? Math.Abs(DC1.Right - DC2.Left) : Math.Abs(DC1.Left - DC2.Right);
+                float DistanceBetweenCollidersY = YourRigidBody.Velocity.Y > 0 ? Math.Abs(DC1.Bottom - DC2.Top) : Math.Abs(DC1.Top - DC2.Bottom);
+
+                float TimeBetweenCollidersX = YourRigidBody.Velocity.X != 0 ? Math.Abs(DistanceBetweenCollidersX / YourRigidBody.Velocity.X) : 0;
+                float TimeBetweenCollidersY = YourRigidBody.Velocity.Y != 0 ? Math.Abs(DistanceBetweenCollidersY / YourRigidBody.Velocity.Y) : 0;
+
+                float ShortestTime;
+                var OldPos = YourRigidBody.gameObject.Transform.Position;
+
+                if (YourRigidBody.Velocity.X != 0 && YourRigidBody.Velocity.Y == 0)
                 {
-                    if (ShortestTime == TimeBetweenCollidersX)
-                    {
-                        YourRigidBody.gameObject.Transform.Position.X = OldPos.X;
-                        YourRigidBody.Velocity.X = ResetVelocity ? 0 : YourRigidBody.Velocity.X;
-
-                        if (!collider.CollisionDetection(this, false))
-                            YourRigidBody.gameObject.Transform.Position.Y = CollisionPos.Y;
-                    }
-
-                    if (ShortestTime == TimeBetweenCollidersY)
-                    {
-                        YourRigidBody.gameObject.Transform.Position.Y = OldPos.Y;
-                        YourRigidBody.Velocity.Y = ResetVelocity ? 0 : YourRigidBody.Velocity.Y;
-
-                        if (!collider.CollisionDetection(this, false))
-                            YourRigidBody.gameObject.Transform.Position.X = CollisionPos.X;
-                    }
+                    // Colliison on X-axis only
+                    ShortestTime = TimeBetweenCollidersX;
+                    YourRigidBody.gameObject.Transform.MoveX(ShortestTime * YourRigidBody.Velocity.X);
+                    YourRigidBody.Velocity.X = ResetVelocity ? 0 : YourRigidBody.Velocity.X;
+                }
+                else if (YourRigidBody.Velocity.X == 0 && YourRigidBody.Velocity.Y != 0)
+                {
+                    // Colliison on Y-axis only
+                    ShortestTime = TimeBetweenCollidersY;
+                    YourRigidBody.gameObject.Transform.MoveY(ShortestTime * YourRigidBody.Velocity.Y);
+                    YourRigidBody.Velocity.Y = ResetVelocity ? 0 : YourRigidBody.Velocity.Y;
                 }
                 else
-                    YourRigidBody.Velocity = ResetVelocity ? Vector2.Zero : YourRigidBody.Velocity;
-            }
-
-            foreach (Collider2D CD in CDs)
-            {
-                if (!gameObject.Name.Equals((CD as GameObjectComponent).gameObject.Name) && !CD.IsTrigger() && CD.CollisionDetection(this, false))
                 {
-                    YourRigidBody.gameObject.Transform.Position = OldPos;
-                    YourRigidBody.Velocity = Vector2.Zero;
-                    break;
+                    // Colliison on both axis
+                    ShortestTime = Math.Min(TimeBetweenCollidersX, TimeBetweenCollidersY);
+                    YourRigidBody.gameObject.Transform.Move(ShortestTime * YourRigidBody.Velocity.X, ShortestTime * YourRigidBody.Velocity.Y);
+                    //YourRigidBody.Velocity = ResetVelocity? Vector2.Zero : YourRigidBody.Velocity;
+
+                    if (SlideCollision)
+                    {
+                        if (ShortestTime == TimeBetweenCollidersX)
+                        {
+                            YourRigidBody.gameObject.Transform.Position.X = OldPos.X;
+                            YourRigidBody.Velocity.X = ResetVelocity ? 0 : YourRigidBody.Velocity.X;
+
+                            if (!collider.CollisionDetection(this, false))
+                                YourRigidBody.gameObject.Transform.Position.Y = CollisionPos.Y;
+                        }
+
+                        if (ShortestTime == TimeBetweenCollidersY)
+                        {
+                            YourRigidBody.gameObject.Transform.Position.Y = OldPos.Y;
+                            YourRigidBody.Velocity.Y = ResetVelocity ? 0 : YourRigidBody.Velocity.Y;
+
+                            if (!collider.CollisionDetection(this, false))
+                                YourRigidBody.gameObject.Transform.Position.X = CollisionPos.X;
+                        }
+                    }
+                    else
+                        YourRigidBody.Velocity = ResetVelocity ? Vector2.Zero : YourRigidBody.Velocity;
+                }
+
+                foreach (Collider2D CD in CDs)
+                {
+                    if (!gameObject.Name.Equals((CD as GameObjectComponent).gameObject.Name) && !CD.IsTrigger() && CD.CollisionDetection(this, false))
+                    {
+                        YourRigidBody.gameObject.Transform.Position = OldPos;
+                        YourRigidBody.Velocity = Vector2.Zero;
+                        break;
+                    }
                 }
             }
         }
