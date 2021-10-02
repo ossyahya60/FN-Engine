@@ -55,7 +55,7 @@ namespace FN_Engine.FN_Editor
             Vector2 Bias = new Vector2(-Vec3.X, -Vec3.Y);
 
             GameObject SelectedGO = GameObjects_Tab.WhoIsSelected;
-            if (ShowGizmos && SelectedGO != null && SelectedGO.Transform != null)
+            if (ShowGizmos && SelectedGO != null && SelectedGO.Active && SelectedGO.Transform != null)
             {
                 var PlayerPos = SelectedGO.Transform.Position * Setup.Camera.Zoom;
 
@@ -241,7 +241,7 @@ namespace FN_Engine.FN_Editor
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (GameObjects_Tab.WhoIsSelected != null)
+            if (GameObjects_Tab.WhoIsSelected != null && GameObjects_Tab.WhoIsSelected.Active)
             {
                 //Collider Visualization
                 var Colliders = GameObjects_Tab.WhoIsSelected.GameObjectComponents.FindAll(Item => Item is Collider2D);

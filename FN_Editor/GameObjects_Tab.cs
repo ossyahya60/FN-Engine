@@ -154,7 +154,7 @@ namespace FN_Engine.FN_Editor
                     }
                     IsCopy = false;
                 }
-                else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.D) && ImGui.IsWindowFocused()) //Duplicate //Not functioning well...
+                else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.D) /*&& ImGui.IsWindowFocused()*/) //Duplicate //Not functioning well...
                 {
                     GameObject[] Instances = SelectedGOs.ToArray();
                     for (int i = 0; i < SelectedGOs.Count; i++)

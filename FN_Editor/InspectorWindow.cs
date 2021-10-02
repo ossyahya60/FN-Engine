@@ -29,10 +29,12 @@ namespace FN_Engine.FN_Editor
         private PropertyInfo ActivePI = null;
         private GameObjectComponent ActiveGOC = null;
         private bool Subscribed = false;
-        private int ChosenComponent = -1;
+        private string ChosenComponent;
         private List<bool> ComponentsNotRemoved = new List<bool>();
         private object ValueToChange = null;
         private bool ComboChanged = false;
+        private string SearchText = "";
+
 
         static InspectorWindow() //This should be called again on 'Hot reloading'
         {
@@ -1176,11 +1178,8 @@ namespace FN_Engine.FN_Editor
 
                     if (!ComponentsNotRemoved_Arr[T_Counter])
                     {
-                        if (GOC.gameObject.Name != "Camera Controller")
-                        {
-                            GOC_Removed = GOC;
-                            ComponentsNotRemoved.RemoveAt(T_Counter++);
-                        }
+                        GOC_Removed = GOC;
+                        ComponentsNotRemoved.RemoveAt(T_Counter++);
                     }
 
                     ImGui.NewLine();
@@ -1196,9 +1195,9 @@ namespace FN_Engine.FN_Editor
                     GameObjects_Tab.Redo_Buffer.Clear();
                 }
 
-                if (ImGui.Button("Add Component", new Vector2(ImGui.GetWindowSize().X, 20)) && ChosenComponent != -1)
+                if (ImGui.Button("Add Component", new Vector2(ImGui.GetWindowSize().X, 20)) && !string.IsNullOrEmpty(ChosenComponent))
                 {
-                    var GOC = Utility.GetInstance(ComponentsTypes[ChosenComponent]) as GameObjectComponent;
+                    var GOC = Utility.GetInstance(ComponentsTypes.Find(Item => Item.Name.Equals(ChosenComponent))) as GameObjectComponent;
                     bool AddedSuccessfully = Selected_GO.AddComponent_Generic(GOC);
 
                     if (AddedSuccessfully)
@@ -1222,7 +1221,22 @@ namespace FN_Engine.FN_Editor
                 for (int i = 0; i < Names.Length; i++)
                     Names[i] = ComponentsTypes[i].Name;
 
-                ImGui.Combo("Components", ref ChosenComponent, Names, Names.Length);
+                //ImGui.Combo("Components", ref ChosenComponent, Names, Names.Length);
+
+                if(ImGui.BeginCombo("Components", !string.IsNullOrEmpty(ChosenComponent) ? ChosenComponent : "", ImGuiComboFlags.HeightRegular))
+                {
+                    ImGui.InputText("", ref SearchText, 50);
+
+                    Names = Names.Where(Item => Item.StartsWith(SearchText, true, null)).Concat(Names.Where(Item => !Item.StartsWith(SearchText, true, null) && Item.Contains(SearchText, StringComparison.OrdinalIgnoreCase))).ToArray();
+
+                    for (int i = 0; i < Names.Length; i++)
+                    {
+                        if (ImGui.Selectable(Names[i]))
+                            ChosenComponent = Names[i];
+                    }
+
+                    ImGui.EndCombo();
+                }
             }
 
             ImGui.End();
