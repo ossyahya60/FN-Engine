@@ -49,7 +49,7 @@ namespace FN_Engine
         public static bool CircleContains(Vector2 Center, int Radius, Vector2 Point)
         {
             Vector2 Output = Center - Point;
-            if (MathCompanion.Abs(Output.Length()) > Radius)
+            if (Output.Length() > Radius)
                 return false;
 
             return true;

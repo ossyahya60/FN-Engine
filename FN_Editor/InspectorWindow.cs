@@ -34,7 +34,8 @@ namespace FN_Engine.FN_Editor
         private object ValueToChange = null;
         private bool ComboChanged = false;
         private string SearchText = "";
-
+        private int ComponentSelected = 0;
+        private bool OpenedComboComp = false;
 
         static InspectorWindow() //This should be called again on 'Hot reloading'
         {
@@ -1195,48 +1196,88 @@ namespace FN_Engine.FN_Editor
                     GameObjects_Tab.Redo_Buffer.Clear();
                 }
 
-                if (ImGui.Button("Add Component", new Vector2(ImGui.GetWindowSize().X, 20)) && !string.IsNullOrEmpty(ChosenComponent))
-                {
-                    var GOC = Utility.GetInstance(ComponentsTypes.Find(Item => Item.Name.Equals(ChosenComponent))) as GameObjectComponent;
-                    bool AddedSuccessfully = Selected_GO.AddComponent_Generic(GOC);
-
-                    if (AddedSuccessfully)
-                    {
-                        if(GOC.GetType().Assembly != GameAssem)
-                            GOC.Start();
-
-                        KeyValuePair<GameObject, GameObjectComponent> Info = new KeyValuePair<GameObject, GameObjectComponent>(Selected_GO, GOC);
-                        var KVP = new KeyValuePair<object, Operation>(Info, Operation.AddComponent);
-                        GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, KVP);
-                        GameObjects_Tab.Redo_Buffer.Clear();
-                    }
-                    else
-                    {
-                        GOC.Destroy();
-                        GOC = null;
-                    }
-                }
-
                 string[] Names = new string[ComponentsTypes.Count];
                 for (int i = 0; i < Names.Length; i++)
                     Names[i] = ComponentsTypes[i].Name;
 
                 //ImGui.Combo("Components", ref ChosenComponent, Names, Names.Length);
 
-                if(ImGui.BeginCombo("Components", !string.IsNullOrEmpty(ChosenComponent) ? ChosenComponent : "", ImGuiComboFlags.HeightRegular))
+                if (ImGui.BeginCombo("Components", !string.IsNullOrEmpty(ChosenComponent) ? ChosenComponent : "", ImGuiComboFlags.HeightRegular))
                 {
-                    ImGui.InputText("", ref SearchText, 50);
+                    if (!OpenedComboComp)
+                    {
+                        ImGui.SetKeyboardFocusHere();
+                        OpenedComboComp = true;
+                    }
+
+                    if (ImGui.InputText("", ref SearchText, 50, ImGuiInputTextFlags.AutoSelectAll))
+                        ComponentSelected = 0;
 
                     Names = Names.Where(Item => Item.StartsWith(SearchText, true, null)).Concat(Names.Where(Item => !Item.StartsWith(SearchText, true, null) && Item.Contains(SearchText, StringComparison.OrdinalIgnoreCase))).ToArray();
 
                     for (int i = 0; i < Names.Length; i++)
                     {
-                        if (ImGui.Selectable(Names[i]))
+                        if (ImGui.Selectable(Names[i], i == ComponentSelected))
+                        {
                             ChosenComponent = Names[i];
+                            var GOC = Utility.GetInstance(ComponentsTypes.Find(Item => Item.Name.Equals(ChosenComponent))) as GameObjectComponent;
+                            bool AddedSuccessfully = Selected_GO.AddComponent_Generic(GOC);
+
+                            if (AddedSuccessfully)
+                            {
+                                if (GOC.GetType().Assembly != GameAssem)
+                                    GOC.Start();
+
+                                KeyValuePair<GameObject, GameObjectComponent> Info = new KeyValuePair<GameObject, GameObjectComponent>(Selected_GO, GOC);
+                                var KVP = new KeyValuePair<object, Operation>(Info, Operation.AddComponent);
+                                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, KVP);
+                                GameObjects_Tab.Redo_Buffer.Clear();
+                            }
+                            else
+                            {
+                                GOC.Destroy();
+                                GOC = null;
+                            }
+                        }
+                    }
+
+                    if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.Up))
+                        ComponentSelected = ComponentSelected > 0 ? ComponentSelected - 1 : ComponentSelected;
+                    else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.Down))
+                        ComponentSelected = ComponentSelected < Names.Length - 1 ? ComponentSelected + 1 : ComponentSelected;
+
+                    if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Enter)) && ComponentSelected < Names.Length)
+                    {
+                        ChosenComponent = Names[ComponentSelected];
+                        ImGui.CloseCurrentPopup();
+
+                        if (!string.IsNullOrEmpty(ChosenComponent))
+                        {
+                            var GOC = Utility.GetInstance(ComponentsTypes.Find(Item => Item.Name.Equals(ChosenComponent))) as GameObjectComponent;
+                            bool AddedSuccessfully = Selected_GO.AddComponent_Generic(GOC);
+
+                            if (AddedSuccessfully)
+                            {
+                                if (GOC.GetType().Assembly != GameAssem)
+                                    GOC.Start();
+
+                                KeyValuePair<GameObject, GameObjectComponent> Info = new KeyValuePair<GameObject, GameObjectComponent>(Selected_GO, GOC);
+                                var KVP = new KeyValuePair<object, Operation>(Info, Operation.AddComponent);
+                                GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, KVP);
+                                GameObjects_Tab.Redo_Buffer.Clear();
+                            }
+                            else
+                            {
+                                GOC.Destroy();
+                                GOC = null;
+                            }
+                        }
                     }
 
                     ImGui.EndCombo();
                 }
+                else
+                    OpenedComboComp = false;
             }
 
             ImGui.End();

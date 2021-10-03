@@ -29,7 +29,8 @@ namespace FN_Engine
         {
             set
             {
-                customTex = Setup.Content.Load<Texture2D>(value.ToString());
+                if(!string.IsNullOrEmpty(value))
+                    customTex = Setup.Content.Load<Texture2D>(value);
             }
             get
             {

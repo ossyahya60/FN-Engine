@@ -22,61 +22,6 @@ namespace FN_Engine
             P4 = new Point(200, 0);
         }
 
-        public override void DrawUI()
-        {
-            if (FN_Editor.GameObjects_Tab.WhoIsSelected == gameObject)
-            {
-                ImGui.Begin("Gizoms");
-
-                System.Numerics.Vector2 TransPos = new System.Numerics.Vector2(gameObject.Transform.Position.X + Setup.graphics.PreferredBackBufferWidth * 0.5f, gameObject.Transform.Position.Y + Setup.graphics.PreferredBackBufferHeight * 0.5f);
-
-                //Point 1
-                ImGui.SetNextItemWidth(10);
-                ImGui.SetCursorPos(new System.Numerics.Vector2(P1.X, P1.Y) + TransPos);
-                ImGui.PushID(gameObject.Name + "P1");
-                ImGui.SmallButton("");
-                ImGui.PopID();
-
-                if (ImGui.IsItemActive())
-                    P1 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + FN_Editor.GizmosVisualizer.BiasSceneWindow.X, TransPos.Y + FN_Editor.GizmosVisualizer.BiasSceneWindow.Y)).ToPoint();
-
-                //Point 2
-                ImGui.SetNextItemWidth(10);
-                ImGui.SetCursorPos(new System.Numerics.Vector2(P2.X, P2.Y) + TransPos);
-                ImGui.PushID(gameObject.Name + "P2");
-                ImGui.SmallButton("");
-                ImGui.PopID();
-
-                if (ImGui.IsItemActive())
-                    P2 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + FN_Editor.GizmosVisualizer.BiasSceneWindow.X, TransPos.Y + FN_Editor.GizmosVisualizer.BiasSceneWindow.Y)).ToPoint();
-
-                //Point 3
-                ImGui.SetNextItemWidth(10);
-                ImGui.SetCursorPos(new System.Numerics.Vector2(P3.X, P3.Y) + TransPos);
-                ImGui.PushID(gameObject.Name + "P3");
-                ImGui.SmallButton("");
-                ImGui.PopID();
-
-                if (ImGui.IsItemActive())
-                    P3 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + FN_Editor.GizmosVisualizer.BiasSceneWindow.X, TransPos.Y + FN_Editor.GizmosVisualizer.BiasSceneWindow.Y)).ToPoint();
-
-                //Point 4
-                if (Quadratic)
-                {
-                    ImGui.SetNextItemWidth(10);
-                    ImGui.SetCursorPos(new System.Numerics.Vector2(P4.X, P4.Y) + TransPos);
-                    ImGui.PushID(gameObject.Name + "P4");
-                    ImGui.SmallButton("");
-                    ImGui.PopID();
-
-                    if (ImGui.IsItemActive())
-                        P4 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + FN_Editor.GizmosVisualizer.BiasSceneWindow.X, TransPos.Y + FN_Editor.GizmosVisualizer.BiasSceneWindow.Y)).ToPoint();
-                }
-
-                ImGui.End();
-            }
-        }
-
         public override void Draw(SpriteBatch spriteBatch)
         {
             Point TransPos = gameObject.Transform.Position.ToPoint();

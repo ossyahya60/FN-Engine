@@ -135,25 +135,34 @@ namespace FN_Engine.FN_Editor
                         ImGui.Image(RotationGizmo, new Vector2(128, 128));
                         ImGui.PopID();
 
+                        bool DidClickOnRotaionGizmo = EnteredRotationZone;
                         if (Input.GetMouseClickUp(MouseButtons.LeftClick))
                             EnteredRotationZone = false;
 
-                        if(Input.GetMouseClick(MouseButtons.LeftClick))
+                        if (Input.GetMouseClickDown(MouseButtons.LeftClick))
                         {
-                            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
-                                OldTransVal = SelectedGO.Transform.Rotation;
-
-                            WasMouseHeld = true;
-
-                            Microsoft.Xna.Framework.Vector2 SameBias = new Microsoft.Xna.Framework.Vector2(BiasSceneWindow.X, BiasSceneWindow.Y);
-                            if (EnteredRotationZone || Utility.CircleContains(PlayerPos + SameBias, 64, Input.GetMousePosition()))
+                            Microsoft.Xna.Framework.Vector2 SameBias = Utility.Vec2NumericToVec2MG(new Vector2(PlayerPos.X - 57 + SceneWindow.X + 64, PlayerPos.Y - 37 + 64 + SceneWindow.Y) - Bias);
+                            if (EnteredRotationZone || Utility.CircleContains(SameBias, 64, Input.GetMousePosition()))
                             {
-                                SelectedGO.Transform.Rotation = MathCompanion.GetAngle_Rad(PlayerPos + SameBias, Input.GetMousePosition());
+                                OldTransVal = SelectedGO.Transform.Rotation;
+                                SelectedGO.Transform.Rotation = MathCompanion.GetAngle_Rad(SameBias, Input.GetMousePosition());
                                 EnteredRotationZone = true;
                             }
                         }
 
-                        if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && WasMouseHeld)
+                        if (Input.GetMouseClick(MouseButtons.LeftClick) && EnteredRotationZone)
+                        {
+                            WasMouseHeld = true;
+
+                            Microsoft.Xna.Framework.Vector2 SameBias = Utility.Vec2NumericToVec2MG(new Vector2(PlayerPos.X - 57 + SceneWindow.X + 64, PlayerPos.Y - 37 + 64 + SceneWindow.Y) - Bias);
+                            if (EnteredRotationZone || Utility.CircleContains(SameBias, 64, Input.GetMousePosition()))
+                            {
+                                SelectedGO.Transform.Rotation = MathCompanion.GetAngle_Rad(SameBias, Input.GetMousePosition());
+                                EnteredRotationZone = true;
+                            }
+                        }
+
+                        if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && WasMouseHeld && DidClickOnRotaionGizmo)
                         {
                             GameObjects_Tab.AddToACircularBuffer(GameObjects_Tab.Undo_Buffer, new KeyValuePair<object, Operation>(new KeyValuePair<object, object>(new KeyValuePair<object, object>(SelectedGO.Transform, typeof(Transform).GetMember("Rotation")[0]), OldTransVal), Operation.ChangeValue));
                             GameObjects_Tab.Redo_Buffer.Clear();
@@ -223,6 +232,57 @@ namespace FN_Engine.FN_Editor
                         break;
                 }
                 ImGui.PopStyleColor(3);
+
+                //////////////////////////
+                ///
+                BezierLine BL = SelectedGO.GetComponent<BezierLine>();
+                if (BL != null)
+                {
+                    System.Numerics.Vector2 TransPos = new System.Numerics.Vector2(SelectedGO.Transform.Position.X + Setup.graphics.PreferredBackBufferWidth * 0.5f, SelectedGO.Transform.Position.Y + Setup.graphics.PreferredBackBufferHeight * 0.5f);
+
+                    //Point 1
+                    ImGui.SetNextItemWidth(10);
+                    ImGui.SetCursorPos(new System.Numerics.Vector2(BL.P1.X, BL.P1.Y) + TransPos);
+                    ImGui.PushID(SelectedGO.Name + "P1");
+                    ImGui.SmallButton("");
+                    ImGui.PopID();
+
+                    if (ImGui.IsItemActive())
+                        BL.P1 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + SceneWindow.X, TransPos.Y + SceneWindow.Y)).ToPoint();
+
+                    //Point 2
+                    ImGui.SetNextItemWidth(10);
+                    ImGui.SetCursorPos(new System.Numerics.Vector2(BL.P2.X, BL.P2.Y) + TransPos);
+                    ImGui.PushID(SelectedGO.Name + "P2");
+                    ImGui.SmallButton("");
+                    ImGui.PopID();
+
+                    if (ImGui.IsItemActive())
+                        BL.P2 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + SceneWindow.X, TransPos.Y + SceneWindow.Y)).ToPoint();
+
+                    //Point 3
+                    ImGui.SetNextItemWidth(10);
+                    ImGui.SetCursorPos(new System.Numerics.Vector2(BL.P3.X, BL.P3.Y) + TransPos);
+                    ImGui.PushID(SelectedGO.Name + "P3");
+                    ImGui.SmallButton("");
+                    ImGui.PopID();
+
+                    if (ImGui.IsItemActive())
+                        BL.P3 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + SceneWindow.X, TransPos.Y + SceneWindow.Y)).ToPoint();
+
+                    //Point 4
+                    if (BL.Quadratic)
+                    {
+                        ImGui.SetNextItemWidth(10);
+                        ImGui.SetCursorPos(new System.Numerics.Vector2(BL.P4.X, BL.P4.Y) + TransPos);
+                        ImGui.PushID(SelectedGO.Name + "P4");
+                        ImGui.SmallButton("");
+                        ImGui.PopID();
+
+                        if (ImGui.IsItemActive())
+                            BL.P4 = (Input.GetMousePosition() - new Microsoft.Xna.Framework.Vector2(TransPos.X + SceneWindow.X, TransPos.Y + SceneWindow.Y)).ToPoint();
+                    }
+                }
             }
 
             if (ImGui.IsWindowHovered() && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && ContentWindow.DraggedAsset is GameObject)

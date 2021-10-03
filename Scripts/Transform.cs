@@ -125,7 +125,7 @@ namespace FN_Engine
                 {
                     Displacement = Position - LastPosition;
 
-                    T.Position += MoveLocally && !JustParented ? Displacement / 2 : new Vector2((float)(Displacement.X * Math.Cos(ParentRotation) + Displacement.Y * Math.Sin(ParentRotation)), -(float)(Displacement.X * Math.Sin(ParentRotation) - Displacement.Y * Math.Cos(ParentRotation))) / 2;
+                    T.Position += MoveLocally && !JustParented ? Displacement : new Vector2((float)(Displacement.X * Math.Cos(ParentRotation) + Displacement.Y * Math.Sin(ParentRotation)), -(float)(Displacement.X * Math.Sin(ParentRotation) - Displacement.Y * Math.Cos(ParentRotation)));
                     T.Rotation += Rotation - LastRotation;
                     T.Scale += Scale - LastScale;
                 }
