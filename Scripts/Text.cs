@@ -9,12 +9,13 @@ namespace FN_Engine
         public string Name;
         public Color Color;
         public string text;
-        public SpriteFont Font;
         public SpriteEffects spriteEffects;
         public Vector2 Origin;
         public bool CustomOrigin = false;
 
         private Transform transform;
+        private SpriteFont Font; //?
+
 
         public Text()
         {
@@ -60,11 +61,17 @@ namespace FN_Engine
             if (transform == null)
                 transform = gameObject.Transform;
 
+            if (Font == null)
+                LoadFont("Font");
+
             //transform.Position = new Vector2(Setup.graphics.PreferredBackBufferWidth / 2, Setup.graphics.PreferredBackBufferHeight / 2);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            if (Font == null) //handle font serialization
+                return;
+
             if(!CustomOrigin)
                 Origin = Font.MeasureString(text) * 0.5f;
 

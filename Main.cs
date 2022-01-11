@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections;
 using System.IO;
 
 namespace FN_Engine
@@ -109,8 +111,6 @@ namespace FN_Engine
         {
             SceneManager.ShouldUpdate = false;
             ImportantIntialization();
-
-            Setup.Content.Load<SpriteFont>("Font");
 
             FN_Editor.EditorScene.IsThisTheEditor = true;
 

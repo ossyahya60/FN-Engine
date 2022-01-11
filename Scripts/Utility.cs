@@ -254,6 +254,12 @@ namespace FN_Engine
 
                     JW.WriteValue(((Effect)OBJ).Name);
                     return;
+                case "SpriteFont":
+                    if (!ShouldWriteValue)
+                        JW.WritePropertyName("Should Be Fixed");
+
+                    JW.WriteValue(((SpriteFont)OBJ).Texture.Name);
+                    return;
             }
 
             if (!FirstTime) //Serialized Before!
@@ -270,8 +276,6 @@ namespace FN_Engine
 
             JW.WritePropertyName("Generated ID");
             JW.WriteValue(GID);
-
-
 
             foreach (FieldInfo Member in OBJ.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
             {

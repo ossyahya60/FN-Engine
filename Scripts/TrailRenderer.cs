@@ -36,18 +36,22 @@ namespace FN_Engine
         private float SpawnRateCounter = 0;
         private Random random;
         private Color Color1, Color2, Color3, ColorDefault = Color.White;
+        private Vector2 Lpos = Vector2.Zero;
 
         public TrailRenderer()
         {
             random = new Random();
+            Particles = new Queue();
         }
 
         public override void Start()
         {
-            Particles = new Queue();
+            Particles.Clear();
             SpawnRateCounter = SpawnRate;
             if(OffsetPosition == null)
                 OffsetPosition = Vector2.Zero;
+
+            Lpos = gameObject.Transform.Position;
         }
 
         public override void Update(GameTime gameTime)
@@ -59,11 +63,11 @@ namespace FN_Engine
                 if (Particles.Count >= MaxParticles)
                     Particles.Dequeue();
 
-                if (gameObject.Transform.Position - gameObject.Transform.LastPosition != Vector2.Zero)
+                if (gameObject.Transform.Position - Lpos != Vector2.Zero)
                 {
                     Particle particle = new Particle(false);
                     particle.FadeColor = FadeColor;
-                    particle.Position = gameObject.Transform.LastPosition + OffsetPosition;
+                    particle.Position = Lpos + OffsetPosition;
                     particle.LifeTime = VanishAfter;
                     //if (RandomSize)
                     //    particle.Size = (int)(ParticleSize * random.NextDouble());
@@ -82,8 +86,8 @@ namespace FN_Engine
                     else
                         particle.Color = Color;
 
-                    particle.Rotation = MathCompanion.GetAngle(gameObject.Transform.LastPosition, gameObject.Transform.Position);
-                    particle.Length = 1 + (int)Math.Ceiling((gameObject.Transform.Position - gameObject.Transform.LastPosition).Length());
+                    particle.Rotation = MathCompanion.GetAngle(Lpos, gameObject.Transform.Position);
+                    particle.Length = 1 + (int)Math.Ceiling((gameObject.Transform.Position - Lpos).Length());
                     particle.Height = SegmentWidth;
                     particle.Layer = gameObject.Layer;
 
@@ -99,6 +103,8 @@ namespace FN_Engine
 
             foreach (Particle P in Particles)
                 P.Update(gameTime);
+
+            Lpos = gameObject.Transform.Position;
         }
 
         public override void Draw(SpriteBatch spriteBatch)

@@ -219,6 +219,7 @@ namespace FN_Engine.FN_Editor
                 if (ImGui.TreeNode("Scene Window"))
                 {
                     ImGui.BulletText("To multiselect gameObjects => hold Ctrl then click on a gameObject");
+                    ImGui.BulletText("To multiselect a region => hold Shift then click on a gameObject");
                     ImGui.BulletText("To copy a gameObject => Select then Ctrl + C");
                     ImGui.BulletText("To cut a gameObject => Select then Ctrl + X");
                     ImGui.BulletText("To duplicate a gameObject => Select then Ctrl + D");
