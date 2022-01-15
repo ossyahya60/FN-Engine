@@ -123,7 +123,7 @@ namespace FN_Engine
                 }
                 else
                 {
-                    Displacement = Position - LastPosition;
+                    Displacement = (Position - LastPosition) / gameObject.Parent.Transform.Scale;
 
                     T.Position += MoveLocally && !JustParented ? Displacement : new Vector2((float)(Displacement.X * Math.Cos(ParentRotation) + Displacement.Y * Math.Sin(ParentRotation)), -(float)(Displacement.X * Math.Sin(ParentRotation) - Displacement.Y * Math.Cos(ParentRotation)));
                     T.Rotation += Rotation - LastRotation;

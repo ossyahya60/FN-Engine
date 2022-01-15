@@ -29,8 +29,17 @@ namespace FN_Engine
         {
             set
             {
-                if(!string.IsNullOrEmpty(value))
-                    customTex = Setup.Content.Load<Texture2D>(value);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    try
+                    {
+                        customTex = Setup.Content.Load<Texture2D>(value);
+                    }
+                    catch(Exception e)
+                    {
+                        Utility.Log($"stack trace: {e.StackTrace} \nMessage: {e.Message}");
+                    }
+                }
             }
             get
             {
