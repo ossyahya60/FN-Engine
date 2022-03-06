@@ -14,6 +14,7 @@ namespace FN_Engine
 
         private Vector2 vRayToNearest;
         private float fOverlap;
+        private float lastRotation = 0;
 
         public CircleCollider(int Radius)
         {
@@ -27,6 +28,7 @@ namespace FN_Engine
 
         public override void Start()
         {
+            lastRotation = gameObject.Transform.Rotation;
             var SR = gameObject.GetComponent<SpriteRenderer>();
             if (SR != null && Center.X == 0)  //Initializing Collider bounds with the sprite bounds if exists
             {
@@ -36,6 +38,14 @@ namespace FN_Engine
                     Radius = (int)(SR.Sprite.SourceRectangle.Size.X * 0.5f * gameObject.Transform.Scale.X);
                 }
             }
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            float deltaRotation = gameObject.Transform.Rotation - lastRotation;
+            Center += new Vector2((float)(Radius * Math.Cos(deltaRotation)), (float)(Radius * Math.Sin(deltaRotation)));
+
+            lastRotation = gameObject.Transform.Rotation;
         }
 
         public bool Contains(Vector2 Point)
@@ -143,7 +153,13 @@ namespace FN_Engine
         void Collider2D.Visualize(float X_Bias, float Y_Bias)
         {
             if (Enabled)
+            {
+                Center += Center.Length() * new Vector2((float)(Math.Cos(gameObject.Transform.Rotation) - Math.Cos(lastRotation)), (float)(Math.Sin(gameObject.Transform.Rotation) - Math.Sin(lastRotation)));
+
+                lastRotation = gameObject.Transform.Rotation;
+
                 HitBoxDebuger.DrawCircleNonFilled(Center + gameObject.Transform.Position + new Vector2(X_Bias, Y_Bias), Radius, (int)(Radius * 0.95f), Color.Yellow, 0, gameObject.Transform.Scale.X);
+            }
         }
 
         public override GameObjectComponent DeepCopy(GameObject Clone)

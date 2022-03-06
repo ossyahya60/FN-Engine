@@ -1,14 +1,9 @@
-Message => Unable to load DLL 'libmojoshader_64.dll' or one of its dependencies: The specified module could not be found. (0x8007007E)
-Unexpected error compiling 'C:/FN Engine CrossPlatform/FN_Engine/Content/LightTest.fx'!
+Message => Could not find a part of the path 'C:\Users\ossya\Desktop\Game Development\Games\Project Archery\Content'.
 
-
-Stack Trace =>    at Microsoft.Xna.Framework.Content.Pipeline.Processors.EffectProcessor.ProcessErrorsAndWarnings(Boolean buildFailed, String shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
-   at Microsoft.Xna.Framework.Content.Pipeline.Processors.EffectProcessor.Process(EffectContent input, ContentProcessorContext context)
-   at Microsoft.Xna.Framework.Content.Pipeline.ContentProcessor`2.Microsoft.Xna.Framework.Content.Pipeline.IContentProcessor.Process(Object input, ContentProcessorContext context)
-   at MonoGame.Framework.Content.Pipeline.Builder.PipelineManager.ProcessContent(PipelineBuildEvent pipelineEvent)
-   at FN_Engine.Utility.BuildContentItem(String Path) in C:\FN Engine CrossPlatform\FN_Engine\Scripts\Utility.cs:line 1379
-   at FN_Engine.Main.LoadContent() in C:\FN Engine CrossPlatform\FN_Engine\Main.cs:line 108
-   at FN_Engine.Main.Initialize() in C:\FN Engine CrossPlatform\FN_Engine\Main.cs:line 51
+Stack Trace =>    at System.Environment.set_CurrentDirectoryCore(String value)
+   at System.Environment.set_CurrentDirectory(String value)
+   at FN_Engine.Main.LoadContent() in C:\FN Engine CrossPlatform\FN_Engine\Main.cs:line 134
+   at FN_Engine.Main.Initialize() in C:\FN Engine CrossPlatform\FN_Engine\Main.cs:line 55
    at Microsoft.Xna.Framework.Game.DoInitialize()
    at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior)
    at FN_Engine.Program.Main() in C:\FN Engine CrossPlatform\FN_Engine\Program.cs:line 11
