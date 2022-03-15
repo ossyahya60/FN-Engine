@@ -114,15 +114,19 @@ namespace FN_Engine
                 {
                     // Colliison on X-axis only
                     ShortestTime = TimeBetweenCollidersX;
+                    int posXSign = Math.Sign(DC1.Center.X - DC2.Center.X);
                     YourRigidBody.gameObject.Transform.MoveX(ShortestTime * YourRigidBody.Velocity.X);
-                    YourRigidBody.Velocity.X = ResetVelocity ? 0 : YourRigidBody.Velocity.X;
+                    
+                    YourRigidBody.Velocity.X = ResetVelocity && posXSign != Math.Sign(YourRigidBody.Velocity.X) ? 0 : YourRigidBody.Velocity.X;
                 }
                 else if (YourRigidBody.Velocity.X == 0 && YourRigidBody.Velocity.Y != 0)
                 {
                     // Colliison on Y-axis only
                     ShortestTime = TimeBetweenCollidersY;
+                    int posYSign = Math.Sign(DC1.Center.Y - DC2.Center.Y);
                     YourRigidBody.gameObject.Transform.MoveY(ShortestTime * YourRigidBody.Velocity.Y);
-                    YourRigidBody.Velocity.Y = ResetVelocity ? 0 : YourRigidBody.Velocity.Y;
+
+                    YourRigidBody.Velocity.Y = ResetVelocity && posYSign != Math.Sign(YourRigidBody.Velocity.Y) ? 0 : YourRigidBody.Velocity.Y;
                 }
                 else
                 {
@@ -135,8 +139,9 @@ namespace FN_Engine
                     {
                         if (ShortestTime == TimeBetweenCollidersX)
                         {
+                            int posXSign = Math.Sign(DC1.Center.X - DC2.Center.X);
                             YourRigidBody.gameObject.Transform.Position.X = OldPos.X;
-                            YourRigidBody.Velocity.X = ResetVelocity ? 0 : YourRigidBody.Velocity.X;
+                            YourRigidBody.Velocity.X = ResetVelocity && posXSign != Math.Sign(YourRigidBody.Velocity.X) ? 0 : YourRigidBody.Velocity.X;
 
                             if (!collider.CollisionDetection(this, false))
                                 YourRigidBody.gameObject.Transform.Position.Y = CollisionPos.Y;
@@ -144,8 +149,9 @@ namespace FN_Engine
 
                         if (ShortestTime == TimeBetweenCollidersY)
                         {
+                            int posYSign = Math.Sign(DC1.Center.Y - DC2.Center.Y);
                             YourRigidBody.gameObject.Transform.Position.Y = OldPos.Y;
-                            YourRigidBody.Velocity.Y = ResetVelocity ? 0 : YourRigidBody.Velocity.Y;
+                            YourRigidBody.Velocity.Y = ResetVelocity && posYSign != Math.Sign(YourRigidBody.Velocity.Y) ? 0 : YourRigidBody.Velocity.Y;
 
                             if (!collider.CollisionDetection(this, false))
                                 YourRigidBody.gameObject.Transform.Position.X = CollisionPos.X;

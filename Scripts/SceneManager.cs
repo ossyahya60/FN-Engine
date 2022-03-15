@@ -142,7 +142,7 @@ namespace FN_Engine
             if (ActiveScene != null && ShouldUpdate)
                 ActiveScene.Update(gameTime);
 
-            if (ActiveScene != null && FN_Editor.EditorScene.IsThisTheEditor)
+            if (ActiveScene != null /*&& FN_Editor.EditorScene.IsThisTheEditor*/)
                 ActiveScene.UpdateUI(gameTime);
         }
 

@@ -42,8 +42,7 @@ namespace FN_Engine
 
         public override void Update(GameTime gameTime)
         {
-            float deltaRotation = gameObject.Transform.Rotation - lastRotation;
-            Center += new Vector2((float)(Radius * Math.Cos(deltaRotation)), (float)(Radius * Math.Sin(deltaRotation)));
+            Center += Center.Length() * new Vector2((float)(Math.Cos(gameObject.Transform.Rotation) - Math.Cos(lastRotation)), (float)(Math.Sin(gameObject.Transform.Rotation) - Math.Sin(lastRotation)));
 
             lastRotation = gameObject.Transform.Rotation;
         }
@@ -75,10 +74,10 @@ namespace FN_Engine
                 /////////////////////////This code is heavily inspired by "OneLoneCoder" the youtuber///////////////////////
 
                 Vector2 vNearestPoint;
-                vNearestPoint.X = Math.Clamp(gameObject.Transform.Position.X, IncomingCollider.Left, IncomingCollider.Right);
-                vNearestPoint.Y = Math.Clamp(gameObject.Transform.Position.Y, IncomingCollider.Top, IncomingCollider.Bottom);
+                vNearestPoint.X = Math.Clamp(gameObject.Transform.Position.X + Center.X, IncomingCollider.Left, IncomingCollider.Right);
+                vNearestPoint.Y = Math.Clamp(gameObject.Transform.Position.Y + Center.Y, IncomingCollider.Top, IncomingCollider.Bottom);
 
-                vRayToNearest = vNearestPoint - gameObject.Transform.Position;
+                vRayToNearest = vNearestPoint - gameObject.Transform.Position - Center;
                 fOverlap = Radius - vRayToNearest.Length();
                 //if (std::isnan(fOverlap)) fOverlap = 0;
 
@@ -152,7 +151,7 @@ namespace FN_Engine
 
         void Collider2D.Visualize(float X_Bias, float Y_Bias)
         {
-            if (Enabled)
+            if (Enabled && FN_Editor.EditorScene.IsThisTheEditor)
             {
                 Center += Center.Length() * new Vector2((float)(Math.Cos(gameObject.Transform.Rotation) - Math.Cos(lastRotation)), (float)(Math.Sin(gameObject.Transform.Rotation) - Math.Sin(lastRotation)));
 

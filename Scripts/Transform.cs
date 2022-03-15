@@ -72,9 +72,9 @@ namespace FN_Engine
 
         public override void Update(GameTime gameTime)
         {
-            LastPosition = Position;
-            LastRotation = Rotation;
-            LastScale = Scale;
+            //LastPosition = Position;
+            //LastRotation = Rotation;
+            //LastScale = Scale;
         }
 
         // This Appoach is based on this example code from here:
