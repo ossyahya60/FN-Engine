@@ -1,8 +1,13 @@
-Message => Could not find a part of the path 'C:\Users\ossya\Desktop\Game Development\Games\Project Archery\Content'.
+Message => Could not find a part of the path 'C:\FN_Engine_Projects\Brick Breaker\bin\Debug\netcoreapp3.1\FN_Engine.dll'.
 
-Stack Trace =>    at System.Environment.set_CurrentDirectoryCore(String value)
-   at System.Environment.set_CurrentDirectory(String value)
-   at FN_Engine.Main.LoadContent() in C:\FN Engine CrossPlatform\FN_Engine\Main.cs:line 134
+Stack Trace =>    at System.IO.FileSystem.CopyFile(String sourceFullPath, String destFullPath, Boolean overwrite)
+   at System.IO.File.Copy(String sourceFileName, String destFileName, Boolean overwrite)
+   at System.IO.File.Copy(String sourceFileName, String destFileName)
+   at FN_Engine.FN_Project.VisualizeEngineStartup.MakeNewProject(String Path) in C:\FN Engine CrossPlatform\FN_Engine\FN_Project\VisualizeEngineStartup.cs:line 85
+   at FN_Engine.FN_Project.MakeForm.CreateOrOpenProj() in C:\FN Engine CrossPlatform\FN_Engine\FN_Project\MakeForm.cs:line 25
+   at FN_Engine.FN_Project.VisualizeEngineStartup.Start() in C:\FN Engine CrossPlatform\FN_Engine\FN_Project\VisualizeEngineStartup.cs:line 29
+   at FN_Engine.GameObject.Start() in C:\FN Engine CrossPlatform\FN_Engine\Scripts\GameObject.cs:line 357
+   at FN_Engine.Main.LoadContent() in C:\FN Engine CrossPlatform\FN_Engine\Main.cs:line 120
    at FN_Engine.Main.Initialize() in C:\FN Engine CrossPlatform\FN_Engine\Main.cs:line 55
    at Microsoft.Xna.Framework.Game.DoInitialize()
    at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior)

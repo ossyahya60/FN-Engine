@@ -63,7 +63,7 @@ namespace FN_Engine
 
             if (BodyType != BodyType.Static)
             {
-                Velocity -= LinearDragScale * DeltaTime * Velocity;
+                Velocity.X -= LinearDragScale * DeltaTime * Velocity.X;
 
                 if (ConstraintHorizontalMovement)
                     Velocity = new Vector2(0, Velocity.Y);

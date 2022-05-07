@@ -943,7 +943,7 @@ namespace FN_Engine.FN_Editor
                     }
                     /////////////////////////
 
-                    if (ImGui.BeginDragDropSource())
+                    if (ImGui.BeginDragDropSource() && GameContentPath.Equals(Prefabs[i].Directory))
                     {
                         DraggedAsset = Prefabs[i].Clone;
 

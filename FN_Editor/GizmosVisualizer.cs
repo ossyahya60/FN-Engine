@@ -57,7 +57,12 @@ namespace FN_Engine.FN_Editor
             GameObject SelectedGO = GameObjects_Tab.WhoIsSelected;
             if (ShowGizmos && SelectedGO != null && SelectedGO.Active && SelectedGO.Transform != null)
             {
-                var PlayerPos = SelectedGO.Transform.Position * Setup.Camera.Zoom;
+                Microsoft.Xna.Framework.Vector2 avgPosition = Microsoft.Xna.Framework.Vector2.Zero;
+                foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                    avgPosition += go.Transform.Position;
+                avgPosition /= GameObjects_Tab.SelectedGOs.Count;
+
+                var PlayerPos = avgPosition * Setup.Camera.Zoom;
 
                 //Transform Visualization
                 if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.Q))
@@ -85,7 +90,8 @@ namespace FN_Engine.FN_Editor
                             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                                 OldTransVal = PlayerPos;
 
-                            SelectedGO.Transform.MoveY(Input.MouseDeltaY());
+                            foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                                go.Transform.MoveY(Input.MouseDeltaY());
                             WasMouseHeld = true;
                         }
 
@@ -100,7 +106,8 @@ namespace FN_Engine.FN_Editor
                             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                                 OldTransVal = PlayerPos;
 
-                            SelectedGO.Transform.MoveX(Input.MouseDeltaX());
+                            foreach(GameObject go in GameObjects_Tab.SelectedGOs)
+                                go.Transform.MoveX(Input.MouseDeltaX());
                             WasMouseHeld = true;
                         }
 
@@ -115,7 +122,8 @@ namespace FN_Engine.FN_Editor
                             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                                 OldTransVal = PlayerPos;
 
-                            SelectedGO.Transform.Move(Input.MouseDelta());
+                            foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                                go.Transform.Move(Input.MouseDelta());
                             WasMouseHeld = true;
                         }
 
@@ -145,7 +153,8 @@ namespace FN_Engine.FN_Editor
                             if (EnteredRotationZone || Utility.CircleContains(SameBias, 64, Input.GetMousePosition()))
                             {
                                 OldTransVal = SelectedGO.Transform.Rotation;
-                                SelectedGO.Transform.Rotation = MathCompanion.GetAngle_Rad(SameBias, Input.GetMousePosition());
+                                foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                                    go.Transform.Rotation = MathCompanion.GetAngle_Rad(SameBias, Input.GetMousePosition());
                                 EnteredRotationZone = true;
                             }
                         }
@@ -157,7 +166,8 @@ namespace FN_Engine.FN_Editor
                             Microsoft.Xna.Framework.Vector2 SameBias = Utility.Vec2NumericToVec2MG(new Vector2(PlayerPos.X - 57 + SceneWindow.X + 64, PlayerPos.Y - 37 + 64 + SceneWindow.Y) - Bias);
                             if (EnteredRotationZone || Utility.CircleContains(SameBias, 64, Input.GetMousePosition()))
                             {
-                                SelectedGO.Transform.Rotation = MathCompanion.GetAngle_Rad(SameBias, Input.GetMousePosition());
+                                foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                                    go.Transform.Rotation = MathCompanion.GetAngle_Rad(SameBias, Input.GetMousePosition());
                                 EnteredRotationZone = true;
                             }
                         }
@@ -184,8 +194,8 @@ namespace FN_Engine.FN_Editor
                                 OldTransVal = SelectedGO.Transform.Scale;
 
                             WasMouseHeld = true;
-
-                            SelectedGO.Transform.ScaleY(-Input.MouseDeltaY() * 0.01f);
+                            foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                                go.Transform.ScaleY(-Input.MouseDeltaY() * 0.01f);
                         }
 
                         //Horizontal Scale
@@ -200,8 +210,8 @@ namespace FN_Engine.FN_Editor
                                 OldTransVal = SelectedGO.Transform.Scale;
 
                             WasMouseHeld = true;
-
-                            SelectedGO.Transform.ScaleX(Input.MouseDeltaX() * 0.01f);
+                            foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                                go.Transform.ScaleX(Input.MouseDeltaX() * 0.01f);
                         }
 
                         //Cube (Full Scale)
@@ -219,7 +229,8 @@ namespace FN_Engine.FN_Editor
 
                             int Sign = Input.MouseDeltaX() >= 0 ? 1 : -1;
                             float AverageDelta = (float)Math.Sqrt(Input.MouseDelta().X * Input.MouseDelta().X + Input.MouseDelta().Y * Input.MouseDelta().Y) * 0.01f;
-                            SelectedGO.Transform.ScaleBoth(Microsoft.Xna.Framework.Vector2.One * AverageDelta * Sign);
+                            foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                                go.Transform.ScaleBoth(Microsoft.Xna.Framework.Vector2.One * AverageDelta * Sign);
                         }
 
                         if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && WasMouseHeld)

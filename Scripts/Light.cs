@@ -122,8 +122,14 @@ namespace FN_Engine
             Setup.GraphicsDevice.SetRenderTarget(RenderTarget2D); //Render Target
         }
 
+        internal static void RecalculateAspectRatio()
+        {
+            YOVERX = (float)Setup.graphics.PreferredBackBufferHeight / Setup.graphics.PreferredBackBufferWidth;
+        }
+
         public static void ApplyLighting()
         {
+            RecalculateAspectRatio();
             //You probably need to add they XY coordinates of BiasScene in editor mode too (below two lines) //Ignore this for now
             Rectangle BiasScene = new Rectangle((int)(Setup.Camera.Position.X - Setup.graphics.PreferredBackBufferWidth * 0.5f), (int)(Setup.Camera.Position.Y - Setup.graphics.PreferredBackBufferHeight * 0.5f), Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight);
             if (FN_Editor.EditorScene.IsThisTheEditor)

@@ -13,6 +13,8 @@ namespace FN_Engine.FN_Editor
 
         private string sceneName = "Default";
         private bool PopUpOpen = false;
+        private int displacementAmount = 50;
+        private int sceneCameraSpeed = 3;
 
         public override void Start()
         {
@@ -49,6 +51,36 @@ namespace FN_Engine.FN_Editor
                 else
                     SceneManager.LoadScene_Serialization(SceneManager.LastLoadPath);
             }
+
+            if(Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.Up, KeyboardFlags.SHIFT))
+            {
+                foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                    go.Transform.Position.Y -= displacementAmount;
+            }
+            else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.Down, KeyboardFlags.SHIFT))
+            {
+                foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                    go.Transform.Position.Y += displacementAmount;
+            }
+            else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.Left, KeyboardFlags.SHIFT))
+            {
+                foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                    go.Transform.Position.X -= displacementAmount;
+            }
+            else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.Right, KeyboardFlags.SHIFT))
+            {
+                foreach (GameObject go in GameObjects_Tab.SelectedGOs)
+                    go.Transform.Position.X += displacementAmount;
+            }
+
+            if (Input.GetKey(Microsoft.Xna.Framework.Input.Keys.Up, KeyboardFlags.SOLO))
+                Setup.Camera.Move(-sceneCameraSpeed * Microsoft.Xna.Framework.Vector2.UnitY, ImGui.GetIO().DeltaTime * 60 / Setup.Camera.Zoom);
+            else if (Input.GetKey(Microsoft.Xna.Framework.Input.Keys.Down, KeyboardFlags.SOLO))
+                Setup.Camera.Move(sceneCameraSpeed * Microsoft.Xna.Framework.Vector2.UnitY, ImGui.GetIO().DeltaTime * 60 / Setup.Camera.Zoom);
+            if (Input.GetKey(Microsoft.Xna.Framework.Input.Keys.Left, KeyboardFlags.SOLO))
+                Setup.Camera.Move(-sceneCameraSpeed * Microsoft.Xna.Framework.Vector2.UnitX, ImGui.GetIO().DeltaTime * 60 / Setup.Camera.Zoom);
+            else if (Input.GetKey(Microsoft.Xna.Framework.Input.Keys.Right, KeyboardFlags.SOLO))
+                Setup.Camera.Move(sceneCameraSpeed * Microsoft.Xna.Framework.Vector2.UnitX, ImGui.GetIO().DeltaTime * 60 / Setup.Camera.Zoom);
 
             bool OpenHelp = false;
             if (ImGui.BeginMainMenuBar())
@@ -173,6 +205,8 @@ namespace FN_Engine.FN_Editor
                 {
                     ImGui.Checkbox("Show Gizmos (CTRL + G)", ref GizmosVisualizer.ShowGizmos);
                     ImGui.Checkbox("Auto Config Windows", ref AutoConfigureWindows);
+                    ImGui.InputInt("Displacement Amount", ref displacementAmount);
+                    ImGui.InputInt("Scene Camera Speed", ref sceneCameraSpeed);
 
                     ImGui.EndMenu();
                 }

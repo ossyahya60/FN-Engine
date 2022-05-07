@@ -271,6 +271,9 @@ namespace FN_Engine
         public void ShowUI(SpriteBatch spriteBatch)
         {
             // Drawing ImGUI Stuff
+            if (ImGUI_RenderTarget.Width != Setup.graphics.PreferredBackBufferWidth || ImGUI_RenderTarget.Height != Setup.graphics.PreferredBackBufferHeight)
+                ImGUI_RenderTarget = new RenderTarget2D(Setup.GraphicsDevice, Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight, false, Setup.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+
             Setup.GraphicsDevice.SetRenderTarget(null);
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, null);
             spriteBatch.Draw(ImGUI_RenderTarget, Vector2.Zero, new Rectangle(0, 0, (int)ResolutionIndependentRenderer.GetVirtualRes().X, (int)ResolutionIndependentRenderer.GetVirtualRes().Y), Color.White);

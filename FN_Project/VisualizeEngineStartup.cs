@@ -295,7 +295,7 @@ namespace FN_Engine.FN_Project
             "            Setup.Initialize(graphics, Content, spriteBatch, Window, Camera, this);" + "\n" +
             "    \n" +
             "            ResolutionIndependentRenderer.Init(ref graphics);" + "\n" +
-            "            ResolutionIndependentRenderer.SetResolution(1366, 768, false);" + "\n" +
+            "            ResolutionIndependentRenderer.SetResolution(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, false);" + "\n" +
             "            ResolutionIndependentRenderer.SetVirtualResolution(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);" + "\n" +
             "        }" + "\n" +
             "    \n" +
@@ -327,6 +327,9 @@ namespace FN_Engine.FN_Project
             "            Setup.ConfigurePipelineMG();" + "\n" +
             "    \n" +
             "            SceneManager.LoadScene_Serialization(\"Scenes\\\\DefaultScene\");" + "\n" +
+            "    \n" +
+            "            ResolutionIndependentRenderer.SetResolution(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, false);" + "\n" +
+            "            ResolutionIndependentRenderer.SetVirtualResolution(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);" + "\n" +
             "        }" + "\n" +
             "    \n" +
             "        /// <summary>" + "\n" +

@@ -33,6 +33,7 @@ namespace FN_Engine
             if (t1 >= 0.0f && t2 >= 0.0f && t2 <= 1.0f)
             {
                 t = t1;
+                HitSomething = true;
                 return t1;
             }
 

@@ -92,13 +92,13 @@ namespace FN_Engine
 
         public override void DrawUI()
         {
-            if (!SceneManager.ShouldUpdate)
-            {
-                Setup.Camera.Position = gameObject.Transform.Position;
-                Setup.Camera.Rotation = gameObject.Transform.Rotation;
-                gameObject.Transform.Scale = Vector2.One;
-                Setup.Camera.Zoom = CameraZoom;
-            }
+            //if (!SceneManager.ShouldUpdate)
+            //{
+            //    Setup.Camera.Position = gameObject.Transform.Position;
+            //    Setup.Camera.Rotation = gameObject.Transform.Rotation;
+            //    gameObject.Transform.Scale = Vector2.One;
+            //    Setup.Camera.Zoom = CameraZoom;
+            //}
         }
 
         public override void Draw(SpriteBatch spriteBatch)

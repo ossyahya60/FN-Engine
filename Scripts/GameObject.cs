@@ -208,8 +208,10 @@ namespace FN_Engine
         public T GetComponent<T>() where T : GameObjectComponent
         {
             foreach (GameObjectComponent GOC in GameObjectComponents)
-                if (GOC is T)
-                    return (T)GOC;
+            {
+                if (GOC.GetType().FullName == typeof(T).FullName)
+                    return (T)GOC; //bugged
+            }
 
             return null;
         }

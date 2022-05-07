@@ -16,11 +16,11 @@ namespace FN_Engine.FN_Editor
         public static LinkedList<KeyValuePair<object, Operation>> Undo_Buffer;
         public static LinkedList<KeyValuePair<object, Operation>> Redo_Buffer;
         public static GameObject DraggedGO;
+        public static HashSet<GameObject> SelectedGOs;
 
         public const int BufferLimit = 200; //200 Items
 
         private string NameBuffer = "";
-        private HashSet<GameObject> SelectedGOs;
         private GameObject[] GOs_Clipboard = null;
         private bool IsCopy = true;
 
@@ -154,11 +154,16 @@ namespace FN_Engine.FN_Editor
                     }
                     IsCopy = false;
                 }
-                else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.D) /*&& ImGui.IsWindowFocused()*/) //Duplicate //Not functioning well...
+                else if (Input.GetKeyDown(Microsoft.Xna.Framework.Input.Keys.D) /*&& ImGui.IsWindowFocused()*/)
                 {
                     GameObject[] Instances = SelectedGOs.ToArray();
-                    for (int i = 0; i < SelectedGOs.Count; i++)
+                    SelectedGOs.Clear();
+
+                    for (int i = 0; i < Instances.Length; i++)
+                    {
                         Instances[i] = GameObject.Instantiate(Instances[i]);
+                        SelectedGOs.Add(Instances[i]);
+                    }
 
                     if (SelectedGOs.Count != 0)
                     {
