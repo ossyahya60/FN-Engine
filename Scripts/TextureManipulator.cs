@@ -8,23 +8,33 @@ namespace FN_Engine
         {
             GameObject otherSlice = GameObject.Instantiate(go);
 
-            Rectangle sourceRect = go.GetComponent<SpriteRenderer>().Sprite.SourceRectangle;
+            Sprite SR_go = go.GetComponent<SpriteRenderer>().Sprite;
+            Sprite SR_os = otherSlice.GetComponent<SpriteRenderer>().Sprite;
+
+
+            Rectangle sourceRect = SR_go.SourceRectangle;
 
             Rectangle rect = new Rectangle(sourceRect.X, sourceRect.Y, Horizontal ? sourceRect.Width : sourceRect.Width / 2, Horizontal ? sourceRect.Height / 2 : sourceRect.Height);
 
-            go.GetComponent<SpriteRenderer>().Sprite.SourceRectangle = rect;
+            SR_go.SourceRectangle = rect;
 
             if (Horizontal)
+            {
+                go.Transform.Position.Y -= SR_go.Origin.Y * go.Transform.Scale.Y * (sourceRect.Height - rect.Height);
                 rect = new Rectangle(sourceRect.X, sourceRect.Y + sourceRect.Height / 2, sourceRect.Width, sourceRect.Height / 2);
+            }
             else
+            {
+                go.Transform.Position.X -= SR_go.Origin.X * go.Transform.Scale.X * (sourceRect.Width - rect.Width);
                 rect = new Rectangle(sourceRect.X + sourceRect.Width / 2, sourceRect.Y, sourceRect.Width / 2, sourceRect.Height);
+            }
 
-            otherSlice.GetComponent<SpriteRenderer>().Sprite.SourceRectangle = rect;
+            SR_os.SourceRectangle = rect;
 
             if (Horizontal)
-                otherSlice.Transform.Position.Y += go.GetComponent<SpriteRenderer>().Sprite.DynamicScaledRect().Height + 2;
+                otherSlice.Transform.Position.Y -= SR_os.Origin.Y * otherSlice.Transform.Scale.Y * (sourceRect.Height - rect.Height) - (SR_go.DynamicScaledRect().Height + 2);
             else
-                otherSlice.Transform.Position.X += go.GetComponent<SpriteRenderer>().Sprite.DynamicScaledRect().Width + 2;
+                otherSlice.Transform.Position.X -= SR_os.Origin.X * otherSlice.Transform.Scale.X * (sourceRect.Width - rect.Width) - (SR_go.DynamicScaledRect().Width + 2);
 
             return new GameObject[] { go, otherSlice };
         }
@@ -33,23 +43,33 @@ namespace FN_Engine
         {
             GameObject otherSlice = GameObject.Instantiate(go);
 
-            Rectangle sourceRect = go.GetComponent<SpriteRenderer>().Sprite.SourceRectangle;
+            Sprite SR_go = go.GetComponent<SpriteRenderer>().Sprite;
+            Sprite SR_os = otherSlice.GetComponent<SpriteRenderer>().Sprite;
+
+
+            Rectangle sourceRect = SR_go.SourceRectangle;
 
             Rectangle rect = new Rectangle(sourceRect.X, sourceRect.Y, Horizontal ? sourceRect.Width : sourceRect.Width / 2, Horizontal ? sourceRect.Height / 2 : sourceRect.Height);
 
-            go.GetComponent<SpriteRenderer>().Sprite.SourceRectangle = rect;
+            SR_go.SourceRectangle = rect;
 
             if (Horizontal)
+            {
+                go.Transform.Position.Y -= SR_go.Origin.Y * go.Transform.Scale.Y * (sourceRect.Height - rect.Height);
                 rect = new Rectangle(sourceRect.X, sourceRect.Y + sourceRect.Height / 2, sourceRect.Width, sourceRect.Height / 2);
+            }
             else
+            {
+                go.Transform.Position.X -= SR_go.Origin.X * go.Transform.Scale.X * (sourceRect.Width - rect.Width);
                 rect = new Rectangle(sourceRect.X + sourceRect.Width / 2, sourceRect.Y, sourceRect.Width / 2, sourceRect.Height);
+            }
 
-            otherSlice.GetComponent<SpriteRenderer>().Sprite.SourceRectangle = rect;
+            SR_os.SourceRectangle = rect;
 
             if (Horizontal)
-                otherSlice.Transform.Position.Y += go.GetComponent<SpriteRenderer>().Sprite.DynamicScaledRect().Height + 2;
+                otherSlice.Transform.Position.Y -= SR_os.Origin.Y * otherSlice.Transform.Scale.Y * (sourceRect.Height - rect.Height) - (SR_go.DynamicScaledRect().Height + 2);
             else
-                otherSlice.Transform.Position.X += go.GetComponent<SpriteRenderer>().Sprite.DynamicScaledRect().Width + 2;
+                otherSlice.Transform.Position.X -= SR_os.Origin.X * otherSlice.Transform.Scale.X * (sourceRect.Width - rect.Width) - (SR_go.DynamicScaledRect().Width + 2);
         }
     }
 }
