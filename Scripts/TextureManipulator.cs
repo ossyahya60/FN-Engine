@@ -32,9 +32,9 @@ namespace FN_Engine
             SR_os.SourceRectangle = rect;
 
             if (Horizontal)
-                otherSlice.Transform.Position.Y -= SR_os.Origin.Y * otherSlice.Transform.Scale.Y * (sourceRect.Height - rect.Height) - (SR_go.DynamicScaledRect().Height + 2);
+                otherSlice.Transform.Position.Y -= SR_os.Origin.Y * otherSlice.Transform.Scale.Y * (sourceRect.Height - rect.Height) - (SR_go.DynamicScaledRect().Height);
             else
-                otherSlice.Transform.Position.X -= SR_os.Origin.X * otherSlice.Transform.Scale.X * (sourceRect.Width - rect.Width) - (SR_go.DynamicScaledRect().Width + 2);
+                otherSlice.Transform.Position.X -= SR_os.Origin.X * otherSlice.Transform.Scale.X * (sourceRect.Width - rect.Width) - (SR_go.DynamicScaledRect().Width);
 
             return new GameObject[] { go, otherSlice };
         }
@@ -67,9 +67,9 @@ namespace FN_Engine
             SR_os.SourceRectangle = rect;
 
             if (Horizontal)
-                otherSlice.Transform.Position.Y -= SR_os.Origin.Y * otherSlice.Transform.Scale.Y * (sourceRect.Height - rect.Height) - (SR_go.DynamicScaledRect().Height + 2);
+                otherSlice.Transform.Position.Y -= SR_os.Origin.Y * otherSlice.Transform.Scale.Y * (sourceRect.Height - rect.Height) - (SR_go.DynamicScaledRect().Height);
             else
-                otherSlice.Transform.Position.X -= SR_os.Origin.X * otherSlice.Transform.Scale.X * (sourceRect.Width - rect.Width) - (SR_go.DynamicScaledRect().Width + 2);
+                otherSlice.Transform.Position.X -= SR_os.Origin.X * otherSlice.Transform.Scale.X * (sourceRect.Width - rect.Width) - (SR_go.DynamicScaledRect().Width);
         }
     }
 }

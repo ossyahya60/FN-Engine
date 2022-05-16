@@ -6,22 +6,19 @@ namespace FN_Engine
 {
     public class Text : GameObjectComponent
     {
-        public string Name;
+        public string Name = "Default";
         public Color Color;
         public string text;
         public SpriteEffects spriteEffects;
         public Vector2 Origin;
         public bool CustomOrigin = false;
 
-        private Transform transform;
         private SpriteFont Font; //?
 
 
         public Text()
         {
             text = "Text";
-            if (gameObject != null)
-                transform = gameObject.Transform;
             Origin = Vector2.Zero;
             spriteEffects = SpriteEffects.None;
             Color = Color.White;
@@ -30,8 +27,6 @@ namespace FN_Engine
         public Text(string name)
         {
             text = "Text";
-            if(gameObject != null)
-                transform = gameObject.Transform;
             Origin = Vector2.Zero;
             Name = name;
             spriteEffects = SpriteEffects.None;
@@ -41,8 +36,6 @@ namespace FN_Engine
         public Text(string name, SpriteFont font)
         {
             text = "Text";
-            if (gameObject != null)
-                transform = gameObject.Transform;
             Origin = Vector2.Zero;
             Name = name;
             spriteEffects = SpriteEffects.None;
@@ -58,8 +51,6 @@ namespace FN_Engine
         public override void Start()
         {
             gameObject.Layer = LayerUI.GetLayer("Text");
-            if (transform == null)
-                transform = gameObject.Transform;
 
             if (Font == null)
                 LoadFont("Font");
@@ -70,17 +61,18 @@ namespace FN_Engine
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (Font == null) //handle font serialization
-                return;
+                LoadFont("Font");
 
-            if(!CustomOrigin)
+            if (!CustomOrigin)
                 Origin = Font.MeasureString(text) * 0.5f;
 
-            spriteBatch.DrawString(Font, text, transform.Position, Color, MathHelper.ToRadians(transform.Rotation), Origin, transform.Scale, spriteEffects, gameObject.Layer);
+            spriteBatch.DrawString(Font, text, gameObject.Transform.Position, Color, MathHelper.ToRadians(gameObject.Transform.Rotation), Origin, gameObject.Transform.Scale, spriteEffects, gameObject.Layer);
         }
 
         public void LoadFont(string Name)
         {
-            Font = Setup.Content.Load<SpriteFont>(Name);
+            try { Font = Setup.Content.Load<SpriteFont>(Name); }
+            catch (Exception E) { Utility.Log(E.Message); }
         }
 
         public string GetName()
@@ -97,7 +89,6 @@ namespace FN_Engine
         {
             Text clone = this.MemberwiseClone() as Text;
             clone.gameObject = Clone;
-            clone.transform = Clone.Transform;
             Clone.Layer = LayerUI.GetLayer("Text");
 
             return clone;
