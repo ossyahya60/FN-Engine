@@ -249,10 +249,15 @@ namespace FN_Engine
                 for (int i = Count; i >= 0; i--)
                     GameObjects[Count - i].DrawUI();
 
-            ImGuiNET.ImGui.Begin("Scene", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, System.Numerics.Vector2.Zero);
+            if (FN_Editor.EditorScene.IsThisTheEditor)
+                ImGuiNET.ImGui.Begin("Scene", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+            else
+                ImGuiNET.ImGui.Begin("Game", ImGuiWindowFlags.NoDecoration);
             ImGuiNET.ImGui.Image(SceneManager.SceneTexPtr, new System.Numerics.Vector2(Setup.graphics.PreferredBackBufferWidth, Setup.graphics.PreferredBackBufferHeight));
             FN_Editor.GizmosVisualizer.DrawGizmos();
             ImGuiNET.ImGui.End();
+            ImGui.PopStyleVar();
 
             if (FN_Editor.EditorScene.IsThisTheEditor && Input.GetMouseClickUp(MouseButtons.LeftClick))
             {

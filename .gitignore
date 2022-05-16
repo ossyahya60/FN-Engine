@@ -2,3 +2,5 @@
 ##bin/Release/netcoreapp3.1/Content/*
 Content/bin/DesktopGL/*
 FirstSetup.txt
+.vs
+.git
