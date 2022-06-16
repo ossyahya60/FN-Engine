@@ -1,3 +1,4 @@
+<pre>
 FFFFFFFFFFFFFFFFFFF          NNNN         NNNN
 FFFFFFFFFFFFFFFFFFF          NNNNN        NNNN
 FFFF                         NNNNNN       NNNN
@@ -10,7 +11,7 @@ FFFF                         NNNN   NNNNN NNNN
 FFFF                         NNNN    NNNNNNNNN
 FFFF                         NNNN     NNNNNNNN 
 FFFF                         NNNN      NNNNNNN
-
+</pre>
 FN-Engine - "From Newbies" Engine - is a 2D game engine based on Monogame framework
 It's written in C# and is supposed to be cross-platform
 It's based on Entity Component architecture
@@ -37,5 +38,5 @@ Features:
 
 
 
-Licencse:
+Licence:
 You are free to use this engine however you like, I would be thankful if I got credited though (Verbally) :D
